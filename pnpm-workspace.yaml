@@ -6,7 +6,12 @@ linkWorkspacePackages: true
 overrides:
   "@internationalized/date": "3.12.2"
   "@lapis-notes/api": "link:../lapis-notes/packages/api"
+  "@lapis-notes/file-explorer": "link:../lapis-notes/packages/file-explorer"
+  "@lapis-notes/markdown": "link:../lapis-notes/packages/plugins/plugin-markdown"
+  "@lapis-notes/search": "link:../lapis-notes/packages/plugins/plugin-search"
   "@lapis-notes/ui": "link:../lapis-notes/packages/ui"
+  "@lapis-notes/workspace": "link:../lapis-notes/packages/workspace"
   "@lapismd/design-core": "link:../design-core"
+  "@lapismd/mira": "link:../mira-mde/packages/mira"
   "@lapismd/spec-validator": "link:../spec-validator"
   svelte: "5.56.9"

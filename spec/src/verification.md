@@ -13,15 +13,15 @@
 | LPT-SPEC-009 | Implemented | Exact Storybook mirror validation covers every SUMMARY chapter. |
 | LPT-SPEC-010 | Implemented | Canonical plugin chapters and stories use the `Plugins/Tasks` hierarchy. |
 | LN-TASK-001 | Implemented | Package identity, manifest, build, and pack inspection. |
-| LN-TASK-002 | Implemented | Plugin onload registers the tasks projection and no views or commands. |
+| LN-TASK-002 | Implemented | Plugin onload registers the tasks projection, `tasks` view, `tasks:open`, and ribbon. |
 | LN-TASK-003 | Implemented | Application-ownership audit excludes `globalThis.app`. |
 | LN-TASK-004 | Implemented | Catalog sources import public Design Core primitives and native Tasks CSS. |
-| LN-TASK-005 | Implemented | Package dependencies and source audit exclude forbidden legacy packages. |
+| LN-TASK-005 | Implemented | Published runtime excludes forbidden packages; Storybook may depend on workspace hosts. |
 | LN-TASK-006 | Implemented | Storybook Vitest accessibility annotations fail axe violations; stories stay `visual-pending`. |
-| LN-TASK-007 | Implemented | Hosts register Tasks for indexing; onload still registers no workspace views. |
-| LN-TASK-008 | Implemented | Public `src/lib/index.ts` exports the plugin and catalog components without `TaskDueCalendar`. |
+| LN-TASK-007 | Implemented | Hosts register TasksPlugin only; views come from plugin onload. |
+| LN-TASK-008 | Implemented | Public `src/lib/index.ts` exports the plugin, view type, and catalog components without `TaskDueCalendar`. |
 | LN-TASK-009 | Implemented | Catalog Autodocs stories set `parameters.docs.source` to public package imports. |
-| LN-TASK-010 | Implemented | Stub `onload` still registers no views, commands, or host panels; file format is specified by LN-TASK-014 onward. |
+| LN-TASK-010 | Implemented | `TasksView` mounts the Column Canvas planner in a main-area `tasks` leaf. |
 | LN-TASK-011 | Implemented | CV-only fields live in `src/lib/model` fixtures. |
 | LN-TASK-012 | Implemented | `Plugins/Tasks/Panels` Column Canvas story fills the viewport without page scroll, blends the leading Tasks column without a bottom border, squares the sticky Tasks overlay, keeps the planner start corners complete, curves the Tasks resize handle around those corners, sizes Tasks to its labels and counts, aligns the Tasks and planner headers, keeps visible Tasks hover and selected states, mounts detail without a wrapper, and flushes the Tasks resize handle to the planner start border. |
 | LN-TASK-013 | Implemented | `ApplicationTaskAreaPicker` composes Command View as the list picker; Area Picker Sample areas play asserts the command-view host. |
@@ -33,3 +33,4 @@
 | LN-TASK-019 | Implemented | Mutations rewrite one document then project; rolling complete resets only `## Checklist`. |
 | LN-TASK-020 | Implemented | `TaskRepository` queries AppDatabase projections; planner fixtures assert the same view ids as catalog summaries. |
 | LN-TASK-021 | Implemented | Planner Markdown fixtures round-trip through `parseTaskDocument`; list membership comes from task-list `## Items`. |
+| LN-TASK-022 | Implemented | `Plugins/Tasks/Shell` boots WorkspaceShell with File Explorer, Search, Markdown, and TasksPlugin against planner Markdown fixtures. |

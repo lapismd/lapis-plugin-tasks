@@ -16,6 +16,7 @@ import {
 import {
   completeTaskDocument,
   planTaskDocument,
+  reopenTaskDocument,
   setReservedLinks,
   setTaskDeadline,
   setTaskInbox,
@@ -29,6 +30,7 @@ import type { TaskSummary, TaskView } from "./task-queries";
 export type TaskFileStore = {
   read(path: string): Promise<string>;
   write(path: string, content: string): Promise<void>;
+  remove?(path: string): Promise<void>;
 };
 
 export function createMemoryTaskFileStore(
@@ -44,7 +46,18 @@ export function createMemoryTaskFileStore(
     async write(path, content) {
       store.set(path, content);
     },
+    async remove(path) {
+      store.delete(path);
+    },
   };
+}
+
+export function replaceTitleHeading(body: string, title: string): string {
+  if (/^#\s+.+/m.test(body)) {
+    return body.replace(/^#\s+.+/m, `# ${title}`);
+  }
+  const trimmed = body.replace(/^\n+/, "");
+  return trimmed ? `# ${title}\n\n${trimmed}` : `# ${title}\n`;
 }
 
 export function taskRowToSummary(row: AppDatabaseTaskRecord): TaskSummary {
@@ -146,6 +159,73 @@ export class TaskRepository {
 
   async complete(path: string, at: string): Promise<TaskSummary> {
     return this.mutate(path, (document) => completeTaskDocument(document, at));
+  }
+
+  async reopen(path: string, at: string): Promise<TaskSummary> {
+    return this.mutate(path, (document) => reopenTaskDocument(document, at));
+  }
+
+  async setTitle(
+    path: string,
+    title: string,
+    at: string,
+  ): Promise<TaskSummary> {
+    return this.mutate(path, (document) => ({
+      ...document,
+      title,
+      updated: at,
+      body: replaceTitleHeading(document.body, title),
+    }));
+  }
+
+  async create(input: {
+    path: string;
+    title: string;
+    at: string;
+    id?: string;
+    inbox?: boolean;
+  }): Promise<TaskSummary> {
+    const id =
+      input.id ??
+      `task-${input.title
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") || "untitled"}-${input.at.slice(0, 10)}`;
+    const document: ParsedTaskFile = {
+      path: input.path,
+      raw: "",
+      id,
+      kind: "task",
+      title: input.title,
+      tags: [],
+      created: input.at,
+      updated: input.at,
+      task: {
+        status: "open",
+        inbox: input.inbox ?? true,
+        start: { kind: "anytime" },
+        comments: [],
+      },
+      body: `# ${input.title}\n`,
+      checklist: [],
+      structuralLinks: [],
+      diagnostics: [],
+    };
+    await this.writeDocument(document);
+    return taskRowToSummary(projectTask(document));
+  }
+
+  async remove(path: string): Promise<void> {
+    if (!this.files?.remove) {
+      throw new Error("TaskRepository deletions require a file store remove.");
+    }
+    await this.files.remove(path);
+    await this.database.deleteProjectionSource(
+      PUBLIC_TASKS_PROJECTION_ID,
+      path,
+      "tasks",
+    );
   }
 
   async skip(path: string, at: string): Promise<TaskSummary> {

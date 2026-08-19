@@ -5,17 +5,18 @@ This repository owns the first-party external Lapis plugin whose runtime ID is
 
 ## Ownership and compatibility
 
-- Keep Tasks catalog components, native Tasks CSS, and the stub plugin runtime
+- Keep Tasks catalog components, native Tasks CSS, and the plugin runtime
   in this repository.
 - Consume host facilities only through published `@lapis-notes/api` and
   `@lapismd/design-core` exports.
 - Do not depend on `@stevejuma/ui`, `@lapis-server/*`, Mira, or Lapis Markdown
-  in this stub slice.
+  in the published runtime. Package Storybook MAY depend on workspace hosts
+  and Markdown for `Plugins/Tasks/Shell`.
 - Preserve runtime ID `tasks`. Package and repository names do not authorize a
   later vault migration.
-- Keep production host registration in Lapis. Hosts load this plugin for
-  indexing and queries only; `onload` must not register workspace views.
-  Package Storybook owns Tasks catalog acceptance under `Plugins/Tasks/*`;
+- Keep production host registration in Lapis. Hosts load the plugin class;
+  `onload` registers the planner view, command, and ribbon. Package Storybook
+  owns Tasks catalog and shell acceptance under `Plugins/Tasks/*`;
   Lapis Storybook must not duplicate those stories.
 
 ## Application ownership

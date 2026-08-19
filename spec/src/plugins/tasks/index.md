@@ -1,10 +1,10 @@
 # Tasks Plugin
 
 `@lapis-notes/lapis-plugin-tasks` owns the first-party external Tasks catalog
-and an index-only plugin runtime. A task is a Markdown file with YAML front
+and plugin runtime. A task is a Markdown file with YAML front
 matter. The filesystem is authoritative. AppDatabase owns the public
-`tasks/task` projection. Host views, commands, and movable panels remain
-unspecified.
+`tasks/task` projection. The plugin registers a main-area planner view.
+Host movable panels remain unspecified.
 Reusable leaf controls come from public Design Core APIs.
 `ApplicationTaskAreaPicker` is the catalog list picker and composes Design
 Core Command View. The
@@ -17,15 +17,15 @@ not a host movable-panel runtime.
 | ID | Requirement |
 | --- | --- |
 | LN-TASK-001 | The standalone repository MUST ship `@lapis-notes/lapis-plugin-tasks` as a versioned first-party external package whose runtime manifest id is `tasks`, distribution is `first-party-external`, provenance is `official`, and `enabledByDefault` is `true`. |
-| LN-TASK-002 | `TasksPlugin` MUST extend the public API `Plugin` surface. `onload` MUST register the public tasks projection and MUST NOT register views, commands, settings tabs, or plugin data. |
+| LN-TASK-002 | `TasksPlugin` MUST extend the public API `Plugin` surface. `onload` MUST register the public tasks projection and the main-area `tasks` planner view. It MAY register `tasks:open` and a ribbon item. It MUST NOT register settings tabs or plugin data. |
 | LN-TASK-003 | Production and Storybook source MUST receive `App` explicitly or from API context and MUST NOT read or assign `globalThis.app`. |
 | LN-TASK-004 | The package MUST own the adapted Tasks catalog components and native `--ui-tasks-*` CSS. Reusable leaf controls MUST come from public `@lapismd/design-core` exports. |
-| LN-TASK-005 | The package MUST NOT depend on `@stevejuma/ui`, `@lapis-server/*`, `/Users/stevejuma/code/cv`, `@cvstudio/*`, `@lapismd/mira`, or Lapis Markdown. |
+| LN-TASK-005 | The published runtime MUST NOT depend on `@stevejuma/ui`, `@lapis-server/*`, `/Users/stevejuma/code/cv`, `@cvstudio/*`, `@lapismd/mira`, or Lapis Markdown. Package Storybook MAY depend on `@lapis-notes/workspace`, File Explorer, Search, and Markdown for shell stories. |
 | LN-TASK-006 | Package Storybook MUST run on port 7030, fail `pnpm test:storybook` on axe violations, and keep changed visual stories `visual-pending`. |
-| LN-TASK-007 | Desktop and web hosts MUST register and load this plugin for indexing and queries. They MUST NOT register Tasks workspace views, commands, or ribbon items. |
-| LN-TASK-008 | The public package export MUST include `TasksPlugin` and the catalog components. It MUST NOT re-export Design Core `TaskDueCalendar`. |
+| LN-TASK-007 | Desktop and web hosts MUST register and load this plugin. They MUST NOT register Tasks workspace views, commands, or ribbon items themselves. |
+| LN-TASK-008 | The public package export MUST include `TasksPlugin`, `TasksView`, `TASKS_VIEW_TYPE`, and the catalog components. It MUST NOT re-export Design Core `TaskDueCalendar`. |
 | LN-TASK-009 | Autodocs Show Code MUST use public `@lapis-notes/lapis-plugin-tasks` imports, not story-only harness wrappers. |
-| LN-TASK-010 | Workspace views, commands, and host movable panels MUST remain unspecified in this slice. `onload` MUST NOT register them. |
+| LN-TASK-010 | The planner MUST register as main-area view type `tasks` and fill the leaf with the Column Canvas composition from LN-TASK-012. Host movable panels remain unspecified. |
 | LN-TASK-011 | CV-only `applicationId`, `linkedTo`, and `JobApplication` shapes MUST stay in catalog model fixtures and MUST NOT become canonical Task resource types. |
 | LN-TASK-012 | Package Storybook MUST include a `Plugins/Tasks/Panels` Column Canvas composition of planner navigation, planner body, and closeable task detail without `AppShell`. Additional closeable columns MAY open from the selected task. This catalog canvas MUST consume public Design Core `column-canvas`, MUST fill the Storybook viewport without page-level scrollbars, MUST use the App Shell sidebar surface, MUST render the leading Tasks column without a column border so it blends into that surface, MUST render the sticky Tasks overlay without corner radius, MUST keep the planner column’s start corners complete, MUST clip the Tasks resize handle to those start corners, MUST size the leading Tasks column to the navigation labels and counts, MUST align the Tasks column header with the planner column header, MUST keep Tasks column hover and selected item states visible on the sidebar surface, MUST mount task detail directly in the detail column without an extra story wrapper, MUST place the Tasks resize handle on the planner column’s start border with no gap between those two columns, and MUST NOT register host movable panels. |
 | LN-TASK-013 | `ApplicationTaskAreaPicker` MUST compose `@lapismd/design-core/shadcn/command-view` for the searchable list picker. It MUST NOT use native Command as that picker surface. |
@@ -37,3 +37,4 @@ not a host movable-panel runtime.
 | LN-TASK-019 | Mutations MUST edit one Markdown file or parent reserved-section links, then upsert the projection from that parse. Completing a linked child MUST update the child file. Rolling complete MAY reset only `## Checklist`. |
 | LN-TASK-020 | Planner lists and cards MUST consume `TaskSummary` rows from the AppDatabase tasks projection. Detail and editor surfaces MAY load the Markdown `TaskDocument`. UI MUST NOT treat the database as authoritative. |
 | LN-TASK-021 | Canonical catalog types MUST use the Markdown-first schema. Catalog planner fixtures MUST round-trip through task documents. Area membership MUST mean a task-list `## Items` parent. |
+| LN-TASK-022 | Package Storybook MUST include `Plugins/Tasks/Shell` desktop and phone-width stories that boot a public `App`, load File Explorer, Search, Markdown, and `TasksPlugin`, seed planner Markdown, and restore a `tasks` leaf in `WorkspaceShell`. Show Code MUST use public package imports. |

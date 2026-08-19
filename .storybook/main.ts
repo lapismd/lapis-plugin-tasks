@@ -12,8 +12,13 @@ const packageLib = path.resolve(storybookDir, "../src/lib");
 
 const linkedSiblingPackages = [
   "@lapis-notes/api",
+  "@lapis-notes/file-explorer",
+  "@lapis-notes/markdown",
+  "@lapis-notes/search",
   "@lapis-notes/ui",
+  "@lapis-notes/workspace",
   "@lapismd/design-core",
+  "@lapismd/mira",
 ] as const;
 
 const linkedSiblingRoots = linkedSiblingPackages.flatMap((packageName) => {

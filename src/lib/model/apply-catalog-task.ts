@@ -1,0 +1,207 @@
+import { taskDateOnly } from "./planner";
+import type { Task, TaskQuickCreateInput } from "./types";
+import type { TaskPlan, TaskStart } from "./task-document";
+import { catalogTaskFromSummary } from "./catalog-adapter";
+import type { TaskRepository } from "./task-repository";
+
+function isDone(task: Task): boolean {
+  return (
+    task.status === "done" ||
+    task.status === "completed" ||
+    Boolean(task.completedAt)
+  );
+}
+
+function catalogStart(task: Task): TaskStart {
+  if (task.start === "someday" || task.when === "someday") {
+    return { kind: "someday" };
+  }
+  if (
+    task.start &&
+    task.start !== "anytime" &&
+    task.start !== "someday"
+  ) {
+    return { kind: "date", date: task.start };
+  }
+  return { kind: "anytime" };
+}
+
+function catalogPlan(task: Task): TaskPlan | undefined {
+  if (task.when === "anytime" || task.when === "someday") return undefined;
+  const date =
+    taskDateOnly(task.planDate) ??
+    taskDateOnly(task.scheduledAt) ??
+    (task.when === "today" || task.when === "this-evening"
+      ? taskDateOnly(task.updatedAt)
+      : null);
+  if (!date) return undefined;
+  if (task.planAt === "evening" || task.when === "this-evening") {
+    return { date, at: "evening" };
+  }
+  if (task.planAt === "all-day") return { date, at: "all-day" };
+  if (typeof task.planAt === "string" && /^\d{2}:\d{2}$/.test(task.planAt)) {
+    return { date, at: "time", time: task.planAt };
+  }
+  return { date, at: "anytime" };
+}
+
+function startsEqual(left: TaskStart, right: TaskStart): boolean {
+  if (left.kind !== right.kind) return false;
+  return left.kind !== "date" || left.date === (right as { date?: string }).date;
+}
+
+function plansEqual(
+  left: TaskPlan | undefined,
+  right: TaskPlan | undefined,
+): boolean {
+  if (!left && !right) return true;
+  if (!left || !right) return false;
+  return (
+    left.date === right.date &&
+    left.at === right.at &&
+    left.time === right.time
+  );
+}
+
+function uniqueInboxPath(existingPaths: Iterable<string>, title: string): string {
+  const slug =
+    title
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") || "task";
+  const existing = new Set(existingPaths);
+  let path = `inbox/${slug}.md`;
+  let index = 2;
+  while (existing.has(path)) {
+    path = `inbox/${slug}-${index}.md`;
+    index += 1;
+  }
+  return path;
+}
+
+function todayFrom(now: Date): string {
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+export async function applyCatalogTaskToRepository(
+  repository: TaskRepository,
+  next: Task,
+  previous?: Task,
+): Promise<void> {
+  const path = next.sourcePath ?? previous?.sourcePath;
+  if (!path) throw new Error("Task is missing a vault path");
+  const at = next.updatedAt || new Date().toISOString();
+
+  const completed = isDone(next) && (!previous || !isDone(previous));
+  const reopened = !isDone(next) && Boolean(previous && isDone(previous));
+  if (completed) {
+    await repository.complete(path, next.completedAt ?? at);
+  } else if (reopened) {
+    await repository.reopen(path, at);
+  }
+
+  if (next.title !== previous?.title) {
+    await repository.setTitle(path, next.title, at);
+  }
+
+  if (!completed && Boolean(next.inbox) !== Boolean(previous?.inbox)) {
+    await repository.setInbox(path, Boolean(next.inbox), at);
+  }
+
+  if (!completed) {
+    const nextStart = catalogStart(next);
+    const previousStart = previous ? catalogStart(previous) : null;
+    if (!previousStart || !startsEqual(nextStart, previousStart)) {
+      await repository.setStart(path, nextStart, at);
+    }
+
+    const nextPlan = catalogPlan(next);
+    const previousPlan = previous ? catalogPlan(previous) : undefined;
+    if (!plansEqual(nextPlan, previousPlan)) {
+      await repository.planFor(path, nextPlan, at);
+    }
+  }
+
+  const deadline = next.deadline ?? next.dueAt;
+  const previousDeadline = previous?.deadline ?? previous?.dueAt;
+  if (deadline !== previousDeadline) {
+    await repository.setDeadline(path, deadline, at);
+  }
+
+  if (next.listId !== previous?.listId) {
+    const lists = await repository.lists();
+    const list = lists.find(
+      (entry) =>
+        entry.id === next.listId ||
+        entry.title.toLowerCase() === next.listId?.toLowerCase(),
+    );
+    await repository.moveToList(path, list?.path ?? null, at);
+  }
+}
+
+export async function createCatalogTaskInRepository(
+  repository: TaskRepository,
+  input: TaskQuickCreateInput,
+  options: { existingPaths: Iterable<string>; now?: Date },
+): Promise<Task> {
+  const now = options.now ?? new Date();
+  const at = now.toISOString();
+  const today = todayFrom(now);
+  const path = uniqueInboxPath(options.existingPaths, input.title);
+  const when =
+    input.when ??
+    (input.view === "today"
+      ? "today"
+      : input.view === "anytime"
+        ? "anytime"
+        : input.view === "someday"
+          ? "someday"
+          : undefined);
+  const created = await repository.create({
+    path,
+    title: input.title,
+    at,
+    inbox: input.view === "inbox",
+  });
+  const previous = catalogTaskFromSummary(created);
+  const next: Task = {
+    ...previous,
+    when,
+    start: when === "someday" ? "someday" : "anytime",
+    planDate:
+      when === "today" || when === "this-evening"
+        ? today
+        : input.scheduledAt
+          ? taskDateOnly(input.scheduledAt) ?? undefined
+          : undefined,
+    planAt:
+      when === "this-evening"
+        ? "evening"
+        : when === "today"
+          ? "anytime"
+          : undefined,
+    dueAt: input.dueAt,
+    deadline: input.dueAt,
+    listId: input.area ?? undefined,
+    areas: input.area ? [input.area] : [],
+    inbox: input.view === "inbox",
+    updatedAt: at,
+  };
+  await applyCatalogTaskToRepository(repository, next, previous);
+  const summary = await repository.get(created.id);
+  return summary
+    ? { ...catalogTaskFromSummary(summary), listId: next.listId, areas: next.areas }
+    : next;
+}
+
+export async function deleteCatalogTaskFromRepository(
+  repository: TaskRepository,
+  task: Task,
+): Promise<void> {
+  if (!task.sourcePath) throw new Error("Task is missing a vault path");
+  await repository.remove(task.sourcePath);
+}

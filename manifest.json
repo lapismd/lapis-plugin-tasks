@@ -3,7 +3,7 @@
   "name": "Tasks",
   "version": "0.1.0",
   "minAppVersion": "0.0.1",
-  "description": "Vault-native Tasks indexing and queries. Workspace views are not registered yet.",
+  "description": "Vault-native Tasks planner, indexing, and queries.",
   "author": "Lapis Notes",
   "distribution": "first-party-external",
   "provenance": "official",

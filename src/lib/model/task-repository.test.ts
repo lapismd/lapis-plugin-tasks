@@ -139,6 +139,26 @@ describe("TaskRepository", () => {
     expect(raw).not.toContain("inbox: true");
   });
 
+  it("reopens, retitles, creates, and removes Markdown-backed tasks", async () => {
+    const { repository, files } = await openRepository();
+    await repository.complete("buy.md", "2026-08-20T09:00:00Z");
+    await repository.reopen("buy.md", "2026-08-20T10:00:00Z");
+    await expect(repository.get("t_buy")).resolves.toMatchObject({
+      status: "open",
+    });
+    await repository.setTitle("buy.md", "Buy a new filter", "2026-08-20T11:00:00Z");
+    expect(await files.read("buy.md")).toContain("# Buy a new filter");
+    const created = await repository.create({
+      path: "inbox/new.md",
+      title: "New capture",
+      at: "2026-08-20T12:00:00Z",
+    });
+    expect(created.title).toBe("New capture");
+    expect(created.inbox).toBe(true);
+    await repository.remove("inbox/new.md");
+    await expect(repository.get(created.id)).resolves.toBeNull();
+  });
+
   it("plans a someday task without silently rolling dates", async () => {
     const { repository } = await openRepository();
     const next = await repository.planFor(

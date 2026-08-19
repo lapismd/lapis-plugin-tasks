@@ -30,6 +30,17 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
   background: var(--ui-tasks-muted-background);
 }
 
+.task-column-canvas-story--workspace {
+  padding: 0;
+  background: transparent;
+}
+
+.task-column-canvas-story--workspace .task-column-canvas-story__canvas {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
 .task-column-canvas-story__canvas {
   --ui-column-canvas-background: var(--sidebar);
   --ui-column-canvas-padding: 0.5rem;

@@ -5,7 +5,7 @@
 | ID | Requirement |
 | --- | --- |
 | LPT-SPEC-001 | `spec/src` MUST remain the canonical standalone specification and MUST build with mdBook. |
-| LPT-SPEC-002 | Protected package, manifest, source, Storybook, validation, and CI changes MUST update an owning canonical chapter in the same Jujutsu change. Host index-only Tasks load is specified in LN-TASK-007 and does not move governance ownership. |
+| LPT-SPEC-002 | Protected package, manifest, source, Storybook, validation, and CI changes MUST update an owning canonical chapter in the same Jujutsu change. Host plugin-class registration is specified in LN-TASK-007 and does not move governance ownership. |
 | LPT-SPEC-003 | Every normative requirement ID MUST be unique and MUST have exactly one verification row with concrete evidence. |
 | LPT-SPEC-004 | Published package manifests MUST use portable semver ranges and MUST NOT contain `workspace:`, `link:`, `file:`, or machine-specific dependency paths. Registry packages such as `yaml` MAY be added when the Markdown-first task model needs them. |
 | LPT-SPEC-005 | Colocated siblings MUST resolve through `link:`-valued workspace-level overrides. Siblings MUST NOT become workspace members or mutate sibling `node_modules`. |

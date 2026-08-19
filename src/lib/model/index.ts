@@ -15,6 +15,11 @@ export {
 } from "./application-adapter";
 export { createTask, sampleApplicationBoard } from "./fixtures";
 export {
+  applyCatalogTaskToRepository,
+  createCatalogTaskInRepository,
+  deleteCatalogTaskFromRepository,
+} from "./apply-catalog-task";
+export {
   catalogTaskFromDocument,
   catalogTaskFromSummary,
 } from "./catalog-adapter";
@@ -31,6 +36,7 @@ export * from "./task-queries";
 export * from "./task-mutations";
 export * from "./task-projection";
 export * from "./task-repository";
+export { createVaultTaskFileStore } from "./vault-task-file-store";
 export {
   buildTaskPlannerMovePatch,
   buildTaskPlannerSnapshot,

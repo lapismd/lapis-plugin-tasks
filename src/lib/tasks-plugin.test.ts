@@ -5,28 +5,58 @@ import { describe, expect, it } from "vitest";
 
 const sourceRoot = resolve(fileURLToPath(new URL(".", import.meta.url)));
 const repoRoot = resolve(sourceRoot, "../..");
+const notesRoot = resolve(repoRoot, "../lapis-notes");
 
-describe("TasksPlugin stub", () => {
-  it("keeps the runtime id and does not register views or commands", () => {
+describe("TasksPlugin", () => {
+  it("registers the planner view from onload and keeps hosts from registering it", () => {
     const source = readFileSync(resolve(sourceRoot, "tasks-plugin.ts"), "utf8");
     const index = readFileSync(resolve(sourceRoot, "index.ts"), "utf8");
+    const view = readFileSync(resolve(sourceRoot, "tasks-view.ts"), "utf8");
     const manifest = readFileSync(resolve(repoRoot, "manifest.json"), "utf8");
     const pkg = readFileSync(resolve(repoRoot, "package.json"), "utf8");
+    const desktop = readFileSync(
+      resolve(
+        notesRoot,
+        "packages/desktop-electron/src/DesktopWorkspaceSession.svelte",
+      ),
+      "utf8",
+    );
+    const web = readFileSync(
+      resolve(notesRoot, "packages/web/src/WebWorkspaceSession.svelte"),
+      "utf8",
+    );
 
-    expect(source).toContain('id: TASKS_PLUGIN_ID');
+    expect(source).toContain("id: TASKS_PLUGIN_ID");
     expect(source).toContain("async onload()");
-    expect(source).not.toContain("registerView");
-    expect(source).not.toContain("addCommand");
-    expect(source).not.toContain("addRibbonIcon");
+    expect(source).toContain("registerIndexProjection");
+    expect(source).toContain("registerView");
+    expect(source).toContain("TASKS_VIEW_TYPE");
+    expect(source).toContain('id: "open"');
+    expect(source).toContain("addRibbonIcon");
     expect(source).not.toContain("addSettingTab");
+    expect(view).toContain('export const TASKS_VIEW_TYPE = "tasks"');
     expect(index).toContain("TasksPlugin");
+    expect(index).toContain("TasksView");
+    expect(index).toContain("TASKS_VIEW_TYPE");
     expect(index).not.toContain("TaskDueCalendar");
     expect(manifest).toContain('"id": "tasks"');
     expect(manifest).toContain('"enabledByDefault": true');
-    expect(source).toContain("registerIndexProjection");
-    expect(pkg).not.toContain("@stevejuma/ui");
-    expect(pkg).not.toContain("@lapis-server/");
-    expect(pkg).not.toContain("@lapismd/mira");
+    const manifestJson = JSON.parse(pkg) as {
+      dependencies?: Record<string, string>;
+      peerDependencies?: Record<string, string>;
+    };
+    const runtimeDeps = {
+      ...manifestJson.dependencies,
+      ...manifestJson.peerDependencies,
+    };
+    expect(Object.keys(runtimeDeps).join("\n")).not.toContain("@stevejuma/ui");
+    expect(Object.keys(runtimeDeps).join("\n")).not.toContain("@lapis-server/");
+    expect(Object.keys(runtimeDeps).join("\n")).not.toContain("@lapismd/mira");
+    expect(Object.keys(runtimeDeps).join("\n")).not.toContain("@lapis-notes/markdown");
     expect(pkg).not.toMatch(/"(?:workspace|link|file):/u);
+    expect(desktop).toContain("TasksPlugin");
+    expect(web).toContain("TasksPlugin");
+    expect(desktop).not.toContain("registerView");
+    expect(web).not.toContain("registerView");
   });
 });

@@ -1,7 +1,7 @@
 {
   "name": "@lapis-notes/lapis-plugin-tasks",
   "version": "0.1.0",
-  "description": "Lapis Notes Tasks plugin stub and catalog",
+  "description": "Lapis Notes Tasks planner, indexing, and catalog",
   "license": "AGPL-3.0-or-later",
   "repository": {
     "type": "git",
@@ -74,8 +74,13 @@
     "@fontsource-variable/dm-sans": "^5.2.8",
     "@fontsource-variable/source-code-pro": "5.2.7",
     "@lapis-notes/api": "0.0.1",
+    "@lapis-notes/file-explorer": "0.0.1",
+    "@lapis-notes/markdown": "0.0.1",
+    "@lapis-notes/search": "0.0.1",
     "@lapis-notes/ui": "0.0.1",
+    "@lapis-notes/workspace": "0.0.1",
     "@lapismd/design-core": "0.1.0",
+    "@lapismd/mira": "0.0.1",
     "@lapismd/spec-validator": "0.1.0",
     "@storybook/addon-a11y": "10.5.7",
     "@storybook/addon-docs": "10.5.7",
