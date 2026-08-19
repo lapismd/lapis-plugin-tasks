@@ -23,3 +23,4 @@
 | LN-TASK-009 | Implemented | Catalog Autodocs stories set `parameters.docs.source` to public package imports. |
 | LN-TASK-010 | Planned | Vault files, views, commands, and panels remain unspecified. |
 | LN-TASK-011 | Implemented | CV-only fields live in `src/lib/model` fixtures. |
+| LN-TASK-012 | Implemented | `Plugins/Tasks/Panels` Column Canvas story composes planner nav, body, and closeable detail without AppShell. |

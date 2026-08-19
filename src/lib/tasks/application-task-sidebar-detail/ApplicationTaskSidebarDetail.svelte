@@ -46,6 +46,7 @@
     onRemoveTask = () => {},
     onCopyLink = () => {},
     onMenuAction = () => {},
+    onOpenApplication,
   }: {
     task: Task;
     application?: ApplicationSummary | null;
@@ -56,6 +57,7 @@
     onUpdateTitle?: (task: Task, title: string) => void;
     onRemoveTask?: (task: Task) => void;
     onCopyLink?: (task: Task) => void;
+    onOpenApplication?: (applicationId: string) => void;
     onMenuAction?: (
       action:
         | "unsubscribe"
@@ -302,12 +304,27 @@
 
     <div class="task-sidebar-detail__chips">
       {#if application}
-        <span class="task-sidebar-detail__chip">
-          <span class="task-sidebar-detail__chip-emoji" aria-hidden="true"
-            >💯</span
+        {#if onOpenApplication && task.applicationId}
+          {@const applicationId = task.applicationId}
+          <button
+            type="button"
+            class="task-sidebar-detail__chip task-sidebar-detail__chip--action"
+            aria-label={`Open ${application.title}`}
+            onclick={() => onOpenApplication(applicationId)}
           >
-          {application.title}
-        </span>
+            <span class="task-sidebar-detail__chip-emoji" aria-hidden="true"
+              >💯</span
+            >
+            {application.title}
+          </button>
+        {:else}
+          <span class="task-sidebar-detail__chip">
+            <span class="task-sidebar-detail__chip-emoji" aria-hidden="true"
+              >💯</span
+            >
+            {application.title}
+          </span>
+        {/if}
       {/if}
       {#if scheduleLabel}
         <span class="task-sidebar-detail__chip">

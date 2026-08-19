@@ -1,0 +1,119 @@
+body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
+  padding: 0;
+}
+
+.task-column-canvas-story {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 70rem;
+  height: 100vh;
+  min-height: 42rem;
+  overflow: hidden;
+  padding: 1.5rem;
+  background: var(--ui-tasks-muted-background);
+}
+
+.task-column-canvas-story__canvas {
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--ui-tasks-border);
+  border-radius: var(--ui-tasks-radius);
+  background: var(--ui-tasks-background);
+  box-shadow: 0 1rem 2.5rem
+    color-mix(in srgb, var(--ui-tasks-foreground) 9%, transparent);
+}
+
+.task-column-canvas-story__section-label {
+  margin: 0;
+  padding: 0.7rem 0.55rem 0.25rem;
+  color: var(--ui-tasks-muted);
+  font-size: 0.63rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.task-column-canvas-story__nav-item {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: 1rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.task-column-canvas-story__nav-item svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: none;
+}
+
+.task-column-canvas-story__nav-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-column-canvas-story__nav-item small {
+  display: inline-flex;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--ui-tasks-muted-background);
+  color: var(--ui-tasks-muted);
+  font-size: 0.62rem;
+  padding-inline: 0.3rem;
+}
+
+.task-column-canvas-story__pane {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.task-column-canvas-story__pane--padded {
+  padding: 0.5rem;
+}
+
+.task-column-canvas-story__pane :global(.application-task-view),
+.task-column-canvas-story__pane :global(.task-sidebar-detail) {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+.task-column-canvas-story__related {
+  box-sizing: border-box;
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.85rem 0.95rem 1rem;
+  color: var(--ui-tasks-foreground);
+}
+
+.task-column-canvas-story__related h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+.task-column-canvas-story__related p {
+  margin: 0;
+  color: var(--ui-tasks-muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.task-column-canvas-story__related-empty {
+  margin: auto;
+  max-width: 16rem;
+  text-align: center;
+}

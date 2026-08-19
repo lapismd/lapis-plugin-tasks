@@ -16,6 +16,7 @@ export { default as ApplicationTasksEditor } from "./application-tasks-editor/Ap
 export { default as ApplicationTasksPreview } from "./application-tasks-preview/ApplicationTasksPreview.svelte";
 export { default as ApplicationTaskPlannerShell } from "./application-task-planner-shell/ApplicationTaskPlannerShell.svelte";
 export { default as ApplicationTaskPlannerMode } from "./application-task-planner-mode/ApplicationTaskPlannerMode.svelte";
+export { default as ApplicationTaskSidebarDetail } from "./application-task-sidebar-detail/ApplicationTaskSidebarDetail.svelte";
 export { default as ApplicationPlannerTaskRow } from "./application-planner-task-row/ApplicationPlannerTaskRow.svelte";
 
 export { buildApplicationTaskReferenceIndex } from "./lib/references";

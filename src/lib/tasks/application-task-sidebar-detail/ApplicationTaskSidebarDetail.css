@@ -47,6 +47,8 @@
 
 .task-sidebar-detail__top-start
   [data-ui-part="sidebar-close"][data-ui-component="button"],
+.task-sidebar-detail__top-start
+  [data-ui-part="column-close"][data-ui-component="button"],
 .task-sidebar-detail__icon-button[data-ui-component="button"] {
   display: grid;
   width: 2rem;
@@ -65,6 +67,10 @@
   [data-ui-part="sidebar-close"][data-ui-component="button"]:hover,
 .task-sidebar-detail__top-start
   [data-ui-part="sidebar-close"][data-ui-component="button"]:focus-visible,
+.task-sidebar-detail__top-start
+  [data-ui-part="column-close"][data-ui-component="button"]:hover,
+.task-sidebar-detail__top-start
+  [data-ui-part="column-close"][data-ui-component="button"]:focus-visible,
 .task-sidebar-detail__icon-button[data-ui-component="button"]:hover,
 .task-sidebar-detail__icon-button[data-ui-component="button"]:focus-visible {
   border-color: var(--border);
@@ -74,6 +80,7 @@
 }
 
 .task-sidebar-detail__top-start [data-ui-part="sidebar-close"] svg,
+.task-sidebar-detail__top-start [data-ui-part="column-close"] svg,
 .task-sidebar-detail__icon-button svg {
   width: 0.95rem;
   height: 0.95rem;
@@ -163,6 +170,23 @@
 .task-sidebar-detail__chip-emoji {
   font-size: 0.78rem;
   line-height: 1;
+}
+
+button.task-sidebar-detail__chip--action {
+  font: inherit;
+  cursor: pointer;
+}
+
+button.task-sidebar-detail__chip--action:hover,
+button.task-sidebar-detail__chip--action:focus-visible {
+  border-color: color-mix(
+    in srgb,
+    var(--task-sidebar-border) 80%,
+    var(--task-sidebar-muted)
+  );
+  background: var(--task-sidebar-surface);
+  color: var(--task-sidebar-fg);
+  outline: 0;
 }
 
 .task-sidebar-detail__body {

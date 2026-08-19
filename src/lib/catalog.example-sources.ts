@@ -124,3 +124,35 @@ export const ApplicationTaskPlannerShellExample = `<script lang="ts">
 
 <ApplicationTaskPlannerShell />
 `;
+
+export const ApplicationTaskPlannerColumnCanvasExample = `<script lang="ts">
+  import * as ColumnCanvas from "@lapismd/design-core/shadcn/column-canvas";
+  import {
+    ApplicationTaskPlannerMode,
+    ApplicationTaskSidebarDetail,
+  } from "@lapis-notes/lapis-plugin-tasks";
+
+  const canvas = ColumnCanvas.createColumnCanvasController({
+    columns: {
+      tasks: { defaultWidth: 260, pathLevel: 0, collapsible: true },
+      planner: { defaultWidth: 540, pathLevel: 1, resizable: true },
+      detail: { defaultWidth: 360, pathLevel: 2, closeable: true },
+    },
+    initialPath: ["today"],
+  });
+</script>
+
+<div style="height: 100vh">
+  <ColumnCanvas.Root controller={canvas} aria-label="Task planner">
+    <ColumnCanvas.Column id="tasks" title="Tasks">
+      <ColumnCanvas.Body><!-- planner navigation --></ColumnCanvas.Body>
+    </ColumnCanvas.Column>
+    <ColumnCanvas.Column id="planner" title="Today">
+      <ApplicationTaskPlannerMode detailsPresentation="external" />
+    </ColumnCanvas.Column>
+    <ColumnCanvas.Column id="detail" title="Details">
+      <ApplicationTaskSidebarDetail {task} />
+    </ColumnCanvas.Column>
+  </ColumnCanvas.Root>
+</div>
+`;

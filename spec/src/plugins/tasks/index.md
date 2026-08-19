@@ -3,7 +3,10 @@
 `@lapis-notes/lapis-plugin-tasks` owns the first-party external Tasks catalog
 and a stub plugin runtime. Vault persistence, views, commands, and host
 registration remain planned. Reusable leaf controls come from public Design
-Core APIs.
+Core APIs. The `Plugins/Tasks/Panels` catalog story composes planner
+navigation, planner body, and task detail with Design Core Column Canvas.
+That presentation is not a host movable-panel runtime; LN-TASK-010 remains
+Planned for vault views, commands, and movable panels.
 
 ## Requirements
 
@@ -20,3 +23,4 @@ Core APIs.
 | LN-TASK-009 | Autodocs Show Code MUST use public `@lapis-notes/lapis-plugin-tasks` imports, not story-only harness wrappers. |
 | LN-TASK-010 | Vault task files, workspace views, commands, and movable panels MUST remain unspecified for this stub and MUST NOT be invented in source. |
 | LN-TASK-011 | CV-only `applicationId`, `linkedTo`, and `JobApplication` shapes MUST stay in catalog model fixtures and MUST NOT become canonical Task resource types. |
+| LN-TASK-012 | Package Storybook MUST include a `Plugins/Tasks/Panels` Column Canvas composition of planner navigation, planner body, and closeable task detail without `AppShell`. Additional closeable columns MAY open from the selected task. This catalog canvas MUST consume public Design Core `column-canvas` and MUST NOT register host movable panels. |

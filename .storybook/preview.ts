@@ -40,6 +40,7 @@ const preview: Preview = {
             [
               "Overview",
               "App Shell",
+              "Panels",
               "Planners",
               ["Planner Mode", "Planner"],
               "Editors",

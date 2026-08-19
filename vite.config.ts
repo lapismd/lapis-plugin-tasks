@@ -34,6 +34,7 @@ export default defineConfig({
       "react-dom/client",
       "@storybook/addon-a11y/preview",
       "@storybook/svelte-vite",
+      "@lucide/svelte/icons/arrow-left",
     ],
     esbuildOptions: {
       target: "esnext",

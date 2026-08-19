@@ -89,6 +89,7 @@ const config: StorybookConfig = {
           "react-dom/client",
           "@lucide/svelte/icons/calendar-days",
           "@lucide/svelte/icons/check",
+          "@lucide/svelte/icons/arrow-left",
         ],
       },
       server: {

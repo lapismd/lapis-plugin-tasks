@@ -1,0 +1,373 @@
+<script lang="ts">
+  import ArchiveIcon from "@lucide/svelte/icons/archive";
+  import CalendarClockIcon from "@lucide/svelte/icons/calendar-clock";
+  import CalendarDaysIcon from "@lucide/svelte/icons/calendar-days";
+  import CircleEllipsisIcon from "@lucide/svelte/icons/circle-ellipsis";
+  import FolderKanbanIcon from "@lucide/svelte/icons/folder-kanban";
+  import ListTodoIcon from "@lucide/svelte/icons/list-todo";
+  import * as ColumnCanvas from "@lapismd/design-core/shadcn/column-canvas";
+  import {
+    buildPlannerApplicationSummaries,
+    buildTaskPlannerSnapshot,
+    createTask,
+    sampleApplicationBoard,
+    type JobApplication,
+    type Task,
+    type TaskBucket,
+    type TaskQuickCreateInput,
+  } from "../../model";
+  import { samplePlannerTasks } from "../story-fixture";
+  import ApplicationTaskSidebarDetail from "../application-task-sidebar-detail/ApplicationTaskSidebarDetail.svelte";
+  import ApplicationTaskPlannerMode from "./ApplicationTaskPlannerMode.svelte";
+  import "./ApplicationTaskPlannerColumnCanvasStory.css";
+
+  const plannerBuckets = [
+    { id: "today", label: "Today", icon: ListTodoIcon },
+    { id: "upcoming", label: "Upcoming", icon: CalendarDaysIcon },
+    { id: "anytime", label: "Anytime", icon: CircleEllipsisIcon },
+    { id: "someday", label: "Someday", icon: CalendarClockIcon },
+    { id: "logbook", label: "Logbook", icon: ArchiveIcon },
+  ] satisfies Array<{
+    id: TaskBucket;
+    label: string;
+    icon: typeof ListTodoIcon;
+  }>;
+
+  const plannerBucketIds = new Set<string>(
+    plannerBuckets.map((bucket) => bucket.id),
+  );
+
+  const canvas = ColumnCanvas.createColumnCanvasController({
+    columns: {
+      tasks: {
+        defaultWidth: 260,
+        minWidth: 240,
+        maxWidth: 360,
+        pathLevel: 0,
+        collapsible: true,
+        resizable: true,
+      },
+      planner: {
+        defaultWidth: 540,
+        minWidth: 360,
+        maxWidth: 720,
+        pathLevel: 1,
+        resizable: true,
+      },
+      detail: {
+        defaultWidth: 360,
+        minWidth: 300,
+        maxWidth: 520,
+        pathLevel: 2,
+        closeable: true,
+        resizable: true,
+      },
+      related: {
+        defaultWidth: 340,
+        minWidth: 280,
+        maxWidth: 480,
+        pathLevel: 3,
+        closeable: true,
+        resizable: true,
+      },
+    },
+    initialPath: ["today"],
+  });
+
+  const applicationSummaries =
+    buildPlannerApplicationSummaries(sampleApplicationBoard);
+
+  let tasks = $state(samplePlannerTasks());
+  let applications = $state<JobApplication[]>(
+    sampleApplicationBoard.applications.map((application) => ({
+      ...application,
+      tasks: application.tasks?.map((task) => ({ ...task })),
+    })),
+  );
+  let taskView = $state<TaskBucket>("today");
+  let taskArea = $state<string | null>(null);
+  let activeTaskId = $state<string | null>(null);
+
+  const snapshot = $derived(buildTaskPlannerSnapshot(tasks));
+  const activePlannerLabel = $derived(
+    taskArea
+      ? (snapshot.areas.find((area) => area.id === taskArea)?.title ?? taskArea)
+      : (plannerBuckets.find((bucket) => bucket.id === taskView)?.label ??
+        "Today"),
+  );
+  const activeTask = $derived(
+    activeTaskId
+      ? (tasks.find((task) => task.id === activeTaskId) ?? null)
+      : null,
+  );
+  const activeTaskApplication = $derived(
+    activeTask?.applicationId
+      ? (applicationSummaries[activeTask.applicationId] ?? null)
+      : null,
+  );
+  const relatedApplication = $derived.by(() => {
+    const relatedId = canvas.pathAt(2);
+    if (!relatedId) return null;
+    return applications.find((application) => application.id === relatedId) ??
+      null;
+  });
+
+  function isBucket(id: string): id is TaskBucket {
+    return plannerBucketIds.has(id);
+  }
+
+  function showNav(id: string) {
+    if (isBucket(id)) {
+      taskView = id;
+      taskArea = null;
+    } else {
+      taskArea = id;
+    }
+    activeTaskId = null;
+    if (!canvas.isSelected(0, id)) {
+      canvas.select(0, id);
+      return;
+    }
+    canvas.clearFrom(1);
+  }
+
+  function handleActiveTaskChange(taskId: string | null) {
+    if (taskId) {
+      activeTaskId = taskId;
+      if (canvas.pathAt(1) === taskId) {
+        canvas.open("detail");
+        return;
+      }
+      canvas.select(1, taskId);
+      return;
+    }
+    activeTaskId = null;
+    canvas.close("detail");
+    if (canvas.pathAt(1)) canvas.clearFrom(1);
+  }
+
+  function closeDetailColumn() {
+    activeTaskId = null;
+    canvas.clearFrom(1);
+  }
+
+  function handleOpenApplication(applicationId: string) {
+    const ownerId =
+      activeTask?.applicationId === applicationId
+        ? activeTask.id
+        : (tasks.find((task) => task.applicationId === applicationId)?.id ??
+          null);
+    if (ownerId) handleActiveTaskChange(ownerId);
+    if (canvas.pathAt(2) === applicationId) {
+      canvas.open("related");
+      return;
+    }
+    canvas.select(2, applicationId);
+  }
+
+  function updateActiveTaskTitle(task: Task, title: string) {
+    saveTask({
+      ...task,
+      title,
+      updatedAt: new Date().toISOString(),
+    });
+  }
+
+  function toggleActiveTaskDone(task: Task) {
+    const done = task.status !== "done";
+    saveTask({
+      ...task,
+      status: done ? "done" : "todo",
+      completedAt: done ? (task.completedAt ?? new Date().toISOString()) : undefined,
+      updatedAt: new Date().toISOString(),
+    });
+  }
+
+  function removeActiveTask(task: Task) {
+    deleteTask(task);
+    handleActiveTaskChange(null);
+  }
+
+  function bucketCount(bucket: TaskBucket) {
+    if (bucket === "today") {
+      return snapshot.today.length + snapshot.thisEvening.length;
+    }
+    if (bucket === "upcoming") {
+      return snapshot.upcoming.reduce(
+        (total, group) => total + group.tasks.length,
+        0,
+      );
+    }
+    if (bucket === "anytime") return snapshot.anytime.length;
+    if (bucket === "someday") return snapshot.someday.length;
+    return snapshot.logbook.reduce(
+      (total, group) => total + group.tasks.length,
+      0,
+    );
+  }
+
+  function saveTask(task: Task) {
+    tasks = tasks.map((entry) => (entry.id === task.id ? task : entry));
+  }
+
+  function createPlannerTask(input: TaskQuickCreateInput) {
+    const now = new Date().toISOString();
+    const when =
+      input.when ??
+      (input.view === "today"
+        ? "today"
+        : input.view === "anytime"
+          ? "anytime"
+          : input.view === "someday"
+            ? "someday"
+            : undefined);
+    tasks = [
+      ...tasks,
+      createTask({
+        id: `story-canvas-task-${tasks.length + 1}`,
+        title: input.title,
+        status: "todo",
+        dueAt: input.dueAt,
+        priority: input.priority,
+        scheduledAt: input.scheduledAt,
+        when,
+        areas: input.area ? [input.area] : [],
+        order: input.order,
+        createdAt: now,
+        updatedAt: now,
+      }),
+    ];
+  }
+
+  function deleteTask(task: Task) {
+    tasks = tasks.filter((entry) => entry.id !== task.id);
+  }
+
+  function saveApplication(application: JobApplication) {
+    applications = applications.map((entry) =>
+      entry.id === application.id ? application : entry,
+    );
+  }
+</script>
+
+<div class="task-column-canvas-story">
+  <div
+    class="task-column-canvas-story__canvas"
+    data-task-planner-column-canvas
+  >
+    <ColumnCanvas.Root controller={canvas} aria-label="Task planner">
+      <ColumnCanvas.Column
+        id="tasks"
+        title="Tasks"
+        count={tasks.length}
+        sticky
+      >
+        {#snippet stickyRail()}
+          <ListTodoIcon aria-hidden="true" />
+        {/snippet}
+        <ColumnCanvas.Body>
+          <p class="task-column-canvas-story__section-label">Planner</p>
+          {#each plannerBuckets as bucket (bucket.id)}
+            <ColumnCanvas.Item
+              aria-label={bucket.label}
+              selected={canvas.isSelected(0, bucket.id)}
+              onclick={() => showNav(bucket.id)}
+            >
+              <span class="task-column-canvas-story__nav-item">
+                <bucket.icon aria-hidden="true" />
+                <span>{bucket.label}</span>
+                <small>{bucketCount(bucket.id)}</small>
+              </span>
+            </ColumnCanvas.Item>
+          {/each}
+
+          <p class="task-column-canvas-story__section-label">Areas</p>
+          {#each snapshot.areas as area (area.id)}
+            <ColumnCanvas.Item
+              aria-label={area.title}
+              selected={canvas.isSelected(0, area.id)}
+              onclick={() => showNav(area.id)}
+            >
+              <span class="task-column-canvas-story__nav-item">
+                <FolderKanbanIcon aria-hidden="true" />
+                <span>{area.title}</span>
+                <small>{area.count}</small>
+              </span>
+            </ColumnCanvas.Item>
+          {/each}
+        </ColumnCanvas.Body>
+      </ColumnCanvas.Column>
+
+      <ColumnCanvas.Column id="planner" title={activePlannerLabel}>
+        <div class="task-column-canvas-story__pane">
+          <ApplicationTaskPlannerMode
+            {tasks}
+            {applications}
+            view={taskView}
+            area={taskArea}
+            {activeTaskId}
+            detailsPresentation="external"
+            taskAreas={snapshot.areas}
+            {applicationSummaries}
+            onActiveTaskChange={handleActiveTaskChange}
+            onSaveTask={saveTask}
+            onCreateTask={createPlannerTask}
+            onDeleteTask={deleteTask}
+            onSaveApplication={saveApplication}
+            onOpenApplication={handleOpenApplication}
+          />
+        </div>
+      </ColumnCanvas.Column>
+
+      <ColumnCanvas.Column id="detail">
+        <div
+          class="task-column-canvas-story__pane task-column-canvas-story__pane--padded"
+        >
+          {#if activeTask}
+            <ApplicationTaskSidebarDetail
+              task={activeTask}
+              application={activeTaskApplication}
+              onToggleDone={toggleActiveTaskDone}
+              onUpdateTitle={updateActiveTaskTitle}
+              onRemoveTask={removeActiveTask}
+              onOpenApplication={handleOpenApplication}
+            >
+              {#snippet closeAction()}
+                <ColumnCanvas.Close onclick={closeDetailColumn} />
+              {/snippet}
+            </ApplicationTaskSidebarDetail>
+          {:else}
+            <div class="task-column-canvas-story__related-empty">
+              <ColumnCanvas.Close onclick={closeDetailColumn} />
+              <p>Select a Task’s details control to open it here.</p>
+            </div>
+          {/if}
+        </div>
+      </ColumnCanvas.Column>
+
+      <ColumnCanvas.Column
+        id="related"
+        title={relatedApplication?.company ?? "Related"}
+      >
+        <ColumnCanvas.Body>
+          {#if relatedApplication}
+            <div class="task-column-canvas-story__related">
+              <h2>{relatedApplication.company}</h2>
+              <p>{relatedApplication.role}</p>
+              {#if relatedApplication.location}
+                <p>{relatedApplication.location}</p>
+              {/if}
+              {#if relatedApplication.notes}
+                <p>{relatedApplication.notes}</p>
+              {/if}
+            </div>
+          {:else}
+            <p class="task-column-canvas-story__related-empty">
+              Open a linked application from the task detail.
+            </p>
+          {/if}
+        </ColumnCanvas.Body>
+      </ColumnCanvas.Column>
+    </ColumnCanvas.Root>
+  </div>
+</div>
