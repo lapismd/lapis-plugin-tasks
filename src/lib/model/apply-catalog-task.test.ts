@@ -91,6 +91,25 @@ describe("applyCatalogTaskToRepository", () => {
     const createdRaw = await files.read("inbox/write-notes.md");
     expect(createdRaw).toContain("# Write notes");
     expect(createdRaw).toContain("date: 2026-08-20");
-    expect(await files.read("lists/home.md")).toContain("inbox/write-notes.md");
+    expect(await files.read("lists/home.md")).toContain("../inbox/write-notes.md");
+
+    const assigned = await createCatalogTaskInRepository(
+      repository,
+      {
+        title: "New project work",
+        view: "inbox",
+        area: "Projects",
+        order: 2048,
+      },
+      {
+        existingPaths: ["buy.md", "lists/home.md", "inbox/write-notes.md"],
+        now: new Date("2026-08-20T15:00:00Z"),
+      },
+    );
+    expect(assigned.listId).toBe("Projects");
+    expect(await files.read("lists/projects.md")).toContain("# Projects");
+    expect(await files.read("lists/projects.md")).toContain(
+      "../inbox/new-project-work.md",
+    );
   });
 });

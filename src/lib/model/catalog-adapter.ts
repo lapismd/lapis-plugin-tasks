@@ -47,7 +47,7 @@ export function catalogTaskFromDocument(document: ParsedTaskFile): Task {
       id: document.id,
       title: document.title,
       status: "todo",
-      listId: document.id,
+      listId: document.kind === "task-list" ? document.id : undefined,
       sourcePath: document.path,
     });
   }

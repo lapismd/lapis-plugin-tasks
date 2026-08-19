@@ -159,6 +159,53 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
   white-space: nowrap;
 }
 
+.task-list-tree__section {
+  cursor: default;
+}
+
+.task-list-tree__section--drop {
+  color: var(--ui-tasks-accent);
+}
+
+.task-list-tree__row {
+  display: grid;
+  grid-template-columns: 1.1rem minmax(0, 1fr);
+  align-items: center;
+  padding-inline-start: calc(var(--task-list-tree-depth, 0) * 0.7rem);
+}
+
+.task-list-tree__row--drop {
+  outline: 1px dashed var(--ui-tasks-accent);
+  border-radius: 0.4rem;
+}
+
+.task-list-tree__row--dragging {
+  opacity: 0.55;
+}
+
+.task-list-tree__disclosure,
+.task-list-tree__disclosure-spacer {
+  display: inline-flex;
+  width: 1.1rem;
+  height: 1.1rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ui-tasks-muted);
+}
+
+.task-list-tree__disclosure svg {
+  width: 0.75rem;
+  height: 0.75rem;
+  transition: transform 120ms ease;
+}
+
+.task-list-tree__disclosure--open svg {
+  transform: rotate(90deg);
+}
+
 .task-column-canvas-story__nav-item small {
   display: inline-flex;
   min-width: 1.25rem;

@@ -5,6 +5,21 @@ import {
 } from "./task-document";
 
 export function projectTask(document: ParsedTaskFile): AppDatabaseTaskRecord {
+  if (document.kind === "task-list-navigation") {
+    return {
+      documentPath: document.path,
+      documentId: document.id,
+      kind: "task-list-navigation" as AppDatabaseTaskRecord["kind"],
+      title: document.title,
+      status: "active",
+      inbox: false,
+      startKind: "anytime",
+      checklistTotal: 0,
+      checklistCompleted: 0,
+      commentCount: 0,
+      projectionVersion: TASK_PROJECTION_VERSION,
+    };
+  }
   if (document.kind === "task-list") {
     return {
       documentPath: document.path,

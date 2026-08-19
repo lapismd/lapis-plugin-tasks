@@ -3,10 +3,11 @@ import { describe, expect, it } from "vitest";
 import {
   catalogTasksFromPlannerFixtures,
   parsePlannerFixtures,
+  plannerMarkdownFixtures,
   PLANNER_FIXTURE_TODAY,
 } from "./planner-fixtures";
 import { indexTaskDocument } from "./task-index";
-import { TaskRepository } from "./task-repository";
+import { createMemoryTaskFileStore, TaskRepository } from "./task-repository";
 import { serializeTaskDocument } from "./task-document";
 import {
   buildTaskPlannerSnapshot,
@@ -85,5 +86,35 @@ describe("planner Markdown fixtures", () => {
       "Draft design critique",
       "Prepare model serving examples",
     ]);
+  });
+
+  it("builds a sectioned list tree from the navigation document", async () => {
+    const now = new Date(`${PLANNER_FIXTURE_TODAY}T12:00:00`);
+    const database = new MemoryAppDatabase("planner-list-tree");
+    await database.open();
+    const files = Object.fromEntries(
+      plannerMarkdownFixtures.map((fixture) => [fixture.path, fixture.raw]),
+    );
+    const store = createMemoryTaskFileStore(files);
+    for (const document of parsePlannerFixtures()) {
+      await indexTaskDocument(database, document);
+    }
+    const snapshot = await buildTaskPlannerSnapshotFromRepository(
+      new TaskRepository(database, store),
+      now,
+    );
+    expect(snapshot.listTree.sections.map((section) => section.title)).toEqual([
+      "Applications",
+      "Docs",
+      "CV",
+    ]);
+    expect(
+      snapshot.listTree.sections
+        .find((section) => section.title === "Docs")
+        ?.lists[0]?.children.map((child) => child.title),
+    ).toEqual(["Writing"]);
+    expect(snapshot.areas.map((area) => area.title)).toEqual(
+      expect.arrayContaining(["Applications", "Docs", "CV", "Writing"]),
+    );
   });
 });

@@ -1,6 +1,7 @@
 import type {
   AppDatabase,
   AppDatabaseIndexedFile,
+  AppDatabaseLinkKind,
   AppDatabaseLinkRecord,
   IndexProjectionEdgeInput,
   IndexProjectionRegistration,
@@ -54,13 +55,21 @@ export function resolveTaskHref(sourcePath: string, href: string): string {
 
 export function taskEdges(document: ParsedTaskFile): IndexProjectionEdgeInput[] {
   return document.structuralLinks
-    .filter((link) => link.kind === "subtask" || link.kind === "list-item")
+    .filter(
+      (link) =>
+        link.kind === "subtask" ||
+        link.kind === "list-item" ||
+        link.kind === "navigation-item",
+    )
     .map((link) => ({
       sourceRowId: document.id,
       relation: link.kind,
       targetPath: resolveTaskHref(document.path, link.href) || null,
       targetText: link.href,
       ordinal: link.ordinal,
+      ...(link.kind === "navigation-item" && link.heading
+        ? { data: { section: link.heading } }
+        : {}),
     }));
 }
 
@@ -75,7 +84,10 @@ export function taskDocumentToIndexedFile(
       type: "link",
       count: 1,
       heading: link.heading,
-      kind: link.kind,
+      kind:
+        link.kind === "navigation-item"
+          ? undefined
+          : (link.kind as AppDatabaseLinkKind),
       ordinal: link.ordinal,
     }),
   );

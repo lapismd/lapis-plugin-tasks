@@ -1,7 +1,7 @@
 <script lang="ts" module>
   import type { App } from "@lapis-notes/api";
   import { defineMeta } from "@storybook/addon-svelte-csf";
-  import { expect, userEvent, waitFor, within } from "storybook/test";
+  import { expect, fireEvent, userEvent, waitFor, within } from "storybook/test";
 
   import PluginWorkspaceDemo from "./PluginWorkspaceDemo.svelte";
   import { PluginWorkspaceExample } from "./PluginWorkspace.example-sources";
@@ -89,11 +89,36 @@
       await canvas.findByText("Tailor platform CV variant"),
     ).toBeVisible();
     expect(canvas.getByTestId("tasks-planner")).toBeVisible();
+    expect(canvas.getByRole("button", { name: "Applications" })).toBeVisible();
+    expect(canvasElement.querySelector('[data-list-section="Docs"]')).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "Expand Docs" }));
+    expect(await canvas.findByRole("button", { name: "Writing" })).toBeVisible();
     expect(
       canvasElement.querySelector(
         '[data-hint-target-id="ribbon:tasks:Open Tasks"]',
       ),
     ).toBeVisible();
+
+    const writing = canvas.getByRole("button", { name: "Writing" });
+    const applications = canvas.getByRole("button", { name: "Applications" });
+    const dataTransfer = new DataTransfer();
+    fireEvent.dragStart(writing.closest("[data-list-path]") ?? writing, {
+      dataTransfer,
+    });
+    fireEvent.dragOver(applications.closest("[data-list-path]") ?? applications, {
+      dataTransfer,
+    });
+    fireEvent.drop(applications.closest("[data-list-path]") ?? applications, {
+      dataTransfer,
+    });
+    await waitFor(async () => {
+      const docs = app.vault.getFileByPath("lists/docs.md");
+      const apps = app.vault.getFileByPath("lists/applications.md");
+      expect(docs).toBeTruthy();
+      expect(apps).toBeTruthy();
+      expect(await app.vault.cachedRead(docs!)).not.toContain("./writing.md");
+      expect(await app.vault.cachedRead(apps!)).toContain("./writing.md");
+    });
 
     const complete = canvas.getByRole("checkbox", {
       name: "Mark Tailor platform CV variant complete",

@@ -134,6 +134,45 @@ describe("parseTaskDocument", () => {
     expect(again.task.deadline).toBe("2026-08-24");
   });
 
+  it("parses a navigation document as presentation pins", () => {
+    const document = parseTaskDocument(
+      `---
+type: task-list-navigation
+id: lists-nav
+---
+# Lists
+
+## Items
+- [Home](./lists/home.md)
+
+## Work
+- [Docs](./lists/docs.md)
+`,
+      "lists.md",
+    );
+    expect(document).toMatchObject({
+      kind: "task-list-navigation",
+      id: "lists-nav",
+      title: "Lists",
+    });
+    expect(document?.structuralLinks).toEqual([
+      {
+        title: "Home",
+        href: "./lists/home.md",
+        kind: "navigation-item",
+        heading: "Items",
+        ordinal: 0,
+      },
+      {
+        title: "Docs",
+        href: "./lists/docs.md",
+        kind: "navigation-item",
+        heading: "Work",
+        ordinal: 0,
+      },
+    ]);
+  });
+
   it("rejects someday plus an active plan", () => {
     const document = parseTaskDocument(
       `---

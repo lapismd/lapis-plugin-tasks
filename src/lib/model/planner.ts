@@ -1,4 +1,9 @@
 import { catalogTaskFromSummary } from "./catalog-adapter";
+import {
+  listTreeFromAreas,
+  toListNavNode,
+  type TaskListNavigationSnapshot,
+} from "./list-navigation";
 import type { TaskRepository } from "./task-repository";
 import type { Task, TaskBucket, TaskStatus, TaskWhen } from "./types";
 
@@ -99,6 +104,7 @@ export type TaskPlannerSnapshot = {
   review: Task[];
   logbook: TaskPlannerDateGroup[];
   areas: TaskAreaSummary[];
+  listTree: TaskListNavigationSnapshot;
 };
 
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
@@ -591,7 +597,90 @@ export async function buildTaskPlannerSnapshotFromRepository(
       }))
       .sort((left, right) => left.title.localeCompare(right.title));
   }
+  const counts = new Map(
+    snapshot.areas.map((area) => [area.id, area.count] as const),
+  );
+  snapshot.listTree = await buildListNavigationSnapshot(repository, counts);
   return snapshot;
+}
+
+export async function buildListNavigationSnapshot(
+  repository: TaskRepository,
+  counts: Map<string, number>,
+): Promise<TaskListNavigationSnapshot> {
+  const diagnostics: TaskListNavigationSnapshot["diagnostics"] = [];
+  const documents = await repository.navigationDocuments();
+  const navigation = await repository.navigation();
+  for (const extra of documents) {
+    if (navigation && extra.path !== navigation.path) {
+      diagnostics.push({
+        code: "extra-navigation-document",
+        message: `Ignored extra navigation document ${extra.path}.`,
+        field: extra.path,
+      });
+    }
+  }
+  const lists = (await repository.lists()).filter(
+    (list) => list.status === "active",
+  );
+  for (const list of lists) {
+    const parents = await repository.listParents(list.id);
+    if (parents.length > 1) {
+      diagnostics.push({
+        code: "multiple-list-parents",
+        message: `${list.title} has more than one structural list parent.`,
+        field: list.path,
+      });
+    }
+  }
+  const pins = await repository.navigationPins();
+  for (const pin of pins) {
+    if (!pin.ignored) continue;
+    diagnostics.push({
+      code: "ignored-navigation-pin",
+      message: `${pin.list.title} is nested under a list and was not pinned.`,
+      field: pin.list.path,
+    });
+  }
+  const pinned = pins.filter((pin) => !pin.ignored);
+  const sections = new Map<string, TaskListNavigationSnapshot["sections"][number]>();
+  for (const pin of pinned) {
+    const children = await repository.listChildren(pin.list.id);
+    const node = toListNavNode(
+      pin.list,
+      counts.get(pin.list.id) ?? 0,
+      children.map((child) =>
+        toListNavNode(child, counts.get(child.id) ?? 0, [], {
+          parentId: pin.list.id,
+        }),
+      ),
+      { section: pin.section },
+    );
+    node.hasChildren = children.length > 0;
+    const current = sections.get(pin.section) ?? {
+      title: pin.section,
+      lists: [],
+    };
+    current.lists.push(node);
+    sections.set(pin.section, current);
+  }
+  const unpinned = await repository.unpinnedRoots();
+  return {
+    sections: [...sections.values()],
+    unpinned: await Promise.all(
+      unpinned.map(async (list) => {
+        const children = await repository.listChildren(list.id);
+        const node = toListNavNode(
+          list,
+          counts.get(list.id) ?? 0,
+          [],
+        );
+        node.hasChildren = children.length > 0;
+        return node;
+      }),
+    ),
+    diagnostics,
+  };
 }
 
 export function buildTaskPlannerSnapshot(
@@ -660,6 +749,11 @@ export function buildTaskPlannerSnapshot(
     logbook,
     areas: [...areas.values()].sort((left, right) =>
       left.title.localeCompare(right.title),
+    ),
+    listTree: listTreeFromAreas(
+      [...areas.values()].sort((left, right) =>
+        left.title.localeCompare(right.title),
+      ),
     ),
   };
 }

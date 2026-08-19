@@ -3,14 +3,18 @@ import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 export const TASK_DOCUMENT_SCHEMA = "tasks/v1";
 export const TASK_PROJECTION_VERSION = 1;
 
-export type TaskDocumentKind = "task" | "task-list";
+export type TaskDocumentKind = "task" | "task-list" | "task-list-navigation";
 export type CanonicalTaskStatus = "open" | "completed" | "canceled";
 export type TaskListStatus = "active" | "archived";
 export type TaskStartKind = "anytime" | "someday" | "date";
 export type TaskPlanKind = "anytime" | "all-day" | "evening" | "time";
 export type TaskRepeatFrequency = "daily" | "weekly" | "monthly" | "yearly";
 export type TaskRepeatAnchor = "schedule" | "completion";
-export type StructuralLinkKind = "subtask" | "list-item" | "reference";
+export type StructuralLinkKind =
+  | "subtask"
+  | "list-item"
+  | "reference"
+  | "navigation-item";
 
 export type TaskDiagnostic = {
   code: string;
@@ -112,7 +116,24 @@ export type TaskListDocument = {
   diagnostics: TaskDiagnostic[];
 };
 
-export type ParsedTaskFile = TaskDocument | TaskListDocument;
+export type TaskNavigationDocument = {
+  path: string;
+  raw: string;
+  id: string;
+  kind: "task-list-navigation";
+  title: string;
+  tags: string[];
+  created?: string;
+  updated?: string;
+  body: string;
+  structuralLinks: StructuralLink[];
+  diagnostics: TaskDiagnostic[];
+};
+
+export type ParsedTaskFile =
+  | TaskDocument
+  | TaskListDocument
+  | TaskNavigationDocument;
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_RE = /^\d{2}:\d{2}$/;
@@ -398,24 +419,55 @@ function parseListFrontMatter(value: unknown): TaskListFrontMatter {
   };
 }
 
+function asNavigationLinks(links: StructuralLink[]): StructuralLink[] {
+  const ordinals = new Map<string, number>();
+  return links.map((link) => {
+    const section = link.heading ?? "";
+    const ordinal = ordinals.get(section) ?? 0;
+    ordinals.set(section, ordinal + 1);
+    return {
+      ...link,
+      kind: "navigation-item" as const,
+      ordinal,
+    };
+  });
+}
+
 export function parseTaskDocument(
   raw: string,
   path = "untitled.md",
 ): ParsedTaskFile | null {
   const { frontMatter, body } = splitFrontMatter(raw);
   const type = asString(frontMatter.type);
-  if (type !== "task" && type !== "task-list") return null;
+  if (type !== "task" && type !== "task-list" && type !== "task-list-navigation") {
+    return null;
+  }
   const diagnostics: TaskDiagnostic[] = [];
   const id = asString(frontMatter.id);
   if (!id) {
     diagnostics.push({
       code: "missing-id",
       field: "id",
-      message: "Task and task-list files must have a stable id.",
+      message: "Task, task-list, and navigation files must have a stable id.",
     });
   }
   const title = firstHeading(body) ?? titleFromPath(path);
   const structure = parseBodyStructure(body);
+  if (type === "task-list-navigation") {
+    return {
+      path,
+      raw,
+      id: id ?? "",
+      kind: "task-list-navigation",
+      title,
+      tags: asStringArray(frontMatter.tags),
+      created: asString(frontMatter.created),
+      updated: asString(frontMatter.updated),
+      body,
+      structuralLinks: asNavigationLinks(structure.structuralLinks),
+      diagnostics,
+    };
+  }
   if (type === "task-list") {
     return {
       path,
@@ -467,6 +519,11 @@ export function serializeTaskDocument(document: ParsedTaskFile): string {
   if (document.tags.length) common.tags = document.tags;
   if (document.created) common.created = document.created;
   if (document.updated) common.updated = document.updated;
+  if (document.kind === "task-list-navigation") {
+    const yaml = stringifyYaml(common, { lineWidth: 0 }).trimEnd();
+    const body = document.body.replace(/^\n+/, "");
+    return `---\n${yaml}\n---\n${body.startsWith("\n") ? body : `\n${body}`}`;
+  }
   if (document.kind === "task-list") {
     common.list = {
       status: document.list.status,
@@ -533,9 +590,9 @@ export function replaceChecklistSection(
     .join("\n");
 }
 
-export function replaceReservedLinks(
+export function replaceHeadingLinks(
   body: string,
-  heading: "Subtasks" | "Items",
+  heading: string,
   links: Array<{ title: string; href: string }>,
 ): string {
   const headingRe = new RegExp(`^(#{1,6})\\s+${heading}\\s*$`, "i");
@@ -555,4 +612,12 @@ export function replaceReservedLinks(
     ...lines.slice(end),
   ];
   return next.join("\n");
+}
+
+export function replaceReservedLinks(
+  body: string,
+  heading: "Subtasks" | "Items",
+  links: Array<{ title: string; href: string }>,
+): string {
+  return replaceHeadingLinks(body, heading, links);
 }

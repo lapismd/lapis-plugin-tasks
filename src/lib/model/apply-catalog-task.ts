@@ -63,21 +63,34 @@ function plansEqual(
   );
 }
 
-function uniqueInboxPath(existingPaths: Iterable<string>, title: string): string {
+function uniquePath(
+  existingPaths: Iterable<string>,
+  directory: string,
+  title: string,
+  fallback: string,
+): string {
   const slug =
     title
       .trim()
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "") || "task";
+      .replace(/^-|-$/g, "") || fallback;
   const existing = new Set(existingPaths);
-  let path = `inbox/${slug}.md`;
+  let path = `${directory}/${slug}.md`;
   let index = 2;
   while (existing.has(path)) {
-    path = `inbox/${slug}-${index}.md`;
+    path = `${directory}/${slug}-${index}.md`;
     index += 1;
   }
   return path;
+}
+
+function uniqueInboxPath(existingPaths: Iterable<string>, title: string): string {
+  return uniquePath(existingPaths, "inbox", title, "task");
+}
+
+function uniqueListPath(existingPaths: Iterable<string>, title: string): string {
+  return uniquePath(existingPaths, "lists", title, "list");
 }
 
 function todayFrom(now: Date): string {
@@ -134,11 +147,21 @@ export async function applyCatalogTaskToRepository(
 
   if (next.listId !== previous?.listId) {
     const lists = await repository.lists();
-    const list = lists.find(
+    let list = lists.find(
       (entry) =>
         entry.id === next.listId ||
         entry.title.toLowerCase() === next.listId?.toLowerCase(),
     );
+    if (!list && next.listId) {
+      list = await repository.createList({
+        path: uniqueListPath(
+          lists.map((entry) => entry.path),
+          next.listId,
+        ),
+        title: next.listId,
+        at,
+      });
+    }
     await repository.moveToList(path, list?.path ?? null, at);
   }
 }

@@ -4,19 +4,22 @@
   import CalendarDaysIcon from "@lucide/svelte/icons/calendar-days";
   import CircleAlertIcon from "@lucide/svelte/icons/circle-alert";
   import CircleEllipsisIcon from "@lucide/svelte/icons/circle-ellipsis";
-  import FolderKanbanIcon from "@lucide/svelte/icons/folder-kanban";
   import InboxIcon from "@lucide/svelte/icons/inbox";
   import ListTodoIcon from "@lucide/svelte/icons/list-todo";
   import * as ColumnCanvas from "@lapismd/design-core/shadcn/column-canvas";
-  import type {
-    JobApplication,
-    Task,
-    TaskBucket,
-    TaskPlannerSnapshot,
-    TaskQuickCreateInput,
+  import {
+    findListNavNode,
+    listTreeFromAreas,
+    type JobApplication,
+    type ListTreeDropTarget,
+    type Task,
+    type TaskBucket,
+    type TaskPlannerSnapshot,
+    type TaskQuickCreateInput,
   } from "../../model";
   import ApplicationTaskSidebarDetail from "../application-task-sidebar-detail/ApplicationTaskSidebarDetail.svelte";
   import ApplicationTaskPlannerMode from "./ApplicationTaskPlannerMode.svelte";
+  import TaskListNavTree from "./TaskListNavTree.svelte";
   import "./ApplicationTaskPlannerColumnCanvasStory.css";
 
   type ApplicationSummary = {
@@ -38,6 +41,8 @@
     onDeleteTask,
     onSaveApplication = () => {},
     onOpenApplication = () => {},
+    onExpandList,
+    onDropList,
   }: {
     tasks: Task[];
     now?: Date;
@@ -51,7 +56,13 @@
     onDeleteTask: (task: Task) => void;
     onSaveApplication?: (application: JobApplication) => void;
     onOpenApplication?: (applicationId: string) => void;
+    onExpandList?: (id: string) => void;
+    onDropList?: (sourcePath: string, target: ListTreeDropTarget) => void;
   } = $props();
+
+  const listTree = $derived(
+    snapshot.listTree ?? listTreeFromAreas(snapshot.areas),
+  );
 
   const plannerBuckets = [
     { id: "inbox", label: "Inbox", icon: InboxIcon },
@@ -114,7 +125,9 @@
 
   const activePlannerLabel = $derived(
     taskArea
-      ? (snapshot.areas.find((area) => area.id === taskArea)?.title ?? taskArea)
+      ? (findListNavNode(listTree, taskArea)?.title ??
+        snapshot.areas.find((area) => area.id === taskArea)?.title ??
+        taskArea)
       : (plannerBuckets.find((bucket) => bucket.id === taskView)?.label ??
         "Today"),
   );
@@ -273,20 +286,14 @@
             </ColumnCanvas.Item>
           {/each}
 
-          <p class="task-column-canvas-story__section-label">Lists</p>
-          {#each snapshot.areas as area (area.id)}
-            <ColumnCanvas.Item
-              aria-label={area.title}
-              selected={canvas.isSelected(0, area.id)}
-              onclick={() => showNav(area.id)}
-            >
-              <span class="task-column-canvas-story__nav-item">
-                <FolderKanbanIcon aria-hidden="true" />
-                <span>{area.title}</span>
-                <small>{area.count}</small>
-              </span>
-            </ColumnCanvas.Item>
-          {/each}
+          <TaskListNavTree
+            tree={listTree}
+            selectedId={taskArea}
+            isSelected={(id) => canvas.isSelected(0, id)}
+            onSelect={showNav}
+            onExpand={onExpandList}
+            onDrop={onDropList}
+          />
         </ColumnCanvas.Body>
       </ColumnCanvas.Column>
 

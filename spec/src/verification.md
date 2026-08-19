@@ -34,3 +34,7 @@
 | LN-TASK-020 | Implemented | `TaskRepository` queries AppDatabase projections; planner fixtures assert the same view ids as catalog summaries. |
 | LN-TASK-021 | Implemented | Planner Markdown fixtures round-trip through `parseTaskDocument`; list membership comes from task-list `## Items`. |
 | LN-TASK-022 | Implemented | `Plugins/Tasks/Shell` boots WorkspaceShell with File Explorer, Search, Markdown, and TasksPlugin against planner Markdown fixtures, pins the planner clock, fills the canvas viewport, and keeps docs embeds at 700px. |
+| LN-TASK-023 | Implemented | Parser accepts `type: task-list-navigation`; planner fixtures seed vault-root `lists.md`; extra navigation documents are ignored. |
+| LN-TASK-024 | Implemented | Index emits `navigation-item` edges that `parent()` ignores. Repository list-parent queries use incoming `list-item` only and refuse cycles or a second structural parent. |
+| LN-TASK-025 | Implemented | Planner snapshot builds a sectioned list tree; sidebar renders nested lists and All lists; opening a list still filters tasks by that list. |
+| LN-TASK-026 | Implemented | Navigation and `## Items` rewrites cover pin reorder, restack, nest, and unnest. `createList` writes a new list file; area-picker create uses it. |

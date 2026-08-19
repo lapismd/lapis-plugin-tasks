@@ -6,6 +6,9 @@
     buildTaskPlannerSnapshotFromRepository,
     createCatalogTaskInRepository,
     deleteCatalogTaskFromRepository,
+    replaceListNavChildren,
+    toListNavNode,
+    type ListTreeDropTarget,
     type Task,
     type TaskPlannerSnapshot,
     type TaskQuickCreateInput,
@@ -35,6 +38,7 @@
     review: [],
     logbook: [],
     areas: [],
+    listTree: { sections: [], unpinned: [], diagnostics: [] },
   });
   let loadError = $state<string | null>(null);
   let refreshQueue = $state(Promise.resolve());
@@ -99,6 +103,32 @@
     await queueRefresh();
   }
 
+  async function expandList(id: string) {
+    const children = await repository.listChildren(id);
+    const counts = new Map(
+      snapshot.areas.map((area) => [area.id, area.count] as const),
+    );
+    snapshot = {
+      ...snapshot,
+      listTree: replaceListNavChildren(
+        snapshot.listTree,
+        id,
+        children.map((child) =>
+          toListNavNode(child, counts.get(child.id) ?? 0, [], { parentId: id }),
+        ),
+      ),
+    };
+  }
+
+  async function dropList(sourcePath: string, target: ListTreeDropTarget) {
+    await repository.applyListTreeDrop(
+      sourcePath,
+      target,
+      (now ?? new Date()).toISOString(),
+    );
+    await queueRefresh();
+  }
+
   onMount(() => {
     void queueRefresh();
     const changed = app.metadataCache.on("changed", (file) => {
@@ -128,6 +158,8 @@
     onSaveTask={(task) => void saveTask(task)}
     onCreateTask={(input) => void createTask(input)}
     onDeleteTask={(task) => void deleteTask(task)}
+    onExpandList={(id) => void expandList(id)}
+    onDropList={(sourcePath, target) => void dropList(sourcePath, target)}
   />
 {/if}
 

@@ -1,5 +1,6 @@
 <script module lang="ts">
   import { defineMeta } from "@storybook/addon-svelte-csf";
+  import { expect, within } from "storybook/test";
   import { ApplicationTaskPlannerColumnCanvasExample } from "../../catalog.example-sources";
   import ApplicationTaskPlannerColumnCanvasStory from "./ApplicationTaskPlannerColumnCanvasStory.svelte";
   import { playTitleClickStartsInlineEdit } from "../planner-title-edit-selection.story-play";
@@ -37,7 +38,12 @@
       },
     },
   }}
-  play={playTitleClickStartsInlineEdit}
+  play={async (context) => {
+    const canvas = within(context.canvasElement);
+    expect(canvas.getByText("All lists")).toBeVisible();
+    expect(canvas.getByRole("button", { name: "Applications" })).toBeVisible();
+    await playTitleClickStartsInlineEdit(context);
+  }}
 >
   {#snippet template()}
     <ApplicationTaskPlannerColumnCanvasStory />

@@ -12,6 +12,24 @@ export type PlannerMarkdownFixture = {
 
 export const plannerMarkdownFixtures: PlannerMarkdownFixture[] = [
   {
+    path: "lists.md",
+    raw: `---
+type: task-list-navigation
+id: lists-nav
+---
+# Lists
+
+## Applications
+- [Applications](./lists/applications.md)
+
+## Docs
+- [Docs](./lists/docs.md)
+
+## CV
+- [CV](./lists/cv.md)
+`,
+  },
+  {
     path: "lists/applications.md",
     raw: `---
 type: task-list
@@ -41,8 +59,22 @@ list:
 # Docs
 
 ## Items
+- [Writing](./writing.md)
 - [Draft design critique](../upcoming/critique.md)
 - [Write flashcards for system design](../inbox/docs-1.md)
+`,
+  },
+  {
+    path: "lists/writing.md",
+    raw: `---
+type: task-list
+id: list-writing
+list:
+  status: active
+---
+# Writing
+
+## Items
 `,
   },
   {

@@ -30,6 +30,7 @@ export {
   plannerMarkdownFixtures,
   PLANNER_FIXTURE_TODAY,
 } from "./planner-fixtures";
+export * from "./list-navigation";
 export * from "./task-document";
 export * from "./task-index";
 export * from "./task-queries";
@@ -39,6 +40,7 @@ export * from "./task-repository";
 export { createVaultTaskFileStore } from "./vault-task-file-store";
 export {
   buildTaskPlannerMovePatch,
+  buildListNavigationSnapshot,
   buildTaskPlannerSnapshot,
   buildTaskPlannerSnapshotFromRepository,
   buildUpcomingRows,

@@ -13,7 +13,7 @@ export type TaskSummary = {
   id: string;
   path: string;
   title: string;
-  kind: "task" | "task-list";
+  kind: "task" | "task-list" | "task-list-navigation";
   status: CanonicalTaskStatus | "active" | "archived";
   inbox: boolean;
   startKind: "anytime" | "someday" | "date";
@@ -34,6 +34,20 @@ export function isTaskDocument(document: ParsedTaskFile): document is TaskDocume
 }
 
 export function taskDocumentToSummary(document: ParsedTaskFile): TaskSummary {
+  if (document.kind === "task-list-navigation") {
+    return {
+      id: document.id,
+      path: document.path,
+      title: document.title,
+      kind: "task-list-navigation",
+      status: "active",
+      inbox: false,
+      startKind: "anytime",
+      checklistTotal: 0,
+      checklistCompleted: 0,
+      commentCount: 0,
+    };
+  }
   if (document.kind === "task-list") {
     return {
       id: document.id,

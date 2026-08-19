@@ -7,7 +7,9 @@ matter. The filesystem is authoritative. AppDatabase owns the public
 Host movable panels remain unspecified.
 Reusable leaf controls come from public Design Core APIs.
 `ApplicationTaskAreaPicker` is the catalog list picker and composes Design
-Core Command View. The
+Core Command View. A vault MAY include one `task-list-navigation` Markdown
+file whose headings are sidebar sections and whose links pin root lists.
+Nested lists stay in each list’s `## Items`. The
 `Plugins/Tasks/Panels` catalog story composes planner navigation, planner
 body, and task detail with Design Core Column Canvas. That presentation is
 not a host movable-panel runtime.
@@ -38,3 +40,7 @@ not a host movable-panel runtime.
 | LN-TASK-020 | Planner lists and cards MUST consume `TaskSummary` rows from the AppDatabase tasks projection. Detail and editor surfaces MAY load the Markdown `TaskDocument`. UI MUST NOT treat the database as authoritative. |
 | LN-TASK-021 | Canonical catalog types MUST use the Markdown-first schema. Catalog planner fixtures MUST round-trip through task documents. Area membership MUST mean a task-list `## Items` parent. |
 | LN-TASK-022 | Package Storybook MUST include `Plugins/Tasks/Shell` desktop and phone-width stories that boot a public `App`, load File Explorer, Search, Markdown, and `TasksPlugin`, seed planner Markdown, and restore a `tasks` leaf in `WorkspaceShell`. Canvas stories MUST fill the available Storybook viewport. Docs embeds MUST stay height-capped. The live planner MUST use the same pinned clock as the repository snapshot. Show Code MUST use public package imports. |
+| LN-TASK-023 | A vault MAY include at most one authoritative Markdown file whose front matter `type` is `task-list-navigation` and whose `id` is stable. Extra navigation documents MUST be ignored after a diagnostic. Headings in that file MUST be presentation sections, not resources. Links under those headings MUST pin root lists. The file MUST remain ordinary vault Markdown and MUST NOT live in plugin data. |
+| LN-TASK-024 | A `list-item` link under a task-list `## Items` MUST be the only structural list parent. A `navigation-item` MUST be presentation only and MUST NOT count as a structural parent. A task-list MUST have at most one incoming `list-item`. Ordinary `reference` links MAY point at the same list from many places. Cycles in the list-item graph MUST be rejected. |
+| LN-TASK-025 | The planner Lists sidebar MUST render navigation sections, then pinned root lists, then nested task-lists from outgoing `list-item` edges whose target `kind` is `task-list`. Tasks MUST NOT appear in that tree. Structural roots that are not pinned MUST appear under All lists. Opening a list MUST still show every `list-item` child, including tasks. |
+| LN-TASK-026 | Reordering pinned roots, moving a list between sections, nesting, and unnesting MUST rewrite one navigation or list Markdown file (or one reserved-section rewrite) and then reproject. Creating a list from the area picker MUST write a new `task-list` file. |
