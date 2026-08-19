@@ -62,10 +62,14 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
   [data-column-id="tasks"][data-ui-part="collapsed-column"] {
   box-sizing: border-box;
   border: 0;
-  border-start-start-radius: 0;
-  border-end-start-radius: 0;
+  border-radius: 0;
   padding-block-start: 1px;
   background: transparent;
+}
+
+.task-column-canvas-story__canvas
+  [data-ui-part="sticky-stack"] {
+  border-radius: 0;
 }
 
 .task-column-canvas-story__canvas
