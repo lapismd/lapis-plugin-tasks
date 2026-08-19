@@ -12,6 +12,7 @@
     listTreeFromAreas,
     type JobApplication,
     type ListTreeDropTarget,
+    type TaskListCreateInput,
     type Task,
     type TaskBucket,
     type TaskPlannerSnapshot,
@@ -43,6 +44,13 @@
     onOpenApplication = () => {},
     onExpandList,
     onDropList,
+    onRenameList,
+    onRenameSection,
+    onOpenNote,
+    onCreateList,
+    onUnpinList,
+    onArchiveList,
+    onDeleteList,
   }: {
     tasks: Task[];
     now?: Date;
@@ -58,6 +66,13 @@
     onOpenApplication?: (applicationId: string) => void;
     onExpandList?: (id: string) => void;
     onDropList?: (sourcePath: string, target: ListTreeDropTarget) => void;
+    onRenameList?: (path: string, title: string) => void;
+    onRenameSection?: (from: string, to: string) => void;
+    onOpenNote?: (path: string) => void;
+    onCreateList?: (input: TaskListCreateInput) => void;
+    onUnpinList?: (path: string) => void;
+    onArchiveList?: (path: string) => void;
+    onDeleteList?: (path: string) => void;
   } = $props();
 
   const listTree = $derived(
@@ -122,6 +137,7 @@
   let taskView = $state<TaskBucket>("today");
   let taskArea = $state<string | null>(null);
   let activeTaskId = $state<string | null>(null);
+  let activeDropTargetId = $state<string | null>(null);
 
   const activePlannerLabel = $derived(
     taskArea
@@ -271,29 +287,58 @@
           <ListTodoIcon aria-hidden="true" />
         {/snippet}
         <ColumnCanvas.Body>
-          <p class="task-column-canvas-story__section-label">Planner</p>
-          {#each plannerBuckets as bucket (bucket.id)}
-            <ColumnCanvas.Item
-              aria-label={bucket.label}
-              selected={canvas.isSelected(0, bucket.id)}
-              onclick={() => showNav(bucket.id)}
-            >
-              <span class="task-column-canvas-story__nav-item">
-                <bucket.icon aria-hidden="true" />
-                <span>{bucket.label}</span>
-                <small>{bucketCount(bucket.id)}</small>
-              </span>
-            </ColumnCanvas.Item>
-          {/each}
+          <nav
+            class="task-column-canvas-story__nav"
+            aria-label="Planner menu"
+            data-planner-menu-dragging={activeDropTargetId !== null || undefined}
+          >
+            <p class="task-column-canvas-story__section-label">Planner</p>
+            {#each plannerBuckets as bucket (bucket.id)}
+              {@const dropId = `planner-sidebar:${bucket.id}`}
+              <div
+                class="task-column-canvas-story__nav-drop"
+                class:task-column-canvas-story__nav-drop--active={activeDropTargetId ===
+                  dropId}
+                data-planner-drop-id={dropId}
+                data-planner-drop-mode="valid"
+                data-planner-drop-active={activeDropTargetId === dropId ||
+                  undefined}
+                data-planner-drop-data={JSON.stringify({
+                  type: "planner-sidebar-bucket",
+                  bucket: bucket.id,
+                })}
+              >
+                <ColumnCanvas.Item
+                  aria-label={bucket.label}
+                  selected={canvas.isSelected(0, bucket.id)}
+                  onclick={() => showNav(bucket.id)}
+                >
+                  <span class="task-column-canvas-story__nav-item">
+                    <bucket.icon aria-hidden="true" />
+                    <span>{bucket.label}</span>
+                    <small>{bucketCount(bucket.id)}</small>
+                  </span>
+                </ColumnCanvas.Item>
+              </div>
+            {/each}
 
-          <TaskListNavTree
-            tree={listTree}
-            selectedId={taskArea}
-            isSelected={(id) => canvas.isSelected(0, id)}
-            onSelect={showNav}
-            onExpand={onExpandList}
-            onDrop={onDropList}
-          />
+            <TaskListNavTree
+              tree={listTree}
+              selectedId={taskArea}
+              isSelected={(id) => canvas.isSelected(0, id)}
+              {activeDropTargetId}
+              onSelect={showNav}
+              onExpand={onExpandList}
+              onDrop={onDropList}
+              {onRenameList}
+              {onRenameSection}
+              {onOpenNote}
+              {onCreateList}
+              {onUnpinList}
+              {onArchiveList}
+              {onDeleteList}
+            />
+          </nav>
         </ColumnCanvas.Body>
       </ColumnCanvas.Column>
 
@@ -315,6 +360,7 @@
             {onDeleteTask}
             {onSaveApplication}
             onOpenApplication={handleOpenApplication}
+            onDragTargetChange={(targetId) => (activeDropTargetId = targetId)}
           />
         </div>
       </ColumnCanvas.Column>

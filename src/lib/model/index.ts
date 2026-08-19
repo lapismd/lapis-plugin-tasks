@@ -18,6 +18,7 @@ export {
   applyCatalogTaskToRepository,
   createCatalogTaskInRepository,
   deleteCatalogTaskFromRepository,
+  uniqueListPath,
 } from "./apply-catalog-task";
 export {
   catalogTaskFromDocument,

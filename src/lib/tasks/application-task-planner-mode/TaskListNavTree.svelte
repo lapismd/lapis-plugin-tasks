@@ -1,10 +1,14 @@
 <script lang="ts">
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
+  import FolderIcon from "@lucide/svelte/icons/folder";
   import FolderKanbanIcon from "@lucide/svelte/icons/folder-kanban";
   import * as ColumnCanvas from "@lapismd/design-core/shadcn/column-canvas";
+  import * as ContextMenu from "@lapismd/design-core/shadcn/context-menu";
+  import { Input } from "@lapismd/design-core/shadcn/input";
   import { SvelteSet } from "svelte/reactivity";
   import type {
     ListTreeDropTarget,
+    TaskListCreateInput,
     TaskListNavNode,
     TaskListNavigationSnapshot,
   } from "../../model";
@@ -13,34 +17,88 @@
     tree,
     selectedId = null,
     isSelected,
+    activeDropTargetId = null,
     onSelect,
     onExpand,
     onDrop,
+    onRenameList,
+    onRenameSection,
+    onOpenNote,
+    onCreateList,
+    onUnpinList,
+    onArchiveList,
+    onDeleteList,
   }: {
     tree: TaskListNavigationSnapshot;
     selectedId?: string | null;
     isSelected: (id: string) => boolean;
+    activeDropTargetId?: string | null;
     onSelect: (id: string) => void;
     onExpand?: (id: string) => void;
     onDrop?: (sourcePath: string, target: ListTreeDropTarget) => void;
+    onRenameList?: (path: string, title: string) => void;
+    onRenameSection?: (from: string, to: string) => void;
+    onOpenNote?: (path: string) => void;
+    onCreateList?: (input: TaskListCreateInput) => void;
+    onUnpinList?: (path: string) => void;
+    onArchiveList?: (path: string) => void;
+    onDeleteList?: (path: string) => void;
   } = $props();
 
-  let expanded = new SvelteSet<string>();
+  let expandedLists = new SvelteSet<string>();
+  let collapsedSections = new SvelteSet<string>();
   let draggingPath = $state<string | null>(null);
   let dropKey = $state<string | null>(null);
+  let editingKey = $state<string | null>(null);
 
   const canDrag = $derived(Boolean(onDrop));
 
-  function isExpanded(id: string) {
-    return expanded.has(id);
+  function sectionKey(title: string) {
+    return `section:${title}`;
   }
 
-  function toggle(node: TaskListNavNode) {
-    if (expanded.has(node.id)) expanded.delete(node.id);
+  function listDropId(id: string) {
+    return `planner-sidebar-list:${id}`;
+  }
+
+  function isSectionOpen(title: string) {
+    return !collapsedSections.has(sectionKey(title));
+  }
+
+  function toggleSection(title: string) {
+    const key = sectionKey(title);
+    if (collapsedSections.has(key)) collapsedSections.delete(key);
+    else collapsedSections.add(key);
+  }
+
+  function isListOpen(id: string) {
+    return expandedLists.has(id);
+  }
+
+  function toggleList(node: TaskListNavNode) {
+    if (expandedLists.has(node.id)) expandedLists.delete(node.id);
     else {
-      expanded.add(node.id);
+      expandedLists.add(node.id);
       if (!node.children.length && node.hasChildren) onExpand?.(node.id);
     }
+  }
+
+  function expandForDrop(key: string, list?: TaskListNavNode) {
+    if (list) {
+      expandedLists.add(list.id);
+      if (!list.children.length && list.hasChildren) onExpand?.(list.id);
+      return;
+    }
+    collapsedSections.delete(key);
+  }
+
+  function focusRename(node: HTMLElement) {
+    const input = node.querySelector("input");
+    if (!input) return;
+    queueMicrotask(() => {
+      input.focus();
+      input.select();
+    });
   }
 
   function dragPayload(event: DragEvent, path: string) {
@@ -58,10 +116,11 @@
     );
   }
 
-  function allowDrop(event: DragEvent, key: string) {
+  function allowDrop(event: DragEvent, key: string, list?: TaskListNavNode) {
     if (!canDrag || !draggingPath) return;
     event.preventDefault();
     dropKey = key;
+    expandForDrop(key, list);
   }
 
   function dropOnSection(event: DragEvent, section: string) {
@@ -86,65 +145,233 @@
     draggingPath = null;
     dropKey = null;
   }
+
+  function startRename(key: string) {
+    editingKey = key;
+  }
+
+  function cancelRename() {
+    editingKey = null;
+  }
+
+  function commitListRename(node: TaskListNavNode, value: string) {
+    editingKey = null;
+    const next = value.trim();
+    if (!next || next === node.title) return;
+    onRenameList?.(node.path, next);
+  }
+
+  function commitSectionRename(from: string, value: string) {
+    editingKey = null;
+    const next = value.trim();
+    if (!next || next === from || from === "All lists") return;
+    onRenameSection?.(from, next);
+  }
+
+  function sectionCount(lists: TaskListNavNode[]) {
+    return lists.reduce((total, list) => total + list.count, 0);
+  }
+
+  const hasListMenu = $derived(
+    Boolean(
+      onOpenNote ||
+        onRenameList ||
+        onCreateList ||
+        onUnpinList ||
+        onArchiveList ||
+        onDeleteList,
+    ),
+  );
+
+  function canUnpin(node: TaskListNavNode) {
+    return Boolean(onUnpinList && node.section && !node.parentId);
+  }
 </script>
 
 <p class="task-column-canvas-story__section-label">Lists</p>
-{#each tree.sections as section (section.title)}
-  <p
-    class="task-column-canvas-story__section-label task-list-tree__section"
-    class:task-list-tree__section--drop={dropKey === `section:${section.title}`}
-    data-list-section={section.title}
-    ondragover={(event) => allowDrop(event, `section:${section.title}`)}
-    ondrop={(event) => dropOnSection(event, section.title)}
-  >
-    {section.title}
-  </p>
-  {#each section.lists as node (node.id)}
-    {@render listRow(node, 0)}
+<ul class="task-list-tree" data-list-tree>
+  {#each tree.sections as section (section.title)}
+    {@render sectionFolder(section.title, section.lists, false)}
   {/each}
-{/each}
-{#if tree.unpinned.length}
-  <p
-    class="task-column-canvas-story__section-label task-list-tree__section"
-    class:task-list-tree__section--drop={dropKey === "section:All lists"}
-    data-list-section="All lists"
-    ondragover={(event) => allowDrop(event, "section:All lists")}
-    ondrop={(event) => dropOnSection(event, "All lists")}
-  >
-    All lists
-  </p>
-  {#each tree.unpinned as node (node.id)}
-    {@render listRow(node, 0)}
-  {/each}
-{/if}
+  {#if tree.unpinned.length}
+    {@render sectionFolder("All lists", tree.unpinned, true)}
+  {/if}
+</ul>
 
-{#snippet listRow(node: TaskListNavNode, depth: number)}
-  {@const open = isExpanded(node.id)}
+{#snippet sectionRow(
+  title: string,
+  lists: TaskListNavNode[],
+  allLists: boolean,
+  key: string,
+  open: boolean,
+  editing: boolean,
+  triggerProps: Record<string, unknown>,
+)}
   <div
-    class="task-list-tree__row"
-    class:task-list-tree__row--drop={dropKey === `list:${node.id}`}
+    {...triggerProps}
+    class={[
+      "task-list-tree__row",
+      typeof triggerProps.class === "string" ? triggerProps.class : "",
+    ]
+      .filter(Boolean)
+      .join(" ")}
+    class:task-list-tree__row--drop={dropKey === key}
+    class:task-list-tree__row--folder={true}
+    role="group"
+    data-tree-depth="0"
+    data-list-section={title}
+    data-drop={dropKey === key || undefined}
+    ondragover={(event) => allowDrop(event, key)}
+    ondrop={(event) => dropOnSection(event, title)}
+  >
+    <button
+      type="button"
+      class="task-list-tree__disclosure"
+      class:task-list-tree__disclosure--open={open}
+      aria-expanded={open}
+      aria-label={open ? `Collapse ${title} section` : `Expand ${title} section`}
+      onclick={(event) => {
+        event.stopPropagation();
+        toggleSection(title);
+      }}
+    >
+      <ChevronRightIcon aria-hidden="true" />
+    </button>
+    {#if editing}
+      <span class="task-list-tree__rename" {@attach focusRename}>
+        <Input
+          class="task-list-tree__rename-input"
+          value={title}
+          aria-label={`Rename ${title} section`}
+          onkeydown={(event) => {
+            if (event.code === "Enter") {
+              event.preventDefault();
+              commitSectionRename(title, event.currentTarget.value);
+            }
+            if (event.code === "Escape") cancelRename();
+          }}
+          onblur={(event) =>
+            commitSectionRename(title, event.currentTarget.value)}
+        />
+      </span>
+    {:else}
+      <ColumnCanvas.Item
+        aria-label={`${title} section`}
+        onclick={() => toggleSection(title)}
+        onkeydown={(event) => {
+          if (event.code === "Enter" && !allLists && onRenameSection) {
+            event.preventDefault();
+            startRename(key);
+          }
+        }}
+      >
+        <span class="task-column-canvas-story__nav-item">
+          <FolderIcon aria-hidden="true" />
+          <span>{title}</span>
+        </span>
+      </ColumnCanvas.Item>
+      <small class="task-list-tree__count">{sectionCount(lists)}</small>
+    {/if}
+  </div>
+{/snippet}
+
+{#snippet sectionFolder(title: string, lists: TaskListNavNode[], allLists: boolean)}
+  {@const key = sectionKey(title)}
+  {@const open = isSectionOpen(title)}
+  {@const editing = editingKey === key}
+  <li class="task-list-tree__item" style:--task-list-tree-depth={0}>
+    {#if editing || !(onRenameSection || onCreateList)}
+      {@render sectionRow(title, lists, allLists, key, open, editing, {})}
+    {:else}
+      <ContextMenu.Root>
+        <ContextMenu.Trigger>
+          {#snippet child({ props })}
+            {@render sectionRow(title, lists, allLists, key, open, editing, props)}
+          {/snippet}
+        </ContextMenu.Trigger>
+        <ContextMenu.Content aria-label={`${title} section actions`}>
+          {#if onCreateList}
+            <ContextMenu.Item
+              onclick={() =>
+                onCreateList({
+                  section: allLists ? undefined : title,
+                })}
+            >
+              New list
+            </ContextMenu.Item>
+          {/if}
+          {#if !allLists && onRenameSection}
+            <ContextMenu.Item onclick={() => startRename(key)}>
+              Rename
+            </ContextMenu.Item>
+          {/if}
+        </ContextMenu.Content>
+      </ContextMenu.Root>
+    {/if}
+    {#if open}
+      <div class="task-list-tree__branch">
+        <span class="task-list-tree__guide" aria-hidden="true" data-list-guide></span>
+        <ul class="task-list-tree__sublist" data-list-sublist={title}>
+          {#each lists as node (node.id)}
+            {@render listRow(node, 1)}
+          {/each}
+        </ul>
+      </div>
+    {/if}
+  </li>
+{/snippet}
+
+{#snippet listChrome(
+  node: TaskListNavNode,
+  depth: number,
+  open: boolean,
+  editing: boolean,
+  nestable: boolean,
+  selected: boolean,
+  dropId: string,
+  triggerProps: Record<string, unknown>,
+)}
+  <div
+    {...triggerProps}
+    class={[
+      "task-list-tree__row",
+      typeof triggerProps.class === "string" ? triggerProps.class : "",
+    ]
+      .filter(Boolean)
+      .join(" ")}
+    class:task-list-tree__row--drop={dropKey === `list:${node.id}` ||
+      activeDropTargetId === dropId}
     class:task-list-tree__row--dragging={draggingPath === node.path}
-    style:--task-list-tree-depth={depth}
-    role="listitem"
+    role="group"
+    data-tree-depth={depth}
     data-list-id={node.id}
     data-list-path={node.path}
-    data-list-depth={depth}
-    draggable={canDrag}
+    data-drop={dropKey === `list:${node.id}` || undefined}
+    data-planner-drop-id={dropId}
+    data-planner-drop-mode="valid"
+    data-planner-drop-active={activeDropTargetId === dropId || undefined}
+    data-planner-drop-data={JSON.stringify({
+      type: "planner-sidebar-list",
+      listId: node.id,
+      title: node.title,
+    })}
+    draggable={canDrag && !editing}
     ondragstart={(event) => dragPayload(event, node.path)}
     ondragend={endDrag}
-    ondragover={(event) => allowDrop(event, `list:${node.id}`)}
+    ondragover={(event) => allowDrop(event, `list:${node.id}`, node)}
     ondrop={(event) => dropOnList(event, node)}
   >
-    {#if node.hasChildren || node.children.length}
+    {#if nestable}
       <button
         type="button"
         class="task-list-tree__disclosure"
         class:task-list-tree__disclosure--open={open}
         aria-expanded={open}
         aria-label={open ? `Collapse ${node.title}` : `Expand ${node.title}`}
+        onpointerdown={(event) => event.stopPropagation()}
         onclick={(event) => {
           event.stopPropagation();
-          toggle(node);
+          toggleList(node);
         }}
       >
         <ChevronRightIcon aria-hidden="true" />
@@ -152,21 +379,114 @@
     {:else}
       <span class="task-list-tree__disclosure-spacer"></span>
     {/if}
-    <ColumnCanvas.Item
-      aria-label={node.title}
-      selected={isSelected(node.id) || selectedId === node.id}
-      onclick={() => onSelect(node.id)}
-    >
-      <span class="task-column-canvas-story__nav-item">
-        <FolderKanbanIcon aria-hidden="true" />
-        <span>{node.title}</span>
-        <small>{node.count}</small>
+    {#if editing}
+      <span class="task-list-tree__rename" {@attach focusRename}>
+        <Input
+          class="task-list-tree__rename-input"
+          value={node.title}
+          aria-label={`Rename ${node.title}`}
+          onkeydown={(event) => {
+            if (event.code === "Enter") {
+              event.preventDefault();
+              commitListRename(node, event.currentTarget.value);
+            }
+            if (event.code === "Escape") cancelRename();
+          }}
+          onblur={(event) => commitListRename(node, event.currentTarget.value)}
+        />
       </span>
-    </ColumnCanvas.Item>
+    {:else}
+      <ColumnCanvas.Item
+        aria-label={node.title}
+        {selected}
+        onclick={() => onSelect(node.id)}
+        onkeydown={(event) => {
+          if (event.code === "Enter" && selected && onRenameList) {
+            event.preventDefault();
+            startRename(`list:${node.id}`);
+          }
+        }}
+      >
+        <span class="task-column-canvas-story__nav-item">
+          <FolderKanbanIcon aria-hidden="true" />
+          <span>{node.title}</span>
+        </span>
+      </ColumnCanvas.Item>
+      <small class="task-list-tree__count">{node.count}</small>
+    {/if}
   </div>
-  {#if open}
-    {#each node.children as child (child.id)}
-      {@render listRow(child, depth + 1)}
-    {/each}
-  {/if}
+{/snippet}
+
+{#snippet listRow(node: TaskListNavNode, depth: number)}
+  {@const open = isListOpen(node.id)}
+  {@const editing = editingKey === `list:${node.id}`}
+  {@const dropId = listDropId(node.id)}
+  {@const nestable = node.hasChildren || node.children.length > 0}
+  {@const selected = isSelected(node.id) || selectedId === node.id}
+  <li class="task-list-tree__item" style:--task-list-tree-depth={depth}>
+    {#if editing || !hasListMenu}
+      {@render listChrome(node, depth, open, editing, nestable, selected, dropId, {})}
+    {:else}
+      <ContextMenu.Root>
+        <ContextMenu.Trigger>
+          {#snippet child({ props })}
+            {@render listChrome(node, depth, open, editing, nestable, selected, dropId, props)}
+          {/snippet}
+        </ContextMenu.Trigger>
+        <ContextMenu.Content aria-label={`${node.title} list actions`}>
+          {#if onOpenNote}
+            <ContextMenu.Item onclick={() => onOpenNote(node.path)}>
+              Open note
+            </ContextMenu.Item>
+          {/if}
+          {#if onRenameList}
+            <ContextMenu.Item onclick={() => startRename(`list:${node.id}`)}>
+              Rename
+            </ContextMenu.Item>
+          {/if}
+          {#if onCreateList}
+            <ContextMenu.Item
+              onclick={() => {
+                expandedLists.add(node.id);
+                onCreateList({ nestUnderPath: node.path });
+              }}
+            >
+              New nested list
+            </ContextMenu.Item>
+          {/if}
+          {#if canUnpin(node)}
+            <ContextMenu.Item onclick={() => onUnpinList?.(node.path)}>
+              Unpin
+            </ContextMenu.Item>
+          {/if}
+          {#if onArchiveList || onDeleteList}
+            <ContextMenu.Separator />
+          {/if}
+          {#if onArchiveList}
+            <ContextMenu.Item onclick={() => onArchiveList(node.path)}>
+              Archive
+            </ContextMenu.Item>
+          {/if}
+          {#if onDeleteList}
+            <ContextMenu.Item
+              variant="destructive"
+              onclick={() => onDeleteList(node.path)}
+            >
+              Delete
+            </ContextMenu.Item>
+          {/if}
+        </ContextMenu.Content>
+      </ContextMenu.Root>
+    {/if}
+    {#if open && node.children.length}
+      <div class="task-list-tree__branch">
+        <span class="task-list-tree__guide" aria-hidden="true" data-list-guide></span>
+        <ul class="task-list-tree__sublist" data-list-sublist={node.title}>
+          {#each node.children as child (child.id)}
+            {@render listRow(child, depth + 1)}
+          {/each}
+        </ul>
+      </div>
+    {/if}
+  </li>
 {/snippet}

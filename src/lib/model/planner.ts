@@ -642,18 +642,22 @@ export async function buildListNavigationSnapshot(
       field: pin.list.path,
     });
   }
-  const pinned = pins.filter((pin) => !pin.ignored);
+  const pinned = pins.filter(
+    (pin) => !pin.ignored && pin.list.status !== "archived",
+  );
   const sections = new Map<string, TaskListNavigationSnapshot["sections"][number]>();
   for (const pin of pinned) {
     const children = await repository.listChildren(pin.list.id);
     const node = toListNavNode(
       pin.list,
       counts.get(pin.list.id) ?? 0,
-      children.map((child) =>
-        toListNavNode(child, counts.get(child.id) ?? 0, [], {
-          parentId: pin.list.id,
-        }),
-      ),
+      children
+        .filter((child) => child.status !== "archived")
+        .map((child) =>
+          toListNavNode(child, counts.get(child.id) ?? 0, [], {
+            parentId: pin.list.id,
+          }),
+        ),
       { section: pin.section },
     );
     node.hasChildren = children.length > 0;
@@ -669,7 +673,9 @@ export async function buildListNavigationSnapshot(
     sections: [...sections.values()],
     unpinned: await Promise.all(
       unpinned.map(async (list) => {
-        const children = await repository.listChildren(list.id);
+        const children = (await repository.listChildren(list.id)).filter(
+          (child) => child.status !== "archived",
+        );
         const node = toListNavNode(
           list,
           counts.get(list.id) ?? 0,

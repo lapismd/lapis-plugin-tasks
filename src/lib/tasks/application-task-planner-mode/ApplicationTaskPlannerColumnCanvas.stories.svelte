@@ -1,6 +1,6 @@
 <script module lang="ts">
   import { defineMeta } from "@storybook/addon-svelte-csf";
-  import { expect, within } from "storybook/test";
+  import { expect, userEvent, waitFor, within } from "storybook/test";
   import { ApplicationTaskPlannerColumnCanvasExample } from "../../catalog.example-sources";
   import ApplicationTaskPlannerColumnCanvasStory from "./ApplicationTaskPlannerColumnCanvasStory.svelte";
   import { playTitleClickStartsInlineEdit } from "../planner-title-edit-selection.story-play";
@@ -41,8 +41,33 @@
   play={async (context) => {
     const canvas = within(context.canvasElement);
     expect(canvas.getByText("All lists")).toBeVisible();
+    expect(
+      canvas.getByRole("button", { name: "Collapse All lists section" }),
+    ).toBeVisible();
+    expect(canvas.getByRole("button", { name: "All lists section" })).toBeVisible();
     expect(canvas.getByRole("button", { name: "Applications" })).toBeVisible();
+    expect(
+      context.canvasElement.querySelector(
+        '[data-planner-drop-id="planner-sidebar:inbox"]',
+      ),
+    ).toBeVisible();
     await playTitleClickStartsInlineEdit(context);
+    const applications = canvas.getByRole("button", { name: "Applications" });
+    await userEvent.pointer({ keys: "[MouseRight]", target: applications });
+    const menu = within(context.canvasElement.ownerDocument.body);
+    expect(await menu.findByRole("menuitem", { name: "Open note" })).toBeVisible();
+    expect(menu.getByRole("menuitem", { name: "Rename" })).toBeVisible();
+    expect(menu.getByRole("menuitem", { name: "New nested list" })).toBeVisible();
+    expect(menu.getByRole("menuitem", { name: "Archive" })).toBeVisible();
+    expect(menu.getByRole("menuitem", { name: "Delete" })).toBeVisible();
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => {
+      expect(
+        context.canvasElement.ownerDocument.body.querySelector(
+          '[data-slot="context-menu-content"]',
+        ),
+      ).toBeNull();
+    });
   }}
 >
   {#snippet template()}

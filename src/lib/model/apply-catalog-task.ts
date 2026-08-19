@@ -90,7 +90,10 @@ function uniqueInboxPath(existingPaths: Iterable<string>, title: string): string
   return uniquePath(existingPaths, "inbox", title, "task");
 }
 
-function uniqueListPath(existingPaths: Iterable<string>, title: string): string {
+export function uniqueListPath(
+  existingPaths: Iterable<string>,
+  title: string,
+): string {
   return uniquePath(existingPaths, "lists", title, "list");
 }
 

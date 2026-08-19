@@ -90,9 +90,39 @@
     ).toBeVisible();
     expect(canvas.getByTestId("tasks-planner")).toBeVisible();
     expect(canvas.getByRole("button", { name: "Applications" })).toBeVisible();
+    expect(canvas.getByRole("button", { name: "Docs" })).toBeVisible();
+    expect(canvas.getByRole("button", { name: "CV" })).toBeVisible();
+    expect(
+      canvas.getByRole("button", { name: "Collapse Applications section" }),
+    ).toBeVisible();
+    expect(canvas.getByRole("button", { name: "Collapse Docs section" })).toBeVisible();
+    expect(canvas.getByRole("button", { name: "Collapse CV section" })).toBeVisible();
+    const docsSublist = canvasElement.querySelector('[data-list-sublist="Docs"]');
+    const docsGuide = docsSublist
+      ?.closest(".task-list-tree__branch")
+      ?.querySelector("[data-list-guide]");
+    const docsChevron = canvasElement.querySelector(
+      '[data-list-section="Docs"] .task-list-tree__disclosure svg',
+    );
+    expect(docsSublist).toBeVisible();
+    expect(docsGuide).toBeTruthy();
+    expect(docsChevron).toBeTruthy();
+    const guideBox = docsGuide!.getBoundingClientRect();
+    expect(guideBox.width).toBeGreaterThan(0);
+    const chevronBox = docsChevron!.getBoundingClientRect();
+    const guideCenter = guideBox.left + guideBox.width / 2;
+    const chevronTip = chevronBox.left + chevronBox.width / 2;
+    expect(Math.abs(guideCenter - chevronTip)).toBeLessThan(1);
     expect(canvasElement.querySelector('[data-list-section="Docs"]')).toBeVisible();
     await userEvent.click(canvas.getByRole("button", { name: "Expand Docs" }));
     expect(await canvas.findByRole("button", { name: "Writing" })).toBeVisible();
+    const inboxDrop = canvasElement.querySelector(
+      '[data-planner-drop-id="planner-sidebar:inbox"]',
+    );
+    expect(inboxDrop).toBeVisible();
+    expect(inboxDrop?.getAttribute("data-planner-drop-data")).toContain(
+      "planner-sidebar-bucket",
+    );
     expect(
       canvasElement.querySelector(
         '[data-hint-target-id="ribbon:tasks:Open Tasks"]',
@@ -134,6 +164,22 @@
     await userEvent.click(canvas.getByRole("button", { name: "Upcoming" }));
     expect(await canvas.findByText("Draft design critique")).toBeVisible();
     expect(canvas.getByText("Prepare model serving examples")).toBeVisible();
+
+    await userEvent.pointer({
+      keys: "[MouseRight]",
+      target: canvas.getByRole("button", { name: "Applications" }),
+    });
+    const menu = within(canvasElement.ownerDocument.body);
+    expect(await menu.findByRole("menuitem", { name: "Open note" })).toBeVisible();
+    expect(menu.getByRole("menuitem", { name: "Rename" })).toBeVisible();
+    expect(menu.getByRole("menuitem", { name: "New nested list" })).toBeVisible();
+    expect(menu.getByRole("menuitem", { name: "Unpin" })).toBeVisible();
+    expect(menu.getByRole("menuitem", { name: "Archive" })).toBeVisible();
+    expect(menu.getByRole("menuitem", { name: "Delete" })).toBeVisible();
+    await userEvent.click(menu.getByRole("menuitem", { name: "Open note" }));
+    await waitFor(() => {
+      expect(app.workspace.getActiveFile()?.path).toBe("lists/applications.md");
+    });
   }}
 />
 

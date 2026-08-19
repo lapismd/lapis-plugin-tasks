@@ -93,4 +93,11 @@
   onCreateTask={createPlannerTask}
   onDeleteTask={deleteTask}
   onSaveApplication={saveApplication}
+  onRenameList={() => {}}
+  onRenameSection={() => {}}
+  onOpenNote={() => {}}
+  onCreateList={() => {}}
+  onUnpinList={() => {}}
+  onArchiveList={() => {}}
+  onDeleteList={() => {}}
 />

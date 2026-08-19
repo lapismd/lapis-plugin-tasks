@@ -274,4 +274,33 @@ describe("list navigation Markdown", () => {
     expect(await files.read("lists.md")).not.toContain("## Applications");
     expect(await files.read("lists.md")).toContain("[Applications]");
   });
+
+  it("archives a pinned list and omits it from the tree", async () => {
+    const { repository, files } = await openRepository();
+    await repository.archiveList("lists/docs.md", AT);
+    expect(await files.read("lists/docs.md")).toContain("status: archived");
+    expect(await files.read("lists.md")).not.toContain("./lists/docs.md");
+    const tree = await repository.unpinnedRoots();
+    expect(tree.map((list) => list.id)).not.toContain("list-docs");
+    expect(await repository.pinnedRoots()).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ list: expect.objectContaining({ id: "list-docs" }) }),
+      ]),
+    );
+  });
+
+  it("deletes a nested list without removing its sibling files", async () => {
+    const { repository, files } = await openRepository();
+    await repository.deleteList("lists/writing.md", AT);
+    await expect(files.read("lists/writing.md")).rejects.toThrow();
+    expect(await files.read("lists/docs.md")).not.toContain("./writing.md");
+    expect(await files.read("lists/docs.md")).toContain("# Docs");
+  });
+
+  it("deletes a pinned root and removes its navigation pin", async () => {
+    const { repository, files } = await openRepository();
+    await repository.deleteList("lists/applications.md", AT);
+    await expect(files.read("lists/applications.md")).rejects.toThrow();
+    expect(await files.read("lists.md")).not.toContain("./lists/applications.md");
+  });
 });

@@ -349,6 +349,40 @@ export class TaskRepository {
     return renamed;
   }
 
+  async archiveList(path: string, at: string): Promise<TaskSummary> {
+    const archived = await this.mutate(path, (current) => {
+      if (current.kind !== "task-list") {
+        throw new TaskListMutationError(
+          "not-a-list",
+          "Only task-lists can be archived.",
+        );
+      }
+      return {
+        ...current,
+        list: { ...current.list, status: "archived" },
+        updated: at,
+      };
+    });
+    await this.unpinList(path, at);
+    return archived;
+  }
+
+  async deleteList(path: string, at: string): Promise<void> {
+    const document = await this.loadDocument(path);
+    if (document.kind !== "task-list") {
+      throw new TaskListMutationError(
+        "not-a-list",
+        "Only task-lists can be deleted.",
+      );
+    }
+    const parents = await this.listParents(path);
+    for (const parent of parents) {
+      await this.replaceListItem(parent.path, path, null, at);
+    }
+    await this.unpinList(path, at);
+    await this.remove(path);
+  }
+
   async renameNavigationSection(
     from: string,
     to: string,

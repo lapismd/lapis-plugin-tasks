@@ -35,6 +35,11 @@ export type ListTreeDropTarget =
   | { kind: "section"; section: string; beforePath?: string | null }
   | { kind: "nest"; parentPath: string; beforePath?: string | null };
 
+export type TaskListCreateInput = {
+  nestUnderPath?: string;
+  section?: string;
+};
+
 export class TaskListMutationError extends Error {
   constructor(
     readonly code: string,

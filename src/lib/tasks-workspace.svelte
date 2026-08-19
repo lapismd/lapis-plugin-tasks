@@ -8,7 +8,9 @@
     deleteCatalogTaskFromRepository,
     replaceListNavChildren,
     toListNavNode,
+    uniqueListPath,
     type ListTreeDropTarget,
+    type TaskListCreateInput,
     type Task,
     type TaskPlannerSnapshot,
     type TaskQuickCreateInput,
@@ -113,9 +115,11 @@
       listTree: replaceListNavChildren(
         snapshot.listTree,
         id,
-        children.map((child) =>
-          toListNavNode(child, counts.get(child.id) ?? 0, [], { parentId: id }),
-        ),
+        children
+          .filter((child) => child.status !== "archived")
+          .map((child) =>
+            toListNavNode(child, counts.get(child.id) ?? 0, [], { parentId: id }),
+          ),
       ),
     };
   }
@@ -126,6 +130,62 @@
       target,
       (now ?? new Date()).toISOString(),
     );
+    await queueRefresh();
+  }
+
+  async function renameList(path: string, title: string) {
+    await repository.renameList(path, title, (now ?? new Date()).toISOString());
+    await queueRefresh();
+  }
+
+  async function renameSection(from: string, to: string) {
+    await repository.renameNavigationSection(
+      from,
+      to,
+      (now ?? new Date()).toISOString(),
+    );
+    await queueRefresh();
+  }
+
+  async function openNote(path: string) {
+    const file = app.vault.getFileByPath(path);
+    if (file) await app.openFile(file);
+  }
+
+  async function createList(input: TaskListCreateInput) {
+    const at = (now ?? new Date()).toISOString();
+    const title = "Untitled list";
+    const path = uniqueListPath(
+      app.vault.getMarkdownFiles().map((file) => file.path),
+      title,
+    );
+    await repository.createList({
+      path,
+      title,
+      at,
+      pin:
+        input.section && input.section !== "All lists"
+          ? { section: input.section }
+          : undefined,
+    });
+    if (input.nestUnderPath) {
+      await repository.nestList(path, input.nestUnderPath, at);
+    }
+    await queueRefresh();
+  }
+
+  async function unpinList(path: string) {
+    await repository.unpinList(path, (now ?? new Date()).toISOString());
+    await queueRefresh();
+  }
+
+  async function archiveList(path: string) {
+    await repository.archiveList(path, (now ?? new Date()).toISOString());
+    await queueRefresh();
+  }
+
+  async function deleteList(path: string) {
+    await repository.deleteList(path, (now ?? new Date()).toISOString());
     await queueRefresh();
   }
 
@@ -160,6 +220,13 @@
     onDeleteTask={(task) => void deleteTask(task)}
     onExpandList={(id) => void expandList(id)}
     onDropList={(sourcePath, target) => void dropList(sourcePath, target)}
+    onRenameList={(path, title) => void renameList(path, title)}
+    onRenameSection={(from, to) => void renameSection(from, to)}
+    onOpenNote={(path) => void openNote(path)}
+    onCreateList={(input) => void createList(input)}
+    onUnpinList={(path) => void unpinList(path)}
+    onArchiveList={(path) => void archiveList(path)}
+    onDeleteList={(path) => void deleteList(path)}
   />
 {/if}
 
