@@ -68,8 +68,8 @@
     },
   }}
   play={async ({ canvasElement }) => {
-    canvasElement.style.height = `${window.innerHeight}px`;
-    canvasElement.style.maxHeight = `${window.innerHeight}px`;
+    canvasElement.style.height = "100%";
+    canvasElement.style.maxHeight = "100%";
     canvasElement.style.overflow = "hidden";
     const canvas = await waitForReady(canvasElement);
 
@@ -124,8 +124,8 @@
     },
   }}
   play={async ({ canvasElement }) => {
-    canvasElement.style.height = `${window.innerHeight}px`;
-    canvasElement.style.maxHeight = `${window.innerHeight}px`;
+    canvasElement.style.height = "100%";
+    canvasElement.style.maxHeight = "100%";
     canvasElement.style.overflow = "hidden";
     const canvas = await waitForReady(canvasElement);
 

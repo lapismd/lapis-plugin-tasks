@@ -33,4 +33,4 @@
 | LN-TASK-019 | Implemented | Mutations rewrite one document then project; rolling complete resets only `## Checklist`. |
 | LN-TASK-020 | Implemented | `TaskRepository` queries AppDatabase projections; planner fixtures assert the same view ids as catalog summaries. |
 | LN-TASK-021 | Implemented | Planner Markdown fixtures round-trip through `parseTaskDocument`; list membership comes from task-list `## Items`. |
-| LN-TASK-022 | Implemented | `Plugins/Tasks/Shell` boots WorkspaceShell with File Explorer, Search, Markdown, and TasksPlugin against planner Markdown fixtures and pins the planner clock. |
+| LN-TASK-022 | Implemented | `Plugins/Tasks/Shell` boots WorkspaceShell with File Explorer, Search, Markdown, and TasksPlugin against planner Markdown fixtures, pins the planner clock, fills the canvas viewport, and keeps docs embeds at 700px. |

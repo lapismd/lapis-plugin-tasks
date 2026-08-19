@@ -73,29 +73,49 @@
 </div>
 
 <style>
-  :global(#storybook-root:has(.plugin-workspace-demo)) {
+  :global(html:has(body.sb-main-fullscreen .plugin-workspace-demo)),
+  :global(body.sb-main-fullscreen:has(.plugin-workspace-demo)) {
+    height: 100%;
+    height: 100dvh;
+    max-height: 100%;
+    overflow: hidden;
+  }
+
+  :global(
+      body.sb-main-fullscreen:has(#storybook-root .plugin-workspace-demo)
+        #storybook-root
+    ),
+  :global(
+      body.sb-main-fullscreen #storybook-root:has(.plugin-workspace-demo) > *
+    ) {
     box-sizing: border-box;
     width: 100%;
     height: 100%;
+    max-width: 100%;
+    max-height: 100%;
     min-height: 0;
     overflow: hidden;
     padding: 0 !important;
   }
 
-  :global(body:has(#storybook-root .plugin-workspace-demo)) {
-    overflow: hidden;
-  }
-
   .plugin-workspace-demo {
     position: relative;
-    display: grid;
+    display: flex;
+    flex-direction: column;
     width: 100%;
     height: 100%;
+    max-height: 100%;
     min-width: 0;
-    min-height: 44rem;
+    min-height: 0;
     overflow: hidden;
     color: var(--ui-workspace-foreground, var(--foreground));
     background: var(--ui-workspace-background, var(--background));
+  }
+
+  :global(.workspace-shell-docs-canvas) .plugin-workspace-demo {
+    height: 700px;
+    max-height: 700px;
+    min-height: 700px;
   }
 
   .plugin-workspace-demo--mobile {
@@ -108,6 +128,7 @@
 
   .plugin-workspace-demo
     > :global([data-ui-component="lapis-workspace-shell"]) {
+    flex: 1 1 0;
     width: 100%;
     height: 100%;
     min-width: 0;
