@@ -34,6 +34,8 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
   --ui-column-canvas-background: var(--sidebar);
   --ui-column-canvas-padding: 0.5rem;
   --ui-column-canvas-scrollbar-gap: 0px;
+  --task-column-canvas-column-gap: 0.75rem;
+  --ui-column-canvas-gap: 0px;
 
   box-sizing: border-box;
   flex: 1 1 auto;
@@ -57,7 +59,13 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
 .task-column-canvas-story__canvas
   [data-column-id="tasks"][data-ui-part="column"],
 .task-column-canvas-story__canvas
-  [data-column-id="tasks"][data-ui-part="collapsed-column"],
+  [data-column-id="tasks"][data-ui-part="collapsed-column"] {
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
 .task-column-canvas-story__canvas
   [data-column-id="detail"][data-ui-part="column"],
 .task-column-canvas-story__canvas
@@ -68,11 +76,23 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
 }
 
 .task-column-canvas-story__canvas
+  [data-column-id="planner"]
+  ~ [data-ui-part="column"],
+.task-column-canvas-story__canvas
+  [data-column-id="planner"]
+  ~ [data-ui-part="collapsed-column"],
+.task-column-canvas-story__canvas
+  [data-column-id="planner"]
+  ~ [data-ui-part="trailing-spacer"] {
+  margin-inline-start: var(--task-column-canvas-column-gap);
+}
+
+.task-column-canvas-story__canvas
   [data-column-id="tasks"]
-  + [data-column-id="planner"] {
-  margin-inline-start: calc(-1 * var(--ui-column-canvas-gap, 0.75rem));
-  border-start-start-radius: 0;
-  border-end-start-radius: 0;
+  > [data-ui-part="resize-handle"] {
+  top: var(--ui-column-canvas-radius, var(--radius-lg, var(--radius)));
+  height: auto;
+  bottom: var(--ui-column-canvas-radius, var(--radius-lg, var(--radius)));
 }
 
 .task-column-canvas-story__section-label {
