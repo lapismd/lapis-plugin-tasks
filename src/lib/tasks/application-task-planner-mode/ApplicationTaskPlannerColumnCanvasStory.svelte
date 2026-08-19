@@ -40,9 +40,9 @@
   const canvas = ColumnCanvas.createColumnCanvasController({
     columns: {
       tasks: {
-        defaultWidth: 260,
-        minWidth: 240,
-        maxWidth: 360,
+        defaultWidth: 196,
+        minWidth: 180,
+        maxWidth: 280,
         pathLevel: 0,
         collapsible: true,
         resizable: true,
