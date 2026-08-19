@@ -320,29 +320,25 @@
       </ColumnCanvas.Column>
 
       <ColumnCanvas.Column id="detail">
-        <div
-          class="task-column-canvas-story__pane task-column-canvas-story__pane--padded"
-        >
-          {#if activeTask}
-            <ApplicationTaskSidebarDetail
-              task={activeTask}
-              application={activeTaskApplication}
-              onToggleDone={toggleActiveTaskDone}
-              onUpdateTitle={updateActiveTaskTitle}
-              onRemoveTask={removeActiveTask}
-              onOpenApplication={handleOpenApplication}
-            >
-              {#snippet closeAction()}
-                <ColumnCanvas.Close onclick={closeDetailColumn} />
-              {/snippet}
-            </ApplicationTaskSidebarDetail>
-          {:else}
-            <div class="task-column-canvas-story__related-empty">
+        {#if activeTask}
+          <ApplicationTaskSidebarDetail
+            task={activeTask}
+            application={activeTaskApplication}
+            onToggleDone={toggleActiveTaskDone}
+            onUpdateTitle={updateActiveTaskTitle}
+            onRemoveTask={removeActiveTask}
+            onOpenApplication={handleOpenApplication}
+          >
+            {#snippet closeAction()}
               <ColumnCanvas.Close onclick={closeDetailColumn} />
-              <p>Select a Task’s details control to open it here.</p>
-            </div>
-          {/if}
-        </div>
+            {/snippet}
+          </ApplicationTaskSidebarDetail>
+        {:else}
+          <div class="task-column-canvas-story__related-empty">
+            <ColumnCanvas.Close onclick={closeDetailColumn} />
+            <p>Select a Task’s details control to open it here.</p>
+          </div>
+        {/if}
       </ColumnCanvas.Column>
 
       <ColumnCanvas.Column

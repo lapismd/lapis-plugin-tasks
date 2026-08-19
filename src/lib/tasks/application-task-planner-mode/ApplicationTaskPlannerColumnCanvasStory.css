@@ -1,28 +1,70 @@
+html:has(.task-column-canvas-story) {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+body.sb-main-fullscreen:has(.task-column-canvas-story),
+body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story),
+body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) > * {
+  box-sizing: border-box;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
 body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
   padding: 0;
 }
 
 .task-column-canvas-story {
   box-sizing: border-box;
+  display: flex;
   width: 100%;
-  min-width: 70rem;
-  height: 100vh;
-  min-height: 42rem;
+  min-width: 0;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
   overflow: hidden;
   padding: 1.5rem;
   background: var(--ui-tasks-muted-background);
 }
 
 .task-column-canvas-story__canvas {
+  --ui-column-canvas-background: var(--sidebar);
+  --ui-column-canvas-padding: 0.5rem;
+  --ui-column-canvas-scrollbar-gap: 0px;
+
   box-sizing: border-box;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
   height: 100%;
   min-height: 0;
   overflow: hidden;
   border: 1px solid var(--ui-tasks-border);
   border-radius: var(--ui-tasks-radius);
-  background: var(--ui-tasks-background);
+  background: var(--sidebar);
   box-shadow: 0 1rem 2.5rem
     color-mix(in srgb, var(--ui-tasks-foreground) 9%, transparent);
+}
+
+.task-column-canvas-story__canvas
+  [data-ui-component="column-canvas"][data-ui-part="root"] {
+  min-width: 0;
+}
+
+.task-column-canvas-story__canvas
+  [data-column-id="tasks"][data-ui-part="column"],
+.task-column-canvas-story__canvas
+  [data-column-id="tasks"][data-ui-part="collapsed-column"],
+.task-column-canvas-story__canvas
+  [data-column-id="detail"][data-ui-part="column"],
+.task-column-canvas-story__canvas
+  [data-column-id="detail"][data-ui-part="collapsed-column"] {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .task-column-canvas-story__section-label {
@@ -78,12 +120,10 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
   overflow: hidden;
 }
 
-.task-column-canvas-story__pane--padded {
-  padding: 0.5rem;
-}
-
-.task-column-canvas-story__pane :global(.application-task-view),
-.task-column-canvas-story__pane :global(.task-sidebar-detail) {
+.task-column-canvas-story__pane .application-task-view,
+.task-column-canvas-story__canvas
+  [data-column-id="detail"]
+  > .task-sidebar-detail {
   flex: 1 1 auto;
   min-width: 0;
   min-height: 0;
