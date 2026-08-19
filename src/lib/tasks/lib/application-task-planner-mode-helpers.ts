@@ -43,6 +43,12 @@ const plannerPlacementKeys = [
 	'dueAt',
 	'scheduledAt',
 	'when',
+	'start',
+	'planDate',
+	'planAt',
+	'deadline',
+	'inbox',
+	'listId',
 	'status',
 	'completedAt',
 	'order'
@@ -74,6 +80,7 @@ export function plannerMovePatchToApplicationPatch(
 	if ('dueAt' in patch) nextPatch.dueAt = patch.dueAt ?? undefined;
 	if ('scheduledAt' in patch) nextPatch.scheduledAt = patch.scheduledAt ?? undefined;
 	if ('when' in patch) nextPatch.when = patch.when ?? undefined;
+	if ('deadline' in patch) nextPatch.dueAt = patch.deadline ?? nextPatch.dueAt;
 	if ('status' in patch) nextPatch.status = patch.status;
 	if ('completedAt' in patch) nextPatch.completedAt = patch.completedAt ?? undefined;
 	if ('order' in patch) nextPatch.order = patch.order;
@@ -101,20 +108,24 @@ export function visiblePlannerTasks(
 				)
 			);
 	}
+	if (taskView === 'inbox') return snapshot.inbox;
 	if (taskView === 'today') return [...snapshot.today, ...snapshot.thisEvening];
 	if (taskView === 'upcoming')
 		return snapshot.upcomingRows.flatMap((row) => (row.kind === 'day' ? row.tasks : []));
 	if (taskView === 'anytime') return snapshot.anytime;
 	if (taskView === 'someday') return snapshot.someday;
+	if (taskView === 'review') return snapshot.review;
 	return snapshot.logbook.flatMap((group) => group.tasks);
 }
 
 export function plannerTasksForListId(tasks: Task[], listId: string) {
 	const snapshot = buildTaskPlannerSnapshot(tasks);
+	if (listId === 'inbox') return snapshot.inbox;
 	if (listId === 'today') return snapshot.today;
 	if (listId === 'this-evening') return snapshot.thisEvening;
 	if (listId === 'anytime') return snapshot.anytime;
 	if (listId === 'someday') return snapshot.someday;
+	if (listId === 'review') return snapshot.review;
 	if (listId.startsWith('upcoming:')) {
 		const date = listId.slice('upcoming:'.length);
 		return snapshot.upcoming.find((group) => group.date === date)?.tasks ?? [];
@@ -162,11 +173,17 @@ export function buildPlannerDragLayout(
 	}
 
 	const snapshot = buildTaskPlannerSnapshot(tasks, now);
+	if (taskView === 'inbox') {
+		return { inbox: snapshot.inbox.map((task) => task.id) };
+	}
 	if (taskView === 'today') {
 		return {
 			today: snapshot.today.map((task) => task.id),
 			'this-evening': snapshot.thisEvening.map((task) => task.id)
 		};
+	}
+	if (taskView === 'review') {
+		return { review: snapshot.review.map((task) => task.id) };
 	}
 	if (taskView === 'upcoming') {
 		return Object.fromEntries(
@@ -226,7 +243,7 @@ export function plannerDropDescriptorForList(listId: string): PlannerDropDescrip
 	if (listId === 'today' || listId === 'this-evening') {
 		return { type: 'planner-list', listId, bucket: 'today' };
 	}
-	if (listId === 'anytime' || listId === 'someday') {
+	if (listId === 'inbox' || listId === 'anytime' || listId === 'someday' || listId === 'review') {
 		return { type: 'planner-list', listId, bucket: listId };
 	}
 	if (listId.startsWith('upcoming:')) {
@@ -376,6 +393,12 @@ function applyPlannerMovePatch(task: Task, patch: TaskPlannerMovePatch): Task {
 		...('dueAt' in patch ? { dueAt: patch.dueAt ?? undefined } : {}),
 		...('scheduledAt' in patch ? { scheduledAt: patch.scheduledAt ?? undefined } : {}),
 		...('when' in patch ? { when: patch.when ?? undefined } : {}),
+		...('start' in patch ? { start: patch.start ?? undefined } : {}),
+		...('planDate' in patch ? { planDate: patch.planDate ?? undefined } : {}),
+		...('planAt' in patch ? { planAt: patch.planAt ?? undefined } : {}),
+		...('deadline' in patch ? { deadline: patch.deadline ?? undefined } : {}),
+		...('inbox' in patch ? { inbox: patch.inbox ?? undefined } : {}),
+		...('listId' in patch ? { listId: patch.listId ?? undefined } : {}),
 		...('status' in patch ? { status: patch.status ?? task.status } : {}),
 		...('completedAt' in patch ? { completedAt: patch.completedAt ?? undefined } : {}),
 		...('updatedAt' in patch ? { updatedAt: patch.updatedAt ?? task.updatedAt } : {}),

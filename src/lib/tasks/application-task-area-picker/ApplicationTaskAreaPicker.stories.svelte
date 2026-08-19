@@ -16,7 +16,7 @@
           type: "code",
         },
         description: {
-          component: "Area tag picker for application tasks.",
+          component: "List picker for a task's single task-list parent.",
         },
       },
     },

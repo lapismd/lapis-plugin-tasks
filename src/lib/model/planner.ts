@@ -1,3 +1,5 @@
+import { catalogTaskFromSummary } from "./catalog-adapter";
+import type { TaskRepository } from "./task-repository";
 import type { Task, TaskBucket, TaskStatus, TaskWhen } from "./types";
 
 export type TaskPlannerDateGroup = {
@@ -61,7 +63,7 @@ export type TaskPlannerPlacementSource =
 
 export type TaskPlannerDropTarget =
   | {
-      bucket: "today" | "anytime" | "someday" | "logbook";
+      bucket: "inbox" | "today" | "anytime" | "someday" | "review" | "logbook";
     }
   | {
       bucket: "upcoming";
@@ -72,6 +74,12 @@ export type TaskPlannerMovePatch = {
   dueAt?: string | null;
   scheduledAt?: string | null;
   when?: TaskWhen | null;
+  start?: "anytime" | "someday" | string | null;
+  planDate?: string | null;
+  planAt?: "anytime" | "all-day" | "evening" | string | null;
+  deadline?: string | null;
+  inbox?: boolean;
+  listId?: string | null;
   status?: TaskStatus;
   completedAt?: string | null;
   order?: number;
@@ -81,12 +89,14 @@ export type TaskPlannerMovePatch = {
 export type PlannerSelectionPosition = "single" | "first" | "middle" | "last";
 
 export type TaskPlannerSnapshot = {
+  inbox: Task[];
   today: Task[];
   thisEvening: Task[];
   upcoming: TaskPlannerDateGroup[];
   upcomingRows: TaskPlannerUpcomingRow[];
   anytime: Task[];
   someday: Task[];
+  review: Task[];
   logbook: TaskPlannerDateGroup[];
   areas: TaskAreaSummary[];
 };
@@ -223,15 +233,28 @@ function buildUpcomingGapRow(
 }
 
 function isCompleted(task: Task) {
-  return task.status === "done" || Boolean(task.completedAt);
+  return (
+    task.status === "done" ||
+    task.status === "completed" ||
+    Boolean(task.completedAt)
+  );
 }
 
 function taskPlannerDate(task: Task) {
-  return taskDateOnly(task.scheduledAt) ?? taskDateOnly(task.dueAt);
+  return (
+    taskDateOnly(task.planDate) ??
+    taskDateOnly(task.scheduledAt) ??
+    taskDateOnly(task.deadline) ??
+    taskDateOnly(task.dueAt)
+  );
 }
 
 function hasPlannerOverride(task: Task) {
-  return task.when === "anytime" || task.when === "someday";
+  return (
+    task.start === "someday" ||
+    task.when === "anytime" ||
+    task.when === "someday"
+  );
 }
 
 function taskScheduledOrDueDate(task: Task) {
@@ -259,13 +282,33 @@ export function classifyTask(
   today = formatDateOnly(new Date()),
 ): TaskBucket {
   if (isCompleted(task)) return "logbook";
-  if (task.when === "someday") return "someday";
-  if (task.when === "anytime") return "anytime";
-  if (task.when === "this-evening") return "today";
-  if (task.when === "today") return "today";
-  const date = taskScheduledOrDueDate(task);
-  if (date && date <= today) return "today";
-  if (date && date > today) return "upcoming";
+  if (task.inbox) return "inbox";
+  if (task.start === "someday" || task.when === "someday") return "someday";
+  const planDate = taskDateOnly(task.planDate) ?? taskDateOnly(task.scheduledAt);
+  const deadline = taskDateOnly(task.deadline) ?? taskDateOnly(task.dueAt);
+  const startDate = taskDateOnly(
+    task.start && task.start !== "anytime" && task.start !== "someday"
+      ? task.start
+      : undefined,
+  );
+  if (planDate && planDate < today) return "review";
+  if (
+    task.when === "this-evening" ||
+    task.when === "today" ||
+    task.planAt === "evening"
+  ) {
+    if (!planDate || planDate <= today) return "today";
+  }
+  if ((planDate && planDate <= today) || (deadline && deadline <= today)) {
+    return "today";
+  }
+  if (
+    (startDate && startDate > today) ||
+    (planDate && planDate > today) ||
+    (deadline && deadline > today)
+  ) {
+    return "upcoming";
+  }
   return "anytime";
 }
 
@@ -274,29 +317,63 @@ export function getTaskPlannerPlacementSource(
 ): TaskPlannerPlacementSource {
   if (isCompleted(task)) return "completedAt";
   if (task.when) return "when";
-  if (taskDateOnly(task.scheduledAt)) return "scheduledAt";
-  if (taskDateOnly(task.dueAt)) return "dueAt";
+  if (taskDateOnly(task.planDate) || taskDateOnly(task.scheduledAt)) {
+    return "scheduledAt";
+  }
+  if (taskDateOnly(task.deadline) || taskDateOnly(task.dueAt)) return "dueAt";
   return "none";
 }
 
 export function resolveTaskPlannerPlacement(
   placement: TaskPlannerPlacement,
   now = new Date(),
-): Pick<TaskPlannerMovePatch, "scheduledAt" | "when"> {
+): Pick<
+  TaskPlannerMovePatch,
+  "scheduledAt" | "when" | "start" | "planDate" | "planAt"
+> {
   const today = formatDateOnly(now);
   if (placement === "today") {
-    return { scheduledAt: today, when: null };
+    return {
+      scheduledAt: today,
+      when: null,
+      start: "anytime",
+      planDate: today,
+      planAt: "anytime",
+    };
   }
   if (placement === "this-evening") {
-    return { scheduledAt: today, when: "this-evening" };
+    return {
+      scheduledAt: today,
+      when: "this-evening",
+      start: "anytime",
+      planDate: today,
+      planAt: "evening",
+    };
   }
   if (placement === "anytime") {
-    return { scheduledAt: null, when: "anytime" };
+    return {
+      scheduledAt: null,
+      when: "anytime",
+      start: "anytime",
+      planDate: null,
+      planAt: null,
+    };
   }
   if (placement === "someday") {
-    return { scheduledAt: null, when: "someday" };
+    return {
+      scheduledAt: null,
+      when: "someday",
+      start: "someday",
+      planDate: null,
+      planAt: null,
+    };
   }
-  return { scheduledAt: null, when: null };
+  return {
+    scheduledAt: null,
+    when: null,
+    planDate: null,
+    planAt: null,
+  };
 }
 
 export function buildTaskPlannerMovePatch(
@@ -306,6 +383,19 @@ export function buildTaskPlannerMovePatch(
 ): TaskPlannerMovePatch {
   const updatedAt = now.toISOString();
   const activePatch = activeTaskPatch(task);
+  if (target.bucket === "inbox") {
+    return compactMovePatch({
+      ...activePatch,
+      inbox: true,
+      updatedAt,
+    });
+  }
+  if (target.bucket === "review") {
+    return compactMovePatch({
+      ...activePatch,
+      updatedAt,
+    });
+  }
   if (target.bucket === "today") {
     return compactMovePatch({
       ...activePatch,
@@ -342,7 +432,14 @@ export function buildTaskPlannerMovePatch(
     const date = taskDateOnly(target.date) ?? target.date;
     const source = getTaskPlannerPlacementSource(task);
     const datePatch =
-      source === "dueAt" ? { dueAt: date } : { scheduledAt: date };
+      source === "dueAt"
+        ? { dueAt: date, deadline: date }
+        : {
+            scheduledAt: date,
+            planDate: date,
+            planAt: "anytime" as const,
+            start: "anytime" as const,
+          };
     return compactMovePatch({
       ...activePatch,
       ...datePatch,
@@ -442,16 +539,76 @@ export function buildUpcomingRows(
   return rows;
 }
 
+export async function buildTaskPlannerSnapshotFromRepository(
+  repository: TaskRepository,
+  now = new Date(),
+): Promise<TaskPlannerSnapshot> {
+  const today = formatDateOnly(now);
+  const [
+    inbox,
+    todayTasks,
+    anytime,
+    upcoming,
+    someday,
+    review,
+    completed,
+    lists,
+  ] = await Promise.all([
+    repository.inbox(today),
+    repository.today(today),
+    repository.anytime(today),
+    repository.upcoming(today),
+    repository.someday(),
+    repository.review(today),
+    repository.completed(),
+    repository.lists(),
+  ]);
+  const seen = new Set<string>();
+  const tasks: Task[] = [];
+  for (const summary of [
+    ...inbox,
+    ...todayTasks,
+    ...anytime,
+    ...upcoming,
+    ...someday,
+    ...review,
+    ...completed,
+  ]) {
+    if (seen.has(summary.id)) continue;
+    seen.add(summary.id);
+    const parent = await repository.parent(summary.path);
+    tasks.push({
+      ...catalogTaskFromSummary(summary),
+      listId: parent?.kind === "task-list" ? parent.id : undefined,
+      areas: parent?.kind === "task-list" ? [parent.title] : [],
+    });
+  }
+  const snapshot = buildTaskPlannerSnapshot(tasks, now);
+  if (lists.length) {
+    snapshot.areas = lists
+      .filter((list) => list.status === "active")
+      .map((list) => ({
+        id: list.id,
+        title: list.title,
+        count: tasks.filter((task) => task.listId === list.id).length,
+      }))
+      .sort((left, right) => left.title.localeCompare(right.title));
+  }
+  return snapshot;
+}
+
 export function buildTaskPlannerSnapshot(
   tasks: Task[],
   now = new Date(),
 ): TaskPlannerSnapshot {
   const today = formatDateOnly(now);
   const buckets: Record<TaskBucket, Task[]> = {
+    inbox: [],
     today: [],
     upcoming: [],
     anytime: [],
     someday: [],
+    review: [],
     logbook: [],
   };
   for (const task of tasks) {
@@ -473,7 +630,12 @@ export function buildTaskPlannerSnapshot(
   const areas = new Map<string, TaskAreaSummary>();
   for (const task of tasks) {
     if (isCompleted(task)) continue;
-    for (const area of task.areas) {
+    const labels = task.areas.length
+      ? task.areas
+      : task.listId
+        ? [task.listId]
+        : [];
+    for (const area of labels) {
       const key = area.toLowerCase();
       const current = areas.get(key);
       if (current) current.count += 1;
@@ -486,16 +648,18 @@ export function buildTaskPlannerSnapshot(
     }
   }
   return {
+    inbox: [...buckets.inbox].sort(comparePlannerTasks),
     today: buckets.today
-      .filter((task) => task.when !== "this-evening")
+      .filter((task) => task.when !== "this-evening" && task.planAt !== "evening")
       .sort(comparePlannerTasks),
     thisEvening: buckets.today
-      .filter((task) => task.when === "this-evening")
+      .filter((task) => task.when === "this-evening" || task.planAt === "evening")
       .sort(comparePlannerTasks),
     upcoming,
     upcomingRows: buildUpcomingRows(upcoming, today),
     anytime: [...buckets.anytime].sort(comparePlannerTasks),
     someday: [...buckets.someday].sort(comparePlannerTasks),
+    review: [...buckets.review].sort(comparePlannerTasks),
     logbook,
     areas: [...areas.values()].sort((left, right) =>
       left.title.localeCompare(right.title),

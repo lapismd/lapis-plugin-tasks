@@ -1,17 +1,19 @@
 /**
- * Internal compatibility model for the pinned CV reference catalog.
- * Legacy applicationId and linkedTo fields intentionally stop at this boundary.
+ * Catalog compatibility model. Canonical Markdown documents live in
+ * `task-document.ts`. Legacy applicationId and linkedTo fields stay fixture-only.
  */
-export const TASK_SCHEMA_VERSION = "cvstudio.tasks.v1";
+export const TASK_SCHEMA_VERSION = "tasks/v1";
 
-export type TaskStatus = "todo" | "waiting" | "done";
+export type TaskStatus = "todo" | "waiting" | "done" | "open" | "completed" | "canceled";
 export type TaskPriority = "low" | "medium" | "high";
 export type TaskWhen = "today" | "this-evening" | "anytime" | "someday";
 export type TaskBucket =
+  | "inbox"
   | "today"
   | "upcoming"
   | "anytime"
   | "someday"
+  | "review"
   | "logbook";
 
 export type TaskLink = {
@@ -40,6 +42,13 @@ export type Task = {
   dueAt?: string;
   scheduledAt?: string;
   when?: TaskWhen;
+  inbox?: boolean;
+  start?: "anytime" | "someday" | string;
+  planDate?: string;
+  planAt?: "anytime" | "all-day" | "evening" | string;
+  planDuration?: string;
+  deadline?: string;
+  listId?: string;
   areas: string[];
   tags: string[];
   completedAt?: string;
@@ -67,6 +76,13 @@ export type CreateTaskInput = {
   dueAt?: string;
   scheduledAt?: string;
   when?: TaskWhen;
+  inbox?: boolean;
+  start?: "anytime" | "someday" | string;
+  planDate?: string;
+  planAt?: "anytime" | "all-day" | "evening" | string;
+  planDuration?: string;
+  deadline?: string;
+  listId?: string;
   areas?: string[];
   tags?: string[];
   completedAt?: string;
@@ -75,6 +91,7 @@ export type CreateTaskInput = {
   order?: number;
   todayOrder?: number;
   areaOrder?: number;
+  sourcePath?: string;
   notes?: string;
 };
 
@@ -103,6 +120,12 @@ export type ApplicationTaskAdapter = {
   priority?: TaskPriority;
   linkedTo?: TaskLink;
   areas?: string[];
+  listId?: string;
+  start?: "anytime" | "someday" | string;
+  planDate?: string;
+  planAt?: "anytime" | "all-day" | "evening" | string;
+  deadline?: string;
+  inbox?: boolean;
   notes?: string;
   order?: number;
 };

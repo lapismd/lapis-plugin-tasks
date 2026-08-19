@@ -364,6 +364,16 @@
 					? patch.scheduledAt
 					: task.scheduledAt,
 				when: Object.prototype.hasOwnProperty.call(patch, 'when') ? patch.when : task.when,
+				start: Object.prototype.hasOwnProperty.call(patch, 'start') ? patch.start : task.start,
+				planDate: Object.prototype.hasOwnProperty.call(patch, 'planDate')
+					? patch.planDate
+					: task.planDate,
+				planAt: Object.prototype.hasOwnProperty.call(patch, 'planAt') ? patch.planAt : task.planAt,
+				deadline: Object.prototype.hasOwnProperty.call(patch, 'deadline')
+					? patch.deadline
+					: task.deadline,
+				inbox: Object.prototype.hasOwnProperty.call(patch, 'inbox') ? patch.inbox : task.inbox,
+				listId: Object.prototype.hasOwnProperty.call(patch, 'listId') ? patch.listId : task.listId,
 				completedAt: Object.prototype.hasOwnProperty.call(patch, 'completedAt')
 					? patch.completedAt
 					: task.completedAt,

@@ -165,7 +165,7 @@
   }
 
   function updateTaskAreas(areas: string[]) {
-    onUpdateTask(task, { areas });
+    onUpdateTask(task, { areas, listId: areas[0] });
   }
 
   function removeTask() {
@@ -324,6 +324,7 @@
         <ApplicationTaskAreaPicker
           variant="chip"
           areas={task.areas}
+          listId={task.listId ?? task.areas[0]}
           options={areaOptions}
           onChange={updateTaskAreas}
         />

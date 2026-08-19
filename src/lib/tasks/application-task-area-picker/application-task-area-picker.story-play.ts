@@ -7,7 +7,7 @@ export async function playAreaPickerUsesCommandView({
   canvasElement: HTMLElement;
 }) {
   const trigger = canvasElement.querySelector<HTMLButtonElement>(
-    '[data-task-area-picker] button[aria-label="Task area"]',
+    '[data-task-area-picker] button[aria-label="Task list"]',
   );
   expect(trigger).not.toBeNull();
   await userEvent.click(trigger!);

@@ -16,6 +16,12 @@ export function taskToApplicationTask(task: Task): ApplicationTaskAdapter {
     priority: task.priority,
     linkedTo: task.linkedTo,
     areas: task.areas,
+    listId: task.listId,
+    start: task.start,
+    planDate: task.planDate,
+    planAt: task.planAt,
+    deadline: task.deadline ?? task.dueAt,
+    inbox: task.inbox,
     notes: task.notes.trim() || undefined,
     order: task.order,
   };
@@ -35,7 +41,8 @@ export function applicationTaskToTask(
     priority: task.priority,
     applicationId,
     linkedTo: task.linkedTo,
-    dueAt: task.dueAt,
+    dueAt: task.dueAt ?? task.deadline,
+    deadline: task.deadline ?? task.dueAt,
     completedAt: task.completedAt,
     createdAt,
     updatedAt,
@@ -48,6 +55,21 @@ export function applicationTaskToTask(
     areas: Object.prototype.hasOwnProperty.call(task, "areas")
       ? task.areas
       : existing?.areas,
+    listId: Object.prototype.hasOwnProperty.call(task, "listId")
+      ? task.listId
+      : existing?.listId,
+    start: Object.prototype.hasOwnProperty.call(task, "start")
+      ? task.start
+      : existing?.start,
+    planDate: Object.prototype.hasOwnProperty.call(task, "planDate")
+      ? task.planDate
+      : existing?.planDate,
+    planAt: Object.prototype.hasOwnProperty.call(task, "planAt")
+      ? task.planAt
+      : existing?.planAt,
+    inbox: Object.prototype.hasOwnProperty.call(task, "inbox")
+      ? task.inbox
+      : existing?.inbox,
     tags: existing?.tags,
     order: task.order ?? existing?.order,
     todayOrder: existing?.todayOrder,

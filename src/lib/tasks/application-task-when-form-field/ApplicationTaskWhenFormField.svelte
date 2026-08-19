@@ -13,6 +13,10 @@
   type TaskWhenValue = {
     scheduledAt?: string;
     when?: TaskWhen;
+    start?: "anytime" | "someday" | string;
+    planDate?: string;
+    planAt?: "anytime" | "all-day" | "evening" | string;
+    deadline?: string;
   };
 
   let {
@@ -49,6 +53,9 @@
     void update({
       scheduledAt: patch.scheduledAt ?? undefined,
       when: patch.when ?? undefined,
+      start: patch.start ?? undefined,
+      planDate: patch.planDate ?? undefined,
+      planAt: patch.planAt ?? undefined,
     });
   }
 </script>
@@ -69,8 +76,22 @@
     {pickerId}
     scheduledAt={scheduleValue.scheduledAt}
     when={scheduleValue.when}
-    onSelectDate={(date) => void update({ scheduledAt: date, when: undefined })}
+    onSelectDate={(date) =>
+      void update({
+        scheduledAt: date,
+        when: undefined,
+        start: "anytime",
+        planDate: date,
+        planAt: "anytime",
+      })}
     onSelectPlacement={selectPlacement}
-    onClear={() => void update({ scheduledAt: undefined, when: undefined })}
+    onClear={() =>
+      void update({
+        scheduledAt: undefined,
+        when: undefined,
+        start: "anytime",
+        planDate: undefined,
+        planAt: undefined,
+      })}
   />
 {/if}

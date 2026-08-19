@@ -45,6 +45,7 @@
         priority: input.priority,
         scheduledAt: input.scheduledAt,
         when,
+        listId: input.area ?? undefined,
         areas: input.area ? [input.area] : [],
         order: input.order,
         createdAt: now,

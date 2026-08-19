@@ -21,7 +21,15 @@
 | LN-TASK-007 | Implemented | No desktop or web host registration is present in this repository. |
 | LN-TASK-008 | Implemented | Public `src/lib/index.ts` exports the plugin and catalog components without `TaskDueCalendar`. |
 | LN-TASK-009 | Implemented | Catalog Autodocs stories set `parameters.docs.source` to public package imports. |
-| LN-TASK-010 | Planned | Vault files, views, commands, and panels remain unspecified. |
+| LN-TASK-010 | Implemented | Stub `onload` still registers no views, commands, or host panels; file format is specified by LN-TASK-014 onward. |
 | LN-TASK-011 | Implemented | CV-only fields live in `src/lib/model` fixtures. |
 | LN-TASK-012 | Implemented | `Plugins/Tasks/Panels` Column Canvas story fills the viewport without page scroll, blends the leading Tasks column without a bottom border, squares the sticky Tasks overlay, keeps the planner start corners complete, curves the Tasks resize handle around those corners, sizes Tasks to its labels and counts, aligns the Tasks and planner headers, keeps visible Tasks hover and selected states, mounts detail without a wrapper, and flushes the Tasks resize handle to the planner start border. |
-| LN-TASK-013 | Implemented | `ApplicationTaskAreaPicker` composes Command View; Area Picker Sample areas play asserts the command-view host. |
+| LN-TASK-013 | Implemented | `ApplicationTaskAreaPicker` composes Command View as the list picker; Area Picker Sample areas play asserts the command-view host. |
+| LN-TASK-014 | Implemented | `parseTaskDocument` requires `type: task` and `id`; title comes from the first H1. |
+| LN-TASK-015 | Implemented | `parseTaskDocument` accepts `type: task-list` with `list.status` active or archived. |
+| LN-TASK-016 | Implemented | Task front matter maps nested `task:` status, start, inbox, plan, deadline, and repeat; view flags are not stored. |
+| LN-TASK-017 | Implemented | Reserved-section parser indexes Checklist checkboxes and Subtasks/Items links without checkbox wrappers. |
+| LN-TASK-018 | Implemented | `task-queries` derives Inbox, Today, Anytime, Upcoming, Someday, Completed, and Review without rewriting plan dates. |
+| LN-TASK-019 | Implemented | Mutations rewrite one document then project; rolling complete resets only `## Checklist`. |
+| LN-TASK-020 | Implemented | `TaskRepository` queries AppDatabase projections; planner fixtures assert the same view ids as catalog summaries. |
+| LN-TASK-021 | Implemented | Planner Markdown fixtures round-trip through `parseTaskDocument`; list membership comes from task-list `## Items`. |

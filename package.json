@@ -62,7 +62,8 @@
     "@dnd-kit/svelte": "0.5.0",
     "@internationalized/date": "3.12.2",
     "@lucide/svelte": "^0.523.0",
-    "chrono-node": "^2.10.1"
+    "chrono-node": "^2.10.1",
+    "yaml": "^2.9.0"
   },
   "peerDependencies": {
     "@lapis-notes/api": "^0.0.1",

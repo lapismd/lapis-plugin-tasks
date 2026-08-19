@@ -5,7 +5,7 @@
 		value = [],
 		update,
 		options = [],
-		ariaLabel = 'Task area'
+		ariaLabel = 'Task list'
 	}: {
 		value?: string[];
 		update: (areas: string[]) => void | Promise<void>;

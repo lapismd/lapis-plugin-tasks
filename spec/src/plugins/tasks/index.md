@@ -1,13 +1,15 @@
 # Tasks Plugin
 
 `@lapis-notes/lapis-plugin-tasks` owns the first-party external Tasks catalog
-and a stub plugin runtime. Vault persistence, views, commands, and host
-registration remain planned. Reusable leaf controls come from public Design
-Core APIs. `ApplicationTaskAreaPicker` composes Design Core Command View for
-the searchable area list. The `Plugins/Tasks/Panels` catalog story composes planner
-navigation, planner body, and task detail with Design Core Column Canvas.
-That presentation is not a host movable-panel runtime; LN-TASK-010 remains
-Planned for vault views, commands, and movable panels.
+and a stub plugin runtime. A task is a Markdown file with YAML front matter.
+The filesystem is authoritative. AppDatabase task rows are disposable
+projections. Host views, commands, and movable panels remain unspecified.
+Reusable leaf controls come from public Design Core APIs.
+`ApplicationTaskAreaPicker` is the catalog list picker and composes Design
+Core Command View. The
+`Plugins/Tasks/Panels` catalog story composes planner navigation, planner
+body, and task detail with Design Core Column Canvas. That presentation is
+not a host movable-panel runtime.
 
 ## Requirements
 
@@ -22,7 +24,15 @@ Planned for vault views, commands, and movable panels.
 | LN-TASK-007 | Desktop and web hosts MUST NOT register or load this plugin until a later Lapis requirement authorizes host cutover. |
 | LN-TASK-008 | The public package export MUST include `TasksPlugin` and the catalog components. It MUST NOT re-export Design Core `TaskDueCalendar`. |
 | LN-TASK-009 | Autodocs Show Code MUST use public `@lapis-notes/lapis-plugin-tasks` imports, not story-only harness wrappers. |
-| LN-TASK-010 | Vault task files, workspace views, commands, and movable panels MUST remain unspecified for this stub and MUST NOT be invented in source. |
+| LN-TASK-010 | Workspace views, commands, and host movable panels MUST remain unspecified in this slice. `onload` MUST NOT register them. |
 | LN-TASK-011 | CV-only `applicationId`, `linkedTo`, and `JobApplication` shapes MUST stay in catalog model fixtures and MUST NOT become canonical Task resource types. |
 | LN-TASK-012 | Package Storybook MUST include a `Plugins/Tasks/Panels` Column Canvas composition of planner navigation, planner body, and closeable task detail without `AppShell`. Additional closeable columns MAY open from the selected task. This catalog canvas MUST consume public Design Core `column-canvas`, MUST fill the Storybook viewport without page-level scrollbars, MUST use the App Shell sidebar surface, MUST render the leading Tasks column without a column border so it blends into that surface, MUST render the sticky Tasks overlay without corner radius, MUST keep the planner column’s start corners complete, MUST clip the Tasks resize handle to those start corners, MUST size the leading Tasks column to the navigation labels and counts, MUST align the Tasks column header with the planner column header, MUST keep Tasks column hover and selected item states visible on the sidebar surface, MUST mount task detail directly in the detail column without an extra story wrapper, MUST place the Tasks resize handle on the planner column’s start border with no gap between those two columns, and MUST NOT register host movable panels. |
-| LN-TASK-013 | `ApplicationTaskAreaPicker` MUST compose `@lapismd/design-core/shadcn/command-view` for the searchable area list. It MUST NOT use native Command as that picker surface. |
+| LN-TASK-013 | `ApplicationTaskAreaPicker` MUST compose `@lapismd/design-core/shadcn/command-view` for the searchable list picker. It MUST NOT use native Command as that picker surface. |
+| LN-TASK-014 | A canonical task MUST be a Markdown file whose front matter includes `type: task` and a stable `id`. The display title MUST be the first H1, else the filename. Child files MUST NOT store parent or list ids. |
+| LN-TASK-015 | A canonical list MUST be a Markdown file whose front matter includes `type: task-list` and a stable `id`. `list.status` MUST be `active` or `archived`. Lists MUST NOT be completable outcomes. |
+| LN-TASK-016 | Task planning metadata MUST nest under `task:` with `status` `open`, `completed`, or `canceled`, and `start` `anytime`, `someday`, or a date. Inbox, plan, deadline, repeat, and comments MAY be omitted. YAML MUST NOT store `today` or `upcoming` flags. |
+| LN-TASK-017 | `## Checklist` MUST hold lightweight checkboxes only. `## Subtasks` MUST hold Markdown links to task files without wrapping checkboxes. `## Items` MUST hold links to task or task-list files. Other links MUST be ordinary references. |
+| LN-TASK-018 | Inbox, Today, Anytime, Upcoming, Someday, Completed, and daily Review MUST be derived queries over projections. Overdue `plan.date` values MUST stay visible until the user reschedules, completes, skips, or cancels. |
+| LN-TASK-019 | Mutations MUST edit one Markdown file or parent reserved-section links, then upsert the projection from that parse. Completing a linked child MUST update the child file. Rolling complete MAY reset only `## Checklist`. |
+| LN-TASK-020 | Planner lists and cards MUST consume `TaskSummary` rows from the AppDatabase tasks projection. Detail and editor surfaces MAY load the Markdown `TaskDocument`. UI MUST NOT treat the database as authoritative. |
+| LN-TASK-021 | Canonical catalog types MUST use the Markdown-first schema. Catalog planner fixtures MUST round-trip through task documents. Area membership MUST mean a task-list `## Items` parent. |

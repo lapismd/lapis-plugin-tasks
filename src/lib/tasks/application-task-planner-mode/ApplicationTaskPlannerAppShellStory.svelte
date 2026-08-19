@@ -3,8 +3,10 @@
   import BoxesIcon from "@lucide/svelte/icons/boxes";
   import CalendarClockIcon from "@lucide/svelte/icons/calendar-clock";
   import CalendarDaysIcon from "@lucide/svelte/icons/calendar-days";
+  import CircleAlertIcon from "@lucide/svelte/icons/circle-alert";
   import CircleEllipsisIcon from "@lucide/svelte/icons/circle-ellipsis";
   import FolderKanbanIcon from "@lucide/svelte/icons/folder-kanban";
+  import InboxIcon from "@lucide/svelte/icons/inbox";
   import ListTodoIcon from "@lucide/svelte/icons/list-todo";
   import NotebookTabsIcon from "@lucide/svelte/icons/notebook-tabs";
   import ServerIcon from "@lucide/svelte/icons/server";
@@ -13,6 +15,7 @@
     buildPlannerApplicationSummaries,
     buildTaskPlannerSnapshot,
     createTask,
+    PLANNER_FIXTURE_TODAY,
     sampleApplicationBoard,
     type JobApplication,
     type Task,
@@ -46,7 +49,9 @@
   ];
 
   const plannerBuckets = [
+    { id: "inbox", label: "Inbox", icon: InboxIcon },
     { id: "today", label: "Today", icon: ListTodoIcon },
+    { id: "review", label: "Review", icon: CircleAlertIcon },
     { id: "upcoming", label: "Upcoming", icon: CalendarDaysIcon },
     { id: "anytime", label: "Anytime", icon: CircleEllipsisIcon },
     { id: "someday", label: "Someday", icon: CalendarClockIcon },
@@ -83,7 +88,9 @@
   let activeDropTargetId = $state<string | null>(null);
   let activeTaskId = $state<string | null>(null);
 
-  const snapshot = $derived(buildTaskPlannerSnapshot(tasks));
+  const snapshot = $derived(
+    buildTaskPlannerSnapshot(tasks, new Date(`${PLANNER_FIXTURE_TODAY}T12:00:00`)),
+  );
   const selectedProjectDetails = $derived(
     projects.find((project) => project.id === selectedProject) ?? projects[0],
   );
@@ -157,9 +164,11 @@
   }
 
   function bucketCount(bucket: TaskBucket) {
+    if (bucket === "inbox") return snapshot.inbox.length;
     if (bucket === "today") {
       return snapshot.today.length + snapshot.thisEvening.length;
     }
+    if (bucket === "review") return snapshot.review.length;
     if (bucket === "upcoming") {
       return snapshot.upcoming.reduce(
         (total, group) => total + group.tasks.length,
@@ -208,7 +217,11 @@
         priority: input.priority,
         scheduledAt: input.scheduledAt,
         when,
+        listId: input.area ?? undefined,
         areas: input.area ? [input.area] : [],
+        start: when === "someday" ? "someday" : "anytime",
+        planDate: when === "today" || when === "this-evening" ? PLANNER_FIXTURE_TODAY : undefined,
+        planAt: when === "this-evening" ? "evening" : when === "today" ? "anytime" : undefined,
         order: input.order,
         createdAt: now,
         updatedAt: now,
@@ -362,7 +375,7 @@
           {/each}
 
           {#if !plannerCompact}
-            <p class="task-app-shell-story__section-label">Areas</p>
+            <p class="task-app-shell-story__section-label">Lists</p>
           {/if}
           {#each snapshot.areas as area (area.id)}
             <button

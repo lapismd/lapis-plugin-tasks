@@ -15,8 +15,26 @@ export {
 } from "./application-adapter";
 export { createTask, sampleApplicationBoard } from "./fixtures";
 export {
+  catalogTaskFromDocument,
+  catalogTaskFromSummary,
+} from "./catalog-adapter";
+export {
+  catalogTasksFromPlannerFixtures,
+  parsePlannerFixtures,
+  plannerListTitles,
+  plannerMarkdownFixtures,
+  PLANNER_FIXTURE_TODAY,
+} from "./planner-fixtures";
+export * from "./task-document";
+export * from "./task-index";
+export * from "./task-queries";
+export * from "./task-mutations";
+export * from "./task-projection";
+export * from "./task-repository";
+export {
   buildTaskPlannerMovePatch,
   buildTaskPlannerSnapshot,
+  buildTaskPlannerSnapshotFromRepository,
   buildUpcomingRows,
   classifyTask,
   comparePlannerTasks,
