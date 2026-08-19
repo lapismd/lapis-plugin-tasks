@@ -3,7 +3,8 @@
 `@lapis-notes/lapis-plugin-tasks` owns the first-party external Tasks catalog
 and a stub plugin runtime. Vault persistence, views, commands, and host
 registration remain planned. Reusable leaf controls come from public Design
-Core APIs. The `Plugins/Tasks/Panels` catalog story composes planner
+Core APIs. `ApplicationTaskAreaPicker` composes Design Core Command View for
+the searchable area list. The `Plugins/Tasks/Panels` catalog story composes planner
 navigation, planner body, and task detail with Design Core Column Canvas.
 That presentation is not a host movable-panel runtime; LN-TASK-010 remains
 Planned for vault views, commands, and movable panels.
@@ -24,3 +25,4 @@ Planned for vault views, commands, and movable panels.
 | LN-TASK-010 | Vault task files, workspace views, commands, and movable panels MUST remain unspecified for this stub and MUST NOT be invented in source. |
 | LN-TASK-011 | CV-only `applicationId`, `linkedTo`, and `JobApplication` shapes MUST stay in catalog model fixtures and MUST NOT become canonical Task resource types. |
 | LN-TASK-012 | Package Storybook MUST include a `Plugins/Tasks/Panels` Column Canvas composition of planner navigation, planner body, and closeable task detail without `AppShell`. Additional closeable columns MAY open from the selected task. This catalog canvas MUST consume public Design Core `column-canvas`, MUST fill the Storybook viewport without page-level scrollbars, MUST use the App Shell sidebar surface, MUST render the leading Tasks column without a column border so it blends into that surface, MUST render the sticky Tasks overlay without corner radius, MUST keep the planner column’s start corners complete, MUST clip the Tasks resize handle to those start corners, MUST size the leading Tasks column to the navigation labels and counts, MUST align the Tasks column header with the planner column header, MUST mount task detail directly in the detail column without an extra story wrapper, MUST place the Tasks resize handle on the planner column’s start border with no gap between those two columns, and MUST NOT register host movable panels. |
+| LN-TASK-013 | `ApplicationTaskAreaPicker` MUST compose `@lapismd/design-core/shadcn/command-view` for the searchable area list. It MUST NOT use native Command as that picker surface. |

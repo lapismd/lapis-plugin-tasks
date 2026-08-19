@@ -24,3 +24,4 @@
 | LN-TASK-010 | Planned | Vault files, views, commands, and panels remain unspecified. |
 | LN-TASK-011 | Implemented | CV-only fields live in `src/lib/model` fixtures. |
 | LN-TASK-012 | Implemented | `Plugins/Tasks/Panels` Column Canvas story fills the viewport without page scroll, blends the leading Tasks column without a bottom border, squares the sticky Tasks overlay, keeps the planner start corners complete, curves the Tasks resize handle around those corners, sizes Tasks to its labels and counts, aligns the Tasks and planner headers, mounts detail without a wrapper, and flushes the Tasks resize handle to the planner start border. |
+| LN-TASK-013 | Implemented | `ApplicationTaskAreaPicker` composes Command View; Area Picker Sample areas play asserts the command-view host. |

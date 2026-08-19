@@ -91,6 +91,7 @@
   color: var(--kanban-foreground, var(--foreground));
   padding: 0;
   gap: 0;
+  --ui-command-view-list-max-height: 16rem;
 }
 
 .application-task-area-picker__header {
@@ -138,10 +139,8 @@
   height: 0.9rem;
 }
 
-.application-task-area-picker__command[data-ui-component="command"][data-ui-part="command"] {
+.application-task-area-picker__command[data-ui-component="command-view"][data-ui-part="root"] {
   height: auto;
-}
-
-.application-task-area-picker__list {
-  max-height: 16rem;
+  background: transparent;
+  border-radius: 0;
 }

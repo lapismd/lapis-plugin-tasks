@@ -3,7 +3,7 @@
 	import FolderIcon from '@lucide/svelte/icons/folder';
 	import PlusIcon from '@lucide/svelte/icons/plus';
 	import XIcon from '@lucide/svelte/icons/x';
-	import * as Command from '@lapismd/design-core/shadcn/command';
+	import * as CommandView from '@lapismd/design-core/shadcn/command-view';
 	import * as Popover from '@lapismd/design-core/shadcn/popover';
 
 	let {
@@ -102,54 +102,57 @@
 					{/snippet}
 				</Popover.Close>
 			</header>
-			<Command.Root
+			<CommandView.Root
 				class="application-task-area-picker__command"
 				label="Search task areas"
 				shouldFilter={false}
 				loop
 			>
-				<Command.Input
+				<CommandView.Input
 					bind:ref={input}
 					bind:value={query}
 					aria-controls="application-task-area-command-list"
 					placeholder="Search or create area"
 				/>
-				<Command.List
+				<CommandView.List
 					id="application-task-area-command-list"
 					class="application-task-area-picker__list"
 					aria-label="Task areas"
 				>
-					<Command.Group value="areas">
+					<CommandView.Group value="areas">
 						{#if !query.trim()}
-							<Command.Item
+							<CommandView.Item
 								value="__no_area__"
 								data-checked={!primaryArea}
 								onSelect={() => selectArea('')}
 							>
-								<span>No area</span>
-							</Command.Item>
+								<CommandView.ItemLabel>No area</CommandView.ItemLabel>
+							</CommandView.Item>
 						{/if}
 						{#each filteredOptions as area (area)}
-							<Command.Item
+							<CommandView.Item
 								value={area}
 								data-checked={area === primaryArea}
 								onSelect={() => selectArea(area)}
 							>
-								<span>{area}</span>
-							</Command.Item>
+								<CommandView.ItemLabel>{area}</CommandView.ItemLabel>
+							</CommandView.Item>
 						{/each}
 						{#if customArea}
-							<Command.Item
+							<CommandView.Item
 								value={`__create__:${customArea}`}
 								onSelect={() => selectArea(customArea)}
 							>
-								<PlusIcon aria-hidden="true" />
-								<span>Create "{customArea}"</span>
-							</Command.Item>
+								<CommandView.ItemIcon>
+									<PlusIcon aria-hidden="true" />
+								</CommandView.ItemIcon>
+								<CommandView.ItemLabel>Create "{customArea}"</CommandView.ItemLabel>
+							</CommandView.Item>
 						{/if}
-					</Command.Group>
-				</Command.List>
-			</Command.Root>
+					</CommandView.Group>
+					<CommandView.Empty>No matching areas</CommandView.Empty>
+				</CommandView.List>
+			</CommandView.Root>
 		</Popover.Content>
 	</Popover.Root>
 </div>

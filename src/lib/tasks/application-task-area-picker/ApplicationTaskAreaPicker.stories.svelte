@@ -2,6 +2,7 @@
   import { defineMeta } from "@storybook/addon-svelte-csf";
   import { ApplicationTaskAreaPickerExample } from "../../catalog.example-sources";
   import ApplicationTaskAreaPicker from "./ApplicationTaskAreaPicker.svelte";
+  import { playAreaPickerUsesCommandView } from "./application-task-area-picker.story-play";
   import { noop } from "../story-fixture";
 
   const { Story } = defineMeta({
@@ -22,7 +23,7 @@
   });
 </script>
 
-<Story name="Sample areas" tags={["visual-pending"]} parameters={{ docs: { description: { story: "Area picker with sample area options." } } }}>
+<Story name="Sample areas" tags={["visual-pending", "test"]} parameters={{ docs: { description: { story: "Area picker with sample area options." } } }} play={playAreaPickerUsesCommandView}>
   {#snippet template()}
     <div class="task-story-frame task-story-frame--sm">
       <ApplicationTaskAreaPicker
