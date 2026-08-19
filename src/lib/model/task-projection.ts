@@ -1,4 +1,4 @@
-import type { AppDatabaseTaskRecord } from "@lapis-notes/api";
+import type { AppDatabaseTaskRecord } from "@lapis-notes/api/app-database";
 import {
   TASK_PROJECTION_VERSION,
   type ParsedTaskFile,

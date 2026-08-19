@@ -22,7 +22,8 @@ describe("TasksPlugin stub", () => {
     expect(index).toContain("TasksPlugin");
     expect(index).not.toContain("TaskDueCalendar");
     expect(manifest).toContain('"id": "tasks"');
-    expect(manifest).toContain('"enabledByDefault": false');
+    expect(manifest).toContain('"enabledByDefault": true');
+    expect(source).toContain("registerIndexProjection");
     expect(pkg).not.toContain("@stevejuma/ui");
     expect(pkg).not.toContain("@lapis-server/");
     expect(pkg).not.toContain("@lapismd/mira");

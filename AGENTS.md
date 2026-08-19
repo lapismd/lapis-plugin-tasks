@@ -13,9 +13,10 @@ This repository owns the first-party external Lapis plugin whose runtime ID is
   in this stub slice.
 - Preserve runtime ID `tasks`. Package and repository names do not authorize a
   later vault migration.
-- Keep production host registration in Lapis. This slice does not register the
-  plugin in desktop or web. Package Storybook owns Tasks catalog acceptance
-  under `Plugins/Tasks/*`; Lapis Storybook must not duplicate those stories.
+- Keep production host registration in Lapis. Hosts load this plugin for
+  indexing and queries only; `onload` must not register workspace views.
+  Package Storybook owns Tasks catalog acceptance under `Plugins/Tasks/*`;
+  Lapis Storybook must not duplicate those stories.
 
 ## Application ownership
 

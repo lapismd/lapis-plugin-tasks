@@ -63,7 +63,7 @@ export default defineConfig(tableRequirements(), {
         id: "tasks",
         distribution: "first-party-external",
         provenance: "official",
-        enabledByDefault: false,
+        enabledByDefault: true,
       },
     },
     specFirst: {

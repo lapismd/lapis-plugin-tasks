@@ -1,7 +1,11 @@
 import type {
   AppDatabase,
   AppDatabaseTaskRecord,
-} from "@lapis-notes/api";
+} from "@lapis-notes/api/app-database";
+import {
+  PUBLIC_TASKS_PROJECTION_ID,
+  taskQueryToIndexQuery,
+} from "@lapis-notes/api/app-database";
 import {
   parseTaskDocument,
   serializeTaskDocument,
@@ -72,7 +76,11 @@ export class TaskRepository {
   ) {}
 
   async get(id: string): Promise<TaskSummary | null> {
-    const row = await this.database.getTaskRow({ id });
+    const row =
+      (await this.database.getProjectionRow<AppDatabaseTaskRecord>(
+        PUBLIC_TASKS_PROJECTION_ID,
+        id,
+      )) ?? (await this.database.getTaskRow({ id }));
     return row ? taskRowToSummary(row) : null;
   }
 
@@ -105,47 +113,33 @@ export class TaskRepository {
   }
 
   async lists(): Promise<TaskSummary[]> {
-    const rows = await this.database.queryTasks({ kind: "task-list" });
-    return rows.map(taskRowToSummary);
+    const result = await this.database.queryProjection<AppDatabaseTaskRecord>(
+      PUBLIC_TASKS_PROJECTION_ID,
+      taskQueryToIndexQuery({ kind: "task-list" }),
+    );
+    return result.rows.map(taskRowToSummary);
   }
 
   async children(idOrPath: string): Promise<TaskSummary[]> {
-    const source = await this.resolvePath(idOrPath);
-    if (!source) return [];
-    const links = await this.database.listChildLinks({
-      sourcePath: source,
-      kind: "subtask",
-    });
-    return this.summariesForLinks(links);
+    return this.related(idOrPath, "subtask");
   }
 
   async items(idOrPath: string): Promise<TaskSummary[]> {
-    const source = await this.resolvePath(idOrPath);
-    if (!source) return [];
-    const links = await this.database.listChildLinks({
-      sourcePath: source,
-      kind: "list-item",
-    });
-    return this.summariesForLinks(links);
+    return this.related(idOrPath, "list-item");
   }
 
   async parent(idOrPath: string): Promise<TaskSummary | null> {
-    const path = await this.resolvePath(idOrPath);
-    if (!path) return null;
-    const candidates = await this.database.queryTasks();
-    for (const candidate of candidates) {
-      const links = await this.database.listChildLinks({
-        sourcePath: candidate.documentPath,
+    const rowId = await this.resolveRowId(idOrPath);
+    if (!rowId) return null;
+    for (const relation of ["subtask", "list-item"] as const) {
+      const result = await this.database.queryRelated<AppDatabaseTaskRecord>({
+        projectionId: PUBLIC_TASKS_PROJECTION_ID,
+        rowId,
+        relation,
+        direction: "in",
+        limit: 1,
       });
-      if (
-        links.some(
-          (link) =>
-            (link.kind === "subtask" || link.kind === "list-item") &&
-            link.resolvedTargetPath === path,
-        )
-      ) {
-        return taskRowToSummary(candidate);
-      }
+      if (result.rows[0]) return taskRowToSummary(result.rows[0]);
     }
     return null;
   }
@@ -265,21 +259,35 @@ export class TaskRepository {
     return byId?.documentPath ?? null;
   }
 
-  private async summariesForLinks(
-    links: Array<{ resolvedTargetPath?: string | null }>,
+  private async related(
+    idOrPath: string,
+    relation: "subtask" | "list-item",
   ): Promise<TaskSummary[]> {
-    const rows = await Promise.all(
-      links.map((link) =>
-        link.resolvedTargetPath
-          ? this.database.getTaskRow({ path: link.resolvedTargetPath })
-          : null,
-      ),
+    const rowId = await this.resolveRowId(idOrPath);
+    if (!rowId) return [];
+    const result = await this.database.queryRelated<AppDatabaseTaskRecord>({
+      projectionId: PUBLIC_TASKS_PROJECTION_ID,
+      rowId,
+      relation,
+    });
+    return result.rows.map(taskRowToSummary);
+  }
+
+  private async resolveRowId(idOrPath: string): Promise<string | null> {
+    const byId = await this.database.getProjectionRow<AppDatabaseTaskRecord>(
+      PUBLIC_TASKS_PROJECTION_ID,
+      idOrPath,
     );
-    return rows.filter(Boolean).map((row) => taskRowToSummary(row!));
+    if (byId) return byId.documentId;
+    const byPath = await this.database.getTaskRow({ path: idOrPath });
+    return byPath?.documentId ?? null;
   }
 
   private async query(view: TaskView, today?: string): Promise<TaskSummary[]> {
-    const rows = await this.database.queryTasks({ view, today });
-    return rows.map(taskRowToSummary);
+    const result = await this.database.queryProjection<AppDatabaseTaskRecord>(
+      PUBLIC_TASKS_PROJECTION_ID,
+      taskQueryToIndexQuery({ view, today }),
+    );
+    return result.rows.map(taskRowToSummary);
   }
 }

@@ -1,9 +1,10 @@
 # Tasks Plugin
 
 `@lapis-notes/lapis-plugin-tasks` owns the first-party external Tasks catalog
-and a stub plugin runtime. A task is a Markdown file with YAML front matter.
-The filesystem is authoritative. AppDatabase task rows are disposable
-projections. Host views, commands, and movable panels remain unspecified.
+and an index-only plugin runtime. A task is a Markdown file with YAML front
+matter. The filesystem is authoritative. AppDatabase owns the public
+`tasks/task` projection. Host views, commands, and movable panels remain
+unspecified.
 Reusable leaf controls come from public Design Core APIs.
 `ApplicationTaskAreaPicker` is the catalog list picker and composes Design
 Core Command View. The
@@ -15,13 +16,13 @@ not a host movable-panel runtime.
 
 | ID | Requirement |
 | --- | --- |
-| LN-TASK-001 | The standalone repository MUST ship `@lapis-notes/lapis-plugin-tasks` as a versioned first-party external package whose runtime manifest id is `tasks`, distribution is `first-party-external`, provenance is `official`, and `enabledByDefault` is `false`. |
-| LN-TASK-002 | `TasksPlugin` MUST extend the public API `Plugin` surface. `onload` MUST NOT register views, commands, settings tabs, or plugin data in this stub slice. |
+| LN-TASK-001 | The standalone repository MUST ship `@lapis-notes/lapis-plugin-tasks` as a versioned first-party external package whose runtime manifest id is `tasks`, distribution is `first-party-external`, provenance is `official`, and `enabledByDefault` is `true`. |
+| LN-TASK-002 | `TasksPlugin` MUST extend the public API `Plugin` surface. `onload` MUST register the public tasks projection and MUST NOT register views, commands, settings tabs, or plugin data. |
 | LN-TASK-003 | Production and Storybook source MUST receive `App` explicitly or from API context and MUST NOT read or assign `globalThis.app`. |
 | LN-TASK-004 | The package MUST own the adapted Tasks catalog components and native `--ui-tasks-*` CSS. Reusable leaf controls MUST come from public `@lapismd/design-core` exports. |
 | LN-TASK-005 | The package MUST NOT depend on `@stevejuma/ui`, `@lapis-server/*`, `/Users/stevejuma/code/cv`, `@cvstudio/*`, `@lapismd/mira`, or Lapis Markdown. |
 | LN-TASK-006 | Package Storybook MUST run on port 7030, fail `pnpm test:storybook` on axe violations, and keep changed visual stories `visual-pending`. |
-| LN-TASK-007 | Desktop and web hosts MUST NOT register or load this plugin until a later Lapis requirement authorizes host cutover. |
+| LN-TASK-007 | Desktop and web hosts MUST register and load this plugin for indexing and queries. They MUST NOT register Tasks workspace views, commands, or ribbon items. |
 | LN-TASK-008 | The public package export MUST include `TasksPlugin` and the catalog components. It MUST NOT re-export Design Core `TaskDueCalendar`. |
 | LN-TASK-009 | Autodocs Show Code MUST use public `@lapis-notes/lapis-plugin-tasks` imports, not story-only harness wrappers. |
 | LN-TASK-010 | Workspace views, commands, and host movable panels MUST remain unspecified in this slice. `onload` MUST NOT register them. |
@@ -32,7 +33,7 @@ not a host movable-panel runtime.
 | LN-TASK-015 | A canonical list MUST be a Markdown file whose front matter includes `type: task-list` and a stable `id`. `list.status` MUST be `active` or `archived`. Lists MUST NOT be completable outcomes. |
 | LN-TASK-016 | Task planning metadata MUST nest under `task:` with `status` `open`, `completed`, or `canceled`, and `start` `anytime`, `someday`, or a date. Inbox, plan, deadline, repeat, and comments MAY be omitted. YAML MUST NOT store `today` or `upcoming` flags. |
 | LN-TASK-017 | `## Checklist` MUST hold lightweight checkboxes only. `## Subtasks` MUST hold Markdown links to task files without wrapping checkboxes. `## Items` MUST hold links to task or task-list files. Other links MUST be ordinary references. |
-| LN-TASK-018 | Inbox, Today, Anytime, Upcoming, Someday, Completed, and daily Review MUST be derived queries over projections. Overdue `plan.date` values MUST stay visible until the user reschedules, completes, skips, or cancels. |
+| LN-TASK-018 | Inbox, Today, Anytime, Upcoming, Someday, Completed, and daily Review MUST be derived query-AST wrappers over the public `tasks/task` projection. Overdue `plan.date` values MUST stay visible until the user reschedules, completes, skips, or cancels. |
 | LN-TASK-019 | Mutations MUST edit one Markdown file or parent reserved-section links, then upsert the projection from that parse. Completing a linked child MUST update the child file. Rolling complete MAY reset only `## Checklist`. |
 | LN-TASK-020 | Planner lists and cards MUST consume `TaskSummary` rows from the AppDatabase tasks projection. Detail and editor surfaces MAY load the Markdown `TaskDocument`. UI MUST NOT treat the database as authoritative. |
 | LN-TASK-021 | Canonical catalog types MUST use the Markdown-first schema. Catalog planner fixtures MUST round-trip through task documents. Area membership MUST mean a task-list `## Items` parent. |

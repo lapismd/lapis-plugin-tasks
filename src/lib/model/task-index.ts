@@ -2,16 +2,34 @@ import type {
   AppDatabase,
   AppDatabaseIndexedFile,
   AppDatabaseLinkRecord,
-  IndexedProjectionContributor,
-} from "@lapis-notes/api";
+  IndexProjectionEdgeInput,
+  IndexProjectionRegistration,
+} from "@lapis-notes/api/app-database";
+import {
+  PUBLIC_TASKS_PROJECTION_ID,
+  TASK_PROJECTION_FIELDS,
+  TASK_PROJECTION_VERSION,
+} from "@lapis-notes/api/app-database";
 import { parseTaskDocument, type ParsedTaskFile } from "./task-document";
 import { projectTask } from "./task-projection";
 
-export function createTasksProjectionContributor(): IndexedProjectionContributor {
+export function createTasksProjectionRegistration(): IndexProjectionRegistration {
   return {
+    id: "task",
+    version: TASK_PROJECTION_VERSION,
+    visibility: "public",
+    fields: TASK_PROJECTION_FIELDS,
+    source: {
+      extensions: ["md", "markdown"],
+    },
     project({ file, content }) {
       const document = parseTaskDocument(content, file.path);
-      return { task: document ? projectTask(document) : null };
+      if (!document) return { rows: [], edges: [] };
+      const row = projectTask(document);
+      return {
+        rows: [{ id: document.id, kind: document.kind, data: { ...row, id: document.id } }],
+        edges: taskEdges(document),
+      };
     },
   };
 }
@@ -32,6 +50,18 @@ export function resolveTaskHref(sourcePath: string, href: string): string {
     else parts.push(segment);
   }
   return parts.join("/");
+}
+
+export function taskEdges(document: ParsedTaskFile): IndexProjectionEdgeInput[] {
+  return document.structuralLinks
+    .filter((link) => link.kind === "subtask" || link.kind === "list-item")
+    .map((link) => ({
+      sourceRowId: document.id,
+      relation: link.kind,
+      targetPath: resolveTaskHref(document.path, link.href) || null,
+      targetText: link.href,
+      ordinal: link.ordinal,
+    }));
 }
 
 export function taskDocumentToIndexedFile(
@@ -82,4 +112,18 @@ export async function indexTaskDocument(
   document: ParsedTaskFile,
 ): Promise<void> {
   await database.upsertIndexedFile(taskDocumentToIndexedFile(document));
+  await database.replaceProjectionSource({
+    projectionId: PUBLIC_TASKS_PROJECTION_ID,
+    sourcePath: document.path,
+    sourceHash: document.id,
+    writerPluginId: "tasks",
+    rows: [
+      {
+        id: document.id,
+        kind: document.kind,
+        data: { ...projectTask(document), id: document.id },
+      },
+    ],
+    edges: taskEdges(document),
+  });
 }

@@ -1,4 +1,9 @@
-import { Plugin, type App, type PluginManifest } from "@lapis-notes/api";
+import {
+  Plugin,
+  type App,
+  type PluginManifest,
+} from "@lapis-notes/api";
+import { createTasksProjectionRegistration } from "./model/task-index";
 
 export const TASKS_PLUGIN_ID = "tasks";
 
@@ -17,7 +22,7 @@ export class TasksPlugin extends Plugin {
   }
 
   async onload(): Promise<void> {
-    // Stub: catalog-only in this slice. No views, commands, or plugin data.
+    this.registerIndexProjection(createTasksProjectionRegistration());
   }
 }
 

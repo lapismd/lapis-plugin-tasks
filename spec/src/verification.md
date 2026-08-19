@@ -13,12 +13,12 @@
 | LPT-SPEC-009 | Implemented | Exact Storybook mirror validation covers every SUMMARY chapter. |
 | LPT-SPEC-010 | Implemented | Canonical plugin chapters and stories use the `Plugins/Tasks` hierarchy. |
 | LN-TASK-001 | Implemented | Package identity, manifest, build, and pack inspection. |
-| LN-TASK-002 | Implemented | Stub plugin source and unit checks confirm no view or command registration. |
+| LN-TASK-002 | Implemented | Plugin onload registers the tasks projection and no views or commands. |
 | LN-TASK-003 | Implemented | Application-ownership audit excludes `globalThis.app`. |
 | LN-TASK-004 | Implemented | Catalog sources import public Design Core primitives and native Tasks CSS. |
 | LN-TASK-005 | Implemented | Package dependencies and source audit exclude forbidden legacy packages. |
 | LN-TASK-006 | Implemented | Storybook Vitest accessibility annotations fail axe violations; stories stay `visual-pending`. |
-| LN-TASK-007 | Implemented | No desktop or web host registration is present in this repository. |
+| LN-TASK-007 | Implemented | Hosts register Tasks for indexing; onload still registers no workspace views. |
 | LN-TASK-008 | Implemented | Public `src/lib/index.ts` exports the plugin and catalog components without `TaskDueCalendar`. |
 | LN-TASK-009 | Implemented | Catalog Autodocs stories set `parameters.docs.source` to public package imports. |
 | LN-TASK-010 | Implemented | Stub `onload` still registers no views, commands, or host panels; file format is specified by LN-TASK-014 onward. |
