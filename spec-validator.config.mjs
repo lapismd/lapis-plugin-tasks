@@ -69,7 +69,7 @@ export default defineConfig(tableRequirements(), {
     specFirst: {
       mode: "mapped",
       canonicalPattern:
-        "^spec/src/(?:plugins/(?:index|tasks/index)|spec-governance)\\.md$",
+        "^spec/src/(?:plugins/(?:index|tasks/(?:index|documents|runtime|lists|planner))|spec-governance)\\.md$",
       ignore: [
         "(^|/)node_modules/",
         "(^|/)(?:dist|build|storybook-static)/",
@@ -79,7 +79,26 @@ export default defineConfig(tableRequirements(), {
       ],
       rules: [
         {
-          pattern: "^(?:package\\.json$|manifest\\.json$|src/|\\.storybook/)",
+          pattern: "^src/lib/model/(?:task-document|task-index)\\.",
+          chapters: ["spec/src/plugins/tasks/documents.md"],
+        },
+        {
+          pattern:
+            "^src/lib/model/(?:task-projection|task-queries|task-repository|vault-task-file-store|task-mutations)\\.",
+          chapters: ["spec/src/plugins/tasks/runtime.md"],
+        },
+        {
+          pattern: "^src/lib/model/(?:list-navigation|apply-catalog-task)\\.",
+          chapters: ["spec/src/plugins/tasks/lists.md"],
+        },
+        {
+          pattern:
+            "^(?:src/lib/model/planner\\.|src/lib/tasks-view\\.|src/lib/tasks-workspace\\.svelte$|src/lib/tasks/)",
+          chapters: ["spec/src/plugins/tasks/planner.md"],
+        },
+        {
+          pattern:
+            "^(?:package\\.json$|manifest\\.json$|\\.storybook/|src/(?!lib/model/(?:task-document|task-index|task-projection|task-queries|task-repository|vault-task-file-store|task-mutations|list-navigation|apply-catalog-task|planner)\\.|lib/tasks-view\\.|lib/tasks-workspace\\.svelte$|lib/tasks/))",
           chapters: ["spec/src/plugins/tasks/index.md"],
         },
         {

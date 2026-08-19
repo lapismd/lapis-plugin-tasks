@@ -13,3 +13,12 @@
 | LPT-SPEC-007 | Tracked agent guidance MUST require explicit or context-owned App access, restrict `globalThis.app`, and require the package ownership audit for App-related changes. |
 | LPT-SPEC-008 | Repository validation MUST reject story titles outside the `Plugins/Tasks/*` taxonomy. |
 | LPT-SPEC-009 | Repository validation MUST compare every SUMMARY chapter with an exact metadata-only Storybook mirror. |
+
+`spec-first` maps document parser and index sources to
+[Documents](plugins/tasks/documents.md), projection, query, repository,
+mutation, and file-store sources to [Runtime](plugins/tasks/runtime.md),
+list-navigation and catalog-list attach sources to
+[Lists](plugins/tasks/lists.md), and planner, view, workspace, and
+`src/lib/tasks/**` sources to [Planner](plugins/tasks/planner.md). Leftover
+package, manifest, plugin, and Storybook contract sources stay on
+[Tasks](plugins/tasks/index.md).

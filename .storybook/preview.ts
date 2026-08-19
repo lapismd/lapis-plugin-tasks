@@ -33,6 +33,7 @@ const preview: Preview = {
           "Specification/Specification governance",
           "Specification/Plugins",
           "Specification/Plugins/Tasks",
+          ["Documents", "Runtime", "Lists", "Planner"],
           "Specification/Verification",
           "Plugins",
           [

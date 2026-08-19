@@ -14,6 +14,17 @@ Nested lists stay in each list’s `## Items`. The
 body, and task detail with Design Core Column Canvas. That presentation is
 not a host movable-panel runtime.
 
+This chapter is the package contract and the only normative MUST table. The
+following chapters describe the implemented model:
+
+- [Documents](./documents.md) — Markdown kinds, front matter, and reserved
+  sections
+- [Runtime](./runtime.md) — parse, project, query, and mutations
+- [Lists](./lists.md) — navigation pins, list-item parents, and the sidebar
+  tree
+- [Planner](./planner.md) — Column Canvas composition and bucket
+  classification
+
 ## Requirements
 
 | ID | Requirement |
