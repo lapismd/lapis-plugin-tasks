@@ -26,22 +26,22 @@
   max-width: 100%;
   min-height: auto;
   align-self: flex-start;
-  gap: 0.45rem;
+  gap: 0.28rem;
   border: 0;
-  border-radius: 0.32rem;
+  border-radius: 0.25rem;
   background: color-mix(
     in srgb,
     var(--task-application-color, var(--primary)) 8%,
     transparent
   );
   color: var(--kanban-muted, var(--muted-foreground));
-  font-size: 0.76rem;
-  padding: 0.22rem 0.45rem;
+  font-size: 0.66rem;
+  padding: 0.1rem 0.32rem;
 }
 
 .application-task-area-picker__trigger--chip svg {
-  width: 0.76rem;
-  height: 0.76rem;
+  width: 0.66rem;
+  height: 0.66rem;
 }
 
 .application-task-area-picker__trigger:hover,
