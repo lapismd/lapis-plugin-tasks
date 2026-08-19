@@ -18,6 +18,16 @@ list:
 ## Items
 - [Buy filter](../buy.md)
 `,
+  "lists/applications.md": `---
+type: task-list
+id: list-applications
+list:
+  status: active
+---
+# Applications
+
+## Items
+`,
   "buy.md": `---
 type: task
 id: t_buy
@@ -110,6 +120,35 @@ describe("applyCatalogTaskToRepository", () => {
     expect(await files.read("lists/projects.md")).toContain("# Projects");
     expect(await files.read("lists/projects.md")).toContain(
       "../inbox/new-project-work.md",
+    );
+  });
+
+  it("attaches a task to Applications instead of minting list-list-applications", async () => {
+    const { repository, files } = await openRepository();
+    const created = await createCatalogTaskInRepository(
+      repository,
+      {
+        title: "Prep resume",
+        view: "today",
+        area: "list-applications",
+        order: 1024,
+      },
+      {
+        existingPaths: Object.keys(FILES),
+        now: new Date("2026-08-20T16:00:00Z"),
+      },
+    );
+    expect(created.listId).toBe("list-applications");
+    expect(await files.read("lists/applications.md")).toContain(
+      "../inbox/prep-resume.md",
+    );
+    await expect(files.read("lists/list-applications.md")).rejects.toThrow();
+    const lists = await repository.lists();
+    expect(lists.map((list) => list.id)).toEqual(
+      expect.arrayContaining(["list-applications"]),
+    );
+    expect(lists.some((list) => list.id === "list-list-applications")).toBe(
+      false,
     );
   });
 });

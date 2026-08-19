@@ -28,6 +28,7 @@ import { indexTaskDocument, resolveTaskHref } from "./task-index";
 import {
   moveNavigationPin,
   navigationPinHref,
+  renameNavigationPins,
   rewriteNavigationBody,
   TASK_LIST_NAVIGATION_PATH,
   TaskListMutationError,
@@ -308,6 +309,65 @@ export class TaskRepository {
     }));
   }
 
+  async renameList(
+    path: string,
+    title: string,
+    at: string,
+  ): Promise<TaskSummary> {
+    const next = title.trim();
+    if (!next) {
+      throw new TaskListMutationError("invalid-title", "A list needs a title.");
+    }
+    const renamed = await this.setTitle(path, next, at);
+    const parents = await this.listParents(path);
+    for (const parent of parents) {
+      const list = await this.loadDocument(parent.path);
+      const links = list.structuralLinks
+        .filter((link) => link.kind === "list-item")
+        .map((link) => ({
+          title: this.linkTargetsPath(parent.path, link.href, path)
+            ? next
+            : link.title,
+          href: link.href,
+        }));
+      await this.writeDocument({
+        ...setReservedLinks(list, "Items", links),
+        updated: at,
+      });
+    }
+    if (await this.navigation()) {
+      await this.rewriteNavigationPins(
+        (pins, navigationPath) =>
+          pins.map((pin) =>
+            this.pinMatches(pin, path, navigationPath)
+              ? { ...pin, title: next }
+              : pin,
+          ),
+        at,
+      );
+    }
+    return renamed;
+  }
+
+  async renameNavigationSection(
+    from: string,
+    to: string,
+    at: string,
+  ): Promise<void> {
+    const next = to.trim();
+    if (!next) {
+      throw new TaskListMutationError(
+        "invalid-title",
+        "A navigation section needs a title.",
+      );
+    }
+    if (next === from) return;
+    await this.rewriteNavigationPins(
+      (pins) => renameNavigationPins(pins, from, next),
+      at,
+    );
+  }
+
   async create(input: {
     path: string;
     title: string;
@@ -353,13 +413,14 @@ export class TaskRepository {
     id?: string;
     pin?: { section: string };
   }): Promise<TaskSummary> {
-    const id =
-      input.id ??
-      `list-${input.title
+    const slug =
+      input.title
         .trim()
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "") || "untitled"}`;
+        .replace(/^-|-$/g, "")
+        .replace(/^list-/, "") || "untitled";
+    const id = input.id ?? `list-${slug}`;
     const document: ParsedTaskFile = {
       path: input.path,
       raw: "",

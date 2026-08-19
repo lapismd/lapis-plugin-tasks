@@ -36,5 +36,7 @@
 | LN-TASK-022 | Implemented | `Plugins/Tasks/Shell` boots WorkspaceShell with File Explorer, Search, Markdown, and TasksPlugin against planner Markdown fixtures, pins the planner clock, fills the canvas viewport, and keeps docs embeds at 700px. |
 | LN-TASK-023 | Implemented | Parser accepts `type: task-list-navigation`; planner fixtures seed vault-root `lists.md`; extra navigation documents are ignored. |
 | LN-TASK-024 | Implemented | Index emits `navigation-item` edges that `parent()` ignores. Repository list-parent queries use incoming `list-item` only and refuse cycles or a second structural parent. |
-| LN-TASK-025 | Implemented | Planner snapshot builds a sectioned list tree; sidebar renders nested lists and All lists; opening a list still filters tasks by that list. |
-| LN-TASK-026 | Implemented | Navigation and `## Items` rewrites cover pin reorder, restack, nest, and unnest. `createList` writes a new list file; area-picker create uses it. |
+| LN-TASK-025 | Implemented | Planner snapshot builds a sectioned list tree; sidebar renders expandable section folders, nested lists, and All lists; opening a list still filters tasks by that list. |
+| LN-TASK-026 | Implemented | Navigation and `## Items` rewrites cover pin reorder, restack, nest, unnest, and rename. `createList` writes a new list file; area-picker create uses it. Creating a task in Applications with area `list-applications` attaches to that list and does not mint `list-list-applications`. |
+| LN-TASK-027 | Implemented | TaskListNavTree uses Explorer guide tokens, nested sublists, inline rename, and HTML5 drag with auto-expand. |
+| LN-TASK-028 | Implemented | Column Canvas first-column buckets and list rows carry planner drop-host attributes; dragging a task over Inbox morphs the App Shell drag preview. |

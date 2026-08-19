@@ -45,6 +45,33 @@ export class TaskListMutationError extends Error {
   }
 }
 
+export function listIdentitySlug(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+    .replace(/^list-/, "");
+}
+
+export function listsMatch(
+  list: { id: string; title: string; path?: string },
+  needle: string,
+): boolean {
+  const want = listIdentitySlug(needle);
+  if (!want) return false;
+  return (
+    list.id === needle ||
+    list.title.toLowerCase() === needle.toLowerCase() ||
+    listIdentitySlug(list.id) === want ||
+    listIdentitySlug(list.title) === want ||
+    Boolean(
+      list.path &&
+        (list.path === needle || list.path.endsWith(`/${want}.md`)),
+    )
+  );
+}
+
 export function navigationPinHref(navigationPath: string, listPath: string): string {
   const fromParts = navigationPath.split("/");
   fromParts.pop();
@@ -84,6 +111,18 @@ export function rewriteNavigationBody(
     lines.push("");
   }
   return `${lines.join("\n").trimEnd()}\n`;
+}
+
+export function renameNavigationPins(
+  pins: NavigationPin[],
+  from: string,
+  to: string,
+): NavigationPin[] {
+  const next = to.trim();
+  if (!next || next === from) return pins;
+  return pins.map((pin) =>
+    pin.section === from ? { ...pin, section: next } : pin,
+  );
 }
 
 export function moveNavigationPin(

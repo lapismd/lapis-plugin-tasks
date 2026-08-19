@@ -1,3 +1,4 @@
+import { listsMatch } from "./list-navigation";
 import { taskDateOnly } from "./planner";
 import type { Task, TaskQuickCreateInput } from "./types";
 import type { TaskPlan, TaskStart } from "./task-document";
@@ -147,11 +148,9 @@ export async function applyCatalogTaskToRepository(
 
   if (next.listId !== previous?.listId) {
     const lists = await repository.lists();
-    let list = lists.find(
-      (entry) =>
-        entry.id === next.listId ||
-        entry.title.toLowerCase() === next.listId?.toLowerCase(),
-    );
+    let list = next.listId
+      ? lists.find((entry) => listsMatch(entry, next.listId!))
+      : undefined;
     if (!list && next.listId) {
       list = await repository.createList({
         path: uniqueListPath(

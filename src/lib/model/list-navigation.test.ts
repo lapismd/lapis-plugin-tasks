@@ -1,8 +1,11 @@
 import { MemoryAppDatabase } from "@lapis-notes/api/app-database";
 import { describe, expect, it } from "vitest";
 import {
+  listIdentitySlug,
+  listsMatch,
   moveNavigationPin,
   navigationPinHref,
+  renameNavigationPins,
   rewriteNavigationBody,
   TaskListMutationError,
 } from "./list-navigation";
@@ -90,6 +93,19 @@ async function openRepository(files = FILES) {
 }
 
 describe("list navigation Markdown", () => {
+  it("matches Applications by title, id, and list-prefixed id", () => {
+    const list = {
+      id: "list-applications",
+      title: "Applications",
+      path: "lists/applications.md",
+    };
+    expect(listIdentitySlug("list-applications")).toBe("applications");
+    expect(listsMatch(list, "list-applications")).toBe(true);
+    expect(listsMatch(list, "Applications")).toBe(true);
+    expect(listsMatch(list, "applications")).toBe(true);
+    expect(listsMatch(list, "List Applications")).toBe(true);
+  });
+
   it("indexes navigation-item edges with section data", () => {
     const document = parseTaskDocument(FILES["lists.md"]!, "lists.md");
     expect(document?.kind).toBe("task-list-navigation");
@@ -128,6 +144,19 @@ describe("list navigation Markdown", () => {
 ## Docs
 - [Docs](./lists/docs.md)
 `);
+    expect(
+      renameNavigationPins(
+        [
+          { title: "Applications", href: "./lists/applications.md", section: "Applications" },
+          { title: "Docs", href: "./lists/docs.md", section: "Docs" },
+        ],
+        "Docs",
+        "Guides",
+      ),
+    ).toEqual([
+      { title: "Applications", href: "./lists/applications.md", section: "Applications" },
+      { title: "Docs", href: "./lists/docs.md", section: "Guides" },
+    ]);
     expect(
       moveNavigationPin(
         [
@@ -221,9 +250,28 @@ describe("list navigation Markdown", () => {
       at: AT,
     });
     expect(created.kind).toBe("task-list");
+    expect(created.id).toBe("list-notes");
     expect(await files.read("lists/notes.md")).toContain("# Notes");
+    const fromPrefixedTitle = await repository.createList({
+      path: "lists/scratch.md",
+      title: "list-scratch",
+      at: AT,
+    });
+    expect(fromPrefixedTitle.id).toBe("list-scratch");
     await expect(repository.unpinnedRoots()).resolves.toEqual(
       expect.arrayContaining([expect.objectContaining({ id: created.id })]),
     );
+  });
+
+  it("renames a list and a navigation section", async () => {
+    const { repository, files } = await openRepository();
+    await repository.renameList("lists/docs.md", "Documents", AT);
+    expect(await files.read("lists/docs.md")).toContain("# Documents");
+    expect(await files.read("lists.md")).toContain("[Documents]");
+
+    await repository.renameNavigationSection("Applications", "Apps", AT);
+    expect(await files.read("lists.md")).toContain("## Apps");
+    expect(await files.read("lists.md")).not.toContain("## Applications");
+    expect(await files.read("lists.md")).toContain("[Applications]");
   });
 });

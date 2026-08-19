@@ -21,6 +21,8 @@
     buildTaskPlannerSnapshot,
     comparePlannerTasks,
     getPlannerSelectionPosition,
+    listIdentitySlug,
+    listsMatch,
     taskDateOnly,
     type TaskPlannerDateGroup,
     type TaskPlannerRowContext,
@@ -98,20 +100,21 @@
   const snapshot = $derived(buildTaskPlannerSnapshot(tasks, now));
   const selectedTaskIdSet = $derived(new Set(selectedTaskIds));
   const draggedTaskIdSet = $derived(new Set(draggedTaskIds));
-  const selectedArea = $derived.by(() =>
-    area
-      ? (snapshot.areas.find(
-          (item) => item.id === area || item.title === area,
-        ) ?? { id: area, title: areaTitleFromId(area), count: 0 })
-      : null,
-  );
+  const selectedArea = $derived.by(() => {
+    if (!area) return null;
+    const found = snapshot.areas.find((item) => listsMatch(item, area));
+    if (found) return found;
+    const title = areaTitleFromId(area);
+    return { id: area, title, count: 0 };
+  });
   const areaTasks = $derived.by(() => {
     if (!selectedArea) return [];
-    const title = selectedArea.title.toLowerCase();
     return tasks
       .filter((task) => !isTaskDone(task))
-      .filter((task) =>
-        task.areas.some((taskArea) => taskArea.toLowerCase() === title),
+      .filter(
+        (task) =>
+          Boolean(task.listId && listsMatch({ id: task.listId, title: task.listId }, selectedArea.id)) ||
+          task.areas.some((taskArea) => listsMatch(selectedArea, taskArea)),
       )
       .sort(comparePlannerTasks);
   });
@@ -157,7 +160,9 @@
     const trimmed = value.trim();
     if (!trimmed) return "Area";
     if (/\s/.test(trimmed)) return trimmed;
-    return trimmed
+    const slug = listIdentitySlug(trimmed);
+    if (!slug) return "Area";
+    return slug
       .split(/[-_]+/)
       .filter(Boolean)
       .map((part) => part.slice(0, 1).toUpperCase() + part.slice(1))
@@ -315,7 +320,7 @@
     const schedule = quickCreateScheduleFor(group);
     const input: Omit<TaskQuickCreateInput, "title"> = {
       view: bucketForGroup(group),
-      area: selectedArea?.title ?? area,
+      area: selectedArea?.id ?? selectedArea?.title ?? area,
       order: quickCreateOrderForGroup(group),
       dueAt: quickCreateDueDateFor(group),
       priority: quickCreatePriorityFor(group),
