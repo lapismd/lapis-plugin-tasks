@@ -1,0 +1,8 @@
+html,
+body,
+#storybook-root,
+#storybook-root > * {
+  --font-sans: "DM Sans Variable", ui-sans-serif, sans-serif;
+  --font-mono: "Source Code Pro Variable", ui-monospace, monospace;
+  font-family: var(--font-sans);
+}

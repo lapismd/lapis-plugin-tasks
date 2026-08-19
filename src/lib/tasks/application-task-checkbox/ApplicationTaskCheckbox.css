@@ -1,0 +1,128 @@
+.task-checkbox {
+  --task-checkbox-size: 1rem;
+  --task-checkbox-radius: 0.32rem;
+  --task-checkbox-inset-size: 0.68rem;
+  --task-checkbox-inset-radius: 0.19rem;
+  --task-checkbox-tick-width: 0.22rem;
+  --task-checkbox-tick-height: 0.4rem;
+  --task-checkbox-tick-border: 1.5px;
+  --task-checkbox-tick-nudge: -0.04rem;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.task-checkbox[data-size="md"] {
+  --task-checkbox-size: 1.35rem;
+  --task-checkbox-radius: 0.4rem;
+  --task-checkbox-inset-size: 0.92rem;
+  --task-checkbox-inset-radius: 0.24rem;
+  --task-checkbox-tick-width: 0.3rem;
+  --task-checkbox-tick-height: 0.54rem;
+  --task-checkbox-tick-border: 2px;
+  --task-checkbox-tick-nudge: -0.05rem;
+}
+
+.task-checkbox input {
+  width: var(--task-checkbox-size);
+  height: var(--task-checkbox-size);
+  margin: 0;
+  flex-shrink: 0;
+  appearance: none;
+  display: grid;
+  place-content: center;
+  border: 1.5px solid var(--task-checkbox-border, var(--kanban-border));
+  border-radius: var(--task-checkbox-radius);
+  background: transparent;
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.task-checkbox input::before,
+.task-checkbox input::after {
+  content: "";
+  grid-area: 1 / 1;
+  place-self: center;
+  pointer-events: none;
+  transition:
+    background 140ms ease,
+    border-color 140ms ease,
+    opacity 140ms ease;
+}
+
+.task-checkbox input::before {
+  width: var(--task-checkbox-inset-size);
+  height: var(--task-checkbox-inset-size);
+  border-radius: var(--task-checkbox-inset-radius);
+  background: transparent;
+}
+
+.task-checkbox input::after {
+  width: var(--task-checkbox-tick-width);
+  height: var(--task-checkbox-tick-height);
+  border: var(--task-checkbox-tick-border) solid transparent;
+  border-top-width: 0;
+  border-left-width: 0;
+  opacity: 0;
+  transform: translateY(var(--task-checkbox-tick-nudge)) rotate(45deg);
+  transform-origin: center;
+}
+
+.task-checkbox input:hover:not(:checked),
+.task-checkbox input:focus-visible:not(:checked) {
+  border-color: color-mix(
+    in srgb,
+    var(--card-color, var(--ui-tasks-accent)) 52%,
+    var(--kanban-border)
+  );
+}
+
+.task-checkbox input:hover:not(:checked)::before,
+.task-checkbox input:focus-visible:not(:checked)::before {
+  background: color-mix(
+    in srgb,
+    var(--card-color, var(--ui-tasks-accent)) 16%,
+    transparent
+  );
+}
+
+.task-checkbox input:hover:not(:checked)::after,
+.task-checkbox input:focus-visible:not(:checked)::after {
+  border-color: var(--card-color, var(--ui-tasks-accent));
+  opacity: 1;
+}
+
+.task-checkbox input:focus-visible {
+  outline: 2px solid
+    color-mix(
+      in srgb,
+      var(--card-color, var(--ui-tasks-accent)) 38%,
+      transparent
+    );
+  outline-offset: 2px;
+}
+
+.task-checkbox input:checked {
+  border-color: var(--card-color, var(--ui-tasks-accent));
+}
+
+.task-checkbox input:checked::before {
+  background: var(--card-color, var(--ui-tasks-accent));
+}
+
+.task-checkbox input:checked::after {
+  border-color: var(--kanban-card, var(--background));
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .task-checkbox input,
+  .task-checkbox input::before,
+  .task-checkbox input::after {
+    transition: none;
+  }
+}

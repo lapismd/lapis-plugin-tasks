@@ -1,0 +1,534 @@
+body.sb-main-fullscreen #storybook-root:has(.task-app-shell-story) {
+  padding: 0;
+}
+
+.task-app-shell-story {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 70rem;
+  height: 100vh;
+  min-height: 42rem;
+  overflow: hidden;
+  padding: 1.5rem;
+  background: var(--ui-tasks-muted-background);
+}
+
+.task-app-shell-story__shell {
+  --ui-shell-height: 100%;
+  --ui-shell-main-block-inset: 0.45rem;
+  --ui-shell-main-radius: 0.8rem;
+  --ui-shell-right-sidebar-gap: 0;
+
+  border: 1px solid var(--ui-tasks-border);
+  border-radius: var(--ui-tasks-radius);
+  background: var(--sidebar);
+  box-shadow: 0 1rem 2.5rem
+    color-mix(in srgb, var(--ui-tasks-foreground) 9%, transparent);
+}
+
+.task-app-shell-story__sidebar-header {
+  box-sizing: border-box;
+  display: flex;
+  min-height: var(--ui-shell-toolbar-height);
+  align-items: center;
+  gap: 0.65rem;
+  border-block-end: 1px solid var(--ui-tasks-border);
+  padding-inline: 0.7rem;
+  white-space: nowrap;
+}
+
+.task-app-shell-story__sidebar-header > * {
+  transform: translateY(calc(var(--ui-shell-main-block-inset) / 2));
+}
+
+.task-app-shell-story__sidebar-header > [data-ui-part="sidebar-close"] {
+  margin-inline-start: auto;
+}
+
+.task-app-shell-story__brand-mark,
+.task-app-shell-story__project-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  border-radius: 0.55rem;
+  background: color-mix(
+    in srgb,
+    var(--ui-tasks-accent) 14%,
+    var(--ui-tasks-card)
+  );
+  color: var(--ui-tasks-accent);
+}
+
+.task-app-shell-story__brand-mark {
+  width: 2rem;
+  height: 2rem;
+}
+
+.task-app-shell-story__brand-mark svg,
+.task-app-shell-story__project-icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.task-app-shell-story__sidebar-title,
+.task-app-shell-story__planner-heading span,
+.task-app-shell-story__project-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.task-app-shell-story__sidebar-title strong,
+.task-app-shell-story__planner-heading strong,
+.task-app-shell-story__project-copy strong {
+  overflow: hidden;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-app-shell-story__sidebar-title small,
+.task-app-shell-story__planner-heading small,
+.task-app-shell-story__project-copy small {
+  overflow: hidden;
+  color: var(--ui-tasks-muted);
+  font-size: 0.65rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-app-shell-story__project-body nav,
+.task-app-shell-story__planner-body nav {
+  display: flex;
+  flex-direction: column;
+}
+
+.task-app-shell-story__project-body nav {
+  gap: 0.35rem;
+  padding: 0.65rem;
+}
+
+.task-app-shell-story__project {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.7rem;
+  border: 1px solid transparent;
+  border-radius: 0.65rem;
+  background: transparent;
+  color: var(--ui-tasks-foreground);
+  cursor: pointer;
+  font: inherit;
+  padding: 0.6rem;
+  text-align: left;
+}
+
+.task-app-shell-story__project:hover,
+.task-app-shell-story__project:focus-visible {
+  border-color: var(--ui-tasks-border);
+  background: var(--ui-tasks-muted-background);
+  outline: 0;
+}
+
+.task-app-shell-story__project--active {
+  border-color: color-mix(
+    in srgb,
+    var(--ui-tasks-accent) 28%,
+    var(--ui-tasks-border)
+  );
+  background: color-mix(
+    in srgb,
+    var(--ui-tasks-accent) 10%,
+    var(--ui-tasks-card)
+  );
+}
+
+.task-app-shell-story__project-icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.task-app-shell-story__project--active
+  .task-app-shell-story__project-icon {
+  background: var(--ui-tasks-accent);
+  color: var(--ui-tasks-accent-foreground);
+}
+
+.task-app-shell-story__project-footer,
+.task-app-shell-story__planner-footer {
+  min-height: 2.8rem;
+  border-block-start: 1px solid var(--ui-tasks-border);
+  color: var(--ui-tasks-muted);
+  font-size: 0.68rem;
+  padding-inline: 0.85rem;
+}
+
+.task-app-shell-story__project-footer {
+  gap: 0.45rem;
+}
+
+.task-app-shell-story__status-dot,
+.task-app-shell-story__toolbar-status > span {
+  width: 0.45rem;
+  height: 0.45rem;
+  flex: none;
+  border-radius: 999px;
+  background: var(--ui-tasks-success);
+  box-shadow: 0 0 0 0.2rem
+    color-mix(in srgb, var(--ui-tasks-success) 14%, transparent);
+}
+
+.task-app-shell-story__planner-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.task-app-shell-story__planner-heading > svg {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  color: var(--ui-tasks-accent);
+}
+
+.task-app-shell-story__planner-body nav {
+  gap: 0.2rem;
+  padding: 0.55rem;
+}
+
+.task-app-shell-story__section-label {
+  margin: 0;
+  padding: 0.7rem 0.55rem 0.25rem;
+  color: var(--ui-tasks-muted);
+  font-size: 0.63rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.task-app-shell-story__planner-item {
+  display: grid;
+  width: 100%;
+  min-height: 2.15rem;
+  grid-template-columns: 1rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--ui-tasks-foreground);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 650;
+  padding: 0.4rem 0.55rem;
+  text-align: left;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease;
+}
+
+.task-app-shell-story__planner-item svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  color: var(--ui-tasks-muted);
+}
+
+.task-app-shell-story__planner-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-app-shell-story__planner-item small {
+  display: inline-flex;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--ui-tasks-muted-background);
+  color: var(--ui-tasks-muted);
+  font-size: 0.62rem;
+  padding-inline: 0.3rem;
+}
+
+.task-app-shell-story__planner-item:hover,
+.task-app-shell-story__planner-item:focus-visible {
+  background: var(--sidebar-accent, var(--ui-tasks-muted-surface));
+  color: var(--sidebar-accent-foreground, var(--ui-tasks-foreground));
+  outline: 0;
+}
+
+.task-app-shell-story__planner-item--active {
+  background: color-mix(
+    in srgb,
+    var(--ui-tasks-accent) 11%,
+    var(--ui-tasks-card)
+  );
+  color: var(--ui-tasks-accent);
+}
+
+.task-app-shell-story__planner-item--active svg {
+  color: currentColor;
+}
+
+.task-app-shell-story__planner-body
+  nav[data-planner-menu-dragging="true"]
+  .task-app-shell-story__planner-item:not(
+    .task-app-shell-story__planner-item--drop-active
+  ) {
+  opacity: 0.54;
+}
+
+.task-app-shell-story__planner-item--drop-active {
+  z-index: 1;
+  transform: translateX(0.22rem) scale(1.015);
+  border-color: var(--ui-tasks-accent);
+  box-shadow:
+    inset 0 0 0 1px
+      color-mix(in srgb, var(--ui-tasks-accent) 30%, transparent),
+    inset 0 0 0 2rem
+      color-mix(
+        in srgb,
+        var(--ui-tasks-accent) 16%,
+        var(--ui-tasks-card)
+      ),
+    0 0.35rem 1rem
+      color-mix(in srgb, var(--ui-tasks-accent) 16%, transparent);
+  color: var(--ui-tasks-accent);
+}
+
+.task-app-shell-story__planner-item--drop-active svg {
+  color: currentColor;
+}
+
+.task-app-shell-story__planner-item--drop-active small {
+  background: var(--ui-tasks-accent);
+  color: var(--ui-tasks-accent-foreground);
+}
+
+.task-app-shell-story__toolbar {
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-inline: 0.6rem 0.85rem;
+}
+
+.task-app-shell-story__toolbar-actions,
+.task-app-shell-story__toolbar-trailing,
+.task-app-shell-story__breadcrumbs,
+.task-app-shell-story__toolbar-status {
+  display: flex;
+  align-items: center;
+}
+
+.task-app-shell-story__toolbar-actions {
+  gap: 0.1rem;
+}
+
+.task-app-shell-story__toolbar-trailing {
+  gap: 0.45rem;
+  margin-inline-start: auto;
+}
+
+.task-app-shell-story__breadcrumbs {
+  min-width: 0;
+  flex: 1;
+  gap: 0.45rem;
+  color: var(--ui-tasks-muted);
+  font-size: 0.76rem;
+}
+
+.task-app-shell-story__breadcrumbs strong {
+  overflow: hidden;
+  color: var(--ui-tasks-foreground);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-app-shell-story__toolbar-status {
+  gap: 0.45rem;
+  color: var(--ui-tasks-muted);
+  font-size: 0.68rem;
+}
+
+.task-app-shell-story__detail-sidebar {
+  border-inline-start: 0 !important;
+  /* Match the shell chrome behind main so the detail card floats like main. */
+  background: var(--sidebar, var(--ui-tasks-muted-surface)) !important;
+  box-shadow: none;
+}
+
+.task-app-shell-story__detail-body {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  padding: var(--ui-shell-main-block-inset);
+  background: transparent;
+}
+
+.task-app-shell-story__detail-body
+  > [data-ui-part="scroll-area"]
+  > [data-ui-part="scroll-area-viewport"]
+  > div {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+}
+
+.task-app-shell-story__detail-empty {
+  display: flex;
+  min-height: 100%;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--ui-tasks-border);
+  border-radius: calc(var(--ui-tasks-radius, 0.625rem) + 0.2rem);
+  background: var(--kanban-muted-surface, var(--muted));
+  box-shadow: var(
+    --ui-shell-main-shadow,
+    0 1px 3px color-mix(in srgb, var(--ui-tasks-foreground) 10%, transparent),
+    0 1px 2px -1px
+      color-mix(in srgb, var(--ui-tasks-foreground) 10%, transparent)
+  );
+  color: var(--ui-tasks-muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  padding: 0.85rem 0.95rem 1rem;
+}
+
+.task-app-shell-story__detail-empty-top {
+  display: flex;
+}
+
+.task-app-shell-story__detail-empty p {
+  margin: 0;
+}
+
+.task-app-shell-story__body {
+  background: var(--ui-tasks-background);
+}
+
+.task-app-shell-story__body
+  > [data-ui-part="scroll-area"]
+  > [data-ui-part="scroll-area-viewport"]
+  > div {
+  min-height: 100%;
+}
+
+.task-app-shell-story__planner {
+  display: flex;
+  min-height: calc(100vh - 9.1rem);
+}
+
+[data-ui-part="sidebar"][data-state="collapsed"][data-presentation="inline"]
+  .task-app-shell-story__sidebar-title,
+[data-ui-part="sidebar"][data-state="collapsed"][data-presentation="inline"]
+  .task-app-shell-story__project-copy,
+[data-ui-part="sidebar"][data-state="collapsed"][data-presentation="inline"]
+  .task-app-shell-story__planner-heading,
+[data-ui-part="sidebar"][data-state="collapsed"][data-presentation="inline"]
+  .task-app-shell-story__planner-item
+  span,
+[data-ui-part="sidebar"][data-state="collapsed"][data-presentation="inline"]
+  .task-app-shell-story__planner-item
+  small {
+  display: none;
+}
+
+[data-ui-part="sidebar"][data-state="collapsed"][data-presentation="inline"]
+  .task-app-shell-story__planner-item {
+  display: flex;
+  justify-content: center;
+  padding-inline: 0;
+}
+
+[data-ui-part="sidebar"][data-state="collapsed"][data-presentation="inline"]
+  .task-app-shell-story__sidebar-header {
+  justify-content: center;
+  padding-inline: 0.5rem;
+}
+
+[data-ui-part="sidebar"][data-variant="outer"]
+  .task-app-shell-story__sidebar-header {
+  border-block-end: 0;
+}
+
+[data-ui-part="sidebar"][data-variant="outer"][data-state="collapsed"][data-presentation="inline"]
+  .task-app-shell-story__sidebar-header
+  > [data-ui-part="sidebar-close"] {
+  margin-inline-start: 0;
+}
+
+[data-ui-part="sidebar"][data-state="collapsed"][data-presentation="inline"]
+  .task-app-shell-story__project-body
+  nav {
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+}
+
+[data-ui-part="sidebar"][data-state="collapsed"][data-presentation="inline"]
+  .task-app-shell-story__project {
+  width: 2rem;
+  height: 2rem;
+  justify-content: center;
+  border-color: transparent;
+  border-radius: 0.5rem;
+  background: transparent;
+  padding: 0;
+}
+
+[data-ui-part="sidebar"][data-state="collapsed"][data-presentation="inline"]
+  .task-app-shell-story__project:hover,
+[data-ui-part="sidebar"][data-state="collapsed"][data-presentation="inline"]
+  .task-app-shell-story__project:focus-visible {
+  border-color: transparent;
+  background: var(--sidebar-accent, var(--ui-tasks-muted-surface));
+  color: var(--sidebar-accent-foreground, var(--ui-tasks-foreground));
+}
+
+[data-ui-part="sidebar"][data-state="collapsed"][data-presentation="inline"]
+  .task-app-shell-story__project--active {
+  border-color: transparent;
+  background: color-mix(
+    in srgb,
+    var(--ui-tasks-accent) 11%,
+    var(--ui-tasks-card)
+  );
+  color: var(--ui-tasks-accent);
+}
+
+[data-ui-part="sidebar"][data-state="collapsed"][data-presentation="inline"]
+  .task-app-shell-story__project-icon,
+[data-ui-part="sidebar"][data-state="collapsed"][data-presentation="inline"]
+  .task-app-shell-story__project--active
+  .task-app-shell-story__project-icon {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+}
+
+[data-ui-part="sidebar"][data-state="collapsed"][data-presentation="inline"]
+  .task-app-shell-story__project-footer,
+[data-ui-part="sidebar"][data-state="collapsed"][data-presentation="inline"]
+  .task-app-shell-story__planner-footer {
+  min-height: 0;
+  border-block-start: 0;
+  padding: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .task-app-shell-story__planner-item {
+    transition: none;
+  }
+}

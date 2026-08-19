@@ -1,0 +1,171 @@
+  .task-when-picker-content {
+    display: grid;
+    gap: 0.3rem;
+    min-width: 15rem;
+    padding: 0.3rem;
+  }
+
+  .task-when-picker-content__command[data-ui-component="command"][data-ui-part="command"] {
+    height: auto;
+    padding: 0;
+    border-radius: 0 !important;
+    background: transparent;
+  }
+
+  /* Schedule search keeps its muted fill; drop only border and focus ring. */
+  .task-when-picker-content
+    [data-ui-part="command-input-wrapper"]
+    > [data-ui-component="input-group"][data-ui-part="input-group"] {
+    border-color: transparent;
+    background-color: var(--input);
+    box-shadow: none !important;
+    --tw-ring-shadow: 0 0 #0000;
+    --tw-ring-color: transparent;
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .task-when-picker-content
+      [data-ui-part="command-input-wrapper"]
+      > [data-ui-component="input-group"][data-ui-part="input-group"] {
+      background-color: color-mix(in oklab, var(--input) 30%, transparent);
+    }
+  }
+
+  .task-when-picker-content
+    [data-ui-component="input-group"][data-ui-part="input-group"]:focus-within,
+  .task-when-picker-content
+    [data-ui-component="input-group"][data-ui-part="input-group"]:has(
+      [data-slot="input-group-control"]:focus-visible
+    ) {
+    border-color: transparent;
+    background-color: color-mix(
+      in srgb,
+      var(--input) 72%,
+      var(--kanban-foreground, var(--foreground)) 12%
+    );
+    box-shadow: none !important;
+    --tw-ring-shadow: 0 0 #0000;
+    --tw-ring-color: transparent;
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .task-when-picker-content
+      [data-ui-component="input-group"][data-ui-part="input-group"]:focus-within,
+    .task-when-picker-content
+      [data-ui-component="input-group"][data-ui-part="input-group"]:has(
+        [data-slot="input-group-control"]:focus-visible
+      ) {
+      background-color: color-mix(
+        in oklab,
+        var(--input) 42%,
+        var(--kanban-foreground, var(--foreground)) 8%
+      );
+    }
+  }
+
+  .task-when-picker-content
+    [data-ui-part="command-input-wrapper"]
+    [data-slot="input-group-control"]:focus-visible {
+    outline: 0;
+    box-shadow: none !important;
+  }
+
+  .task-when-picker-content__suggestions {
+    max-height: 11rem;
+  }
+
+  .task-when-picker-content__quick {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.2rem;
+  }
+
+  .task-when-picker-content__quick--single {
+    grid-template-columns: 1fr;
+  }
+
+  .task-when-picker-content__quick-row {
+    display: grid;
+    grid-template-columns: 1.1rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.35rem;
+    min-width: 0;
+    min-height: 1.75rem;
+    border: 0;
+    border-radius: 0.3rem;
+    background: transparent;
+    color: var(--kanban-foreground);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 650;
+    padding: 0.2rem 0.3rem;
+    text-align: left;
+  }
+
+  .task-when-picker-content__quick-row > span:nth-child(2) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .task-when-picker-content__quick-row:hover,
+  .task-when-picker-content__quick-row:focus-visible {
+    background: color-mix(in srgb, var(--kanban-border) 45%, transparent);
+    outline: 0;
+  }
+
+  .task-when-picker-content__quick-icon svg,
+  .task-when-picker-content__quick-check svg {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  .task-when-picker-content__quick-icon {
+    display: inline-grid;
+    place-items: center;
+    color: var(--kanban-muted);
+  }
+
+  .task-when-picker-content__quick-icon--star {
+    color: var(--ui-tasks-warning);
+  }
+
+  .task-when-picker-content__quick-icon--moon {
+    color: var(--kanban-primary);
+  }
+
+  .task-when-picker-content__quick-check {
+    color: var(--kanban-accent);
+  }
+
+  .task-when-picker-content__actions {
+    display: grid;
+  }
+
+  .task-when-picker-content__clear {
+    width: 100%;
+    border: 0;
+    border-radius: 0.3rem;
+    background-color: var(--input);
+    color: var(--kanban-muted);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 650;
+    padding: 0.35rem 0.5rem;
+    text-align: center;
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .task-when-picker-content__clear {
+      background-color: color-mix(in oklab, var(--input) 30%, transparent);
+    }
+  }
+
+  .task-when-picker-content__clear:hover,
+  .task-when-picker-content__clear:focus-visible {
+    background: color-mix(in srgb, var(--kanban-border) 45%, transparent);
+    color: var(--kanban-foreground);
+    outline: 0;
+  }

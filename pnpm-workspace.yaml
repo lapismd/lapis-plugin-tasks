@@ -1,0 +1,12 @@
+packages:
+  - "."
+
+linkWorkspacePackages: true
+
+overrides:
+  "@internationalized/date": "3.12.2"
+  "@lapis-notes/api": "link:../lapis-notes/packages/api"
+  "@lapis-notes/ui": "link:../lapis-notes/packages/ui"
+  "@lapismd/design-core": "link:../design-core"
+  "@lapismd/spec-validator": "link:../spec-validator"
+  svelte: "5.56.9"

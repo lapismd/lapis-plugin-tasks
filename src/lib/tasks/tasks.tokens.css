@@ -1,0 +1,34 @@
+/**
+ * Tasks planner role tokens → theme / kanban tokens.
+ */
+:root,
+.tasks-planner {
+  --kanban-background: var(--background);
+  --kanban-foreground: var(--foreground);
+  --kanban-card: var(--card);
+  --kanban-card-foreground: var(--card-foreground);
+  --kanban-muted: var(--muted-foreground);
+  --kanban-muted-surface: var(--muted);
+  --kanban-border: var(--border);
+  --kanban-accent: var(--accent);
+  --kanban-accent-foreground: var(--accent-foreground);
+  --kanban-primary: var(--primary);
+  --kanban-primary-foreground: var(--primary-foreground);
+  --kanban-popover: var(--popover, var(--card));
+  --kanban-shadow: var(--ui-form-shadow, rgb(15 23 42 / 0.1));
+  --kanban-radius: var(--radius, 0.625rem);
+
+  --ui-tasks-background: var(--background);
+  --ui-tasks-foreground: var(--foreground);
+  --ui-tasks-muted: var(--muted-foreground);
+  --ui-tasks-muted-surface: var(--muted);
+  --ui-tasks-border: var(--border);
+  --ui-tasks-accent: var(--primary);
+  --ui-tasks-accent-foreground: var(--primary-foreground);
+  --ui-tasks-card: var(--card);
+  --ui-tasks-destructive: var(--destructive);
+  --ui-tasks-warning: var(--warning, var(--chart-4, #c99700));
+  --ui-tasks-success: var(--success, var(--chart-2, #3d9a5f));
+  --ui-tasks-info: var(--info, var(--chart-1, #6b9bd1));
+  --ui-tasks-radius: var(--radius, 0.625rem);
+}

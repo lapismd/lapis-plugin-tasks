@@ -1,0 +1,384 @@
+  .application-planner-task-row {
+    --task-row-surface: var(--kanban-card);
+
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    margin: 0 -0.5rem 2px;
+    border-radius: 0.45rem;
+    background: var(--task-row-surface);
+    padding: 0.3rem 0.5rem 0.5rem;
+    transition:
+      background-color 140ms ease,
+      box-shadow 140ms ease,
+      border-radius 140ms ease;
+  }
+
+  .application-planner-task-row:not(.application-planner-task-row--expanded):not(.application-planner-task-row--selected):hover:not(:has([data-task-drag-handle]:hover)),
+  .application-planner-task-row:not(.application-planner-task-row--expanded):not(.application-planner-task-row--selected):focus-visible {
+    --task-row-surface: color-mix(
+      in srgb,
+      var(--task-application-color, var(--primary)) 8%,
+      var(--kanban-card)
+    );
+    background: var(--task-row-surface);
+    box-shadow: inset 0 0 0 1px
+      color-mix(
+        in srgb,
+        var(--task-application-color, var(--primary)) 12%,
+        transparent
+      );
+  }
+
+  .application-planner-task-row__columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 0.45rem;
+    min-width: 0;
+  }
+
+  .application-planner-task-row__primary {
+    min-width: 0;
+  }
+
+  .application-planner-task-row__swipe {
+    /* Opaque content must fully cover end actions within this primary column. */
+    --ui-swipe-item-background: transparent;
+    --ui-swipe-item-content-background: var(
+      --task-row-surface,
+      var(--kanban-card, var(--background))
+    );
+    --ui-swipe-item-action-background: transparent;
+    --ui-swipe-item-border-color: transparent;
+    --ui-swipe-item-radius: 0.45rem;
+    --ui-swipe-item-action-min-width: 2.5rem;
+
+    min-width: 0;
+    width: 100%;
+    border: 0;
+    background: transparent;
+  }
+
+  .application-planner-task-row__swipe-content {
+    background: var(
+      --task-row-surface,
+      var(--kanban-card, var(--background))
+    );
+  }
+
+  .application-planner-task-row__swipe[data-ui-component="swipe-item"][data-ui-part="root"]
+    > [data-ui-part="actions"][data-side="end"] {
+    /* Pane grows with reveal; min-width is the stable measured open size. */
+    --task-swipe-delete-size: 2.5rem;
+    width: max(
+      var(--task-swipe-delete-size),
+      calc(0px - var(--ui-swipe-item-offset, 0px) - 0.1rem)
+    );
+    min-width: var(--task-swipe-delete-size);
+    align-items: stretch;
+    overflow: hidden;
+    padding-block: 0.1rem;
+    padding-inline-end: 0.1rem;
+    border-radius: 0.45rem;
+    background: var(--destructive, #dc2626);
+  }
+
+  .application-planner-task-row__swipe[data-ui-component="swipe-item"][data-ui-part="root"]
+    > [data-ui-part="actions"][data-side="end"]:has(
+      [data-ui-part="action"].application-planner-task-row__swipe-delete:hover
+    ),
+  .application-planner-task-row__swipe[data-ui-component="swipe-item"][data-ui-part="root"]
+    > [data-ui-part="actions"][data-side="end"]:has(
+      [data-ui-part="action"].application-planner-task-row__swipe-delete:focus-visible
+    ) {
+    background: color-mix(in srgb, var(--destructive, #dc2626) 88%, black);
+  }
+
+  .application-planner-task-row__swipe[data-ui-component="swipe-item"][data-ui-part="root"]
+    [data-ui-part="action"].application-planner-task-row__swipe-delete {
+    width: auto;
+    min-width: var(--task-swipe-delete-size);
+    height: 100%;
+    min-height: 0;
+    flex: 1 1 auto;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--destructive-foreground, #fff);
+    box-shadow: none;
+  }
+
+  .application-planner-task-row__swipe[data-ui-component="swipe-item"][data-ui-part="root"]
+    [data-ui-part="action"].application-planner-task-row__swipe-delete:hover,
+  .application-planner-task-row__swipe[data-ui-component="swipe-item"][data-ui-part="root"]
+    [data-ui-part="action"].application-planner-task-row__swipe-delete:focus-visible {
+    background: transparent;
+  }
+
+  .application-planner-task-row__swipe[data-ui-component="swipe-item"][data-ui-part="root"]
+    [data-ui-part="action"].application-planner-task-row__swipe-delete
+    svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .application-planner-task-row__aside {
+    display: flex;
+    flex: none;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding-top: 0.05rem;
+  }
+
+  .application-planner-task-row__open {
+    display: grid;
+    width: 1.2rem;
+    height: 1.2rem;
+    flex: none;
+    place-items: center;
+    border: 0;
+    border-radius: 999px;
+    background: var(--kanban-muted-surface);
+    color: var(--kanban-muted);
+    cursor: pointer;
+    padding: 0;
+    box-shadow: none;
+    transition:
+      background-color 140ms ease,
+      color 140ms ease,
+      box-shadow 140ms ease;
+  }
+
+  .application-planner-task-row__open-icon {
+    display: grid;
+    grid-area: 1 / 1;
+    place-items: center;
+  }
+
+  .application-planner-task-row__open-icon svg {
+    width: 0.68rem;
+    height: 0.68rem;
+    stroke-width: 2.35;
+  }
+
+  .application-planner-task-row__open-icon--arrow {
+    display: none;
+  }
+
+  .application-planner-task-row:is(:hover, :focus-within)
+    .application-planner-task-row__open,
+  .application-planner-task-row__open:focus-visible {
+    background: var(--kanban-muted);
+    color: var(--kanban-card);
+    outline: 0;
+    box-shadow: 0 1px 2px
+      color-mix(in srgb, var(--kanban-foreground) 18%, transparent);
+  }
+
+  .application-planner-task-row:is(:hover, :focus-within)
+    .application-planner-task-row__open:hover,
+  .application-planner-task-row__open:focus-visible:hover {
+    background: color-mix(
+      in srgb,
+      var(--kanban-muted) 88%,
+      var(--kanban-foreground)
+    );
+  }
+
+  .application-planner-task-row:is(:hover, :focus-within)
+    .application-planner-task-row__open-icon--notes,
+  .application-planner-task-row__open:focus-visible
+    .application-planner-task-row__open-icon--notes {
+    display: none;
+  }
+
+  .application-planner-task-row:is(:hover, :focus-within)
+    .application-planner-task-row__open-icon--arrow,
+  .application-planner-task-row__open:focus-visible
+    .application-planner-task-row__open-icon--arrow {
+    display: block;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .application-planner-task-row__open {
+      transition: none;
+    }
+  }
+
+  .application-planner-task-row__task {
+    min-width: 0;
+  }
+
+  .application-planner-task-row__task .task-preview-row-shell {
+    border-bottom: 0;
+    padding-right: 1rem;
+    padding-bottom: 0;
+  }
+
+  .application-planner-task-row__meta {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: -0.02rem;
+    margin-left: 2.45rem;
+    padding-right: 0.15rem;
+  }
+
+  .application-planner-task-row__application {
+    display: inline-flex;
+    max-width: 100%;
+    align-items: center;
+    align-self: flex-start;
+    gap: 0.45rem;
+    border: 0;
+    border-radius: 0.32rem;
+    background: color-mix(
+      in srgb,
+      var(--task-application-color, var(--primary)) 8%,
+      transparent
+    );
+    color: var(--task-application-color, var(--primary));
+    padding: 0.22rem 0.45rem;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .application-planner-task-row__application:hover,
+  .application-planner-task-row__application:focus-visible {
+    background: color-mix(
+      in srgb,
+      var(--task-application-color, var(--primary)) 14%,
+      transparent
+    );
+    outline: 0;
+  }
+
+  .application-planner-task-row__application svg {
+    width: 0.85rem;
+    height: 0.85rem;
+    flex: 0 0 auto;
+  }
+
+  .application-planner-task-row__application span {
+    display: inline-flex;
+    min-width: 0;
+    align-items: baseline;
+    gap: 0.35rem;
+    line-height: 1;
+  }
+
+  .application-planner-task-row__application strong,
+  .application-planner-task-row__application small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .application-planner-task-row__application strong {
+    min-width: 0;
+    font-size: 0.76rem;
+  }
+
+  .application-planner-task-row__application small {
+    min-width: 0;
+    color: var(--kanban-muted);
+    font-size: 0.68rem;
+  }
+
+  .application-planner-task-row__application small::before {
+    content: "-";
+    margin-right: 0.35rem;
+    color: color-mix(
+      in srgb,
+      var(--kanban-muted) 70%,
+      transparent
+    );
+  }
+
+  .application-planner-task-row--selected {
+    --task-selection-border: color-mix(
+      in srgb,
+      var(--ui-tasks-accent) 30%,
+      transparent
+    );
+    --task-checkbox-border: color-mix(
+      in srgb,
+      var(--ui-tasks-accent) 58%,
+      var(--kanban-border)
+    );
+    --task-row-surface: color-mix(
+      in srgb,
+      var(--ui-tasks-accent) 13%,
+      var(--kanban-card)
+    );
+
+    background: var(--task-row-surface);
+    box-shadow:
+      inset 1px 0 var(--task-selection-border),
+      inset -1px 0 var(--task-selection-border);
+  }
+
+  .application-planner-task-row--selected-first {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    margin-bottom: 0;
+    padding-bottom: 0.25rem;
+    box-shadow:
+      inset 1px 0 var(--task-selection-border),
+      inset -1px 0 var(--task-selection-border),
+      inset 0 1px var(--task-selection-border);
+  }
+
+  .application-planner-task-row--selected-middle {
+    border-radius: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .application-planner-task-row--selected-last {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    margin-top: 0;
+    padding-top: 0.25rem;
+    box-shadow:
+      inset 1px 0 var(--task-selection-border),
+      inset -1px 0 var(--task-selection-border),
+      inset 0 -1px var(--task-selection-border);
+  }
+
+  .application-planner-task-row--selected-single {
+    box-shadow: inset 0 0 0 1px var(--task-selection-border);
+  }
+
+  .application-planner-task-row--dragged {
+    cursor: grabbing;
+  }
+
+  .application-planner-task-row--drag-preview {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    margin: 0;
+  }
+
+  @media (max-width: 640px) {
+    .application-planner-task-row {
+      align-items: stretch;
+      margin-inline: -0.35rem;
+      padding: 0.25rem 0.35rem 0.45rem;
+    }
+
+    .application-planner-task-row__application {
+      max-width: 100%;
+    }
+  }

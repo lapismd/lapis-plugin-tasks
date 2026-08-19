@@ -1,0 +1,99 @@
+body.sb-main-fullscreen #storybook-root {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: 1.5rem;
+}
+
+.docs-story {
+  overflow: visible !important;
+}
+
+.docs-story .sb-story {
+  box-sizing: border-box;
+  padding: 1rem 2.5rem;
+}
+
+.task-story-frame {
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--ui-tasks-border);
+  border-radius: var(--ui-tasks-radius);
+  background: var(--ui-tasks-background);
+}
+
+.task-story-frame--sm {
+  max-width: 24rem;
+  padding: 1rem;
+}
+
+.task-story-frame--md {
+  max-width: 28rem;
+  padding: 1rem;
+}
+
+.task-story-frame--xl {
+  max-width: 36rem;
+  padding: 1rem;
+}
+
+.task-story-frame--2xl {
+  max-width: 42rem;
+  padding: 1rem;
+}
+
+.task-story-frame--planner {
+  height: 40rem;
+  max-width: 56rem;
+}
+
+.task-story-frame--sortable {
+  display: flex;
+  min-height: 0;
+}
+
+.task-story-frame--selection {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Full-viewport stage matching App Shell workspace for planner compositions. */
+body.sb-main-fullscreen #storybook-root:has(.task-story-shell-stage) {
+  padding: 0;
+}
+
+.task-story-shell-stage {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 70rem;
+  height: 100vh;
+  min-height: 42rem;
+  overflow: hidden;
+  padding: 1.5rem;
+  background: var(--ui-tasks-muted-background);
+}
+
+.task-story-shell-stage__surface {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--ui-tasks-border);
+  border-radius: var(--ui-tasks-radius);
+  background: var(--ui-tasks-background);
+  box-shadow: 0 1rem 2.5rem
+    color-mix(in srgb, var(--ui-tasks-foreground) 9%, transparent);
+}
+
+.task-story-shell-stage__surface > * {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+}
+
+.task-story-shell-stage__surface--sortable {
+  display: flex;
+}

@@ -1,0 +1,28 @@
+@import "./tasks/tasks.tokens.css";
+
+.catalog-boundary {
+  max-width: 42rem;
+  border: 1px solid var(--ui-tasks-border);
+  border-radius: var(--ui-tasks-radius);
+  background: var(--ui-tasks-card);
+  color: var(--ui-tasks-foreground);
+  padding: 2rem;
+}
+
+.catalog-boundary h1,
+.catalog-boundary p {
+  margin: 0;
+}
+
+.catalog-boundary h1 {
+  margin-block: 0.35rem 0.75rem;
+  font-size: 1.5rem;
+}
+
+.catalog-boundary__eyebrow {
+  color: var(--ui-tasks-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

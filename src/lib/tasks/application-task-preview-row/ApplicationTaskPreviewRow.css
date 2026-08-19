@@ -1,0 +1,569 @@
+  .task-preview-row-swipe {
+    /* Content must stay opaque so trailing actions stay covered until revealed. */
+    --ui-swipe-item-background: transparent;
+    --ui-swipe-item-content-background: var(
+      --task-row-surface,
+      var(--kanban-card, var(--background))
+    );
+    --ui-swipe-item-action-background: transparent;
+    --ui-swipe-item-border-color: transparent;
+    --ui-swipe-item-radius: 0.45rem;
+    --ui-swipe-item-action-min-width: 2.5rem;
+
+    border: 0;
+    background: transparent;
+  }
+
+  .task-preview-row-swipe[data-ui-component="swipe-item"][data-ui-part="root"]
+    > [data-ui-part="actions"][data-side="end"] {
+    /* Pane grows with reveal; min-width is the stable measured open size. */
+    --task-swipe-delete-size: 2.5rem;
+    width: max(
+      var(--task-swipe-delete-size),
+      calc(0px - var(--ui-swipe-item-offset, 0px) - 0.1rem)
+    );
+    min-width: var(--task-swipe-delete-size);
+    align-items: stretch;
+    overflow: hidden;
+    padding-block: 0.1rem;
+    padding-inline-end: 0.1rem;
+    border-radius: 0.45rem;
+    background: var(--destructive, #dc2626);
+  }
+
+  .task-preview-row-swipe[data-ui-component="swipe-item"][data-ui-part="root"]
+    > [data-ui-part="actions"][data-side="end"]:has(
+      [data-ui-part="action"].task-preview-row__swipe-delete:hover
+    ),
+  .task-preview-row-swipe[data-ui-component="swipe-item"][data-ui-part="root"]
+    > [data-ui-part="actions"][data-side="end"]:has(
+      [data-ui-part="action"].task-preview-row__swipe-delete:focus-visible
+    ) {
+    background: color-mix(
+      in srgb,
+      var(--destructive, #dc2626) 88%,
+      black
+    );
+  }
+
+  .task-preview-row-swipe[data-ui-component="swipe-item"][data-ui-part="root"]
+    [data-ui-part="action"].task-preview-row__swipe-delete {
+    width: auto;
+    min-width: var(--task-swipe-delete-size);
+    height: 100%;
+    min-height: 0;
+    flex: 1 1 auto;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--destructive-foreground, #fff);
+    box-shadow: none;
+  }
+
+  .task-preview-row-swipe[data-ui-component="swipe-item"][data-ui-part="root"]
+    [data-ui-part="action"].task-preview-row__swipe-delete:hover,
+  .task-preview-row-swipe[data-ui-component="swipe-item"][data-ui-part="root"]
+    [data-ui-part="action"].task-preview-row__swipe-delete:focus-visible {
+    background: transparent;
+  }
+
+  .task-preview-row-swipe[data-ui-component="swipe-item"][data-ui-part="root"]
+    [data-ui-part="action"].task-preview-row__swipe-delete
+    svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .task-preview-row-shell {
+    position: relative;
+    padding-left: 1rem;
+    padding-right: 2.1rem;
+    border-bottom: 1px solid var(--kanban-border);
+  }
+
+  .task-preview-row-shell--expanded {
+    position: relative;
+    z-index: 1;
+    border-bottom-color: transparent;
+  }
+
+  .task-preview-row-shell--expanded .task-preview-row {
+    position: relative;
+    z-index: 0;
+  }
+
+  .task-preview-row-shell--expanded .task-preview-row::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: -0.2rem;
+    right: -0.7rem;
+    bottom: -0.2rem;
+    left: -0.7rem;
+    border: 1px solid var(--kanban-border);
+    border-radius: 0.45rem;
+    background: var(--kanban-card);
+    box-shadow:
+      0 8px 22px
+        color-mix(in srgb, var(--kanban-foreground) 10%, transparent),
+      0 0 0 1px
+        color-mix(in srgb, var(--kanban-border) 65%, transparent);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--task-preview-shell-ms, 160ms) ease;
+  }
+
+  .task-preview-row-shell--expanded .task-preview-row--expanded::before {
+    opacity: 1;
+  }
+
+  .task-preview-row-shell--expanded .task-preview-row--closing::before {
+    opacity: 0;
+    transition:
+      opacity var(--task-preview-close-ms, 140ms) cubic-bezier(0.4, 0, 1, 1),
+      box-shadow var(--task-preview-close-ms, 140ms) cubic-bezier(0.4, 0, 1, 1);
+  }
+
+  .task-preview-row__drag-handle {
+    position: absolute;
+    top: 0.55rem;
+    left: 0;
+    z-index: 2;
+    display: grid;
+    width: 0.85rem;
+    height: 0.85rem;
+    place-items: center;
+    border: 0;
+    border-radius: 0.2rem;
+    background: transparent;
+    color: var(--kanban-muted);
+    cursor: grab;
+    opacity: 0;
+    padding: 0;
+    transition: opacity 140ms ease;
+  }
+
+  .task-preview-row-shell:hover .task-preview-row__drag-handle,
+  .task-preview-row-shell:focus-within .task-preview-row__drag-handle,
+  .task-preview-row-shell--dragging .task-preview-row__drag-handle {
+    opacity: 1;
+  }
+
+  .task-preview-row__drag-handle:active {
+    cursor: grabbing;
+  }
+
+  .task-preview-row__drag-handle:focus-visible {
+    color: var(--kanban-foreground);
+    outline: 2px solid
+      color-mix(in srgb, var(--ui-tasks-accent) 35%, transparent);
+    outline-offset: 2px;
+  }
+
+  .task-preview-row__drag-handle svg {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+
+  .task-preview-row__hover-actions {
+    pointer-events: none;
+  }
+
+  .task-preview-row__hover-move {
+    position: absolute;
+    top: 50%;
+    left: -1.35rem;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    translate: 0 -50%;
+    opacity: 0;
+    transition: opacity 140ms ease;
+    pointer-events: none;
+  }
+
+  .task-preview-row__hover-end {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    translate: 0 -50%;
+    opacity: 0;
+    transition: opacity 140ms ease;
+    pointer-events: none;
+  }
+
+  .task-preview-row-shell:hover .task-preview-row__hover-move,
+  .task-preview-row-shell:focus-within .task-preview-row__hover-move,
+  .task-preview-row-shell:hover .task-preview-row__hover-end,
+  .task-preview-row-shell:focus-within .task-preview-row__hover-end,
+  .task-preview-row__hover-move:hover,
+  .task-preview-row__hover-end:hover,
+  .task-preview-row__hover-move:focus-within,
+  .task-preview-row__hover-end:focus-within {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .task-preview-row__hover-move button,
+  .task-preview-row__hover-swipe-trigger {
+    display: grid;
+    width: 1rem;
+    height: 1rem;
+    min-width: 1rem;
+    min-height: 1rem;
+    place-items: center;
+    border: 0;
+    border-radius: 0.25rem;
+    background: transparent;
+    color: var(--kanban-muted);
+    box-shadow: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .task-preview-row__hover-move button:disabled {
+    cursor: default;
+    opacity: 0.28;
+  }
+
+  .task-preview-row__hover-open {
+    display: grid;
+    width: 1.2rem;
+    height: 1.2rem;
+    flex: none;
+    place-items: center;
+    border: 0;
+    border-radius: 999px;
+    background: var(--kanban-muted);
+    color: var(--kanban-card);
+    cursor: pointer;
+    padding: 0;
+    box-shadow: 0 1px 2px
+      color-mix(in srgb, var(--kanban-foreground) 18%, transparent);
+  }
+
+  .task-preview-row__hover-move button:hover,
+  .task-preview-row__hover-swipe-trigger:hover,
+  .task-preview-row__hover-move button:focus-visible,
+  .task-preview-row__hover-swipe-trigger:focus-visible {
+    color: var(--kanban-foreground);
+    outline: 0;
+  }
+
+  .task-preview-row__hover-open:hover,
+  .task-preview-row__hover-open:focus-visible {
+    background: color-mix(
+      in srgb,
+      var(--kanban-muted) 88%,
+      var(--kanban-foreground)
+    );
+    outline: 0;
+  }
+
+  .task-preview-row__hover-move svg,
+  .task-preview-row__hover-swipe-trigger svg {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+
+  .task-preview-row__hover-open svg {
+    width: 0.68rem;
+    height: 0.68rem;
+    stroke-width: 2.35;
+  }
+
+  .task-preview-row-shell--embedded {
+    padding-left: 0;
+  }
+
+  .task-preview-row-embedded-readonly {
+    min-width: 0;
+    border: 1px solid var(--kanban-border);
+    border-radius: 0.45rem;
+    background: var(--kanban-card);
+    box-shadow:
+      0 8px 22px
+        color-mix(in srgb, var(--kanban-foreground) 8%, transparent),
+      0 0 0 1px
+        color-mix(in srgb, var(--kanban-border) 65%, transparent);
+    padding: 0.65rem 0.75rem;
+  }
+
+  .task-preview-row-embedded-readonly .task-preview-row__expanded {
+    margin-top: 0;
+    animation: none;
+    overflow: visible;
+  }
+
+  .task-preview-row-embedded-readonly .task-preview-row__notes {
+    min-height: 0;
+  }
+
+  .task-preview-row-embedded-readonly .task-preview-row__footer {
+    border-top-color: color-mix(
+      in srgb,
+      var(--kanban-border) 72%,
+      transparent
+    );
+    margin-top: 0.45rem;
+    padding-top: 0.5rem;
+  }
+
+  .task-preview-row {
+    position: relative;
+    min-width: 0;
+    padding: 0.35rem 0;
+    transition:
+      background var(--task-preview-shell-ms, 160ms) ease,
+      box-shadow var(--task-preview-shell-ms, 160ms) ease,
+      padding var(--task-preview-shell-ms, 160ms) ease;
+  }
+
+  .task-preview-row--expanded {
+    padding: 0.35rem 0 0.65rem;
+  }
+
+  .task-preview-row--done .task-line__title,
+  .task-preview-row--done .task-line__title-input {
+    color: var(--kanban-muted);
+    text-decoration: line-through;
+  }
+
+  .task-preview-row__expanded {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 0.2rem;
+    min-width: 0;
+    overflow: hidden;
+    transform-origin: top;
+    animation: task-preview-expand var(--task-preview-expand-ms, 160ms)
+      cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: max-height, opacity, transform;
+  }
+
+  .task-preview-row__expanded--closing {
+    animation: task-preview-collapse var(--task-preview-close-ms, 140ms)
+      cubic-bezier(0.4, 0, 1, 1) forwards;
+    pointer-events: none;
+  }
+
+  .task-preview-row__notes {
+    min-width: 0;
+    min-height: 4rem;
+    color: var(--kanban-muted);
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  .task-preview-row__notes-input,
+  .task-preview-row__notes-placeholder,
+  .task-preview-row__notes-preview {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    overflow-wrap: anywhere;
+    padding: 0;
+    text-align: left;
+  }
+
+  .task-preview-row__notes-input {
+    resize: none;
+    min-height: 1.35rem;
+  }
+
+  .task-preview-row__notes-input:focus {
+    outline: 0;
+    color: var(--kanban-foreground);
+  }
+
+  .task-preview-row__notes-placeholder {
+    cursor: pointer;
+    padding: 0.1rem 0;
+  }
+
+  .task-preview-row__notes-preview {
+    cursor: text;
+    display: block;
+    padding: 0.1rem 0;
+  }
+
+  .task-preview-row__notes-preview .application-markdown-preview,
+  .task-preview-row__notes-preview
+    .application-markdown-preview .carta-renderer {
+    color: inherit;
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  .task-preview-row__notes-placeholder:hover,
+  .task-preview-row__notes-placeholder:focus-visible,
+  .task-preview-row__notes-preview:hover,
+  .task-preview-row__notes-preview:focus-visible {
+    color: var(--kanban-foreground);
+    outline: 0;
+  }
+
+  .task-preview-row__footer--readonly {
+    padding-top: 0.15rem;
+  }
+
+  .task-preview-row__readonly-chip {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--kanban-border);
+    border-radius: 999px;
+    color: var(--kanban-muted);
+    font-size: 0.72rem;
+    font-weight: 650;
+    padding: 0.18rem 0.5rem;
+    white-space: nowrap;
+  }
+
+  .task-preview-row__notes-empty {
+    color: var(--kanban-muted);
+    font-size: 0.82rem;
+    font-style: italic;
+  }
+
+  .task-preview-row__footer {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    border-top: 1px solid var(--kanban-border);
+    margin-top: 0.35rem;
+    padding-top: 0.55rem;
+  }
+
+  .task-preview-row__footer-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+
+  .task-preview-row__footer-meta .cv-structured-form {
+    display: contents;
+  }
+
+  .task-preview-row__completed {
+    color: var(--kanban-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .task-preview-row__footer-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15rem;
+    flex-shrink: 0;
+  }
+
+  .task-preview-row__footer-actions button {
+    display: inline-grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 0;
+    border-radius: 0.3rem;
+    background: transparent;
+    color: var(--kanban-muted);
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .task-preview-row__footer-actions button:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .task-preview-row__footer-actions button:not(:disabled):hover,
+  .task-preview-row__footer-actions button:not(:disabled):focus-visible {
+    background: color-mix(
+      in srgb,
+      var(--kanban-border) 55%,
+      transparent
+    );
+    color: var(--kanban-foreground);
+    outline: 0;
+  }
+
+  .task-preview-row__footer-actions button svg {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  @keyframes task-preview-expand {
+    from {
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(-0.18rem);
+    }
+
+    to {
+      max-height: 40rem;
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes task-preview-collapse {
+    from {
+      max-height: 40rem;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    to {
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(-0.18rem);
+    }
+  }
+
+  @container task-preview (max-width: 24rem) {
+    .task-preview-row .task-line__header {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.3rem;
+    }
+
+    .task-preview-row .task-line__meta {
+      padding-top: 0;
+      flex-wrap: wrap;
+      row-gap: 0.25rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .task-preview-row .task-line__header {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.3rem;
+    }
+
+    .task-preview-row .task-line__meta {
+      padding-top: 0;
+      flex-wrap: wrap;
+      row-gap: 0.25rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .task-preview-row,
+    .task-preview-row__expanded {
+      animation: none;
+      transition: none;
+    }
+  }

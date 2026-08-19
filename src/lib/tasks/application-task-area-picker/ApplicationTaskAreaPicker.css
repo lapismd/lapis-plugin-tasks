@@ -1,0 +1,147 @@
+.application-task-area-picker {
+  display: inline-flex;
+  max-width: 100%;
+  width: fit-content;
+}
+
+.application-task-area-picker__trigger {
+  display: inline-flex;
+  max-width: 100%;
+  min-height: 1.75rem;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--kanban-border, var(--border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--kanban-card, var(--card)) 88%, transparent);
+  color: var(--kanban-muted, var(--muted-foreground));
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0 0.55rem;
+  white-space: nowrap;
+}
+
+.application-task-area-picker__trigger--chip {
+  max-width: 100%;
+  min-height: auto;
+  align-self: flex-start;
+  gap: 0.45rem;
+  border: 0;
+  border-radius: 0.32rem;
+  background: color-mix(
+    in srgb,
+    var(--task-application-color, var(--primary)) 8%,
+    transparent
+  );
+  color: var(--kanban-muted, var(--muted-foreground));
+  font-size: 0.76rem;
+  padding: 0.22rem 0.45rem;
+}
+
+.application-task-area-picker__trigger--chip svg {
+  width: 0.76rem;
+  height: 0.76rem;
+}
+
+.application-task-area-picker__trigger:hover,
+.application-task-area-picker__trigger:focus-visible {
+  background: color-mix(
+    in srgb,
+    var(--task-application-color, var(--primary)) 12%,
+    transparent
+  );
+  color: var(--kanban-foreground, var(--foreground));
+  outline: 0;
+}
+
+.application-task-area-picker__trigger svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  flex: 0 0 auto;
+}
+
+.application-task-area-picker__trigger span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1;
+}
+
+.application-task-area-picker__trigger small {
+  color: inherit;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.application-task-area-picker__panel {
+  z-index: 1400;
+  width: min(22rem, calc(100vw - 2rem));
+  --ui-popover-gap: 0;
+  --ui-popover-padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--kanban-border, var(--border));
+  border-radius: 0.55rem;
+  background: var(--kanban-card, var(--card));
+  box-shadow:
+    0 18px 40px
+      color-mix(in srgb, var(--kanban-foreground, #000) 16%, transparent),
+    0 0 0 1px
+      color-mix(in srgb, var(--kanban-border, var(--border)) 55%, transparent);
+  color: var(--kanban-foreground, var(--foreground));
+  padding: 0;
+  gap: 0;
+}
+
+.application-task-area-picker__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--kanban-border, var(--border));
+  padding: 0.5rem 0.65rem;
+}
+
+.application-task-area-picker__header
+  [data-ui-component="popover"][data-ui-part="popover-title"] {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 850;
+}
+
+.application-task-area-picker__header button {
+  display: grid;
+  width: 1.7rem;
+  height: 1.7rem;
+  place-items: center;
+  border: 0;
+  border-radius: 0.35rem;
+  background: transparent;
+  color: var(--kanban-muted, var(--muted-foreground));
+  cursor: pointer;
+  padding: 0;
+}
+
+.application-task-area-picker__header button:hover,
+.application-task-area-picker__header button:focus-visible {
+  background: color-mix(
+    in srgb,
+    var(--kanban-border, var(--border)) 50%,
+    transparent
+  );
+  color: var(--kanban-foreground, var(--foreground));
+  outline: 0;
+}
+
+.application-task-area-picker__header svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.application-task-area-picker__command[data-ui-component="command"][data-ui-part="command"] {
+  height: auto;
+}
+
+.application-task-area-picker__list {
+  max-height: 16rem;
+}

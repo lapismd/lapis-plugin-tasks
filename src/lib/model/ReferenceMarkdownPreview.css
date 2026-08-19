@@ -1,0 +1,22 @@
+.reference-markdown-preview {
+  color: inherit;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.reference-markdown-preview p {
+  margin: 0 0 0.65rem;
+}
+
+.reference-markdown-preview p:last-child {
+  margin-bottom: 0;
+}
+
+.reference-markdown-preview--compact {
+  font-size: 0.85rem;
+}
+
+.reference-markdown-preview__empty {
+  color: var(--ui-tasks-muted);
+  font-style: italic;
+}

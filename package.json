@@ -1,0 +1,105 @@
+{
+  "name": "@lapis-notes/lapis-plugin-tasks",
+  "version": "0.1.0",
+  "description": "Lapis Notes Tasks plugin stub and catalog",
+  "license": "AGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lapismd/lapis-plugin-tasks.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "packageManager": "pnpm@10.32.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "pnpm run prepack",
+    "check": "pnpm spec:validate && pnpm check:app-ownership && pnpm check:no-tailwind && pnpm check:svelte && pnpm check:types",
+    "check:app-ownership": "vitest run --project unit src/lib/application-ownership.test.ts",
+    "check:no-tailwind": "node scripts/check-no-tailwind.mjs",
+    "check:svelte": "svelte-check --tsconfig ./tsconfig.app.json --fail-on-warnings --output human",
+    "check:types": "tsc -p tsconfig.node.json --noEmit",
+    "test": "vitest run --project unit --passWithNoTests",
+    "test:storybook": "vitest run --project storybook",
+    "build-storybook": "NODE_OPTIONS=\"${NODE_OPTIONS:---max-old-space-size=8192}\" storybook build --config-dir .storybook --output-dir storybook-static",
+    "publint": "publint",
+    "prepack": "svelte-package --tsconfig ./tsconfig.pack.json && publint",
+    "spec:build": "spec-validator build",
+    "spec:check": "spec-validator check && pnpm check:app-ownership",
+    "spec:first": "spec-validator first",
+    "spec:validate": "spec-validator validate",
+    "storybook": "WATCHPACK_POLLING=250 node scripts/storybook-run.mjs --no-open --config-dir .storybook",
+    "storybook:stop": "bash scripts/storybook-stop.sh",
+    "storybook:restart": "bash scripts/storybook-restart.sh"
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.test.*",
+    "!dist/**/*.spec.*",
+    "!dist/**/*.stories.*",
+    "!dist/**/*.example-sources.*",
+    "!dist/**/*.story-play.*"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "svelte": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "dependencies": {
+    "@dnd-kit/helpers": "0.5.0",
+    "@dnd-kit/svelte": "0.5.0",
+    "@internationalized/date": "3.12.2",
+    "@lucide/svelte": "^0.523.0",
+    "chrono-node": "^2.10.1"
+  },
+  "peerDependencies": {
+    "@lapis-notes/api": "^0.0.1",
+    "@lapismd/design-core": "^0.1.0",
+    "svelte": "^5.0.0"
+  },
+  "devDependencies": {
+    "@fontsource-variable/dm-sans": "^5.2.8",
+    "@fontsource-variable/source-code-pro": "5.2.7",
+    "@lapis-notes/api": "0.0.1",
+    "@lapis-notes/ui": "0.0.1",
+    "@lapismd/design-core": "0.1.0",
+    "@lapismd/spec-validator": "0.1.0",
+    "@storybook/addon-a11y": "10.5.7",
+    "@storybook/addon-docs": "10.5.7",
+    "@storybook/addon-svelte-csf": "5.1.2",
+    "@storybook/addon-themes": "10.5.7",
+    "@storybook/addon-vitest": "10.5.7",
+    "@storybook/svelte-vite": "10.5.7",
+    "@sveltejs/package": "2.5.0",
+    "@sveltejs/vite-plugin-svelte": "5.1.1",
+    "@tailwindcss/vite": "4.1.12",
+    "@tsconfig/svelte": "5.0.5",
+    "@types/node": "^22.15.0",
+    "@vitest/browser": "4.1.8",
+    "@vitest/browser-playwright": "4.1.8",
+    "aria-query": "5.3.2",
+    "bits-ui": "2.18.1",
+    "publint": "0.3.12",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "storybook": "10.5.7",
+    "svelte": "5.56.9",
+    "svelte-check": "4.3.1",
+    "tailwindcss": "4.1.12",
+    "typescript": "~5.8.3",
+    "vite": "6.4.2",
+    "vitest": "4.1.8"
+  }
+}

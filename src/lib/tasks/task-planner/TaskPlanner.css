@@ -1,0 +1,546 @@
+  .tasks-planner {
+    min-height: 0;
+    flex: 1;
+    background: var(--ui-tasks-background);
+    color: var(--ui-tasks-foreground);
+  }
+
+  .tasks-planner__content {
+    display: flex;
+    min-height: 100%;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.25rem clamp(1rem, 3vw, 2rem) 2rem;
+    padding-right: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .tasks-planner__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    max-width: 860px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .tasks-planner__title-icon {
+    display: inline-flex;
+    align-items: center;
+    color: var(--ui-tasks-muted);
+  }
+
+  .tasks-planner__title-icon :global(svg) {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .tasks-planner__header h1 {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin: 0;
+    font-size: 1.35rem;
+    line-height: 1.1;
+  }
+
+  .tasks-planner__count,
+  .tasks-planner__section-header span {
+    display: grid;
+    min-width: 1.7rem;
+    height: 1.7rem;
+    place-items: center;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--ui-tasks-accent) 12%, transparent);
+    color: var(--ui-tasks-accent);
+    font-size: 0.8rem;
+    font-weight: 800;
+  }
+
+  .tasks-planner__list,
+  .tasks-planner__section,
+  .tasks-planner__upcoming {
+    display: flex;
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
+    flex-direction: column;
+  }
+
+  .tasks-planner__list {
+    border-top: 1px solid var(--ui-tasks-border);
+    min-height: 1px;
+  }
+
+  .tasks-planner__sortable-row {
+    position: relative;
+    min-width: 0;
+    will-change: transform;
+    transition:
+      transform 300ms cubic-bezier(0.25, 1, 0.5, 1),
+      box-shadow 180ms ease;
+  }
+
+  .tasks-planner__sortable-row[data-dnd-dragging] {
+    z-index: 1200;
+    overflow: hidden;
+    border-radius: 0.45rem;
+    background: var(--kanban-card);
+    box-shadow:
+      inset 0 0 0 1px var(--kanban-border),
+      0 18px 42px color-mix(in srgb, var(--kanban-shadow) 92%, transparent),
+      0 4px 12px color-mix(in srgb, var(--kanban-shadow) 72%, transparent);
+  }
+
+  .tasks-planner__sortable-row[data-dnd-placeholder="hidden"] {
+    visibility: visible !important;
+    overflow: hidden;
+    border-radius: 0.45rem;
+    background: var(--kanban-card);
+    box-shadow: inset 0 0 0 1px var(--kanban-border);
+  }
+
+  .tasks-planner__content[data-planner-drag-feedback="external"]
+    .tasks-planner__sortable-row[data-dnd-dragging] {
+    visibility: hidden;
+  }
+
+  .tasks-planner__content[data-planner-drag-feedback="stack"]
+    .tasks-planner__sortable-row[data-planner-drag-member="true"],
+  .tasks-planner__content[data-planner-drag-feedback="external-stack"]
+    .tasks-planner__sortable-row[data-planner-drag-member="true"] {
+    visibility: hidden !important;
+  }
+
+  .tasks-planner__list--drop-target:empty {
+    min-height: 2.75rem;
+  }
+
+  .tasks-planner .task-preview-add-shell {
+    position: relative;
+    margin-bottom: 2px;
+    padding-left: 1rem;
+    padding-right: 1.35rem;
+    border-bottom: 1px solid var(--kanban-border);
+  }
+
+  .tasks-planner .task-preview-add {
+    display: grid;
+    grid-template-columns: 1.1rem minmax(0, 1fr);
+    gap: 0.65rem;
+    align-items: start;
+    min-height: 2.35rem;
+    padding: 0.55rem 0;
+  }
+
+  .tasks-planner .task-preview-add--collapsed {
+    grid-template-columns: 1.1rem auto minmax(0, 1fr);
+    align-items: center;
+    color: var(--kanban-muted);
+    cursor: text;
+    outline: 0;
+  }
+
+  .tasks-planner .task-preview-add--collapsed:hover,
+  .tasks-planner .task-preview-add--collapsed:focus-visible {
+    color: var(--kanban-foreground);
+  }
+
+  .tasks-planner .task-preview-add--collapsed:focus-visible::after {
+    position: absolute;
+    inset: 0.2rem 0.45rem;
+    border: 1px solid
+      color-mix(in srgb, var(--ui-tasks-accent) 35%, transparent);
+    border-radius: 0.42rem;
+    content: "";
+    pointer-events: none;
+  }
+
+  .tasks-planner .task-preview-add--editing {
+    padding-top: 0.65rem;
+    padding-bottom: 0.62rem;
+  }
+
+  .tasks-planner .task-preview-add__box {
+    position: relative;
+    display: grid;
+    width: 1.1rem;
+    height: 1.1rem;
+    margin-top: 0.12rem;
+    place-items: center;
+    border: 1.5px solid var(--kanban-border);
+    border-radius: 0.36rem;
+    background: transparent;
+    color: var(--kanban-muted);
+    flex-shrink: 0;
+    padding: 0;
+    transition:
+      border-color 140ms ease,
+      color 140ms ease;
+  }
+
+  .tasks-planner .task-preview-add__box svg {
+    position: absolute;
+    top: -0.27rem;
+    right: -0.3rem;
+    width: 0.72rem;
+    height: 0.72rem;
+    border-radius: 999px;
+    background: var(--kanban-card);
+    stroke-width: 2.2;
+  }
+
+  .tasks-planner
+    .task-preview-add--collapsed:hover
+    .task-preview-add__box,
+  .tasks-planner
+    .task-preview-add--collapsed:focus-visible
+    .task-preview-add__box,
+  .tasks-planner
+    .task-preview-add-shell--editing
+    .task-preview-add__box {
+    border-color: var(--ui-tasks-accent);
+    color: var(--ui-tasks-accent);
+  }
+
+  .tasks-planner .task-preview-add__label {
+    min-width: 0;
+    overflow: hidden;
+    color: inherit;
+    font-size: 0.92rem;
+    font-weight: 600;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tasks-planner .task-preview-add__label--draft {
+    color: var(--kanban-foreground);
+    font-weight: 650;
+  }
+
+  .tasks-planner .task-preview-add__editor {
+    display: grid;
+    min-width: 0;
+    gap: 0.35rem;
+  }
+
+  .tasks-planner .task-preview-add__editor > input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: var(--kanban-foreground);
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.35;
+    padding: 0.05rem 0;
+  }
+
+  .tasks-planner .task-preview-add__editor > input:focus {
+    outline: 0;
+  }
+
+  .tasks-planner .task-preview-add__editor > input::placeholder {
+    color: var(--kanban-muted);
+    font-weight: 500;
+  }
+
+  .tasks-planner .task-preview-add__shortcut {
+    display: inline-flex;
+    width: fit-content;
+    height: 1.35rem;
+    align-items: center;
+    justify-self: start;
+    border: 0;
+    border-radius: 0.42rem;
+    background: color-mix(in srgb, var(--kanban-muted) 10%, transparent);
+    color: var(--kanban-muted);
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0 0.38rem;
+  }
+
+  .tasks-planner
+    .task-preview-add--collapsed:focus-visible
+    .task-preview-add__shortcut {
+    background: color-mix(
+      in srgb,
+      var(--ui-tasks-accent) 10%,
+      transparent
+    );
+    color: var(--ui-tasks-accent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tasks-planner__sortable-row {
+      transition: none;
+    }
+  }
+
+  .tasks-planner__task {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 0.75rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--ui-tasks-border);
+  }
+
+  .tasks-planner__check {
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.15rem;
+    border: 2px solid var(--ui-tasks-border);
+    border-radius: 999px;
+    background: var(--ui-tasks-background);
+  }
+
+  .tasks-planner__task--done .tasks-planner__check {
+    border-color: var(--ui-tasks-accent);
+    background: var(--ui-tasks-accent);
+    box-shadow: inset 0 0 0 3px var(--ui-tasks-background);
+  }
+
+  .tasks-planner__task--done h3 {
+    color: var(--ui-tasks-muted);
+    text-decoration: line-through;
+  }
+
+  .tasks-planner__task-main {
+    min-width: 0;
+  }
+
+  .tasks-planner__task-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  .tasks-planner__task h3 {
+    margin: 0;
+    min-width: 0;
+    font-size: 0.98rem;
+    line-height: 1.25;
+  }
+
+  .tasks-planner__priority,
+  .tasks-planner__task-meta,
+  .tasks-planner__task-meta span,
+  .tasks-planner__application {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .tasks-planner__priority {
+    gap: 0.25rem;
+    color: var(--ui-tasks-destructive);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .tasks-planner__priority :global(svg),
+  .tasks-planner__task-meta :global(svg),
+  .tasks-planner__application :global(svg) {
+    width: 0.85rem;
+    height: 0.85rem;
+    flex: 0 0 auto;
+  }
+
+  .tasks-planner__task-meta {
+    flex-wrap: wrap;
+    gap: 0.4rem 0.65rem;
+    margin-top: 0.35rem;
+    color: var(--ui-tasks-muted);
+    font-size: 0.78rem;
+    font-weight: 650;
+  }
+
+  .tasks-planner__task-meta span {
+    gap: 0.25rem;
+  }
+
+  .tasks-planner__task p {
+    margin: 0.45rem 0 0;
+    color: var(--ui-tasks-muted);
+    font-size: 0.85rem;
+    line-height: 1.45;
+  }
+
+  .tasks-planner__application {
+    gap: 0.45rem;
+    max-width: 15rem;
+    border: 1px solid
+      color-mix(
+        in srgb,
+        var(--task-application-color, var(--ui-tasks-accent)) 42%,
+        transparent
+      );
+    border-radius: 999px;
+    background: color-mix(
+      in srgb,
+      var(--task-application-color, var(--ui-tasks-accent)) 8%,
+      transparent
+    );
+    color: var(--task-application-color, var(--ui-tasks-accent));
+    padding: 0.35rem 0.6rem;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .tasks-planner__application span {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    line-height: 1.1;
+  }
+
+  .tasks-planner__application strong,
+  .tasks-planner__application small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tasks-planner__application strong {
+    font-size: 0.76rem;
+  }
+
+  .tasks-planner__application small {
+    color: var(--ui-tasks-muted);
+    font-size: 0.68rem;
+  }
+
+  .tasks-planner__section {
+    gap: 0.5rem;
+  }
+
+  .tasks-planner__section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 0.4rem;
+  }
+
+  .tasks-planner__section-header h2 {
+    margin: 0;
+    color: var(--ui-tasks-muted);
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .tasks-planner__upcoming {
+    gap: 0;
+  }
+
+  .tasks-planner__upcoming-day {
+    display: flex;
+    min-height: 4.25rem;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding: 0.65rem 0 0.55rem;
+  }
+
+  .tasks-planner__date {
+    display: inline-flex;
+    min-height: 1.85rem;
+    align-items: baseline;
+    gap: 0.45rem;
+    color: var(--ui-tasks-muted);
+  }
+
+  .tasks-planner__date strong {
+    color: var(--ui-tasks-foreground);
+    font-size: 1.08rem;
+    font-weight: 700;
+    line-height: 1;
+    min-width: 1.35rem;
+    text-align: right;
+  }
+
+  .tasks-planner__date span {
+    min-width: 0;
+    flex: 1;
+    border-top: 1px solid var(--ui-tasks-border);
+    font-size: 0.78rem;
+    font-weight: 800;
+    overflow: hidden;
+    padding-top: 0.12rem;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .tasks-planner__gap {
+    display: none;
+  }
+
+  .tasks-planner__upcoming-month {
+    border-bottom: 1px solid var(--ui-tasks-border);
+    color: var(--ui-tasks-muted);
+    font-size: 0.8rem;
+    font-weight: 800;
+    padding: 0.9rem 0 0.35rem;
+    text-transform: uppercase;
+  }
+
+  .tasks-planner__upcoming-content {
+    min-width: 0;
+    padding-left: 1.35rem;
+  }
+
+  .tasks-planner__upcoming-content .tasks-planner__list {
+    border-top: 0;
+  }
+
+  .tasks-planner__day-empty {
+    min-height: 2.5rem;
+  }
+
+  .tasks-planner__day-empty.is-drop-target {
+    min-height: 3rem;
+  }
+
+  .tasks-planner__empty {
+    display: block;
+    width: min(100%, 420px);
+    margin: clamp(2.5rem, 9vh, 5rem) auto 0;
+    border: 2px dashed color-mix(in srgb, var(--kanban-border) 78%, transparent);
+    border-radius: 0.4rem;
+    background: transparent;
+    color: var(--kanban-muted);
+    font-size: 1.1875rem;
+    font-weight: 500;
+    line-height: 1.375;
+    padding: 1.15rem 1.55rem;
+    rotate: -3deg;
+    text-align: center;
+  }
+
+  @media (max-width: 680px) {
+    .tasks-planner__content {
+      padding-inline: 1rem;
+      padding-right: 1.5rem;
+    }
+
+    .tasks-planner__task {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .tasks-planner__application {
+      grid-column: 2;
+      width: fit-content;
+      max-width: 100%;
+    }
+
+    .tasks-planner__upcoming-content {
+      padding-left: 0;
+    }
+  }
