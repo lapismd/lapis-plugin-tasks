@@ -32,6 +32,7 @@
   let {
     rootElement = $bindable<HTMLElement | null>(null),
     tasks = [],
+    now,
     view = "today",
     area = null,
     taskRow,
@@ -57,6 +58,7 @@
   }: {
     rootElement?: HTMLElement | null;
     tasks?: Task[];
+    now?: Date;
     view?: TaskBucket;
     area?: string | null;
     taskRow?: Snippet<[Task, TaskPlannerRowContext]>;
@@ -114,6 +116,7 @@
 <div bind:this={rootElement} class="application-task-view" style={taskPreviewStyle}>
   <TaskPlanner
     {tasks}
+    {now}
     {view}
     {area}
     {taskRow}

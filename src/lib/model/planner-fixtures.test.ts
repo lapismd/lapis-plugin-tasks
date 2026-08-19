@@ -1,10 +1,18 @@
 import { MemoryAppDatabase } from "@lapis-notes/api/app-database";
 import { describe, expect, it } from "vitest";
-import { catalogTasksFromPlannerFixtures, parsePlannerFixtures } from "./planner-fixtures";
+import {
+  catalogTasksFromPlannerFixtures,
+  parsePlannerFixtures,
+  PLANNER_FIXTURE_TODAY,
+} from "./planner-fixtures";
 import { indexTaskDocument } from "./task-index";
 import { TaskRepository } from "./task-repository";
 import { serializeTaskDocument } from "./task-document";
-import { classifyTask } from "./planner";
+import {
+  buildTaskPlannerSnapshot,
+  buildTaskPlannerSnapshotFromRepository,
+  classifyTask,
+} from "./planner";
 
 describe("planner Markdown fixtures", () => {
   it("round-trips catalog fixtures through task documents", () => {
@@ -46,5 +54,36 @@ describe("planner Markdown fixtures", () => {
     expect(catalogToday.map((task) => task.id)).toEqual(
       expect.arrayContaining(["story-task-today-1", "story-task-evening"]),
     );
+  });
+
+  it("places deadline-only fixture tasks on upcoming day rows", async () => {
+    const now = new Date(`${PLANNER_FIXTURE_TODAY}T12:00:00`);
+    const catalogSnapshot = buildTaskPlannerSnapshot(
+      catalogTasksFromPlannerFixtures(),
+      now,
+    );
+    const upcomingTitles = (snapshot: typeof catalogSnapshot) =>
+      snapshot.upcomingRows.flatMap((row) =>
+        row.kind === "day" ? row.tasks.map((task) => task.title) : [],
+      );
+
+    expect(upcomingTitles(catalogSnapshot)).toEqual([
+      "Draft design critique",
+      "Prepare model serving examples",
+    ]);
+
+    const database = new MemoryAppDatabase("planner-upcoming");
+    await database.open();
+    for (const document of parsePlannerFixtures()) {
+      await indexTaskDocument(database, document);
+    }
+    const repositorySnapshot = await buildTaskPlannerSnapshotFromRepository(
+      new TaskRepository(database),
+      now,
+    );
+    expect(upcomingTitles(repositorySnapshot)).toEqual([
+      "Draft design critique",
+      "Prepare model serving examples",
+    ]);
   });
 });

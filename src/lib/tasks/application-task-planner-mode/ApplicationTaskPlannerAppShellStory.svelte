@@ -88,9 +88,8 @@
   let activeDropTargetId = $state<string | null>(null);
   let activeTaskId = $state<string | null>(null);
 
-  const snapshot = $derived(
-    buildTaskPlannerSnapshot(tasks, new Date(`${PLANNER_FIXTURE_TODAY}T12:00:00`)),
-  );
+  const now = new Date(`${PLANNER_FIXTURE_TODAY}T12:00:00`);
+  const snapshot = $derived(buildTaskPlannerSnapshot(tasks, now));
   const selectedProjectDetails = $derived(
     projects.find((project) => project.id === selectedProject) ?? projects[0],
   );
@@ -428,6 +427,7 @@
         <div class="task-app-shell-story__planner">
           <ApplicationTaskPlannerMode
             {tasks}
+            {now}
             {applications}
             view={taskView}
             area={taskArea}

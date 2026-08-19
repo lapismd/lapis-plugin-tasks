@@ -105,6 +105,10 @@
       const raw = await app.vault.cachedRead(file!);
       expect(raw).toContain("status: completed");
     });
+
+    await userEvent.click(canvas.getByRole("button", { name: "Upcoming" }));
+    expect(await canvas.findByText("Draft design critique")).toBeVisible();
+    expect(canvas.getByText("Prepare model serving examples")).toBeVisible();
   }}
 />
 

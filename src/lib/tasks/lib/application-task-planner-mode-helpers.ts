@@ -93,9 +93,10 @@ export function plannerMovePatchToApplicationPatch(
 export function visiblePlannerTasks(
 	tasks: Task[],
 	taskView: TaskBucket,
-	taskArea: string | null
+	taskArea: string | null,
+	now = new Date()
 ) {
-	const snapshot = buildTaskPlannerSnapshot(tasks);
+	const snapshot = buildTaskPlannerSnapshot(tasks, now);
 	if (taskArea) {
 		const area = taskArea.toLowerCase();
 		return tasks
@@ -118,8 +119,12 @@ export function visiblePlannerTasks(
 	return snapshot.logbook.flatMap((group) => group.tasks);
 }
 
-export function plannerTasksForListId(tasks: Task[], listId: string) {
-	const snapshot = buildTaskPlannerSnapshot(tasks);
+export function plannerTasksForListId(
+	tasks: Task[],
+	listId: string,
+	now = new Date()
+) {
+	const snapshot = buildTaskPlannerSnapshot(tasks, now);
 	if (listId === 'inbox') return snapshot.inbox;
 	if (listId === 'today') return snapshot.today;
 	if (listId === 'this-evening') return snapshot.thisEvening;
@@ -308,9 +313,10 @@ export function orderTaskIdsByVisiblePosition(
 	tasks: Task[],
 	taskView: TaskBucket,
 	taskArea: string | null,
-	taskIds: string[]
+	taskIds: string[],
+	now = new Date()
 ) {
-	const visibleIds = visiblePlannerTasks(tasks, taskView, taskArea).map((task) => task.id);
+	const visibleIds = visiblePlannerTasks(tasks, taskView, taskArea, now).map((task) => task.id);
 	const uniqueIds = [...new Set(taskIds)];
 	return uniqueIds.sort(
 		(left, right) => visibleIds.indexOf(left) - visibleIds.indexOf(right)

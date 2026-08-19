@@ -39,6 +39,24 @@ const linkedAssetRoots = linkedSiblingRoots.flatMap((root) =>
     return existsSync(candidate) ? [realpathSync(candidate)] : [];
   }),
 );
+const linkedSingletonPackages = [
+  "svelte",
+  "@codemirror/autocomplete",
+  "@codemirror/commands",
+  "@codemirror/lang-markdown",
+  "@codemirror/lang-yaml",
+  "@codemirror/lint",
+  "@codemirror/search",
+  "@codemirror/state",
+  "@codemirror/view",
+  "@codemirror/language",
+  "@lezer/common",
+  "@lezer/highlight",
+  "@lezer/markdown",
+  "@lezer/lr",
+  "@internationalized/date",
+  "bits-ui",
+] as const;
 
 const config: StorybookConfig = {
   stories: ["../stories/**/*.mdx", "../src/**/*.stories.@(js|ts|svelte)"],
@@ -63,7 +81,7 @@ const config: StorybookConfig = {
         tailwindcss(),
       ],
       resolve: {
-        dedupe: ["svelte", "@internationalized/date", "bits-ui"],
+        dedupe: [...linkedSingletonPackages],
         alias: [
           {
             find: /^\$lib(?:\/(.*))?$/,

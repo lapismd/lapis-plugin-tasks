@@ -23,9 +23,8 @@
     })),
   );
 
-  const snapshot = $derived(
-    buildTaskPlannerSnapshot(tasks, new Date(`${PLANNER_FIXTURE_TODAY}T12:00:00`)),
-  );
+  const now = new Date(`${PLANNER_FIXTURE_TODAY}T12:00:00`);
+  const snapshot = $derived(buildTaskPlannerSnapshot(tasks, now));
 
   function saveTask(task: Task) {
     tasks = tasks.map((entry) => (entry.id === task.id ? task : entry));
@@ -85,6 +84,7 @@
 
 <TasksPlannerCanvas
   {tasks}
+  {now}
   {snapshot}
   {applications}
   {applicationSummaries}

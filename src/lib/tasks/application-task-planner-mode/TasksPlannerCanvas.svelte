@@ -27,6 +27,7 @@
 
   let {
     tasks,
+    now,
     snapshot,
     applications = [],
     applicationSummaries = {},
@@ -39,6 +40,7 @@
     onOpenApplication = () => {},
   }: {
     tasks: Task[];
+    now?: Date;
     snapshot: TaskPlannerSnapshot;
     applications?: JobApplication[];
     applicationSummaries?: Record<string, ApplicationSummary>;
@@ -292,6 +294,7 @@
         <div class="task-column-canvas-story__pane">
           <ApplicationTaskPlannerMode
             {tasks}
+            {now}
             {applications}
             view={taskView}
             area={taskArea}

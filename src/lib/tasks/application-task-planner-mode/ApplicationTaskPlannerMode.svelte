@@ -62,6 +62,7 @@
 
 	let {
 		tasks = [],
+		now,
 		applications = [],
 		view = 'today',
 		area = null,
@@ -79,6 +80,7 @@
 		reviewContent
 	}: {
 		tasks?: Task[];
+		now?: Date;
 		applications?: JobApplication[];
 		view?: TaskBucket;
 		area?: string | null;
@@ -476,7 +478,7 @@
 
 	function resolveDragTaskIds(sourceTaskId: string, sourceTasks = displayTasks) {
 		return selectedTaskIds.includes(sourceTaskId)
-			? orderTaskIdsByVisiblePosition(sourceTasks, view, area, selectedTaskIds)
+			? orderTaskIdsByVisiblePosition(sourceTasks, view, area, selectedTaskIds, now)
 			: [sourceTaskId];
 	}
 
@@ -489,7 +491,7 @@
 	function selectTask(task: Task, event: MouseEvent) {
 		const mode = event.shiftKey ? 'range' : event.metaKey || event.ctrlKey ? 'toggle' : 'replace';
 		const selection = resolvePlannerTaskSelection(
-			visiblePlannerTasks(displayTasks, view, area).map((visibleTask) => visibleTask.id),
+			visiblePlannerTasks(displayTasks, view, area, now).map((visibleTask) => visibleTask.id),
 			selectedTaskIds,
 			selectionAnchorTaskId,
 			task.id,
@@ -577,7 +579,7 @@
 		pointerDragActive = true;
 		pointerDragTimestamp = timestamp;
 		pointerDragBaseTasks = baseTasks;
-		pointerDragLayout = buildPlannerDragLayout(baseTasks, view, area, timestamp);
+		pointerDragLayout = buildPlannerDragLayout(baseTasks, view, area, now ?? timestamp);
 		pointerDragSourceTaskId = sourceTaskId;
 
 		const activator = event.nativeEvent ?? event.operation.activatorEvent;
@@ -619,7 +621,7 @@
 			baseTasks,
 			draggedTaskIds,
 			normalizedLayout,
-			pointerDragTimestamp ?? new Date()
+			now ?? pointerDragTimestamp ?? new Date()
 		);
 	}
 
@@ -775,6 +777,7 @@
 <ApplicationTaskPlannerShell
 	bind:rootElement
 	tasks={displayTasks}
+	{now}
 	{view}
 	{area}
 	taskRow={asSnippet(plannerTaskRow)}

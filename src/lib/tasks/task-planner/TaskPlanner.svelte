@@ -48,6 +48,7 @@
 
   let {
     tasks = [],
+    now,
     view = "today",
     area = null,
     taskRow,
@@ -59,6 +60,7 @@
     onCreateTask = undefined,
   }: {
     tasks?: Task[];
+    now?: Date;
     view?: PlannerView;
     area?: string | null;
     taskRow?: Snippet<[Task, TaskPlannerRowContext]>;
@@ -93,7 +95,7 @@
     }),
     KeyboardSensor,
   ];
-  const snapshot = $derived(buildTaskPlannerSnapshot(tasks));
+  const snapshot = $derived(buildTaskPlannerSnapshot(tasks, now));
   const selectedTaskIdSet = $derived(new Set(selectedTaskIds));
   const draggedTaskIdSet = $derived(new Set(draggedTaskIds));
   const selectedArea = $derived.by(() =>

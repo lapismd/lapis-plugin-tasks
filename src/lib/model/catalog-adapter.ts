@@ -1,7 +1,19 @@
 import type { ParsedTaskFile } from "./task-document";
 import type { TaskSummary } from "./task-queries";
 import { createTask } from "./fixtures";
-import type { Task } from "./types";
+import type { Task, TaskWhen } from "./types";
+
+function catalogWhen(input: {
+  startKind?: string;
+  planKind?: string | null;
+  hasPlan?: boolean;
+  deadline?: string;
+}): TaskWhen | undefined {
+  if (input.startKind === "someday") return "someday";
+  if (input.planKind === "evening") return "this-evening";
+  if (input.hasPlan || input.deadline) return undefined;
+  return "anytime";
+}
 
 export function catalogTaskFromSummary(summary: TaskSummary): Task {
   return createTask({
@@ -17,14 +29,12 @@ export function catalogTaskFromSummary(summary: TaskSummary): Task {
     deadline: summary.deadline,
     dueAt: summary.deadline,
     scheduledAt: summary.planDate,
-    when:
-      summary.startKind === "someday"
-        ? "someday"
-        : summary.planKind === "evening"
-          ? "this-evening"
-          : summary.planDate
-            ? undefined
-            : "anytime",
+    when: catalogWhen({
+      startKind: summary.startKind,
+      planKind: summary.planKind,
+      hasPlan: Boolean(summary.planDate),
+      deadline: summary.deadline,
+    }),
     completedAt: summary.completedAt,
     sourcePath: summary.path,
     notes: "",
@@ -59,14 +69,12 @@ export function catalogTaskFromDocument(document: ParsedTaskFile): Task {
     deadline: document.task.deadline,
     dueAt: document.task.deadline,
     scheduledAt: document.task.plan?.date,
-    when:
-      document.task.start.kind === "someday"
-        ? "someday"
-        : document.task.plan?.at === "evening"
-          ? "this-evening"
-          : document.task.plan
-            ? undefined
-            : "anytime",
+    when: catalogWhen({
+      startKind: document.task.start.kind,
+      planKind: document.task.plan?.at,
+      hasPlan: Boolean(document.task.plan),
+      deadline: document.task.deadline,
+    }),
     completedAt: document.task.completedAt,
     sourcePath: document.path,
     notes: document.body,

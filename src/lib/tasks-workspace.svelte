@@ -120,6 +120,7 @@
   <TasksPlannerCanvas
     variant="workspace"
     {tasks}
+    {now}
     {snapshot}
     applications={[]}
     applicationSummaries={{}}

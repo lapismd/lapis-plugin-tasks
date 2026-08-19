@@ -250,11 +250,8 @@ function taskPlannerDate(task: Task) {
 }
 
 function hasPlannerOverride(task: Task) {
-  return (
-    task.start === "someday" ||
-    task.when === "anytime" ||
-    task.when === "someday"
-  );
+  if (task.start === "someday" || task.when === "someday") return true;
+  return task.when === "anytime" && !taskPlannerDate(task);
 }
 
 function taskScheduledOrDueDate(task: Task) {

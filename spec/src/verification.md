@@ -6,7 +6,7 @@
 | LPT-SPEC-002 | Implemented | `pnpm spec:first` maps protected changes to canonical chapters. |
 | LPT-SPEC-003 | Implemented | `pnpm spec:validate` enforces unique definitions and one verification row per ID. |
 | LPT-SPEC-004 | Implemented | Manifest validation rejects non-portable protocols. |
-| LPT-SPEC-005 | Implemented | `pnpm-workspace.yaml` uses `link:` overrides; the package is the only workspace member. |
+| LPT-SPEC-005 | Implemented | `pnpm-workspace.yaml` uses `link:` overrides and pins CodeMirror and Lezer; the package is the only workspace member. |
 | LPT-SPEC-006 | Implemented | Package scripts and supervisor smoke checks cover stop, reuse, and restart on the checkout-owned 7030 lane. |
 | LPT-SPEC-007 | Implemented | `AGENTS.md` defines App ownership and the required source audit. |
 | LPT-SPEC-008 | Implemented | The repository taxonomy audit covers every story title under `Plugins/Tasks`. |
@@ -16,7 +16,7 @@
 | LN-TASK-002 | Implemented | Plugin onload registers the tasks projection, `tasks` view, `tasks:open`, and ribbon. |
 | LN-TASK-003 | Implemented | Application-ownership audit excludes `globalThis.app`. |
 | LN-TASK-004 | Implemented | Catalog sources import public Design Core primitives and native Tasks CSS. |
-| LN-TASK-005 | Implemented | Published runtime excludes forbidden packages; Storybook may depend on workspace hosts. |
+| LN-TASK-005 | Implemented | Published runtime excludes forbidden packages; Storybook may depend on workspace hosts and pins one CodeMirror copy. |
 | LN-TASK-006 | Implemented | Storybook Vitest accessibility annotations fail axe violations; stories stay `visual-pending`. |
 | LN-TASK-007 | Implemented | Hosts register TasksPlugin only; views come from plugin onload. |
 | LN-TASK-008 | Implemented | Public `src/lib/index.ts` exports the plugin, view type, and catalog components without `TaskDueCalendar`. |
@@ -29,8 +29,8 @@
 | LN-TASK-015 | Implemented | `parseTaskDocument` accepts `type: task-list` with `list.status` active or archived. |
 | LN-TASK-016 | Implemented | Task front matter maps nested `task:` status, start, inbox, plan, deadline, and repeat; view flags are not stored. |
 | LN-TASK-017 | Implemented | Reserved-section parser indexes Checklist checkboxes and Subtasks/Items links without checkbox wrappers. |
-| LN-TASK-018 | Implemented | `task-queries` derives Inbox, Today, Anytime, Upcoming, Someday, Completed, and Review without rewriting plan dates. |
+| LN-TASK-018 | Implemented | `task-queries` derives Inbox, Today, Anytime, Upcoming, Someday, Completed, and Review without rewriting plan dates. Planner fixtures assert deadline-only tasks appear on Upcoming day rows. |
 | LN-TASK-019 | Implemented | Mutations rewrite one document then project; rolling complete resets only `## Checklist`. |
 | LN-TASK-020 | Implemented | `TaskRepository` queries AppDatabase projections; planner fixtures assert the same view ids as catalog summaries. |
 | LN-TASK-021 | Implemented | Planner Markdown fixtures round-trip through `parseTaskDocument`; list membership comes from task-list `## Items`. |
-| LN-TASK-022 | Implemented | `Plugins/Tasks/Shell` boots WorkspaceShell with File Explorer, Search, Markdown, and TasksPlugin against planner Markdown fixtures. |
+| LN-TASK-022 | Implemented | `Plugins/Tasks/Shell` boots WorkspaceShell with File Explorer, Search, Markdown, and TasksPlugin against planner Markdown fixtures and pins the planner clock. |
