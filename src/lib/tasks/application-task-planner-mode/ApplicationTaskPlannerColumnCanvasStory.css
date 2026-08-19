@@ -60,6 +60,17 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
   [data-column-id="tasks"][data-ui-part="column"],
 .task-column-canvas-story__canvas
   [data-column-id="tasks"][data-ui-part="collapsed-column"] {
+  --ui-column-canvas-item-hover: var(
+    --sidebar-accent,
+    var(--ui-tasks-muted-surface)
+  );
+  --ui-column-canvas-item-selected: color-mix(
+    in srgb,
+    var(--ui-tasks-accent) 11%,
+    var(--ui-tasks-card)
+  );
+  --ui-column-canvas-item-selected-foreground: var(--ui-tasks-accent);
+
   box-sizing: border-box;
   border: 0;
   border-radius: 0;
