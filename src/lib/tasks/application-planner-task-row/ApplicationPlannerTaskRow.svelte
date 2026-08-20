@@ -94,7 +94,7 @@
   const openSurface = $derived(expanded || closing);
   const showSelectedSurface = $derived(selected && !openSurface);
   const showMeta = $derived(
-    Boolean((application && task.applicationId) || task.areas.length),
+    Boolean((application && task.applicationId) || task.areas.length || task.listId),
   );
   const showRowSwipe = $derived(!openSurface && !dragPreview);
   const swipeEnabled = $derived(showRowSwipe && !dragging);
@@ -345,7 +345,7 @@
           </span>
         </button>
       {/if}
-      {#if task.areas.length}
+      {#if task.areas.length || task.listId}
         <ApplicationTaskAreaPicker
           variant="chip"
           areas={task.areas}

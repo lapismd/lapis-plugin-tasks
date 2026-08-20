@@ -112,6 +112,7 @@ export type TaskListDocument = {
   id: string;
   kind: "task-list";
   title: string;
+  frontMatterTitle?: string;
   tags: string[];
   created?: string;
   updated?: string;
@@ -200,6 +201,21 @@ function firstHeading(body: string): string | undefined {
 function titleFromPath(path: string): string {
   const base = path.split("/").pop() ?? path;
   return base.replace(/\.md$/i, "") || path;
+}
+
+/** Human-readable compatibility label for a list whose page has no title. */
+export function formatTaskListIdTitle(
+  value: string | null | undefined,
+): string | undefined {
+  const normalized = value
+    ?.trim()
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ");
+  if (!normalized) return undefined;
+  return normalized
+    .split(" ")
+    .map((part) => `${part.slice(0, 1).toUpperCase()}${part.slice(1)}`)
+    .join(" ");
 }
 
 export function structuralLinkKind(heading: string | null): StructuralLinkKind {
@@ -461,7 +477,14 @@ export function parseTaskDocument(
       message: "Task, task-list, and navigation files must have a stable id.",
     });
   }
-  const title = firstHeading(body) ?? titleFromPath(path);
+  const frontMatterTitle = asString(frontMatter.title);
+  const title =
+    type === "task-list"
+      ? frontMatterTitle ??
+        firstHeading(body) ??
+        formatTaskListIdTitle(id) ??
+        titleFromPath(path)
+      : firstHeading(body) ?? titleFromPath(path);
   const structure = parseBodyStructure(body);
   if (type === "task-list-navigation") {
     return {
@@ -485,6 +508,7 @@ export function parseTaskDocument(
       id: id ?? "",
       kind: "task-list",
       title,
+      ...(frontMatterTitle ? { frontMatterTitle } : {}),
       tags: asStringArray(frontMatter.tags),
       created: asString(frontMatter.created),
       updated: asString(frontMatter.updated),
@@ -535,6 +559,7 @@ export function serializeTaskDocument(document: ParsedTaskFile): string {
     return `---\n${yaml}\n---\n${body.startsWith("\n") ? body : `\n${body}`}`;
   }
   if (document.kind === "task-list") {
+    if (document.frontMatterTitle) common.title = document.frontMatterTitle;
     common.list = {
       status: document.list.status,
       ...(document.list.role && document.list.role !== "list"

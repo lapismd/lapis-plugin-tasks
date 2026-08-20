@@ -13,6 +13,7 @@ const FILES: Record<string, string> = {
   "lists/home.md": `---
 type: task-list
 id: list_home
+title: Household
 list:
   status: active
 ---
@@ -141,6 +142,26 @@ describe("TaskRepository", () => {
     await expect(repository.items("list_home")).resolves.toMatchObject([
       { id: "t_buy" },
     ]);
+  });
+
+  it("keeps a front-matter list title authoritative when renamed", async () => {
+    const { repository, files } = await openRepository();
+    await expect(repository.get("list_home")).resolves.toMatchObject({
+      title: "Household",
+    });
+
+    await repository.renameList(
+      "lists/home.md",
+      "Home projects",
+      "2026-08-20T11:00:00Z",
+    );
+
+    const raw = await files.read("lists/home.md");
+    expect(raw).toContain("title: Home projects");
+    expect(raw).toContain("# Home projects");
+    await expect(repository.get("list_home")).resolves.toMatchObject({
+      title: "Home projects",
+    });
   });
 
   it("writes a file mutation and upserts the same parse", async () => {

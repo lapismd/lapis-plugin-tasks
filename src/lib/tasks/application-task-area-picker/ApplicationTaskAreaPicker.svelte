@@ -5,6 +5,7 @@
 	import XIcon from '@lucide/svelte/icons/x';
 	import * as CommandView from '@lapismd/design-core/shadcn/command-view';
 	import * as Popover from '@lapismd/design-core/shadcn/popover';
+	import { formatTaskListIdTitle } from '../../model';
 
 	let {
 		areas = [],
@@ -26,7 +27,12 @@
 	let query = $state('');
 	let input = $state<HTMLInputElement | null>(null);
 
-	const primaryArea = $derived(listId?.trim() || areas[0]?.trim() || '');
+	const primaryArea = $derived.by(() => {
+		const area = areas[0]?.trim();
+		const id = listId?.trim();
+		if (area && area !== id) return area;
+		return formatTaskListIdTitle(id ?? area) ?? '';
+	});
 	const normalizedOptions = $derived(
 		Array.from(new Set(options.map((area) => area.trim()).filter(Boolean))).sort((left, right) =>
 			left.localeCompare(right)

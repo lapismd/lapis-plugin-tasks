@@ -23,6 +23,11 @@ Catalog and Storybook fixtures may build a snapshot from in-memory `Task`
 rows instead of a vault. Those fixtures must still round-trip through task
 documents. See LN-TASK-021 and LN-TASK-022.
 
+When a task row shows its list chip, it prefers the projected task-list page
+title over the internal `listId`. A legacy row with only that id shows its
+human-readable fallback (for example, `list-docs` becomes `List Docs`). See
+LN-TASK-015.
+
 `Plugins/Tasks/Shell` boots a public `App`, loads File Explorer, Search,
 Markdown, and `TasksPlugin`, seeds planner Markdown, and restores a `tasks`
 leaf. The live planner uses the same pinned clock as the repository

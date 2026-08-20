@@ -18,9 +18,13 @@ types. See LN-TASK-011.
 | `task-list` | A grouping note | Nested `list.status` `active` or `archived` |
 | `task-list-navigation` | Sidebar section pins | `id` only; headings are presentation |
 
-The display title is the first H1, else the filename without `.md`. Lists are
-not completable outcomes. YAML must not store `today` or `upcoming` flags;
-those views are derived. See LN-TASK-016.
+Task and navigation display titles use the first H1, else the filename without
+`.md`. A list display title instead uses its top-level front matter `title`,
+then its first H1, then a title-cased stable id such as `list-docs` → `List
+Docs`. This gives task chips and list navigation a page-owned human-readable
+label without exposing an internal id. Lists are not completable outcomes. YAML
+must not store `today` or `upcoming` flags; those views are derived. See
+LN-TASK-015 and LN-TASK-016.
 
 ## Task
 

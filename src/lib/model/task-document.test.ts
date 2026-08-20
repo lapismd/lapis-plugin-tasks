@@ -120,6 +120,53 @@ describe("parseTaskDocument", () => {
     );
   });
 
+  it("uses a list page title before its H1 and normalizes an id fallback", () => {
+    const titled = parseTaskDocument(
+      `---
+type: task-list
+id: list-docs
+title: Documentation
+list:
+  status: active
+---
+# Docs
+`,
+      "lists/docs.md",
+    );
+    expect(titled).toMatchObject({
+      kind: "task-list",
+      title: "Documentation",
+      frontMatterTitle: "Documentation",
+    });
+    expect(serializeTaskDocument(titled!)).toContain("title: Documentation");
+
+    const heading = parseTaskDocument(
+      `---
+type: task-list
+id: list-docs
+list:
+  status: active
+---
+# Docs
+`,
+      "lists/docs.md",
+    );
+    expect(heading).toMatchObject({ kind: "task-list", title: "Docs" });
+
+    const fallback = parseTaskDocument(
+      `---
+type: task-list
+id: list-docs
+list:
+  status: active
+---
+List notes without a heading.
+`,
+      "lists/docs.md",
+    );
+    expect(fallback).toMatchObject({ kind: "task-list", title: "List Docs" });
+  });
+
   it("round-trips nested task front matter", () => {
     const parsed = parseTaskDocument(PLANNED_TASK, "notes.md");
     expect(parsed).not.toBeNull();

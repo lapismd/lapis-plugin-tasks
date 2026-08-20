@@ -369,6 +369,9 @@ export class TaskRepository {
     return this.mutate(path, (document) => ({
       ...document,
       title,
+      ...(document.kind === "task-list" && document.frontMatterTitle
+        ? { frontMatterTitle: title }
+        : {}),
       updated: at,
       body: replaceTitleHeading(document.body, title),
     }));

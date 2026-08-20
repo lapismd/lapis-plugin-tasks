@@ -33,6 +33,12 @@ clock values. It does not include body prose or comments text.
 Catalog adapters preserve the optional checklist total and completed counts
 while continuing to exclude checklist item text. See LN-TASK-033.
 
+For a `task-list`, the parser projects the page display title: its top-level
+front matter `title`, then its first H1, then a human-readable stable-id
+fallback. Repository list renames keep an existing front matter title and H1
+in sync before reprojection, so a later mutation cannot silently expose the
+raw id. See LN-TASK-015 and LN-TASK-026.
+
 ## Query views
 
 `matchesTaskView` in `src/lib/model/task-queries.ts` is the query-AST meaning
