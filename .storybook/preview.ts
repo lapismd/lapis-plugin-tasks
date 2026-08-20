@@ -30,11 +30,13 @@ const preview: Preview = {
     options: {
       storySort: {
         order: [
-          "Specification/Specification governance",
-          "Specification/Plugins",
-          "Specification/Plugins/Tasks",
-          ["Documents", "Runtime", "Lists", "Planner"],
-          "Specification/Verification",
+          "Specification",
+          [
+            "Specification governance",
+            "Plugins",
+            ["Tasks", ["Documents", "Runtime", "Lists", "Planner"]],
+            "Verification",
+          ],
           "Plugins",
           [
             "Tasks",
