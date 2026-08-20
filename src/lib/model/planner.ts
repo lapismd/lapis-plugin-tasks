@@ -814,6 +814,7 @@ export async function buildTaskPlannerSnapshotFromRepository(
   repository: TaskRepository,
   now = new Date(),
 ): Promise<TaskPlannerSnapshot> {
+  const structureDiagnostics = await repository.validateStructuralGraph();
   const today = formatDateOnly(now);
   const [
     inbox,
@@ -869,6 +870,13 @@ export async function buildTaskPlannerSnapshotFromRepository(
     snapshot.areas.map((area) => [area.id, area.count] as const),
   );
   snapshot.listTree = await buildListNavigationSnapshot(repository, counts);
+  snapshot.listTree.diagnostics.unshift(
+    ...structureDiagnostics.map((diagnostic) => ({
+      code: diagnostic.code,
+      message: diagnostic.message,
+      field: diagnostic.target,
+    })),
+  );
   return snapshot;
 }
 

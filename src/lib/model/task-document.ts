@@ -1,4 +1,5 @@
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
+import { scanTaskStructure } from "./task-structure";
 
 export const TASK_DOCUMENT_SCHEMA = "tasks/v1";
 export const TASK_PROJECTION_VERSION = 1;
@@ -16,8 +17,8 @@ export type TaskPlanKind =
 export type TaskRepeatFrequency = "daily" | "weekly" | "monthly" | "yearly";
 export type TaskRepeatAnchor = "schedule" | "completion";
 export type StructuralLinkKind =
-  | "subtask"
-  | "list-item"
+  | "task-entry"
+  | "list-entry"
   | "reference"
   | "navigation-item";
 
@@ -82,12 +83,17 @@ export type StructuralLink = {
   kind: StructuralLinkKind;
   heading: string | null;
   ordinal: number;
+  sourceStart?: number;
+  sourceEnd?: number;
 };
 
 export type ChecklistItem = {
   text: string;
   checked: boolean;
   position: number;
+  sourceStart: number;
+  sourceEnd: number;
+  source: string;
 };
 
 export type TaskDocument = {
@@ -218,21 +224,9 @@ export function formatTaskListIdTitle(
     .join(" ");
 }
 
-export function structuralLinkKind(heading: string | null): StructuralLinkKind {
-  const normalized = heading?.trim().toLowerCase();
-  if (normalized === "subtasks") return "subtask";
-  if (normalized === "items") return "list-item";
-  return "reference";
-}
-
-function parseBodyStructure(body: string): {
-  checklist: ChecklistItem[];
-  structuralLinks: StructuralLink[];
-} {
-  const checklist: ChecklistItem[] = [];
+function parseNavigationBodyStructure(body: string): StructuralLink[] {
   const structuralLinks: StructuralLink[] = [];
   let heading: string | null = null;
-  let inChecklist = false;
   let ordinal = 0;
   const lines = body.split("\n");
   for (let index = 0; index < lines.length; index += 1) {
@@ -240,33 +234,21 @@ function parseBodyStructure(body: string): {
     const headingMatch = line.match(/^#{1,6}\s+(.+?)\s*$/);
     if (headingMatch) {
       heading = headingMatch[1]!.trim();
-      inChecklist = heading.toLowerCase() === "checklist";
       continue;
-    }
-    if (inChecklist) {
-      const check = line.match(/^\s*[-*]\s+\[( |x|X)\]\s+(.*)$/);
-      if (check) {
-        checklist.push({
-          text: check[2]!.trim(),
-          checked: check[1] !== " ",
-          position: checklist.length,
-        });
-        continue;
-      }
     }
     const markdownLink = line.match(/^\s*[-*]\s+(?:!\[[^\]]*\]\([^)]+\)|\[([^\]]+)\]\(([^)]+)\))\s*$/);
     if (markdownLink?.[1] && markdownLink[2]) {
       structuralLinks.push({
         title: markdownLink[1],
         href: markdownLink[2],
-        kind: structuralLinkKind(heading),
+        kind: "reference",
         heading,
         ordinal,
       });
       ordinal += 1;
     }
   }
-  return { checklist, structuralLinks };
+  return structuralLinks;
 }
 
 function parseStart(value: unknown, diagnostics: TaskDiagnostic[]): TaskStart {
@@ -485,7 +467,7 @@ export function parseTaskDocument(
         formatTaskListIdTitle(id) ??
         titleFromPath(path)
       : firstHeading(body) ?? titleFromPath(path);
-  const structure = parseBodyStructure(body);
+  const navigationLinks = parseNavigationBodyStructure(body);
   if (type === "task-list-navigation") {
     return {
       path,
@@ -497,11 +479,16 @@ export function parseTaskDocument(
       created: asString(frontMatter.created),
       updated: asString(frontMatter.updated),
       body,
-      structuralLinks: asNavigationLinks(structure.structuralLinks),
+      structuralLinks: asNavigationLinks(navigationLinks),
       diagnostics,
     };
   }
   if (type === "task-list") {
+    const structure = scanTaskStructure(raw, {
+      documentId: id ?? "",
+      documentPath: path,
+      documentKind: "task-list",
+    });
     return {
       path,
       raw,
@@ -514,20 +501,23 @@ export function parseTaskDocument(
       updated: asString(frontMatter.updated),
       list: parseListFrontMatter(frontMatter.list),
       body,
-      structuralLinks: structure.structuralLinks,
+      structuralLinks: structure.candidates.map((entry, ordinal) => ({
+        title: entry.authoredLabel,
+        href: entry.authoredHref,
+        kind: "reference",
+        heading: entry.heading.text,
+        ordinal,
+        sourceStart: entry.sourceStart,
+        sourceEnd: entry.sourceEnd,
+      })),
       diagnostics,
     };
   }
-  const invalidSubtask = structure.structuralLinks.find(
-    (link) => link.kind === "subtask" && link.href.trim() === "",
-  );
-  if (invalidSubtask) {
-    diagnostics.push({
-      code: "empty-subtask",
-      field: "subtasks",
-      message: "Subtasks links must target a Markdown file.",
-    });
-  }
+  const structure = scanTaskStructure(raw, {
+    documentId: id ?? "",
+    documentPath: path,
+    documentKind: "task",
+  });
   return {
     path,
     raw,
@@ -540,7 +530,15 @@ export function parseTaskDocument(
     task: parseTaskFrontMatter(frontMatter.task, diagnostics),
     body,
     checklist: structure.checklist,
-    structuralLinks: structure.structuralLinks,
+    structuralLinks: structure.candidates.map((entry, ordinal) => ({
+      title: entry.authoredLabel,
+      href: entry.authoredHref,
+      kind: "reference",
+      heading: entry.heading.text,
+      ordinal,
+      sourceStart: entry.sourceStart,
+      sourceEnd: entry.sourceEnd,
+    })),
     diagnostics,
   };
 }
@@ -603,56 +601,21 @@ export function serializeTaskDocument(document: ParsedTaskFile): string {
   return `---\n${yaml}\n---\n${body.startsWith("\n") ? body : `\n${body}`}`;
 }
 
-export function replaceChecklistSection(
+export function resetChecklistItems(
   body: string,
   reset: boolean,
 ): string {
   if (!reset) return body;
-  const lines = body.split("\n");
-  let inChecklist = false;
-  return lines
-    .map((line) => {
-      const headingMatch = line.match(/^#{1,6}\s+(.+?)\s*$/);
-      if (headingMatch) {
-        inChecklist = headingMatch[1]!.trim().toLowerCase() === "checklist";
-        return line;
-      }
-      if (inChecklist) {
-        return line.replace(/^(\s*[-*]\s+)\[(?: |x|X)\]/, "$1[ ]");
-      }
-      return line;
-    })
-    .join("\n");
-}
-
-export function replaceHeadingLinks(
-  body: string,
-  heading: string,
-  links: Array<{ title: string; href: string }>,
-): string {
-  const headingRe = new RegExp(`^(#{1,6})\\s+${heading}\\s*$`, "i");
-  const lines = body.split("\n");
-  const start = lines.findIndex((line) => headingRe.test(line));
-  const rendered = links.map((link) => `- [${link.title}](${link.href})`);
-  if (start === -1) {
-    const suffix = [`## ${heading}`, ...rendered].join("\n");
-    return body.trimEnd() ? `${body.trimEnd()}\n\n${suffix}\n` : `${suffix}\n`;
+  const items = scanTaskStructure(body, {
+    documentId: "checklist-reset",
+    documentPath: "checklist-reset.md",
+    documentKind: "task",
+  }).checklist;
+  let next = body;
+  for (const item of [...items].reverse()) {
+    const source = next.slice(item.sourceStart, item.sourceEnd);
+    const replacement = source.replace(/^(\s*[-*+]\s+)\[(?: |x|X)\]/, "$1[ ]");
+    next = `${next.slice(0, item.sourceStart)}${replacement}${next.slice(item.sourceEnd)}`;
   }
-  let end = start + 1;
-  while (end < lines.length && !/^#{1,6}\s+/.test(lines[end]!)) end += 1;
-  const next = [
-    ...lines.slice(0, start + 1),
-    ...rendered,
-    ...(end < lines.length ? [""] : []),
-    ...lines.slice(end),
-  ];
-  return next.join("\n");
-}
-
-export function replaceReservedLinks(
-  body: string,
-  heading: "Subtasks" | "Items",
-  links: Array<{ title: string; href: string }>,
-): string {
-  return replaceHeadingLinks(body, heading, links);
+  return next;
 }

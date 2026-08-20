@@ -1,7 +1,6 @@
 import {
   parseTaskDocument,
-  replaceChecklistSection,
-  replaceReservedLinks,
+  resetChecklistItems,
   serializeTaskDocument,
   type ChecklistItem,
   type ParsedTaskFile,
@@ -27,35 +26,24 @@ export class TaskChecklistMutationError extends Error {
 }
 
 function replaceChecklistMarker(
-  body: string,
-  position: number,
-  expectedText: string,
+  task: TaskDocument,
+  item: ChecklistItem,
   checked: boolean,
 ): string {
-  const lines = body.split("\n");
-  let inChecklist = false;
-  let checklistPosition = 0;
-  for (let index = 0; index < lines.length; index += 1) {
-    const line = lines[index]!;
-    const heading = line.match(/^#{1,6}\s+(.+?)\s*$/);
-    if (heading) {
-      inChecklist = heading[1]!.trim().toLowerCase() === "checklist";
-      continue;
-    }
-    if (!inChecklist) continue;
-    const checkbox = line.match(/^(\s*[-*]\s+\[)( |x|X)(\]\s+)(.*)$/);
-    if (!checkbox) continue;
-    if (checklistPosition !== position) {
-      checklistPosition += 1;
-      continue;
-    }
-    if (checkbox[4]!.trim() !== expectedText.trim()) {
-      throw new TaskChecklistMutationError();
-    }
-    lines[index] = `${checkbox[1]}${checked ? "x" : " "}${checkbox[3]}${checkbox[4]}`;
-    return lines.join("\n");
+  const bodyFrom = task.raw.length - task.body.length;
+  const from = item.sourceStart - bodyFrom;
+  const to = item.sourceEnd - bodyFrom;
+  if (from < 0 || task.body.slice(from, to) !== item.source) {
+    throw new TaskChecklistMutationError();
   }
-  throw new TaskChecklistMutationError();
+  const replacement = item.source.replace(
+    /^(\s*[-*+]\s+\[)( |x|X)(\])/,
+    `$1${checked ? "x" : " "}$3`,
+  );
+  if (replacement === item.source && item.checked !== checked) {
+    throw new TaskChecklistMutationError();
+  }
+  return `${task.body.slice(0, from)}${replacement}${task.body.slice(to)}`;
 }
 
 export function setTaskChecklistItemChecked(
@@ -69,7 +57,7 @@ export function setTaskChecklistItemChecked(
   if (!item || item.position !== position || item.text !== expectedText.trim()) {
     throw new TaskChecklistMutationError();
   }
-  const body = replaceChecklistMarker(task.body, position, expectedText, checked);
+  const body = replaceChecklistMarker(task, item, checked);
   const checklist: ChecklistItem[] = task.checklist.map((entry) =>
     entry.position === position ? { ...entry, checked } : entry,
   );
@@ -121,7 +109,7 @@ export function completeTaskDocument(
     };
   }
   const nextDate = nextRollingDate(task.task.plan?.date, at, task);
-  const body = replaceChecklistSection(
+  const body = resetChecklistItems(
     task.body,
     task.task.repeat.resetChecklist === true,
   );
@@ -265,14 +253,4 @@ export function applyTaskMutation(
   const parsed = parseTaskDocument(raw, path);
   if (!parsed) throw new Error(`Not a task document: ${path}`);
   return serializeTaskDocument(mutate(parsed));
-}
-
-export function setReservedLinks(
-  document: ParsedTaskFile,
-  heading: "Subtasks" | "Items",
-  links: Array<{ title: string; href: string }>,
-): ParsedTaskFile {
-  const body = replaceReservedLinks(document.body, heading, links);
-  const next = parseTaskDocument(serializeTaskDocument({ ...document, body }), document.path);
-  return next ?? document;
 }

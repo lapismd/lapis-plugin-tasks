@@ -45,6 +45,7 @@ task:
 ## Subtasks
 - [Finish migration](./finish-migration.md)
 - [Write docs](./write-docs.md)
+
 See [Prepare deployment](./prepare-deployment.md) for background.
 `;
 
@@ -84,17 +85,17 @@ describe("parseTaskDocument", () => {
     expect(document.task.deadline).toBe("2026-08-24");
   });
 
-  it("indexes checklist aggregates and structural subtask links", () => {
+  it("indexes lightweight checkboxes anywhere and captures link candidates", () => {
     const document = parseTaskDocument(PROJECT_TASK, "release.md");
     expect(document?.kind).toBe("task");
     if (document?.kind !== "task") return;
-    expect(document.checklist).toEqual([
+    expect(document.checklist).toMatchObject([
       { text: "Confirm version", checked: true, position: 0 },
       { text: "Write changelog", checked: false, position: 1 },
     ]);
     expect(document.structuralLinks.map((link) => link.kind)).toEqual([
-      "subtask",
-      "subtask",
+      "reference",
+      "reference",
     ]);
     expect(document.structuralLinks[0]).toMatchObject({
       title: "Finish migration",
@@ -102,7 +103,7 @@ describe("parseTaskDocument", () => {
     });
   });
 
-  it("parses nested task-list items", () => {
+  it("captures task-list link candidates without assigning target kinds", () => {
     const document = parseTaskDocument(NESTED_LIST, "work.md");
     expect(document).toMatchObject({
       kind: "task-list",
@@ -115,7 +116,7 @@ describe("parseTaskDocument", () => {
       "./current-projects.md",
       "../tasks/submit-expenses.md",
     ]);
-    expect(document.structuralLinks.every((link) => link.kind === "list-item")).toBe(
+    expect(document.structuralLinks.every((link) => link.kind === "reference")).toBe(
       true,
     );
   });

@@ -19,23 +19,38 @@ import {
   type TaskStart,
 } from "./task-document";
 import {
-  replaceTaskListItemsSection as replaceItemsSectionSource,
-  scanTaskListItemsSections,
-  type TaskListItemsSection,
+  addStructuralEntryUnderHeading as addEntryUnderHeadingSource,
+  createTaskHeading as createHeadingSource,
+  insertStructuralTaskEntryEditorChange,
+  moveStructuralTaskEntryEditorChanges,
+  removeStructuralTaskEntryEditorChange,
+  renameTaskHeading as renameHeadingSource,
+  replaceStructuralTaskRun as replaceTaskRunSource,
+  type StructuralTaskRun,
+  type StructuralTaskRunEntryInput,
 } from "./task-list-items";
+import {
+  resolveTaskDocumentStructure,
+  scanTaskHeadings,
+  validateTaskStructureGraph,
+  type TaskStructureDiagnostic,
+} from "./task-structure";
 import {
   cancelTaskDocument,
   completeTaskDocument,
   planTaskDocument,
   reopenTaskDocument,
-  setReservedLinks,
   setTaskDeadline,
   setTaskChecklistItemChecked,
   setTaskInbox,
   setTaskStart,
   skipOccurrence,
 } from "./task-mutations";
-import { indexTaskDocument, resolveTaskHref } from "./task-index";
+import {
+  indexResolvedTaskDocument,
+  indexTaskDocument,
+  resolveTaskHref,
+} from "./task-index";
 import {
   moveNavigationPin,
   navigationPinHref,
@@ -129,6 +144,12 @@ export class TaskRepository {
     return document;
   }
 
+  async getDocument(idOrPath: string): Promise<ParsedTaskFile> {
+    const path = await this.resolvePath(idOrPath);
+    if (!path) throw new Error(`Missing task document: ${idOrPath}`);
+    return this.loadDocument(path);
+  }
+
   async getTaskListDocument(idOrPath: string): Promise<TaskListDocument> {
     const path = await this.resolvePath(idOrPath);
     if (!path) throw new Error(`Missing task-list document: ${idOrPath}`);
@@ -146,30 +167,176 @@ export class TaskRepository {
     return this.getByPath(resolveTaskHref(sourcePath, target));
   }
 
-  async replaceTaskListItemsSection(
+  async replaceStructuralTaskRun(
     idOrPath: string,
-    expected: Pick<TaskListItemsSection, "ordinal" | "source">,
-    entries: ReadonlyArray<{ label: string; target: string }>,
-  ): Promise<TaskListDocument> {
+    expected: StructuralTaskRun,
+    entries: ReadonlyArray<StructuralTaskRunEntryInput>,
+  ): Promise<TaskDocument | TaskListDocument> {
     if (!this.files) {
       throw new Error("TaskRepository mutations require a file store.");
     }
     const path = await this.resolvePath(idOrPath);
-    if (!path) throw new Error(`Missing task-list document: ${idOrPath}`);
+    if (!path) throw new Error(`Missing task document: ${idOrPath}`);
     const raw = await this.files.read(path);
-    const nextRaw = replaceItemsSectionSource(raw, expected, entries, path);
+    const nextRaw = replaceTaskRunSource(raw, expected, entries, path);
     const reparsed = parseTaskDocument(nextRaw, path);
-    if (!reparsed || reparsed.kind !== "task-list") {
-      throw new Error(`Items mutation produced an invalid task list: ${path}`);
+    if (!reparsed || !["task", "task-list"].includes(reparsed.kind)) {
+      throw new Error(`Task run mutation produced an invalid document: ${path}`);
     }
     await this.files.write(path, nextRaw);
-    await indexTaskDocument(this.database, { ...reparsed, raw: nextRaw });
-    return { ...reparsed, raw: nextRaw };
+    const next = { ...reparsed, raw: nextRaw } as TaskDocument | TaskListDocument;
+    await indexTaskDocument(
+      this.database,
+      next,
+      (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
+    );
+    return next;
   }
 
-  async getTaskListItemsSections(idOrPath: string): Promise<TaskListItemsSection[]> {
-    const document = await this.getTaskListDocument(idOrPath);
-    return scanTaskListItemsSections(document.raw, document.path);
+  async getStructuralTaskRuns(idOrPath: string): Promise<StructuralTaskRun[]> {
+    const path = await this.resolvePath(idOrPath);
+    if (!path) throw new Error(`Missing task document: ${idOrPath}`);
+    const document = await this.loadDocument(path);
+    if (document.kind === "task-list-navigation") return [];
+    const structure = await resolveTaskDocumentStructure(
+      document.raw,
+      {
+        documentId: document.id,
+        documentPath: document.path,
+        documentKind: document.kind,
+      },
+      (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
+    );
+    const headings = scanTaskHeadings(document.raw);
+    return structure.runs.map((run, ordinal) => ({
+      id: run.id,
+      ordinal,
+      documentId: run.documentId,
+      documentPath: run.documentPath,
+      headingPath: run.headingPath,
+      headingLevel: run.headingLevel,
+      headingText: run.headingText,
+      headingFrom:
+        headings.find(
+          (heading) =>
+            heading.level === run.headingLevel &&
+            heading.path.join("\u0000") === run.headingPath.join("\u0000"),
+        )?.sourceStart ?? null,
+      headingTo:
+        headings.find(
+          (heading) =>
+            heading.level === run.headingLevel &&
+            heading.path.join("\u0000") === run.headingPath.join("\u0000"),
+        )?.sourceEnd ?? null,
+      listDepth: run.listDepth,
+      from: run.startOffset,
+      to: run.endOffset,
+      source: run.source,
+      entries: run.entries.map((entry) => ({
+        label: entry.authoredLabel,
+        target: entry.authoredHref,
+        kind: entry.kind,
+        targetId: entry.targetDocumentId,
+        targetPath: entry.targetDocumentPath,
+        from: entry.sourceStart,
+        to: entry.sourceEnd,
+        source: document.raw.slice(entry.sourceStart, entry.sourceEnd),
+      })),
+    }));
+  }
+
+  async renameHeading(
+    idOrPath: string,
+    headingPath: readonly string[],
+    nextText: string,
+  ): Promise<void> {
+    const path = await this.resolvePath(idOrPath);
+    if (!path) throw new Error(`Missing task document: ${idOrPath}`);
+    const raw = await this.files!.read(path);
+    await this.writeRawDocument(path, renameHeadingSource(raw, headingPath, nextText));
+  }
+
+  async createHeading(
+    idOrPath: string,
+    text: string,
+    level = 2,
+  ): Promise<void> {
+    const path = await this.resolvePath(idOrPath);
+    if (!path) throw new Error(`Missing task document: ${idOrPath}`);
+    const raw = await this.files!.read(path);
+    await this.writeRawDocument(path, createHeadingSource(raw, text, level));
+  }
+
+  async addStructuralEntryUnderHeading(
+    idOrPath: string,
+    headingPath: readonly string[],
+    entry: StructuralTaskRunEntryInput,
+  ): Promise<void> {
+    const path = await this.resolvePath(idOrPath);
+    if (!path) throw new Error(`Missing task document: ${idOrPath}`);
+    const raw = await this.files!.read(path);
+    await this.writeRawDocument(
+      path,
+      addEntryUnderHeadingSource(raw, headingPath, entry),
+    );
+  }
+
+  async moveStructuralEntry(
+    sourcePath: string,
+    sourceRun: StructuralTaskRun,
+    sourceIndex: number,
+    targetPath: string,
+    targetRun: StructuralTaskRun,
+    targetIndex: number,
+  ): Promise<void> {
+    const source = await this.files!.read(sourcePath);
+    if (sourcePath === targetPath) {
+      const changes = moveStructuralTaskEntryEditorChanges(
+        source,
+        sourceRun,
+        sourceIndex,
+        targetRun,
+        targetIndex,
+      );
+      const next = [...changes]
+        .sort((left, right) => right.from - left.from)
+        .reduce(
+          (value, change) =>
+            `${value.slice(0, change.from)}${change.insert}${value.slice(change.to)}`,
+          source,
+        );
+      await this.writeRawDocument(sourcePath, next);
+      return;
+    }
+
+    const moving = sourceRun.entries[sourceIndex];
+    if (!moving) throw new Error("The structural entry no longer exists.");
+    const target = await this.files!.read(targetPath);
+    const remove = removeStructuralTaskEntryEditorChange(
+      source,
+      sourceRun,
+      sourceIndex,
+    );
+    const insert = insertStructuralTaskEntryEditorChange(
+      target,
+      targetRun,
+      targetIndex,
+      {
+        ...moving,
+        target: navigationPinHref(targetPath, moving.targetPath),
+        source: undefined,
+      },
+    );
+    const nextSource = `${source.slice(0, remove.from)}${remove.insert}${source.slice(remove.to)}`;
+    const nextTarget = `${target.slice(0, insert.from)}${insert.insert}${target.slice(insert.to)}`;
+    if (!parseTaskDocument(nextSource, sourcePath)) {
+      throw new Error("Structural move produced an invalid source document.");
+    }
+    if (!parseTaskDocument(nextTarget, targetPath)) {
+      throw new Error("Structural move produced an invalid target document.");
+    }
+    await this.writeRawDocument(sourcePath, nextSource);
+    await this.writeRawDocument(targetPath, nextTarget);
   }
 
   async setChecklistItemChecked(
@@ -254,18 +421,67 @@ export class TaskRepository {
     return result.rows.map(taskRowToSummary);
   }
 
+  async validateStructuralGraph(): Promise<TaskStructureDiagnostic[]> {
+    if (!this.files) return [];
+    const projected = await this.database.queryProjection<AppDatabaseTaskRecord>(
+      PUBLIC_TASKS_PROJECTION_ID,
+      {},
+    );
+    const loaded = await Promise.all(
+      projected.rows.map(async (row) => {
+        try {
+          return await this.loadDocument(row.documentPath);
+        } catch {
+          return null;
+        }
+      }),
+    );
+    const documents = loaded.filter(
+      (document): document is TaskDocument | TaskListDocument =>
+        Boolean(document && document.kind !== "task-list-navigation"),
+    );
+    const structures = await Promise.all(
+      documents.map((document) =>
+        resolveTaskDocumentStructure(
+          document.raw,
+          {
+            documentId: document.id,
+            documentPath: document.path,
+            documentKind: document.kind,
+          },
+          (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
+        ),
+      ),
+    );
+    const validated = validateTaskStructureGraph(structures);
+    for (const document of documents) {
+      await indexResolvedTaskDocument(
+        this.database,
+        document,
+        validated.get(document.path) ?? null,
+      );
+    }
+    return [...validated.values()].flatMap(
+      (structure) => structure.diagnostics,
+    );
+  }
+
   async children(idOrPath: string): Promise<TaskSummary[]> {
-    return this.related(idOrPath, "subtask");
+    return this.related(idOrPath, "task-entry");
   }
 
   async items(idOrPath: string): Promise<TaskSummary[]> {
-    return this.related(idOrPath, "list-item");
+    const [tasks, lists] = await Promise.all([
+      this.related(idOrPath, "task-entry"),
+      this.related(idOrPath, "list-entry"),
+    ]);
+    return [...tasks, ...lists];
   }
 
   async parent(idOrPath: string): Promise<TaskSummary | null> {
     const rowId = await this.resolveRowId(idOrPath);
     if (!rowId) return null;
-    for (const relation of ["subtask", "list-item"] as const) {
+    for (const relation of ["task-entry", "list-entry"] as const) {
       const result = await this.database.queryRelated<AppDatabaseTaskRecord>({
         projectionId: PUBLIC_TASKS_PROJECTION_ID,
         rowId,
@@ -302,7 +518,7 @@ export class TaskRepository {
     const result = await this.database.queryRelated<AppDatabaseTaskRecord>({
       projectionId: PUBLIC_TASKS_PROJECTION_ID,
       rowId,
-      relation: "list-item",
+      relation: "list-entry",
       direction: "in",
     });
     return result.rows.map(taskRowToSummary);
@@ -318,7 +534,7 @@ export class TaskRepository {
     const result = await this.database.queryRelated<AppDatabaseTaskRecord>({
       projectionId: PUBLIC_TASKS_PROJECTION_ID,
       rowId,
-      relation: "list-item",
+      relation: "list-entry",
       targetWhere: eq("kind", "task-list"),
     });
     return result.rows.map(taskRowToSummary);
@@ -438,19 +654,26 @@ export class TaskRepository {
     const renamed = await this.setTitle(path, next, at);
     const parents = await this.listParents(path);
     for (const parent of parents) {
-      const list = await this.loadDocument(parent.path);
-      const links = list.structuralLinks
-        .filter((link) => link.kind === "list-item")
-        .map((link) => ({
-          title: this.linkTargetsPath(parent.path, link.href, path)
-            ? next
-            : link.title,
-          href: link.href,
-        }));
-      await this.writeDocument({
-        ...setReservedLinks(list, "Items", links),
-        updated: at,
-      });
+      const runs = (await this.getStructuralTaskRuns(parent.path))
+        .filter((run) =>
+          run.entries.some((entry) =>
+            this.linkTargetsPath(parent.path, entry.target, path),
+          ),
+        )
+        .sort((left, right) => right.from - left.from);
+      for (const run of runs) {
+        await this.replaceStructuralTaskRun(
+          parent.path,
+          run,
+          run.entries.map((entry) => ({
+            ...entry,
+            label: this.linkTargetsPath(parent.path, entry.target, path)
+              ? next
+              : entry.label,
+            source: undefined,
+          })),
+        );
+      }
     }
     if (await this.navigation()) {
       await this.rewriteNavigationPins(
@@ -484,7 +707,11 @@ export class TaskRepository {
     return archived;
   }
 
-  async deleteList(path: string, at: string): Promise<void> {
+  async deleteList(
+    path: string,
+    at: string,
+    options: { skipParentPaths?: readonly string[] } = {},
+  ): Promise<void> {
     const document = await this.loadDocument(path);
     if (document.kind !== "task-list") {
       throw new TaskListMutationError(
@@ -493,7 +720,9 @@ export class TaskRepository {
       );
     }
     const parents = await this.listParents(path);
+    const skippedParents = new Set(options.skipParentPaths ?? []);
     for (const parent of parents) {
+      if (skippedParents.has(parent.path)) continue;
       await this.replaceListItem(parent.path, path, null, at);
     }
     await this.unpinList(path, at);
@@ -582,7 +811,7 @@ export class TaskRepository {
       created: input.at,
       updated: input.at,
       list: { status: "active" },
-      body: `# ${input.title}\n\n## Items\n`,
+      body: `# ${input.title}\n`,
       structuralLinks: [],
       diagnostics: [],
     };
@@ -771,27 +1000,31 @@ export class TaskRepository {
     orderedChildPaths: string[],
     at: string,
   ): Promise<void> {
-    const list = await this.loadDocument(listPath);
-    const current = list.structuralLinks.filter((link) => link.kind === "list-item");
-    const next = orderedChildPaths.flatMap((childPath) => {
-      const link = current.find((item) =>
-        this.linkTargetsPath(listPath, item.href, childPath),
+    const runs = await this.getStructuralTaskRuns(listPath);
+    const matchingRuns = runs.filter((run) =>
+      orderedChildPaths.some((path) =>
+        run.entries.some((entry) =>
+          this.linkTargetsPath(listPath, entry.target, path),
+        ),
+      ),
+    );
+    if (matchingRuns.length !== 1) {
+      throw new TaskListMutationError(
+        "cross-run-sort",
+        "A sort can only reorder entries inside one contiguous task run.",
       );
-      return link ? [{ title: link.title, href: link.href }] : [];
-    });
-    for (const link of current) {
-      if (
-        !orderedChildPaths.some((childPath) =>
-          this.linkTargetsPath(listPath, link.href, childPath),
-        )
-      ) {
-        next.push({ title: link.title, href: link.href });
-      }
     }
-    await this.writeDocument({
-      ...setReservedLinks(list, "Items", next),
-      updated: at,
+    const run = matchingRuns[0]!;
+    const ordered = orderedChildPaths.flatMap((childPath) => {
+      const entry = run.entries.find((candidate) =>
+        this.linkTargetsPath(listPath, candidate.target, childPath),
+      );
+      return entry ? [entry] : [];
     });
+    for (const entry of run.entries) {
+      if (!ordered.includes(entry)) ordered.push(entry);
+    }
+    await this.replaceStructuralTaskRun(listPath, run, ordered);
   }
 
   async applyListTreeDrop(
@@ -832,30 +1065,72 @@ export class TaskRepository {
     at: string,
     options?: { beforePath?: string | null },
   ): Promise<void> {
-    const list = await this.loadDocument(listPath);
-    const current = list.structuralLinks
-      .filter((link) => link.kind === "list-item")
-      .filter((link) => !this.linkTargetsPath(listPath, link.href, childPath))
-      .map((link) => ({ title: link.title, href: link.href }));
-    const nextLinks = [...current];
-    if (child) {
-      const entry = {
-        title: child.title,
-        href: navigationPinHref(listPath, childPath),
-      };
+    const matching = (await this.getStructuralTaskRuns(listPath))
+      .filter((run) =>
+        run.entries.some((entry) =>
+          this.linkTargetsPath(listPath, entry.target, childPath),
+        ),
+      )
+      .sort((left, right) => right.from - left.from);
+    for (const run of matching) {
+      await this.replaceStructuralTaskRun(
+        listPath,
+        run,
+        run.entries.filter(
+          (entry) =>
+            !this.linkTargetsPath(listPath, entry.target, childPath),
+        ),
+      );
+    }
+    if (!child) return;
+
+    const runs = await this.getStructuralTaskRuns(listPath);
+    const beforeRun = options?.beforePath
+      ? runs.find((run) =>
+          run.entries.some((entry) =>
+            this.linkTargetsPath(listPath, entry.target, options.beforePath!),
+          ),
+        )
+      : null;
+    const targetRun = beforeRun ?? runs.find((run) => run.listDepth === 0);
+    const entry = {
+      label: child.title,
+      target: navigationPinHref(listPath, childPath),
+    };
+    if (targetRun) {
+      const entries = [...targetRun.entries];
       const beforeIndex = options?.beforePath
-        ? nextLinks.findIndex((link) =>
-            this.linkTargetsPath(listPath, link.href, options.beforePath!),
+        ? entries.findIndex((candidate) =>
+            this.linkTargetsPath(
+              listPath,
+              candidate.target,
+              options.beforePath!,
+            ),
           )
         : -1;
-      if (beforeIndex === -1) nextLinks.push(entry);
-      else nextLinks.splice(beforeIndex, 0, entry);
+      if (beforeIndex < 0) entries.push(entry as typeof entries[number]);
+      else entries.splice(beforeIndex, 0, entry as typeof entries[number]);
+      await this.replaceStructuralTaskRun(listPath, targetRun, entries);
+      return;
     }
-    const next = {
-      ...setReservedLinks(list, "Items", nextLinks),
-      updated: at,
-    };
-    await this.writeDocument(next);
+
+    const document = await this.loadDocument(listPath);
+    const newline = document.raw.includes("\r\n") ? "\r\n" : "\n";
+    const suffix = document.raw.endsWith(newline) ? "" : newline;
+    const nextRaw = `${document.raw}${suffix}${newline}- [${entry.label}](${entry.target})${newline}`;
+    const next = parseTaskDocument(nextRaw, listPath);
+    if (!next || next.kind === "task-list-navigation") {
+      throw new TaskListMutationError(
+        "invalid-structural-move",
+        "Adding the structural entry produced an invalid task document.",
+      );
+    }
+    await this.files!.write(listPath, nextRaw);
+    await indexTaskDocument(
+      this.database,
+      { ...next, raw: nextRaw },
+      (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
+    );
   }
 
   private async rewriteNavigationPins(
@@ -951,7 +1226,53 @@ export class TaskRepository {
     const serialized = serializeTaskDocument(document);
     const next = parseTaskDocument(serialized, document.path) ?? document;
     await this.files.write(document.path, serialized);
-    await indexTaskDocument(this.database, { ...next, raw: serialized });
+    await indexTaskDocument(
+      this.database,
+      { ...next, raw: serialized },
+      (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
+    );
+  }
+
+  private async writeRawDocument(path: string, raw: string): Promise<void> {
+    if (!this.files) {
+      throw new Error("TaskRepository mutations require a file store.");
+    }
+    const parsed = parseTaskDocument(raw, path);
+    if (!parsed || parsed.kind === "task-list-navigation") {
+      throw new Error(`Structural mutation produced an invalid task document: ${path}`);
+    }
+    await this.files.write(path, raw);
+    await indexTaskDocument(
+      this.database,
+      { ...parsed, raw },
+      (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
+    );
+  }
+
+  private async resolveStructureTarget(sourcePath: string, href: string) {
+    if (!this.files) return null;
+    const targetPath = resolveTaskHref(sourcePath, href);
+    if (!targetPath) return null;
+    try {
+      const raw = await this.files.read(targetPath);
+      const target = parseTaskDocument(raw, targetPath);
+      if (!target || target.kind === "task-list-navigation") {
+        return {
+          id: targetPath,
+          path: targetPath,
+          kind: "unsupported" as const,
+          title: targetPath.split("/").pop()?.replace(/\.md$/i, "") ?? targetPath,
+        };
+      }
+      return {
+        id: target.id,
+        path: target.path,
+        kind: target.kind,
+        title: target.title,
+      } as const;
+    } catch {
+      return null;
+    }
   }
 
   private async resolvePath(idOrPath: string): Promise<string | null> {
@@ -963,7 +1284,7 @@ export class TaskRepository {
 
   private async related(
     idOrPath: string,
-    relation: "subtask" | "list-item",
+    relation: "task-entry" | "list-entry",
   ): Promise<TaskSummary[]> {
     const rowId = await this.resolveRowId(idOrPath);
     if (!rowId) return [];

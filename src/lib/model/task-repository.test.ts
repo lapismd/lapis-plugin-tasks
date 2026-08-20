@@ -1,7 +1,10 @@
 import { MemoryAppDatabase } from "@lapis-notes/api/app-database";
 import { describe, expect, it } from "vitest";
 import { parseTaskDocument } from "./task-document";
-import { indexTaskDocument } from "./task-index";
+import {
+  createTaskStructureResolverFromDocuments,
+  indexTaskDocument,
+} from "./task-index";
 import {
   createMemoryTaskFileStore,
   TaskRepository,
@@ -91,14 +94,18 @@ task:
 `,
 };
 
-async function openRepository() {
+async function openRepository(fixtures = FILES) {
   const database = new MemoryAppDatabase("tasks-repo");
   await database.open();
-  const files = createMemoryTaskFileStore(FILES);
-  for (const [path, raw] of Object.entries(FILES)) {
+  const files = createMemoryTaskFileStore(fixtures);
+  const documents = Object.entries(fixtures).map(([path, raw]) => {
     const document = parseTaskDocument(raw, path);
     if (!document) throw new Error(`Invalid fixture ${path}`);
-    await indexTaskDocument(database, document);
+    return document;
+  });
+  const resolve = createTaskStructureResolverFromDocuments(documents);
+  for (const document of documents) {
+    await indexTaskDocument(database, document, resolve);
   }
   return { database, files, repository: new TaskRepository(database, files) };
 }
@@ -144,6 +151,22 @@ describe("TaskRepository", () => {
     ]);
   });
 
+  it("removes conflicting derived edges after whole-vault graph validation", async () => {
+    const fixtures = {
+      "first.md": `---\ntype: task-list\nid: l_first\n---\n# First\n- [Child](child.md)\n`,
+      "second.md": `---\ntype: task\nid: t_second\ntask:\n  status: open\n  start: anytime\n---\n# Second\n- [Child](child.md)\n`,
+      "child.md": `---\ntype: task\nid: t_child\ntask:\n  status: open\n  start: anytime\n---\n# Child\n`,
+    };
+    const { repository } = await openRepository(fixtures);
+    const diagnostics = await repository.validateStructuralGraph();
+    expect(diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: "multiple-structural-parents" }),
+      ]),
+    );
+    await expect(repository.parent("child.md")).resolves.toBeNull();
+  });
+
   it("keeps a front-matter list title authoritative when renamed", async () => {
     const { repository, files } = await openRepository();
     await expect(repository.get("list_home")).resolves.toMatchObject({
@@ -164,13 +187,13 @@ describe("TaskRepository", () => {
     });
   });
 
-  it("guards and reprojects one exact Items section", async () => {
+  it("guards and reprojects one exact structural run", async () => {
     const { repository, files } = await openRepository();
     const before = await files.read("lists/home.md");
-    const [section] = await repository.getTaskListItemsSections("list_home");
+    const [section] = await repository.getStructuralTaskRuns("list_home");
     expect(section?.entries.map((entry) => entry.label)).toEqual(["Buy filter"]);
 
-    const next = await repository.replaceTaskListItemsSection(
+    const next = await repository.replaceStructuralTaskRun(
       "list_home",
       section!,
       [{ label: "Replace cartridge", target: "../child.md" }],
@@ -186,18 +209,52 @@ describe("TaskRepository", () => {
     ]);
   });
 
-  it("rejects a stale Items section without rewriting prose", async () => {
+  it("rejects a stale task run without rewriting prose", async () => {
     const { repository, files } = await openRepository();
-    const [section] = await repository.getTaskListItemsSections("list_home");
+    const [section] = await repository.getStructuralTaskRuns("list_home");
     const changed = (await files.read("lists/home.md")).replace(
       "# Home",
       "# Home\n\nAuthored note.",
     );
     await files.write("lists/home.md", changed.replace("Buy filter", "Changed"));
     await expect(
-      repository.replaceTaskListItemsSection("list_home", section!, []),
-    ).rejects.toMatchObject({ code: "stale-section" });
+      repository.replaceStructuralTaskRun("list_home", section!, []),
+    ).rejects.toMatchObject({ code: "stale-run" });
     await expect(files.read("lists/home.md")).resolves.toContain("Authored note.");
+  });
+
+  it("renames and creates headings without relocating Markdown content", async () => {
+    const { repository, files } = await openRepository();
+    await repository.renameHeading("list_home", ["Items"], "Current Work");
+    await repository.createHeading("list_home", "Later");
+    const raw = await files.read("lists/home.md");
+    expect(raw).toContain("## Current Work\n- [Buy filter](../buy.md)");
+    expect(raw).toContain("\n\n## Later\n");
+  });
+
+  it("moves one entry between runs without rewriting surrounding prose", async () => {
+    const { repository, files } = await openRepository();
+    const [sourceRun] = await repository.getStructuralTaskRuns("buy.md");
+    const [targetRun] = await repository.getStructuralTaskRuns("list_home");
+    const sourceBefore = await files.read("buy.md");
+    const targetBefore = await files.read("lists/home.md");
+    await repository.moveStructuralEntry(
+      "buy.md",
+      sourceRun!,
+      0,
+      "lists/home.md",
+      targetRun!,
+      0,
+    );
+    expect(await files.read("buy.md")).toBe(
+      sourceBefore.replace("- [Replace cartridge](./child.md)\n", ""),
+    );
+    expect(await files.read("lists/home.md")).toBe(
+      targetBefore.replace(
+        "- [Buy filter](../buy.md)",
+        "- [Replace cartridge](../child.md)\n- [Buy filter](../buy.md)",
+      ),
+    );
   });
 
   it("writes a file mutation and upserts the same parse", async () => {
@@ -219,7 +276,7 @@ describe("TaskRepository", () => {
     const { repository, files } = await openRepository();
     const before = await files.read("buy.md");
     const document = await repository.getTaskDocument("t_buy");
-    expect(document.checklist).toEqual([
+    expect(document.checklist).toMatchObject([
       { text: "Measure the opening", checked: true, position: 0 },
       { text: "Order the filter", checked: false, position: 1 },
     ]);

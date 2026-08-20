@@ -1,11 +1,11 @@
 import type {
   AppDatabase,
   AppDatabaseIndexedFile,
-  AppDatabaseLinkKind,
   AppDatabaseLinkRecord,
   IndexProjectionEdgeInput,
   IndexProjectionRegistration,
 } from "@lapis-notes/api/app-database";
+import type { App } from "@lapis-notes/api";
 import {
   PUBLIC_TASKS_PROJECTION_ID,
   TASK_PROJECTION_FIELDS,
@@ -13,8 +13,79 @@ import {
 } from "@lapis-notes/api/app-database";
 import { parseTaskDocument, type ParsedTaskFile } from "./task-document";
 import { projectTask } from "./task-projection";
+import {
+  resolveTaskDocumentStructure,
+  taskStructureForProjection,
+  type ResolvedTaskDocumentStructure,
+  type TaskStructureTargetResolver,
+} from "./task-structure";
 
-export function createTasksProjectionRegistration(): IndexProjectionRegistration {
+const unresolvedTarget: TaskStructureTargetResolver = () => null;
+
+export function createAppTaskStructureResolver(
+  app: App,
+): TaskStructureTargetResolver {
+  return async (sourcePath, href) => {
+    const target = app.metadataCache.getFirstLinkpathDest(href, sourcePath);
+    if (!target) return null;
+    const raw = await app.vault.cachedRead(target);
+    const document = parseTaskDocument(raw, target.path);
+    if (!document || document.kind === "task-list-navigation") {
+      return {
+        id: target.path,
+        path: target.path,
+        kind: "unsupported",
+        title: target.basename,
+      };
+    }
+    return {
+      id: document.id,
+      path: document.path,
+      kind: document.kind,
+      title: document.title,
+    };
+  };
+}
+
+export function createTaskStructureResolverFromDocuments(
+  documents: Iterable<ParsedTaskFile>,
+): TaskStructureTargetResolver {
+  const byPath = new Map(
+    [...documents]
+      .filter((document) => document.kind !== "task-list-navigation")
+      .map((document) => [document.path, document]),
+  );
+  return (sourcePath, href) => {
+    const target = byPath.get(resolveTaskHref(sourcePath, href));
+    if (!target) return null;
+    return {
+      id: target.id,
+      path: target.path,
+      kind: target.kind,
+      title: target.title,
+    };
+  };
+}
+
+async function resolvedStructure(
+  document: ParsedTaskFile,
+  resolveTarget: TaskStructureTargetResolver,
+): Promise<ResolvedTaskDocumentStructure | null> {
+  if (document.kind === "task-list-navigation") return null;
+  return resolveTaskDocumentStructure(
+    document.raw,
+    {
+      documentId: document.id,
+      documentPath: document.path,
+      documentKind: document.kind,
+    },
+    resolveTarget,
+  );
+}
+
+export function createTasksProjectionRegistration(
+  resolveTarget: TaskStructureTargetResolver = unresolvedTarget,
+): IndexProjectionRegistration {
   return {
     id: "task",
     version: TASK_PROJECTION_VERSION,
@@ -23,13 +94,26 @@ export function createTasksProjectionRegistration(): IndexProjectionRegistration
     source: {
       extensions: ["md", "markdown"],
     },
-    project({ file, content }) {
+    async project({ file, content }) {
       const document = parseTaskDocument(content, file.path);
       if (!document) return { rows: [], edges: [] };
       const row = projectTask(document);
+      const structure = await resolvedStructure(document, resolveTarget);
       return {
-        rows: [{ id: document.id, kind: document.kind, data: { ...row, id: document.id } }],
-        edges: taskEdges(document),
+        rows: [
+          {
+            id: document.id,
+            kind: document.kind,
+            data: {
+              ...row,
+              id: document.id,
+              ...(structure
+                ? { structure: taskStructureForProjection(structure) }
+                : {}),
+            },
+          },
+        ],
+        edges: taskEdges(document, structure),
       };
     },
   };
@@ -53,44 +137,72 @@ export function resolveTaskHref(sourcePath: string, href: string): string {
   return parts.join("/");
 }
 
-export function taskEdges(document: ParsedTaskFile): IndexProjectionEdgeInput[] {
-  return document.structuralLinks
-    .filter(
-      (link) =>
-        link.kind === "subtask" ||
-        link.kind === "list-item" ||
-        link.kind === "navigation-item",
-    )
-    .map((link) => ({
+export function taskEdges(
+  document: ParsedTaskFile,
+  structure: ResolvedTaskDocumentStructure | null = null,
+): IndexProjectionEdgeInput[] {
+  if (document.kind !== "task-list-navigation") {
+    return (structure?.entries ?? []).map((entry) => ({
       sourceRowId: document.id,
-      relation: link.kind,
-      targetPath: resolveTaskHref(document.path, link.href) || null,
-      targetText: link.href,
-      ordinal: link.ordinal,
-      ...(link.kind === "navigation-item" && link.heading
-        ? { data: { section: link.heading } }
-        : {}),
+      relation: entry.kind,
+      targetRowId: entry.targetDocumentId,
+      targetPath: entry.targetDocumentPath,
+      targetText: entry.authoredHref,
+      ordinal: structure!.entries.indexOf(entry),
+      data: {
+        headingPath: entry.headingPath,
+        headingLevel: entry.headingLevel,
+        headingText: entry.headingText,
+        runId: entry.runId,
+        positionInRun: entry.positionInRun,
+        sourceStart: entry.sourceStart,
+        sourceEnd: entry.sourceEnd,
+      },
     }));
+  }
+  return document.structuralLinks.map((link) => ({
+    sourceRowId: document.id,
+    relation: "navigation-item",
+    targetPath: resolveTaskHref(document.path, link.href) || null,
+    targetText: link.href,
+    ordinal: link.ordinal,
+    ...(link.heading ? { data: { section: link.heading } } : {}),
+  }));
 }
 
-export function taskDocumentToIndexedFile(
+function indexedLinks(
   document: ParsedTaskFile,
-): AppDatabaseIndexedFile {
-  const links: AppDatabaseLinkRecord[] = document.structuralLinks.map(
-    (link) => ({
+  structure: ResolvedTaskDocumentStructure | null,
+): AppDatabaseLinkRecord[] {
+  if (document.kind === "task-list-navigation") {
+    return document.structuralLinks.map((link) => ({
       sourcePath: document.path,
       targetText: link.href,
       resolvedTargetPath: resolveTaskHref(document.path, link.href) || null,
       type: "link",
       count: 1,
       heading: link.heading,
-      kind:
-        link.kind === "navigation-item"
-          ? undefined
-          : (link.kind as AppDatabaseLinkKind),
+      kind: "navigation-item",
       ordinal: link.ordinal,
-    }),
-  );
+    }));
+  }
+  return (structure?.entries ?? []).map((entry, ordinal) => ({
+    sourcePath: document.path,
+    targetText: entry.authoredHref,
+    resolvedTargetPath: entry.targetDocumentPath,
+    type: "link",
+    count: 1,
+    heading: entry.headingText,
+    kind: entry.kind,
+    ordinal,
+  }));
+}
+
+export function taskDocumentToIndexedFile(
+  document: ParsedTaskFile,
+  structure: ResolvedTaskDocumentStructure | null = null,
+): AppDatabaseIndexedFile {
+  const links = indexedLinks(document, structure);
   return {
     file: {
       path: document.path,
@@ -115,15 +227,43 @@ export function taskDocumentToIndexedFile(
       hierarchy: [tag],
     })),
     properties: [],
-    task: projectTask(document),
+    task: {
+      ...projectTask(document),
+      ...(structure ? { structure: taskStructureForProjection(structure) } : {}),
+    },
   };
 }
 
 export async function indexTaskDocument(
   database: AppDatabase,
   document: ParsedTaskFile,
+  resolveTarget: TaskStructureTargetResolver = async (sourcePath, href) => {
+    const path = resolveTaskHref(sourcePath, href);
+    const target = await database.getTaskRow({ path }).catch(() => null);
+    return target && (target.kind === "task" || target.kind === "task-list")
+      ? {
+          id: target.documentId,
+          path: target.documentPath,
+          kind: target.kind,
+          title: target.title,
+        }
+      : null;
+  },
 ): Promise<void> {
   await database.upsertIndexedFile(taskDocumentToIndexedFile(document));
+  const structure = await resolvedStructure(document, resolveTarget);
+  await indexResolvedTaskDocument(database, document, structure);
+}
+
+export async function indexResolvedTaskDocument(
+  database: AppDatabase,
+  document: ParsedTaskFile,
+  structure: ResolvedTaskDocumentStructure | null,
+): Promise<void> {
+  await database.upsertIndexedFile(
+    taskDocumentToIndexedFile(document, structure),
+  );
+  const projected = projectTask(document);
   await database.replaceProjectionSource({
     projectionId: PUBLIC_TASKS_PROJECTION_ID,
     sourcePath: document.path,
@@ -133,9 +273,15 @@ export async function indexTaskDocument(
       {
         id: document.id,
         kind: document.kind,
-        data: { ...projectTask(document), id: document.id },
+        data: {
+          ...projected,
+          id: document.id,
+          ...(structure
+            ? { structure: taskStructureForProjection(structure) }
+            : {}),
+        },
       },
     ],
-    edges: taskEdges(document),
+    edges: taskEdges(document, structure),
   });
 }

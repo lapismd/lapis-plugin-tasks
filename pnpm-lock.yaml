@@ -49,6 +49,12 @@ importers:
       '@lapismd/design-core':
         specifier: link:../design-core
         version: link:../design-core
+      '@lezer/common':
+        specifier: 1.5.2
+        version: 1.5.2
+      '@lezer/markdown':
+        specifier: 1.7.2
+        version: 1.7.2
       '@lucide/svelte':
         specifier: ^0.523.0
         version: 0.523.0(svelte@5.56.9)
@@ -113,18 +119,12 @@ importers:
       '@lapismd/spec-validator':
         specifier: link:../spec-validator
         version: link:../spec-validator
-      '@lezer/common':
-        specifier: 1.5.2
-        version: 1.5.2
       '@lezer/highlight':
         specifier: 1.2.3
         version: 1.2.3
       '@lezer/lr':
         specifier: 1.4.10
         version: 1.4.10
-      '@lezer/markdown':
-        specifier: 1.7.2
-        version: 1.7.2
       '@storybook/addon-a11y':
         specifier: 10.5.7
         version: 10.5.7(storybook@10.5.7(@types/react@19.2.18)(react@19.2.8))

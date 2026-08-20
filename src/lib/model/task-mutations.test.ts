@@ -36,7 +36,7 @@ task:
 `;
 
 describe("task mutations", () => {
-  it("rolls a recurring task forward and resets only Checklist", () => {
+  it("rolls a recurring task forward and resets every lightweight checklist item", () => {
     const parsed = parseTaskDocument(ROUTINE, "morning.md");
     expect(parsed?.kind).toBe("task");
     const next = completeTaskDocument(parsed!, "2026-08-20T07:52:00+01:00");
@@ -45,7 +45,7 @@ describe("task mutations", () => {
     expect(next.task.status).toBe("open");
     expect(next.task.plan?.date).toBe("2026-08-21");
     expect(next.task.repeat?.completionCount).toBe(1);
-    expect(next.body).toContain("- [x] Keep this historical box");
+    expect(next.body).toContain("- [ ] Keep this historical box");
     expect(next.body).toMatch(/## Checklist\n- \[ \] Shower\n- \[ \] Breakfast/);
   });
 
@@ -83,20 +83,21 @@ task:
 
   it("updates one checklist marker while preserving surrounding Markdown", () => {
     const parsed = parseTaskDocument(ROUTINE, "morning.md");
-    const next = setTaskChecklistItemChecked(parsed!, 1, "Breakfast", true);
+    const next = setTaskChecklistItemChecked(parsed!, 2, "Breakfast", true);
     expect(next.body).toBe(
       parsed!.body.replace("- [ ] Breakfast", "- [x] Breakfast"),
     );
-    expect(next.checklist).toEqual([
-      { text: "Shower", checked: true, position: 0 },
-      { text: "Breakfast", checked: true, position: 1 },
+    expect(next.checklist).toMatchObject([
+      { text: "Keep this historical box", checked: true, position: 0 },
+      { text: "Shower", checked: true, position: 1 },
+      { text: "Breakfast", checked: true, position: 2 },
     ]);
   });
 
   it("rejects a stale checklist ordinal or expected label", () => {
     const parsed = parseTaskDocument(ROUTINE, "morning.md");
     expect(() =>
-      setTaskChecklistItemChecked(parsed!, 1, "Pack lunch", true),
+      setTaskChecklistItemChecked(parsed!, 2, "Pack lunch", true),
     ).toThrow(TaskChecklistMutationError);
     expect(() =>
       setTaskChecklistItemChecked(parsed!, 4, "Breakfast", true),

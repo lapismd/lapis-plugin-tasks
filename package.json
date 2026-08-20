@@ -61,6 +61,8 @@
     "@dnd-kit/helpers": "0.5.0",
     "@dnd-kit/svelte": "0.5.0",
     "@internationalized/date": "3.12.2",
+    "@lezer/common": "1.5.2",
+    "@lezer/markdown": "1.7.2",
     "@lucide/svelte": "^0.523.0",
     "chrono-node": "^2.10.1",
     "yaml": "^2.9.0"
@@ -93,9 +95,7 @@
     "@lapismd/design-core": "0.1.0",
     "@lapismd/mira": "0.0.1",
     "@lapismd/spec-validator": "0.1.0",
-    "@lezer/common": "1.5.2",
     "@lezer/highlight": "1.2.3",
-    "@lezer/markdown": "1.7.2",
     "@lezer/lr": "1.4.10",
     "@storybook/addon-a11y": "10.5.7",
     "@storybook/addon-docs": "10.5.7",

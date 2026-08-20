@@ -10,7 +10,11 @@ import {
   TaskListMutationError,
 } from "./list-navigation";
 import { parseTaskDocument } from "./task-document";
-import { indexTaskDocument, taskEdges } from "./task-index";
+import {
+  createTaskStructureResolverFromDocuments,
+  indexTaskDocument,
+  taskEdges,
+} from "./task-index";
 import {
   createMemoryTaskFileStore,
   TaskRepository,
@@ -84,10 +88,14 @@ async function openRepository(files = FILES) {
   const database = new MemoryAppDatabase("list-nav");
   await database.open();
   const store = createMemoryTaskFileStore(files);
-  for (const [path, raw] of Object.entries(files)) {
+  const documents = Object.entries(files).map(([path, raw]) => {
     const document = parseTaskDocument(raw, path);
     if (!document) throw new Error(`Invalid fixture ${path}`);
-    await indexTaskDocument(database, document);
+    return document;
+  });
+  const resolve = createTaskStructureResolverFromDocuments(documents);
+  for (const document of documents) {
+    await indexTaskDocument(database, document, resolve);
   }
   return { database, files: store, repository: new TaskRepository(database, store) };
 }
@@ -295,6 +303,16 @@ describe("list navigation Markdown", () => {
     await expect(files.read("lists/writing.md")).rejects.toThrow();
     expect(await files.read("lists/docs.md")).not.toContain("./writing.md");
     expect(await files.read("lists/docs.md")).toContain("# Docs");
+  });
+
+  it("can leave an editor-owned parent link for its active transaction", async () => {
+    const { repository, files } = await openRepository();
+    const parentBefore = await files.read("lists/docs.md");
+    await repository.deleteList("lists/writing.md", AT, {
+      skipParentPaths: ["lists/docs.md"],
+    });
+    await expect(files.read("lists/writing.md")).rejects.toThrow();
+    expect(await files.read("lists/docs.md")).toBe(parentBefore);
   });
 
   it("deletes a pinned root and removes its navigation pin", async () => {
