@@ -12,7 +12,21 @@ import "./preview.css";
 
 const preview: Preview = {
   tags: ["autodocs", "test"],
+  globalTypes: {
+    theme: {
+      description: "Brand theme",
+      toolbar: {
+        icon: "paintbrush",
+        items: [
+          { value: "lapis", title: "Obsidian" },
+          { value: "default", title: "Default" },
+        ],
+        dynamicTitle: true,
+      },
+    },
+  },
   initialGlobals: {
+    colorMode: "light",
     theme: "lapis",
   },
   decorators: [
@@ -24,6 +38,15 @@ const preview: Preview = {
       defaultTheme: "lapis",
       attributeName: "data-ui-theme",
     }),
+    (story, context) => {
+      if (typeof document !== "undefined") {
+        document.documentElement.classList.toggle(
+          "dark",
+          context.globals.colorMode === "dark",
+        );
+      }
+      return story();
+    },
   ],
   parameters: {
     layout: "fullscreen",

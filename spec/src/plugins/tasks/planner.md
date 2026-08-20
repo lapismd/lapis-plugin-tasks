@@ -61,9 +61,10 @@ explicit cross-run movement, delete, and a trailing open control. Open mounts th
 linked list's complete Markdown surface in a bordered, rounded, closeable column
 to the right without
 replacing the parent list or forcing its active editor back to preview.
-Recursive disclosure uses the public Lapis `--interactive-accent` role for its
-indentation guide, matching Markdown blockquotes and embedded files without
-hard-coding a Tasks-only colour.
+Recursive disclosure uses `--interactive-accent` for its indentation guide.
+Inside the Lapis Markdown surface, that role resolves to
+`--ui-workspace-focus-ring`, matching Markdown blockquotes and embedded files
+without hard-coding a Tasks-only colour.
 Child-task refreshes update those rows in place. The Markdown file surface is
 keyed by its container and list path, so a task title, schedule, status, or
 checklist mutation cannot remount CodeMirror or leave live preview. Structural

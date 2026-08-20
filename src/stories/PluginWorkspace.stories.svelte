@@ -1256,13 +1256,23 @@
       expect(element).toBeInTheDocument();
       return element!;
     });
-    const accentProbe = document.createElement("span");
+    expect(
+      nestedRuns.closest<HTMLElement>("[data-mira-theme]")?.dataset.miraTheme,
+    ).toBe("obsidian");
+    const accentProbe = nestedRuns.ownerDocument.createElement("span");
     accentProbe.style.color = "var(--interactive-accent)";
     nestedRuns.append(accentProbe);
     expect(getComputedStyle(nestedRuns).borderInlineStartColor).toBe(
       getComputedStyle(accentProbe).color,
     );
     accentProbe.remove();
+    const lapisAccentProbe = nestedRuns.ownerDocument.createElement("span");
+    lapisAccentProbe.style.color = "var(--ui-workspace-focus-ring)";
+    nestedRuns.append(lapisAccentProbe);
+    expect(getComputedStyle(nestedRuns).borderInlineStartColor).toBe(
+      getComputedStyle(lapisAccentProbe).color,
+    );
+    lapisAccentProbe.remove();
     await userEvent.click(
       within(writingRow).getByRole("button", {
         name: "Open list Writing to the right",
