@@ -27,9 +27,10 @@ and drag behavior. See LN-TASK-035 and LN-TASK-037.
 The middle-column toolbar uses the Markdown pencil and book-open affordances to
 enter and leave full-document live preview, so the same control remains
 available at phone width without claiming document-body double-click. The
-planner column also exposes the controller-owned collapse toggle. The TaskRun
-block's code icon is the only pointer control that reveals its literal source.
-It overlays the run's inline end, inset within and vertically centered on the
+planner column also exposes the controller-owned collapse toggle. In live
+preview, the TaskRun block's code icon is the only pointer control that reveals
+its literal source; reading mode and embeds omit that source control. It
+overlays the run's inline end, inset within and vertically centered on the
 authored grouping-heading pill, instead of consuming a standalone row. Live
 preview positions its fold affordance immediately outside the pill's start
 border while keeping it vertically centered; source markers and the heading

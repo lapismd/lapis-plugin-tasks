@@ -390,15 +390,20 @@ function createPostProcessor(app: App, repository: TaskRepository) {
         sourcePath: ctx.sourcePath,
         section: sourceRun,
         surface: ctx.surface ?? { id: ctx.mode ?? "reading" },
-        onRevealSource: async () => {
-          const controller = asTasksMarkdownSurfaceController(ctx.surface?.context);
-          if (controller?.onRevealSource) {
-            await controller.onRevealSource(sourceRun);
-            return;
-          }
-          const file = app.vault.getFileByPath(ctx.sourcePath);
-          if (file) await app.openFile(file);
-        },
+        onRevealSource:
+          ctx.mode === "live-preview"
+            ? async () => {
+                const controller = asTasksMarkdownSurfaceController(
+                  ctx.surface?.context,
+                );
+                if (controller?.onRevealSource) {
+                  await controller.onRevealSource(sourceRun);
+                  return;
+                }
+                const file = app.vault.getFileByPath(ctx.sourcePath);
+                if (file) await app.openFile(file);
+              }
+            : undefined,
       });
       ctx.addChild(child);
     });

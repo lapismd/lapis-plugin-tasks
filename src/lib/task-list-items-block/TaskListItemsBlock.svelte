@@ -458,17 +458,19 @@
   data-structural-task-run
   data-task-list-surface={controller ? "tasks" : "markdown"}
 >
-  <header class="task-list-items-block__header">
-    <button
-      type="button"
-      class="task-list-items-block__source"
-      aria-label="Edit task run source"
-      title="Edit source"
-      onclick={onRevealSource}
-    >
-      <CodeXmlIcon aria-hidden="true" />
-    </button>
-  </header>
+  {#if onRevealSource}
+    <header class="task-list-items-block__header">
+      <button
+        type="button"
+        class="task-list-items-block__source"
+        aria-label="Edit task run source"
+        title="Edit source"
+        onclick={onRevealSource}
+      >
+        <CodeXmlIcon aria-hidden="true" />
+      </button>
+    </header>
+  {/if}
 
   {#if error}
     <p class="task-list-items-block__error" role="alert">{error}</p>

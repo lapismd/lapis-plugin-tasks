@@ -59,6 +59,15 @@ describe("task-list Markdown contribution", () => {
     expect(source).toContain('"data-task-group-heading": "true"');
     expect(source).toContain("markRenderedTaskGroupHeadings");
     expect(source).toContain('ctx.frontmatter?.type !== "task-list-navigation"');
+    expect(source).toContain(
+      'onRevealSource:\n          ctx.mode === "live-preview"',
+    );
+
+    const block = readFileSync(
+      "src/lib/task-list-items-block/TaskListItemsBlock.svelte",
+      "utf8",
+    );
+    expect(block).toContain("{#if onRevealSource}");
   });
 
   it("keeps rich Markdown rows inside the host and protects the Tasks checkbox", () => {

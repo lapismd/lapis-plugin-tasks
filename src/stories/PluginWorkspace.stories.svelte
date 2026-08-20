@@ -209,12 +209,15 @@
       .toBe(tones.length);
   }
 
-  async function expectContainedMarkdownRun(run: HTMLElement) {
+  async function expectContainedMarkdownRun(
+    run: HTMLElement,
+    sourceControl: "hidden" | "visible",
+  ) {
     expect(run).toHaveAttribute("data-task-list-surface", "markdown");
     expect(getComputedStyle(run).position).toBe("relative");
     const sourceHeader = run.querySelector<HTMLElement>(
       ".task-list-items-block__header",
-    )!;
+    );
     const rows = run.querySelector<HTMLElement>(
       ".task-list-items-block__rows",
     )!;
@@ -225,62 +228,67 @@
       );
       expect(row).toBeTruthy();
     });
-    expect(getComputedStyle(sourceHeader).position).toBe("absolute");
-    const sourceButton = sourceHeader.querySelector<HTMLElement>(
-      ".task-list-items-block__source",
-    )!;
-    const sourceButtonBox = sourceButton.getBoundingClientRect();
-    const heading = Array.from(
-      run.ownerDocument.querySelectorAll<HTMLElement>(
-        '[data-task-group-heading="true"]',
-      ),
-    )
-      .filter((candidate) => candidate.getClientRects().length > 0)
-      .sort((left, right) => {
-        const sourceCenter =
-          sourceButtonBox.top + sourceButtonBox.height / 2;
-        const leftBox = left.getBoundingClientRect();
-        const rightBox = right.getBoundingClientRect();
-        return (
-          Math.abs(leftBox.top + leftBox.height / 2 - sourceCenter) -
-          Math.abs(rightBox.top + rightBox.height / 2 - sourceCenter)
-        );
-      })[0]!;
-    const headingBox = heading.getBoundingClientRect();
-    expect(
-      Math.abs(
-        sourceButtonBox.top +
-          sourceButtonBox.height / 2 -
-          (headingBox.top + headingBox.height / 2),
-      ),
-    ).toBeLessThan(4);
-    expect(headingBox.right - sourceButtonBox.right).toBeGreaterThanOrEqual(6);
-    expect(headingBox.right - sourceButtonBox.right).toBeLessThanOrEqual(10);
-    if (heading.matches(".cm-line")) {
-      const foldIndicator = heading.querySelector<HTMLElement>(
-        ":scope > .cm-fold-indicator",
+    if (sourceControl === "hidden") {
+      expect(sourceHeader).not.toBeInTheDocument();
+    } else {
+      expect(sourceHeader).toBeInTheDocument();
+      expect(getComputedStyle(sourceHeader!).position).toBe("absolute");
+      const sourceButton = sourceHeader!.querySelector<HTMLElement>(
+        ".task-list-items-block__source",
       )!;
-      const foldIndicatorBox = foldIndicator.getBoundingClientRect();
-      expect(foldIndicatorBox.right).toBeLessThanOrEqual(headingBox.left);
-      expect(headingBox.left - foldIndicatorBox.right).toBeLessThanOrEqual(8);
+      const sourceButtonBox = sourceButton.getBoundingClientRect();
+      const heading = Array.from(
+        run.ownerDocument.querySelectorAll<HTMLElement>(
+          '[data-task-group-heading="true"]',
+        ),
+      )
+        .filter((candidate) => candidate.getClientRects().length > 0)
+        .sort((left, right) => {
+          const sourceCenter =
+            sourceButtonBox.top + sourceButtonBox.height / 2;
+          const leftBox = left.getBoundingClientRect();
+          const rightBox = right.getBoundingClientRect();
+          return (
+            Math.abs(leftBox.top + leftBox.height / 2 - sourceCenter) -
+            Math.abs(rightBox.top + rightBox.height / 2 - sourceCenter)
+          );
+        })[0]!;
+      const headingBox = heading.getBoundingClientRect();
       expect(
         Math.abs(
-          foldIndicatorBox.top +
-            foldIndicatorBox.height / 2 -
+          sourceButtonBox.top +
+            sourceButtonBox.height / 2 -
             (headingBox.top + headingBox.height / 2),
         ),
       ).toBeLessThan(4);
-      const label = Array.from(
-        heading.querySelectorAll<HTMLElement>(".cm-heading:not(.cm-meta)"),
-      ).findLast((candidate) => candidate.textContent?.trim())!;
-      const labelBox = label.getBoundingClientRect();
-      expect(
-        Math.abs(
-          labelBox.top +
-            labelBox.height / 2 -
-            (headingBox.top + headingBox.height / 2),
-        ),
-      ).toBeLessThan(4);
+      expect(headingBox.right - sourceButtonBox.right).toBeGreaterThanOrEqual(6);
+      expect(headingBox.right - sourceButtonBox.right).toBeLessThanOrEqual(10);
+      if (heading.matches(".cm-line")) {
+        const foldIndicator = heading.querySelector<HTMLElement>(
+          ":scope > .cm-fold-indicator",
+        )!;
+        const foldIndicatorBox = foldIndicator.getBoundingClientRect();
+        expect(foldIndicatorBox.right).toBeLessThanOrEqual(headingBox.left);
+        expect(headingBox.left - foldIndicatorBox.right).toBeLessThanOrEqual(8);
+        expect(
+          Math.abs(
+            foldIndicatorBox.top +
+              foldIndicatorBox.height / 2 -
+              (headingBox.top + headingBox.height / 2),
+          ),
+        ).toBeLessThan(4);
+        const label = Array.from(
+          heading.querySelectorAll<HTMLElement>(".cm-heading:not(.cm-meta)"),
+        ).findLast((candidate) => candidate.textContent?.trim())!;
+        const labelBox = label.getBoundingClientRect();
+        expect(
+          Math.abs(
+            labelBox.top +
+              labelBox.height / 2 -
+              (headingBox.top + headingBox.height / 2),
+          ),
+        ).toBeLessThan(4);
+      }
     }
     expect(
       Math.abs(
@@ -342,14 +350,12 @@
     const readingBlock = surface!.querySelector<HTMLElement>(
       "[data-structural-task-run]",
     )!;
-    const readingSourceButton = within(readingBlock).getByRole("button", {
-      name: "Edit task run source",
-      exact: true,
-    });
     expect(
-      readingBlock.getBoundingClientRect().right -
-        readingSourceButton.getBoundingClientRect().right,
-    ).toBeLessThan(16);
+      within(readingBlock).queryByRole("button", {
+        name: "Edit task run source",
+        exact: true,
+      }),
+    ).not.toBeInTheDocument();
     const documentBackground = getComputedStyle(surface!).backgroundColor;
     expect(documentBackground).not.toBe("rgba(0, 0, 0, 0)");
     expect(
@@ -1284,7 +1290,7 @@
     docs: {
       description: {
         story:
-          "Exercise rich Task/List runs in ordinary Markdown reading and live-preview surfaces, including contained radii, dedicated checkbox styling, overlay source controls, an external live-preview fold affordance, and presentation-only navigation rows.",
+          "Exercise rich Task/List runs in ordinary Markdown reading and live-preview surfaces, including reading-mode source-control omission, a live-preview-only overlay source control, contained radii, dedicated checkbox styling, an external live-preview fold affordance, and presentation-only navigation rows.",
       },
     },
   }}
@@ -1298,7 +1304,7 @@
     await openMarkdownFixture(canvasElement, app, "lists/cv.md", "preview");
     await expectTaskGroupHeadingTones(canvasElement, ["anytime", "morning"]);
     let run = visibleTaskRun(canvasElement, "Explore conference talks");
-    await expectContainedMarkdownRun(run);
+    await expectContainedMarkdownRun(run, "hidden");
     expect(run.querySelector("[data-task-drag-handle]")).not.toBeInTheDocument();
     await expectDedicatedMarkdownCheckbox(run, "Explore conference talks");
 
@@ -1310,7 +1316,7 @@
     );
     await expectTaskGroupHeadingTones(canvasElement, ["anytime", "morning"]);
     run = visibleTaskRun(canvasElement, "Explore conference talks");
-    await expectContainedMarkdownRun(run);
+    await expectContainedMarkdownRun(run, "visible");
     expect(run.querySelector("[data-task-drag-handle]")).not.toBeInTheDocument();
     await expectDedicatedMarkdownCheckbox(run, "Explore conference talks");
 
@@ -1364,7 +1370,7 @@
       ),
     ).toBe(false);
     for (const navigationRun of navigationRuns) {
-      await expectContainedMarkdownRun(navigationRun);
+      await expectContainedMarkdownRun(navigationRun, "hidden");
     }
     await collapseLapisLeftSidebar(within(canvasElement));
   }}
