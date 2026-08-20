@@ -17,7 +17,9 @@ hosts the lanes. The first column is buckets plus the Lists tree from
 `ApplicationTaskPlannerMode`. The third column is task detail.
 The first-column resize handle sits flush against the planner column and rounds
 its logical start edge. Its hover surface therefore curves toward the adjacent
-planner rather than back into the Tasks navigation.
+planner rather than back into the Tasks navigation. It advances across the
+planner's one-pixel start border to meet that border's inner edge, matching the
+right-side resize treatment instead of leaving the hover fill behind the frame.
 
 When navigation selects a task list, the middle column keeps its list title as
 workspace chrome but replaces the bucket planner body with the complete

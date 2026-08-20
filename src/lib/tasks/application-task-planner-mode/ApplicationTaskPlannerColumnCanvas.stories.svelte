@@ -49,6 +49,19 @@
     expect(tasksResizeStyle.borderBottomLeftRadius).not.toBe("0px");
     expect(tasksResizeStyle.borderTopRightRadius).toBe("0px");
     expect(tasksResizeStyle.borderBottomRightRadius).toBe("0px");
+    const tasksColumn = context.canvasElement.querySelector<HTMLElement>(
+      '[data-column-id="tasks"][data-ui-part="column"]',
+    )!;
+    const plannerColumn = context.canvasElement.querySelector<HTMLElement>(
+      '[data-column-id="planner"][data-ui-part="column"]',
+    )!;
+    const plannerStartBorderWidth = Number.parseFloat(
+      getComputedStyle(plannerColumn).borderLeftWidth,
+    );
+    expect(
+      tasksResizeHandle.getBoundingClientRect().right -
+        tasksColumn.getBoundingClientRect().right,
+    ).toBeCloseTo(plannerStartBorderWidth, 1);
     expect(
       canvas.getByRole("button", { name: "Collapse All lists section" }),
     ).toBeVisible();
