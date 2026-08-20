@@ -74,6 +74,9 @@ describe("task-list Markdown contribution", () => {
     );
     expect(styles).toContain("margin-inline: 0;");
     expect(styles).toContain(
+      "var(--interactive-accent, var(--ui-tasks-accent, var(--primary)))",
+    );
+    expect(styles).toContain(
       ".task-list-items-block [data-task-checkbox].task-checkbox input:checked::after",
     );
     expect(styles).toContain("mask: none;");
@@ -88,6 +91,8 @@ describe("task-list Markdown contribution", () => {
     );
     expect(globalStyles).toContain("display: flex !important;");
     expect(globalStyles).toContain("padding: 0.45rem 0.75rem !important;");
+    expect(globalStyles).toContain("inset-inline-start: -1.35rem;");
+    expect(globalStyles).toContain("translate: 0 -50%;");
   });
 
   it.each([

@@ -31,8 +31,10 @@ planner column also exposes the controller-owned collapse toggle. The TaskRun
 block's code icon is the only pointer control that reveals its literal source.
 It overlays the run's inline end, inset within and vertically centered on the
 authored grouping-heading pill, instead of consuming a standalone row. Live
-preview also centers its fold affordance, source markers, and heading label
-within that pill rather than inheriting CodeMirror's top-aligned line box. The
+preview positions its fold affordance immediately outside the pill's start
+border while keeping it vertically centered; source markers and the heading
+label remain centered within the pill rather than inheriting CodeMirror's
+top-aligned line box. The
 preview, CodeMirror editor, scroller, and gutters share the active Lapis
 Markdown theme background and retain the Lapis document margins.
 The rich widget resets CodeMirror whitespace and typography inheritance so its
@@ -58,6 +60,9 @@ explicit cross-run movement, delete, and a trailing open control. Open mounts th
 linked list's complete Markdown surface in a bordered, rounded, closeable column
 to the right without
 replacing the parent list or forcing its active editor back to preview.
+Recursive disclosure uses the public Lapis `--interactive-accent` role for its
+indentation guide, matching Markdown blockquotes and embedded files without
+hard-coding a Tasks-only colour.
 Child-task refreshes update those rows in place. The Markdown file surface is
 keyed by its container and list path, so a task title, schedule, status, or
 checklist mutation cannot remount CodeMirror or leave live preview. Structural

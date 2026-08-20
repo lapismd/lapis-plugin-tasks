@@ -208,7 +208,8 @@
 
 .task-list-items-block__nested {
   margin-inline-start: 1.15rem;
-  border-inline-start: 1px solid var(--ui-border, currentColor);
+  border-inline-start: 1px solid
+    var(--interactive-accent, var(--ui-tasks-accent, var(--primary)));
   padding-inline-start: 0.45rem;
 }
 

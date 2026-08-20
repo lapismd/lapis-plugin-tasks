@@ -257,6 +257,19 @@
     expect(headingBox.right - sourceButtonBox.right).toBeGreaterThanOrEqual(6);
     expect(headingBox.right - sourceButtonBox.right).toBeLessThanOrEqual(10);
     if (heading.matches(".cm-line")) {
+      const foldIndicator = heading.querySelector<HTMLElement>(
+        ":scope > .cm-fold-indicator",
+      )!;
+      const foldIndicatorBox = foldIndicator.getBoundingClientRect();
+      expect(foldIndicatorBox.right).toBeLessThanOrEqual(headingBox.left);
+      expect(headingBox.left - foldIndicatorBox.right).toBeLessThanOrEqual(8);
+      expect(
+        Math.abs(
+          foldIndicatorBox.top +
+            foldIndicatorBox.height / 2 -
+            (headingBox.top + headingBox.height / 2),
+        ),
+      ).toBeLessThan(4);
       const label = Array.from(
         heading.querySelectorAll<HTMLElement>(".cm-heading:not(.cm-meta)"),
       ).findLast((candidate) => candidate.textContent?.trim())!;
@@ -1204,7 +1217,7 @@
     docs: {
       description: {
         story:
-          "Leave a nested List row and its adjacent Markdown column visible for hover and column-chrome review.",
+          "Leave an expanded nested List row and its adjacent Markdown column visible for accent-guide, hover, and column-chrome review.",
       },
     },
   }}
@@ -1224,6 +1237,26 @@
         exact: true,
       }),
     ).toBeInTheDocument();
+    await userEvent.click(
+      within(writingRow).getByRole("button", {
+        name: "Expand Writing",
+        exact: true,
+      }),
+    );
+    const nestedRuns = await waitFor(() => {
+      const element = canvasElement.querySelector<HTMLElement>(
+        "[data-task-list-nested-runs]",
+      );
+      expect(element).toBeInTheDocument();
+      return element!;
+    });
+    const accentProbe = document.createElement("span");
+    accentProbe.style.color = "var(--interactive-accent)";
+    nestedRuns.append(accentProbe);
+    expect(getComputedStyle(nestedRuns).borderInlineStartColor).toBe(
+      getComputedStyle(accentProbe).color,
+    );
+    accentProbe.remove();
     await userEvent.click(
       within(writingRow).getByRole("button", {
         name: "Open list Writing to the right",
@@ -1251,7 +1284,7 @@
     docs: {
       description: {
         story:
-          "Exercise rich Task/List runs in ordinary Markdown reading and live-preview surfaces, including contained radii, dedicated checkbox styling, overlay source controls, and presentation-only navigation rows.",
+          "Exercise rich Task/List runs in ordinary Markdown reading and live-preview surfaces, including contained radii, dedicated checkbox styling, overlay source controls, an external live-preview fold affordance, and presentation-only navigation rows.",
       },
     },
   }}

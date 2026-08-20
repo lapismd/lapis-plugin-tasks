@@ -85,6 +85,10 @@ A nested-List entry uses a list icon instead of a task checkbox. It supports:
 Opening or expanding a child does not create ownership. The authored link
 already owns the relationship.
 
+Recursive rich-List disclosure marks its nested content with an indentation
+guide using the public Lapis `--interactive-accent` role. This keeps the guide
+aligned with the active Markdown theme's blockquote and embedded-file accent.
+
 ## Tree and structural actions
 
 | Action | Source effect |
