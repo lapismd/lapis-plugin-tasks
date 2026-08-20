@@ -25,7 +25,7 @@
   import type { Snippet } from "svelte";
 
   import type { Task } from "../../model";
-  import { getDueSummary } from "../../model";
+  import { formatTaskScheduleLabel, getDueSummary } from "../../model";
   import ApplicationMarkdownPreview from "../../model/ReferenceMarkdownPreview.svelte";
   import ApplicationTaskCheckbox from "../application-task-checkbox/ApplicationTaskCheckbox.svelte";
 
@@ -75,14 +75,11 @@
   const dueSummary = $derived(getDueSummary(task.dueAt));
   const scheduleLabel = $derived.by(() => {
     if (dueSummary) return dueSummary.shortDate;
-    if (task.when === "today") return "Today";
-    if (task.when === "this-evening") return "This evening";
-    if (task.when === "anytime") return "Anytime";
-    if (task.when === "someday") return "Someday";
-    if (task.scheduledAt) {
-      return getDueSummary(task.scheduledAt)?.shortDate ?? null;
-    }
-    return null;
+    return formatTaskScheduleLabel({
+      when: task.when,
+      planAt: task.planAt,
+      scheduledAt: task.scheduledAt ?? task.planDate,
+    });
   });
   const priorityLabel = $derived(
     task.priority === "high"

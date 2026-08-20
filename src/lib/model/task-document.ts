@@ -7,7 +7,12 @@ export type TaskDocumentKind = "task" | "task-list" | "task-list-navigation";
 export type CanonicalTaskStatus = "open" | "completed" | "canceled";
 export type TaskListStatus = "active" | "archived";
 export type TaskStartKind = "anytime" | "someday" | "date";
-export type TaskPlanKind = "anytime" | "all-day" | "evening" | "time";
+export type TaskPlanKind =
+  | "anytime"
+  | "morning"
+  | "afternoon"
+  | "evening"
+  | "time";
 export type TaskRepeatFrequency = "daily" | "weekly" | "monthly" | "yearly";
 export type TaskRepeatAnchor = "schedule" | "completion";
 export type StructuralLinkKind =
@@ -280,7 +285,12 @@ function parsePlan(
   const atRaw = asString(record.at) ?? "anytime";
   let at: TaskPlanKind = "anytime";
   let time: string | undefined;
-  if (atRaw === "anytime" || atRaw === "all-day" || atRaw === "evening") {
+  if (
+    atRaw === "anytime" ||
+    atRaw === "morning" ||
+    atRaw === "afternoon" ||
+    atRaw === "evening"
+  ) {
     at = atRaw;
   } else if (TIME_RE.test(atRaw)) {
     at = "time";
@@ -289,7 +299,7 @@ function parsePlan(
     diagnostics.push({
       code: "invalid-plan-at",
       field: "task.plan.at",
-      message: "plan.at must be anytime, all-day, evening, or HH:mm.",
+      message: "plan.at must be anytime, morning, afternoon, evening, or HH:mm.",
     });
   }
   const duration = asString(record.duration);

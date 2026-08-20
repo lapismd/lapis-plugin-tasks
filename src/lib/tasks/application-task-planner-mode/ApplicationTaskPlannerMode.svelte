@@ -11,6 +11,7 @@
 		type TaskBucket,
 		type TaskAreaSummary,
 		type TaskPlannerMovePatch,
+		type TaskPlannerQuickPlacement,
 		type TaskPlannerRowContext,
 		type TaskQuickCreateInput
 	} from '../../model';
@@ -130,6 +131,7 @@
 	let scheduleDropOpen = $state(false);
 	let scheduleDropValue = $state<string | null>(null);
 	let scheduleDropWhen = $state<string | null>(null);
+	let scheduleDropPlanAt = $state<string | null>(null);
 	let logbookReopenConfirmOpen = $state(false);
 	let pendingLogbookReopen = $state<{
 		task: Task;
@@ -704,6 +706,7 @@
 		scheduleDropTaskIds = movedIds;
 		scheduleDropValue = firstTask?.scheduledAt ?? null;
 		scheduleDropWhen = firstTask?.when ?? null;
+		scheduleDropPlanAt = firstTask?.planAt ?? null;
 		scheduleDropOpen = true;
 	}
 
@@ -712,6 +715,7 @@
 		scheduleDropTaskIds = [];
 		scheduleDropValue = null;
 		scheduleDropWhen = null;
+		scheduleDropPlanAt = null;
 	}
 
 	function applyScheduleDropDate(date: string) {
@@ -720,7 +724,7 @@
 		savePlannerDropPatches(movingTasks, { bucket: 'upcoming', date }, saveMovePatch);
 	}
 
-	function applyScheduleDropPlacement(placement: 'today' | 'this-evening' | 'anytime' | 'someday') {
+	function applyScheduleDropPlacement(placement: TaskPlannerQuickPlacement) {
 		const movingTasks = tasksByIds(scheduleDropTaskIds);
 		closeScheduleDropDialog();
 		for (const task of movingTasks) saveMovePatch(task, buildPlannerPlacementPatch(task, placement));
@@ -803,6 +807,7 @@
 	{scheduleDropOpen}
 	{scheduleDropValue}
 	{scheduleDropWhen}
+	{scheduleDropPlanAt}
 	dragPreviewTask={dragPreviewTask}
 	dragPreviewPointer={dragPreviewPointer}
 	dragPreviewRow={asSnippet(plannerDragPreviewRow)}

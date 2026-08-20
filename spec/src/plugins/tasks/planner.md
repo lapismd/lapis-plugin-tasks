@@ -50,6 +50,11 @@ omitted. A deadline-only task is not undated Anytime. Overdue `plan.date`
 stays visible in Review until the user reschedules, completes, skips, or
 cancels.
 
+`plan.at` is a label within that day, not a separate query view. `anytime`
+has no preferred window. `morning`, `afternoon`, and `evening` are loose
+windows. `HH:mm` is time-blocked. Evening still fills the This evening Today
+subgroup. Morning and afternoon stay in the main Today list. See LN-TASK-016.
+
 ## Drag hosts
 
 The first Column Canvas column uses the same planner drop-host attributes as

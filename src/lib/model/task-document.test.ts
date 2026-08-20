@@ -134,6 +134,76 @@ describe("parseTaskDocument", () => {
     expect(again.task.deadline).toBe("2026-08-24");
   });
 
+  it("parses morning, afternoon, and clock plan.at values", () => {
+    for (const [at, expected] of [
+      ["morning", { at: "morning" }],
+      ["afternoon", { at: "afternoon" }],
+      ["09:30", { at: "time", time: "09:30" }],
+    ] as const) {
+      const document = parseTaskDocument(
+        `---
+type: task
+id: t_plan
+task:
+  status: open
+  start: anytime
+  plan:
+    date: 2026-08-20
+    at: ${at}
+---
+# Planned
+`,
+        "planned.md",
+      );
+      expect(document?.kind).toBe("task");
+      if (document?.kind !== "task") return;
+      expect(document.task.plan).toMatchObject({
+        date: "2026-08-20",
+        ...expected,
+      });
+      const roundTrip = parseTaskDocument(
+        serializeTaskDocument(document),
+        "planned.md",
+      );
+      expect(roundTrip?.kind).toBe("task");
+      if (roundTrip?.kind !== "task") return;
+      expect(roundTrip.task.plan).toMatchObject({
+        date: "2026-08-20",
+        ...expected,
+      });
+    }
+  });
+
+  it("loads all-day plan.at as anytime with a diagnostic", () => {
+    const document = parseTaskDocument(
+      `---
+type: task
+id: t_all_day
+task:
+  status: open
+  start: anytime
+  plan:
+    date: 2026-08-20
+    at: all-day
+---
+# Conference notes
+`,
+      "all-day.md",
+    );
+    expect(document?.kind).toBe("task");
+    if (document?.kind !== "task") return;
+    expect(document.task.plan).toMatchObject({
+      date: "2026-08-20",
+      at: "anytime",
+    });
+    expect(
+      document.diagnostics.some((item) => item.code === "invalid-plan-at"),
+    ).toBe(true);
+    const raw = serializeTaskDocument(document);
+    expect(raw).toContain("at: anytime");
+    expect(raw).not.toContain("all-day");
+  });
+
   it("parses a navigation document as presentation pins", () => {
     const document = parseTaskDocument(
       `---

@@ -27,7 +27,7 @@
 | LN-TASK-013 | Implemented | `ApplicationTaskAreaPicker` composes Command View as the list picker; Area Picker Sample areas play asserts the command-view host. |
 | LN-TASK-014 | Implemented | `parseTaskDocument` requires `type: task` and `id`; title comes from the first H1. |
 | LN-TASK-015 | Implemented | `parseTaskDocument` accepts `type: task-list` with `list.status` active or archived. |
-| LN-TASK-016 | Implemented | Task front matter maps nested `task:` status, start, inbox, plan, deadline, and repeat; view flags are not stored. |
+| LN-TASK-016 | Implemented | Task front matter maps nested `task:` status, start, inbox, plan, deadline, and repeat; `plan.at` accepts anytime, morning, afternoon, evening, or HH:mm and not all-day; view flags are not stored. |
 | LN-TASK-017 | Implemented | Reserved-section parser indexes Checklist checkboxes and Subtasks/Items links without checkbox wrappers. |
 | LN-TASK-018 | Implemented | `task-queries` derives Inbox, Today, Anytime, Upcoming, Someday, Completed, and Review without rewriting plan dates. Planner fixtures assert deadline-only tasks appear on Upcoming day rows. |
 | LN-TASK-019 | Implemented | Mutations rewrite one document then project; rolling complete resets only `## Checklist`. |

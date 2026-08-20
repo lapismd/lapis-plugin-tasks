@@ -135,6 +135,14 @@
     color: var(--kanban-primary);
   }
 
+  .task-when-picker-content__quick-icon--sunrise {
+    color: var(--ui-tasks-warning);
+  }
+
+  .task-when-picker-content__quick-icon--sun {
+    color: var(--ui-tasks-warning);
+  }
+
   .task-when-picker-content__quick-check {
     color: var(--kanban-accent);
   }

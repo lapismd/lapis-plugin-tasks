@@ -68,6 +68,27 @@ export function formatShortTaskDate(dateOnly: string) {
   return `${parsed.getUTCDate()} ${month}`;
 }
 
+const CLOCK_RE = /^\d{2}:\d{2}$/;
+
+export function formatTaskScheduleLabel(input: {
+  when?: string | null;
+  planAt?: string | null;
+  scheduledAt?: string | null;
+}): string | null {
+  if (input.when === "this-evening" || input.planAt === "evening") {
+    return "This Evening";
+  }
+  if (input.planAt === "morning") return "This Morning";
+  if (input.planAt === "afternoon") return "This Afternoon";
+  if (input.when === "someday") return "Someday";
+  if (input.when === "anytime") return "Anytime";
+  if (input.planAt && CLOCK_RE.test(input.planAt)) return input.planAt;
+  const scheduled = normalizeTaskDateOnly(input.scheduledAt);
+  if (!scheduled) return input.when === "today" ? "Today" : null;
+  if (scheduled === todayDateOnly()) return "Today";
+  return formatShortTaskDate(scheduled);
+}
+
 export function getDueSummary(dueAt?: string | null): TaskDueSummary | null {
   const dateOnly = normalizeTaskDateOnly(dueAt);
   if (!dateOnly) return null;

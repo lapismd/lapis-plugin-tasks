@@ -78,4 +78,6 @@ Core Command View. Creating a task while an existing list is selected
 attaches that task to the existing list and must not mint a new id such as
 `list-list-applications`. `listsMatch` and `uniqueListPath` in
 `src/lib/model/list-navigation.ts` and `apply-catalog-task.ts` own that
-identity rule.
+identity rule. Catalog writes through `apply-catalog-task.ts` map `planAt`
+`morning`, `afternoon`, `evening`, or `HH:mm` onto the task file; `all-day`
+is not a stored task token.

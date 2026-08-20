@@ -11,20 +11,17 @@
 
   import {
     resolveTaskPlannerPlacement,
-    type TaskPlannerPlacement,
+    type TaskCatalogPlanAt,
+    type TaskPlannerQuickPlacement,
     type TaskPriority,
     type TaskWhen,
   } from "../../model";
   import ApplicationTaskWhenPickerContent from "../application-task-when-picker-content/ApplicationTaskWhenPickerContent.svelte";
 
-  type QuickPlacement = Extract<
-    TaskPlannerPlacement,
-    "today" | "this-evening" | "anytime" | "someday"
-  >;
-
   type ScheduleValue = {
     scheduledAt?: string;
     when?: TaskWhen;
+    planAt?: TaskCatalogPlanAt;
   };
 
   let {
@@ -32,6 +29,7 @@
     priority = undefined,
     scheduledAt = undefined,
     when = undefined,
+    planAt = undefined,
     onDueAtChange = () => {},
     onPriorityChange = () => {},
     onScheduleChange = () => {},
@@ -41,6 +39,7 @@
     priority?: TaskPriority;
     scheduledAt?: string;
     when?: TaskWhen;
+    planAt?: TaskCatalogPlanAt;
     onDueAtChange?: (dueAt: string | undefined) => void | Promise<void>;
     onPriorityChange?: (
       priority: TaskPriority | undefined,
@@ -89,12 +88,13 @@
     await onScheduleChange({ scheduledAt: date });
   }
 
-  async function selectPlacement(placement: QuickPlacement) {
+  async function selectPlacement(placement: TaskPlannerQuickPlacement) {
     whenOpen = false;
     const patch = resolveTaskPlannerPlacement(placement);
     await onScheduleChange({
       scheduledAt: patch.scheduledAt ?? undefined,
       when: patch.when ?? undefined,
+      planAt: patch.planAt ?? undefined,
     });
   }
 
@@ -198,7 +198,7 @@
           {...props}
           type="button"
           class="task-quick-create-actions__trigger"
-          data-active={scheduledAt || when ? "true" : undefined}
+          data-active={scheduledAt || when || planAt ? "true" : undefined}
           aria-label="Set when"
           title="When"
         >
@@ -222,6 +222,7 @@
         clearable
         {scheduledAt}
         {when}
+        {planAt}
         onClear={clearSchedule}
         onSelectDate={selectScheduleDate}
         onSelectPlacement={selectPlacement}

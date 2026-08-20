@@ -36,10 +36,12 @@ function catalogPlan(task: Task): TaskPlan | undefined {
       ? taskDateOnly(task.updatedAt)
       : null);
   if (!date) return undefined;
+  if (task.planAt === "morning" || task.planAt === "afternoon") {
+    return { date, at: task.planAt };
+  }
   if (task.planAt === "evening" || task.when === "this-evening") {
     return { date, at: "evening" };
   }
-  if (task.planAt === "all-day") return { date, at: "all-day" };
   if (typeof task.planAt === "string" && /^\d{2}:\d{2}$/.test(task.planAt)) {
     return { date, at: "time", time: task.planAt };
   }
@@ -204,11 +206,12 @@ export async function createCatalogTaskInRepository(
           ? taskDateOnly(input.scheduledAt) ?? undefined
           : undefined,
     planAt:
-      when === "this-evening"
+      input.planAt ??
+      (when === "this-evening"
         ? "evening"
         : when === "today"
           ? "anytime"
-          : undefined,
+          : undefined),
     dueAt: input.dueAt,
     deadline: input.dueAt,
     listId: input.area ?? undefined,

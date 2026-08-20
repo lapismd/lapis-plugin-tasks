@@ -6,7 +6,7 @@
   import type {
     Task,
     TaskBucket,
-    TaskPlannerPlacement,
+    TaskPlannerQuickPlacement,
     TaskPlannerRowContext,
     TaskQuickCreateInput,
   } from "../../model";
@@ -24,10 +24,7 @@
     color?: string;
   };
 
-  type QuickPlacement = Extract<
-    TaskPlannerPlacement,
-    "today" | "this-evening" | "anytime" | "someday"
-  >;
+  type QuickPlacement = TaskPlannerQuickPlacement;
 
   let {
     rootElement = $bindable<HTMLElement | null>(null),
@@ -43,6 +40,7 @@
     scheduleDropOpen = false,
     scheduleDropValue = null,
     scheduleDropWhen = null,
+    scheduleDropPlanAt = null,
     dragPreviewTask = null,
     dragPreviewPointer = null,
     dragPreviewGeometry = null,
@@ -69,6 +67,7 @@
     scheduleDropOpen?: boolean;
     scheduleDropValue?: string | null;
     scheduleDropWhen?: string | null;
+    scheduleDropPlanAt?: string | null;
     dragPreviewTask?: Task | null;
     dragPreviewPointer?: { x: number; y: number } | null;
     dragPreviewGeometry?: {
@@ -152,6 +151,7 @@
         clearable
         scheduledAt={scheduleDropValue}
         when={scheduleDropWhen}
+        planAt={scheduleDropPlanAt}
         onClear={onClearScheduleDrop}
         onSelectDate={onSelectScheduleDate}
         onSelectPlacement={onSelectSchedulePlacement}

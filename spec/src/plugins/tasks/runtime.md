@@ -27,8 +27,9 @@ section links.
 Planner lists and cards read `TaskSummary` rows through `TaskRepository`
 query wrappers. Detail and editor surfaces may reload the Markdown
 `TaskDocument`. `TaskSummary` carries indexed planning fields: status, inbox,
-start, plan, deadline, checklist counts, and comment count. It does not
-include body prose or comments text.
+start, plan, deadline, checklist counts, and comment count. Plan kind is
+`anytime`, `morning`, `afternoon`, `evening`, or `time`, with `planTime` for
+clock values. It does not include body prose or comments text.
 
 ## Query views
 

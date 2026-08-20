@@ -7,6 +7,12 @@ export const TASK_SCHEMA_VERSION = "tasks/v1";
 export type TaskStatus = "todo" | "waiting" | "done" | "open" | "completed" | "canceled";
 export type TaskPriority = "low" | "medium" | "high";
 export type TaskWhen = "today" | "this-evening" | "anytime" | "someday";
+export type TaskCatalogPlanAt =
+  | "anytime"
+  | "morning"
+  | "afternoon"
+  | "evening"
+  | string;
 export type TaskBucket =
   | "inbox"
   | "today"
@@ -45,7 +51,7 @@ export type Task = {
   inbox?: boolean;
   start?: "anytime" | "someday" | string;
   planDate?: string;
-  planAt?: "anytime" | "all-day" | "evening" | string;
+  planAt?: TaskCatalogPlanAt;
   planDuration?: string;
   deadline?: string;
   listId?: string;
@@ -79,7 +85,7 @@ export type CreateTaskInput = {
   inbox?: boolean;
   start?: "anytime" | "someday" | string;
   planDate?: string;
-  planAt?: "anytime" | "all-day" | "evening" | string;
+  planAt?: TaskCatalogPlanAt;
   planDuration?: string;
   deadline?: string;
   listId?: string;
@@ -104,6 +110,7 @@ export type TaskQuickCreateInput = {
   scheduledAt?: string;
   when?: TaskWhen;
   order: number;
+  planAt?: TaskCatalogPlanAt;
 };
 
 export type ApplicationTaskAdapter = {
@@ -123,7 +130,7 @@ export type ApplicationTaskAdapter = {
   listId?: string;
   start?: "anytime" | "someday" | string;
   planDate?: string;
-  planAt?: "anytime" | "all-day" | "evening" | string;
+  planAt?: TaskCatalogPlanAt;
   deadline?: string;
   inbox?: boolean;
   notes?: string;

@@ -1,7 +1,8 @@
 <script lang="ts">
   import {
     resolveTaskPlannerPlacement,
-    type TaskPlannerPlacement,
+    type TaskCatalogPlanAt,
+    type TaskPlannerQuickPlacement,
     type TaskWhen,
   } from "../../model";
 
@@ -15,7 +16,7 @@
     when?: TaskWhen;
     start?: "anytime" | "someday" | string;
     planDate?: string;
-    planAt?: "anytime" | "all-day" | "evening" | string;
+    planAt?: TaskCatalogPlanAt;
     deadline?: string;
   };
 
@@ -43,12 +44,7 @@
     isDueMode ? ((value as string | null | undefined) ?? null) : null,
   );
 
-  function selectPlacement(
-    placement: Extract<
-      TaskPlannerPlacement,
-      "today" | "this-evening" | "anytime" | "someday"
-    >,
-  ) {
+  function selectPlacement(placement: TaskPlannerQuickPlacement) {
     const patch = resolveTaskPlannerPlacement(placement);
     void update({
       scheduledAt: patch.scheduledAt ?? undefined,
@@ -76,6 +72,7 @@
     {pickerId}
     scheduledAt={scheduleValue.scheduledAt}
     when={scheduleValue.when}
+    planAt={scheduleValue.planAt}
     onSelectDate={(date) =>
       void update({
         scheduledAt: date,

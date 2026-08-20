@@ -6,7 +6,8 @@ import {
 	type Task,
 	type TaskBucket,
 	type TaskPlannerDropTarget,
-	type TaskPlannerMovePatch
+	type TaskPlannerMovePatch,
+	type TaskPlannerQuickPlacement
 } from '../../model';
 
 import type { ApplicationTask } from '../../model';
@@ -439,12 +440,16 @@ export function plannerPlacementsMatch(left: Task[], right: Task[]) {
 
 export function buildPlannerPlacementPatch(
 	task: Task,
-	placement: 'today' | 'this-evening' | 'anytime' | 'someday'
+	placement: TaskPlannerQuickPlacement
 ) {
-	if (placement === 'this-evening') {
+	if (
+		placement === 'this-evening' ||
+		placement === 'this-morning' ||
+		placement === 'this-afternoon'
+	) {
 		return {
 			...buildTaskPlannerMovePatch(task, { bucket: 'today' }),
-			...resolveTaskPlannerPlacement('this-evening')
+			...resolveTaskPlannerPlacement(placement)
 		};
 	}
 	return buildTaskPlannerMovePatch(task, { bucket: placement });

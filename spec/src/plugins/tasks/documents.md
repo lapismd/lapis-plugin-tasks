@@ -57,8 +57,11 @@ is the relative `.md` path.
 - `status`: `open`, `completed`, or `canceled`
 - `start`: `anytime`, `someday`, or a `YYYY-MM-DD` date
 - `inbox`: optional boolean
-- `plan`: optional `{ date, at }` where `at` is `anytime`, `all-day`,
-  `evening`, or `HH:mm`
+- `plan`: optional `{ date, at }` where `at` is `anytime`, `morning`,
+  `afternoon`, `evening`, or `HH:mm`. `anytime` means that day with no
+  preferred window. Morning, afternoon, and evening are loose day-parts.
+  `HH:mm` is an explicit time block. `all-day` is not a task token; it is
+  reserved for a future calendar or event resource.
 - `deadline`, `repeat`, and `comments`: optional
 
 A someday task must not also have an active plan. `plan.date` must not precede

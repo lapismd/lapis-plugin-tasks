@@ -4,6 +4,7 @@
   import ApplicationTaskWhenFormField from "./ApplicationTaskWhenFormField.svelte";
   import {
     formatShortTaskDate,
+    formatTaskScheduleLabel,
     type TaskWhen,
   } from "../../model";
 
@@ -30,22 +31,16 @@
   type ScheduleValue = {
     scheduledAt?: string;
     when?: TaskWhen;
+    planAt?: string;
   };
 
   let scheduleValue = $state<ScheduleValue>({ when: "today" });
   let duePillAt = $state<string | null>("2026-07-02");
   let dueFooterAt = $state<string | null>("2026-07-02");
 
-  const scheduleLabel = $derived.by(() => {
-    if (scheduleValue.when === "this-evening") return "This Evening";
-    if (scheduleValue.when === "someday") return "Someday";
-    if (scheduleValue.when === "anytime") return "Anytime";
-    if (scheduleValue.when === "today") return "Today";
-    if (scheduleValue.scheduledAt) {
-      return formatShortTaskDate(scheduleValue.scheduledAt);
-    }
-    return "None";
-  });
+  const scheduleLabel = $derived(
+    formatTaskScheduleLabel(scheduleValue) ?? "None",
+  );
 
   const duePillLabel = $derived(
     duePillAt ? formatShortTaskDate(duePillAt) : "None",

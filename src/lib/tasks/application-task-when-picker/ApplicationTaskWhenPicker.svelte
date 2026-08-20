@@ -6,20 +6,14 @@
   import FlagIcon from "@lucide/svelte/icons/flag";
   import XIcon from "@lucide/svelte/icons/x";
   import * as Popover from "@lapismd/design-core/shadcn/popover";
-  import type { TaskPlannerPlacement } from "../../model";
+  import type { TaskPlannerQuickPlacement } from "../../model";
 
   import {
-    formatShortTaskDate,
+    formatTaskScheduleLabel,
     getDueSummary,
     normalizeTaskDateOnly,
-    todayDateOnly,
   } from "../../model";
   import ApplicationTaskWhenPickerContent from "../application-task-when-picker-content/ApplicationTaskWhenPickerContent.svelte";
-
-  type QuickPlacement = Extract<
-    TaskPlannerPlacement,
-    "today" | "this-evening" | "anytime" | "someday"
-  >;
 
   type PickerMode = "schedule" | "due";
   type PickerVariant = "default" | "pill" | "footer";
@@ -31,6 +25,7 @@
     pickerId = `task-when-picker-${Math.random().toString(36).slice(2)}`,
     scheduledAt = null,
     when = null,
+    planAt = null,
     onClear = null,
     onSelectDate = null,
     onSelectPlacement = null,
@@ -41,9 +36,10 @@
     pickerId?: string;
     scheduledAt?: string | null;
     when?: string | null;
+    planAt?: string | null;
     onClear?: (() => void | Promise<void>) | null;
     onSelectDate?: ((date: string) => void | Promise<void>) | null;
-    onSelectPlacement?: ((placement: QuickPlacement) => void | Promise<void>) | null;
+    onSelectPlacement?: ((placement: TaskPlannerQuickPlacement) => void | Promise<void>) | null;
   } = $props();
 
   let open = $state(false);
@@ -55,17 +51,12 @@
   const hasValue = $derived(
     isDueMode
       ? Boolean(normalizedScheduledAt)
-      : Boolean(normalizedScheduledAt || when),
+      : Boolean(normalizedScheduledAt || when || planAt),
   );
 
-  const scheduleLabel = $derived.by(() => {
-    if (when === "this-evening") return "This Evening";
-    if (when === "someday") return "Someday";
-    if (when === "anytime") return "Anytime";
-    if (!normalizedScheduledAt) return "Anytime";
-    if (normalizedScheduledAt === todayDateOnly()) return "Today";
-    return formatShortTaskDate(normalizedScheduledAt);
-  });
+  const scheduleLabel = $derived(
+    formatTaskScheduleLabel({ when, planAt, scheduledAt }) ?? "Anytime",
+  );
 
   const pillLabel = $derived.by(() => {
     if (!normalizedScheduledAt) return "Due";
@@ -92,7 +83,7 @@
     closePopover();
   }
 
-  async function selectPlacement(placement: QuickPlacement) {
+  async function selectPlacement(placement: TaskPlannerQuickPlacement) {
     await onSelectPlacement?.(placement);
     closePopover();
   }
@@ -179,6 +170,7 @@
         {mode}
         {scheduledAt}
         {when}
+        {planAt}
         onClear={clear}
         onSelectDate={selectDate}
         onSelectPlacement={selectPlacement}

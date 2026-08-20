@@ -78,6 +78,18 @@ describe("applyCatalogTaskToRepository", () => {
     await applyCatalogTaskToRepository(
       repository,
       {
+        ...catalogTaskFromSummary((await repository.get("t_buy"))!),
+        planDate: "2026-08-20",
+        planAt: "morning",
+        updatedAt: "2026-08-20T12:30:00Z",
+      },
+      catalogTaskFromSummary((await repository.get("t_buy"))!),
+    );
+    expect(await files.read("buy.md")).toContain("at: morning");
+
+    await applyCatalogTaskToRepository(
+      repository,
+      {
         ...previous,
         status: "done",
         completedAt: "2026-08-20T13:00:00Z",

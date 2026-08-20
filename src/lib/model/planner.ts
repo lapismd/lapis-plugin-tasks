@@ -5,7 +5,7 @@ import {
   type TaskListNavigationSnapshot,
 } from "./list-navigation";
 import type { TaskRepository } from "./task-repository";
-import type { Task, TaskBucket, TaskStatus, TaskWhen } from "./types";
+import type { Task, TaskBucket, TaskCatalogPlanAt, TaskStatus, TaskWhen } from "./types";
 
 export type TaskPlannerDateGroup = {
   date: string;
@@ -54,10 +54,22 @@ export type TaskPlannerRowContext = {
 
 export type TaskPlannerPlacement =
   | "today"
+  | "this-morning"
+  | "this-afternoon"
   | "this-evening"
   | "anytime"
   | "someday"
   | "clear";
+
+export type TaskPlannerQuickPlacement = Extract<
+  TaskPlannerPlacement,
+  | "today"
+  | "this-morning"
+  | "this-afternoon"
+  | "this-evening"
+  | "anytime"
+  | "someday"
+>;
 
 export type TaskPlannerPlacementSource =
   | "scheduledAt"
@@ -81,7 +93,7 @@ export type TaskPlannerMovePatch = {
   when?: TaskWhen | null;
   start?: "anytime" | "someday" | string | null;
   planDate?: string | null;
-  planAt?: "anytime" | "all-day" | "evening" | string | null;
+  planAt?: TaskCatalogPlanAt | null;
   deadline?: string | null;
   inbox?: boolean;
   listId?: string | null;
@@ -342,6 +354,24 @@ export function resolveTaskPlannerPlacement(
       start: "anytime",
       planDate: today,
       planAt: "anytime",
+    };
+  }
+  if (placement === "this-morning") {
+    return {
+      scheduledAt: today,
+      when: null,
+      start: "anytime",
+      planDate: today,
+      planAt: "morning",
+    };
+  }
+  if (placement === "this-afternoon") {
+    return {
+      scheduledAt: today,
+      when: null,
+      start: "anytime",
+      planDate: today,
+      planAt: "afternoon",
     };
   }
   if (placement === "this-evening") {

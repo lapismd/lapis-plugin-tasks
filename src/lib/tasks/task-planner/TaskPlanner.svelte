@@ -31,6 +31,7 @@
   import type {
     Task,
     TaskBucket,
+    TaskCatalogPlanAt,
     TaskPriority,
     TaskQuickCreateInput,
     TaskWhen,
@@ -80,7 +81,7 @@
     Record<string, TaskPriority | undefined>
   >({});
   let quickCreateSchedules = $state<
-    Record<string, { scheduledAt?: string; when?: TaskWhen }>
+    Record<string, { scheduledAt?: string; when?: TaskWhen; planAt?: TaskCatalogPlanAt }>
   >({});
   let quickCreateActiveGroup = $state<string | null>(null);
   let quickCreateInteractionGroup = $state<string | null>(null);
@@ -265,6 +266,7 @@
   function defaultQuickCreateSchedule(group: string): {
     scheduledAt?: string;
     when?: TaskWhen;
+    planAt?: TaskCatalogPlanAt;
   } {
     const date = dateForGroup(group);
     if (date) return { scheduledAt: date };
@@ -285,7 +287,7 @@
 
   function setQuickCreateSchedule(
     group: string,
-    value: { scheduledAt?: string; when?: TaskWhen },
+    value: { scheduledAt?: string; when?: TaskWhen; planAt?: TaskCatalogPlanAt },
   ) {
     quickCreateSchedules = { ...quickCreateSchedules, [group]: value };
   }
@@ -326,6 +328,7 @@
       priority: quickCreatePriorityFor(group),
       scheduledAt: schedule.scheduledAt,
       when: schedule.when,
+      planAt: schedule.planAt,
     };
     return input;
   }
@@ -523,6 +526,7 @@
               priority={quickCreatePriorityFor(group)}
               scheduledAt={quickCreateScheduleFor(group).scheduledAt}
               when={quickCreateScheduleFor(group).when}
+              planAt={quickCreateScheduleFor(group).planAt}
               onDueAtChange={(dueAt) => setQuickCreateDueDate(group, dueAt)}
               onPriorityChange={(priority) =>
                 setQuickCreatePriority(group, priority)}

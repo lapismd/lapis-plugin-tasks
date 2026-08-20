@@ -5,7 +5,7 @@
   import {
     formatShortTaskDate,
     resolveTaskPlannerPlacement,
-    type TaskPlannerPlacement,
+    type TaskPlannerQuickPlacement,
     type TaskWhen,
   } from "../../model";
 
@@ -29,18 +29,18 @@
 </script>
 
 <script lang="ts">
-  type QuickPlacement = Extract<
-    TaskPlannerPlacement,
-    "today" | "this-evening" | "anytime" | "someday"
-  >;
+  type QuickPlacement = TaskPlannerQuickPlacement;
 
   let when = $state<TaskWhen | null>("today");
   let scheduledAt = $state<string | null>(null);
+  let planAt = $state<string | null>(null);
   let duePillAt = $state<string | null>("2026-07-02");
   let dueFooterAt = $state<string | null>("2026-07-02");
 
   const selectedLabel = $derived.by(() => {
-    if (when === "this-evening") return "This Evening";
+    if (planAt === "morning") return "This Morning";
+    if (planAt === "afternoon") return "This Afternoon";
+    if (when === "this-evening" || planAt === "evening") return "This Evening";
     if (when === "someday") return "Someday";
     if (when === "anytime") return "Anytime";
     if (when === "today") return "Today";
@@ -59,16 +59,19 @@
     const patch = resolveTaskPlannerPlacement(placement);
     when = patch.when ?? null;
     scheduledAt = patch.scheduledAt ?? null;
+    planAt = patch.planAt ?? null;
   }
 
   function selectDate(date: string) {
     when = null;
     scheduledAt = date;
+    planAt = "anytime";
   }
 
   function clearSchedule() {
     when = null;
     scheduledAt = null;
+    planAt = null;
   }
 
   function selectDuePill(date: string) {
@@ -94,6 +97,7 @@
       <ApplicationTaskWhenPicker
         {when}
         {scheduledAt}
+        {planAt}
         onSelectPlacement={selectPlacement}
         onSelectDate={selectDate}
         onClear={clearSchedule}

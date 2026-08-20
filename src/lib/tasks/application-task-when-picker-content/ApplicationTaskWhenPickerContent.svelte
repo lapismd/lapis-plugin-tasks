@@ -5,11 +5,13 @@
   import CheckIcon from "@lucide/svelte/icons/check";
   import MoonIcon from "@lucide/svelte/icons/moon";
   import StarIcon from "@lucide/svelte/icons/star";
+  import SunIcon from "@lucide/svelte/icons/sun";
+  import SunriseIcon from "@lucide/svelte/icons/sunrise";
   import * as Command from "@lapismd/design-core/shadcn/command";
   import { parseDate } from "chrono-node";
   import type { DateValue } from "@internationalized/date";
   import { TaskDueCalendar } from "@lapismd/design-core/forms";
-  import type { TaskPlannerPlacement } from "../../model";
+  import type { TaskPlannerQuickPlacement } from "../../model";
 
   import {
     buildNaturalDateSuggestions,
@@ -21,11 +23,6 @@
     type TaskDateSuggestion,
   } from "../../model";
 
-  type QuickPlacement = Extract<
-    TaskPlannerPlacement,
-    "today" | "this-evening" | "anytime" | "someday"
-  >;
-
   type PickerMode = "schedule" | "due";
 
   let {
@@ -36,14 +33,16 @@
     onSelectPlacement = null,
     scheduledAt = null,
     when = null,
+    planAt = null,
   }: {
     clearable?: boolean;
     mode?: PickerMode;
     onClear?: (() => void | Promise<void>) | null;
     onSelectDate?: ((date: string) => void | Promise<void>) | null;
-    onSelectPlacement?: ((placement: QuickPlacement) => void | Promise<void>) | null;
+    onSelectPlacement?: ((placement: TaskPlannerQuickPlacement) => void | Promise<void>) | null;
     scheduledAt?: string | null;
     when?: string | null;
+    planAt?: string | null;
   } = $props();
 
   let inputValue = $state("");
@@ -71,10 +70,20 @@
   const suggestionsId = $derived(
     isDueMode ? "task-due-picker-suggestions" : "task-when-picker-suggestions",
   );
+  const isClockPlan = $derived(Boolean(planAt && /^\d{2}:\d{2}$/.test(planAt)));
+  const isMorningSelected = $derived(planAt === "morning");
+  const isAfternoonSelected = $derived(planAt === "afternoon");
+  const isEveningSelected = $derived(
+    when === "this-evening" || planAt === "evening",
+  );
   const isTodaySelected = $derived(
     isDueMode
       ? normalizedScheduledAt === today
-      : normalizedScheduledAt === today && when !== "this-evening",
+      : normalizedScheduledAt === today &&
+        !isMorningSelected &&
+        !isAfternoonSelected &&
+        !isEveningSelected &&
+        !isClockPlan,
   );
 
   function updateNaturalDate(nextValue: string) {
@@ -87,7 +96,7 @@
     await onSelectDate?.(suggestion.date);
   }
 
-  async function applyPlacement(placement: QuickPlacement) {
+  async function applyPlacement(placement: TaskPlannerQuickPlacement) {
     if (isDueMode) {
       if (placement === "today") await onSelectDate?.(todayDateOnly());
       return;
@@ -176,6 +185,40 @@
         <button
           type="button"
           class="task-when-picker-content__quick-row"
+          onclick={() => void applyPlacement("this-morning")}
+        >
+          <span
+            class="task-when-picker-content__quick-icon task-when-picker-content__quick-icon--sunrise"
+          >
+            <SunriseIcon />
+          </span>
+          <span>This Morning</span>
+          {#if isMorningSelected}
+            <span class="task-when-picker-content__quick-check">
+              <CheckIcon />
+            </span>
+          {/if}
+        </button>
+        <button
+          type="button"
+          class="task-when-picker-content__quick-row"
+          onclick={() => void applyPlacement("this-afternoon")}
+        >
+          <span
+            class="task-when-picker-content__quick-icon task-when-picker-content__quick-icon--sun"
+          >
+            <SunIcon />
+          </span>
+          <span>This Afternoon</span>
+          {#if isAfternoonSelected}
+            <span class="task-when-picker-content__quick-check">
+              <CheckIcon />
+            </span>
+          {/if}
+        </button>
+        <button
+          type="button"
+          class="task-when-picker-content__quick-row"
           onclick={() => void applyPlacement("this-evening")}
         >
           <span
@@ -184,7 +227,7 @@
             <MoonIcon />
           </span>
           <span>This Evening</span>
-          {#if when === "this-evening"}
+          {#if isEveningSelected}
             <span class="task-when-picker-content__quick-check">
               <CheckIcon />
             </span>

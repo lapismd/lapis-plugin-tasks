@@ -19,7 +19,7 @@ export type TaskSummary = {
   startKind: "anytime" | "someday" | "date";
   startDate?: string;
   planDate?: string;
-  planKind?: "anytime" | "all-day" | "evening" | "time";
+  planKind?: "anytime" | "morning" | "afternoon" | "evening" | "time";
   planTime?: string;
   durationMinutes?: number;
   deadline?: string;
