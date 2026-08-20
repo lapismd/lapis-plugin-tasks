@@ -66,63 +66,53 @@
 
 .task-at-picker__panel {
   z-index: 1400;
-  width: min(12.5rem, calc(100vw - 1rem));
-  --ui-popover-gap: 0;
+  width: min(22rem, calc(100vw - 1rem));
   --ui-popover-padding: 0;
-  border: 1px solid var(--kanban-border, var(--border));
-  border-radius: 0.5rem;
-  background: var(--kanban-card, var(--card));
-  box-shadow:
-    0 18px 40px
-      color-mix(in srgb, var(--kanban-foreground, #000) 16%, transparent),
-    0 0 0 1px
-      color-mix(in srgb, var(--kanban-border, var(--border)) 55%, transparent);
-  color: var(--kanban-foreground, var(--foreground));
-  padding: 0.3rem;
+  overflow: hidden;
 }
 
-.task-at-picker__list {
+.task-at-picker__custom {
   display: grid;
-  gap: 0.15rem;
+  gap: 0.45rem;
+  border-top: 1px solid var(--ui-border, var(--border));
+  padding: 0.65rem;
 }
 
-.task-at-picker__option {
-  display: grid;
-  grid-template-columns: 1.1rem minmax(0, 1fr) auto;
+.task-at-picker__custom > span {
+  color: var(--ui-muted-foreground, var(--muted-foreground));
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.task-at-picker__custom > div {
+  display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.5rem;
+}
+
+.task-at-picker__custom .ui-time-picker {
   min-width: 0;
-  min-height: 1.75rem;
-  border: 0;
-  border-radius: 0.3rem;
-  background: transparent;
-  color: var(--kanban-foreground, var(--foreground));
+  flex: 1 1 auto;
+}
+
+.task-at-picker__custom .ui-time-picker__input {
+  width: 100%;
+}
+
+.task-at-picker__custom button {
+  min-height: 2rem;
+  border: 1px solid var(--ui-border, var(--border));
+  border-radius: var(--radius, 0.4rem);
+  background: var(--ui-accent, var(--accent));
+  color: var(--ui-accent-foreground, var(--accent-foreground));
   cursor: pointer;
   font: inherit;
-  font-size: 0.8rem;
-  font-weight: 650;
-  padding: 0.2rem 0.3rem;
-  text-align: left;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
 }
 
-.task-at-picker__option > span:nth-child(2) {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.task-at-picker__option:hover,
-.task-at-picker__option:focus-visible {
-  background: color-mix(in srgb, var(--kanban-border, var(--border)) 45%, transparent);
-  outline: 0;
-}
-
-.task-at-picker__option svg,
-.task-at-picker__check svg {
-  width: 0.9rem;
-  height: 0.9rem;
-}
-
-.task-at-picker__check {
-  color: var(--kanban-accent, var(--accent-foreground));
+.task-at-picker__custom button:disabled {
+  cursor: default;
+  opacity: 0.5;
 }

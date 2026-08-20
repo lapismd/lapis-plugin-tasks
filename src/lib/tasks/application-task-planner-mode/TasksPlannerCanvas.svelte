@@ -186,6 +186,11 @@
   let taskView = $state<TaskBucket>("today");
   let selectedDate = $state("");
   let taskArea = $state<string | null>(null);
+  const activePlannerBucket = $derived(
+    taskArea
+      ? null
+      : (plannerBuckets.find((bucket) => bucket.id === taskView) ?? null),
+  );
   let activeTaskId = $state<string | null>(null);
   let activeListPath = $state<string | null>(null);
   let activeLinkedList = $state<{ path: string; title: string } | null>(null);
@@ -723,7 +728,14 @@
             data-ui-component="column-canvas"
             data-ui-part="column-header-main"
           >
-            <ColumnCanvas.Title>{activePlannerLabel}</ColumnCanvas.Title>
+            <ColumnCanvas.Title>
+              <span class="task-column-canvas-story__planner-title">
+                {#if activePlannerBucket}
+                  <activePlannerBucket.icon aria-hidden="true" />
+                {/if}
+                <span>{activePlannerLabel}</span>
+              </span>
+            </ColumnCanvas.Title>
           </div>
           <ColumnCanvas.HeaderActions>
             {#if showTodayShortcut}

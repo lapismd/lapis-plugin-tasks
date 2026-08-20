@@ -5,6 +5,7 @@ export { default as ApplicationTaskWhenPicker } from "./application-task-when-pi
 export { default as ApplicationTaskWhenPickerContent } from "./application-task-when-picker-content/ApplicationTaskWhenPickerContent.svelte";
 export { default as ApplicationTaskWhenFormField } from "./application-task-when-form-field/ApplicationTaskWhenFormField.svelte";
 export { default as ApplicationTaskAtPicker } from "./application-task-at-picker/ApplicationTaskAtPicker.svelte";
+export { default as ApplicationTaskRepeatPicker } from "./application-task-repeat-picker/ApplicationTaskRepeatPicker.svelte";
 export { default as ApplicationTaskAtFormField } from "./application-task-at-form-field/ApplicationTaskAtFormField.svelte";
 export { default as ApplicationTaskAreaPicker } from "./application-task-area-picker/ApplicationTaskAreaPicker.svelte";
 export { default as ApplicationTaskAreaFormField } from "./application-task-area-form-field/ApplicationTaskAreaFormField.svelte";
@@ -23,4 +24,3 @@ export { default as ApplicationPlannerTaskRow } from "./application-planner-task
 
 export { buildApplicationTaskReferenceIndex } from "./lib/references";
 export * from "./lib/references-task";
-

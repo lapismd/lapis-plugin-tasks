@@ -46,6 +46,7 @@ export function catalogTaskFromSummary(summary: TaskSummary): Task {
     checklistTotal: summary.checklistTotal,
     checklistCompleted: summary.checklistCompleted,
     notes: "",
+    repeat: summary.repeat,
   });
 }
 
@@ -88,5 +89,6 @@ export function catalogTaskFromDocument(document: ParsedTaskFile): Task {
     checklistTotal: document.checklist.length,
     checklistCompleted: document.checklist.filter((item) => item.checked).length,
     notes: document.body,
+    repeat: document.task.repeat,
   });
 }

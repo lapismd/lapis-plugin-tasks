@@ -2,7 +2,6 @@
 	import './ApplicationTaskAreaPicker.css';
 	import FolderIcon from '@lucide/svelte/icons/folder';
 	import PlusIcon from '@lucide/svelte/icons/plus';
-	import XIcon from '@lucide/svelte/icons/x';
 	import * as CommandView from '@lapismd/design-core/shadcn/command-view';
 	import * as Popover from '@lapismd/design-core/shadcn/popover';
 	import { formatTaskListIdTitle } from '../../model';
@@ -86,6 +85,7 @@
 
 		<Popover.Content
 			class="application-task-area-picker__panel"
+			style="--ui-popover-width: 22rem"
 			align="start"
 			sideOffset={6}
 			role="dialog"
@@ -95,18 +95,7 @@
 			onFocusOutside={closePicker}
 			onpointerdown={(event) => event.stopPropagation()}
 		>
-			<header class="application-task-area-picker__header">
-				<Popover.Title>List</Popover.Title>
-				<Popover.Close>
-					{#snippet child({ props })}
-						<button {...props} type="button" aria-label="Close list picker">
-							<XIcon aria-hidden="true" />
-						</button>
-					{/snippet}
-				</Popover.Close>
-			</header>
 			<CommandView.Root
-				class="application-task-area-picker__command"
 				label="Search task lists"
 				shouldFilter={false}
 				loop

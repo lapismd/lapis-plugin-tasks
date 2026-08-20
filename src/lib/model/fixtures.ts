@@ -34,6 +34,7 @@ export function createTask(input: CreateTaskInput): Task {
     planDate: input.planDate,
     planAt: input.planAt,
     planDuration: input.planDuration,
+    repeat: input.repeat,
     deadline: input.deadline ?? input.dueAt,
     listId: input.listId,
     areas: [...(input.areas ?? [])],

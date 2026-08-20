@@ -4,6 +4,7 @@ import {
   completeTaskDocument,
   planTaskDocument,
   setTaskChecklistItemChecked,
+  setTaskRepeat,
   skipOccurrence,
   TaskChecklistMutationError,
 } from "./task-mutations";
@@ -24,6 +25,7 @@ task:
     interval: 1
     anchor: schedule
     resetChecklist: true
+    lastCompletedAt: 2026-08-19T07:45:00.000Z
     completionCount: 0
 ---
 
@@ -56,6 +58,32 @@ describe("task mutations", () => {
     expect(next.task.status).toBe("open");
     expect(next.task.plan?.date).toBe("2026-08-21");
     expect(next.task.repeat?.completionCount).toBe(0);
+  });
+
+  it("sets and clears the normalized recurrence object", () => {
+    const parsed = parseTaskDocument(ROUTINE, "morning.md");
+    const changed = setTaskRepeat(
+      parsed!,
+      {
+        strategy: "rolling",
+        frequency: "weekly",
+        interval: 2,
+        anchor: "completion",
+        resetChecklist: true,
+      },
+      "2026-08-20T10:00:00Z",
+    );
+    expect(changed.task.repeat).toMatchObject({
+      frequency: "weekly",
+      interval: 2,
+      anchor: "completion",
+      resetChecklist: true,
+      lastCompletedAt: "2026-08-19T07:45:00.000Z",
+      completionCount: 0,
+    });
+    expect(
+      setTaskRepeat(changed, undefined, "2026-08-20T10:01:00Z").task.repeat,
+    ).toBeUndefined();
   });
 
   it("planning a someday task reactivates it", () => {

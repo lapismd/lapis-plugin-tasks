@@ -2,6 +2,8 @@
  * Catalog compatibility model. Canonical Markdown documents live in
  * `task-document.ts`. Legacy applicationId and linkedTo fields stay fixture-only.
  */
+import type { TaskRepeat } from "./task-document";
+
 export const TASK_SCHEMA_VERSION = "tasks/v1";
 
 export type TaskStatus = "todo" | "waiting" | "done" | "open" | "completed" | "canceled";
@@ -53,6 +55,7 @@ export type Task = {
   planDate?: string;
   planAt?: TaskCatalogPlanAt;
   planDuration?: string;
+  repeat?: TaskRepeat;
   deadline?: string;
   listId?: string;
   areas: string[];
@@ -89,6 +92,7 @@ export type CreateTaskInput = {
   planDate?: string;
   planAt?: TaskCatalogPlanAt;
   planDuration?: string;
+  repeat?: TaskRepeat;
   deadline?: string;
   listId?: string;
   areas?: string[];
@@ -135,6 +139,7 @@ export type ApplicationTaskAdapter = {
   start?: "anytime" | "someday" | string;
   planDate?: string;
   planAt?: TaskCatalogPlanAt;
+  repeat?: TaskRepeat;
   deadline?: string;
   inbox?: boolean;
   checklistTotal?: number;

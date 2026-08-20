@@ -24,6 +24,7 @@ export function taskToApplicationTask(task: Task): ApplicationTaskAdapter {
     start: task.start,
     planDate: task.planDate,
     planAt: task.planAt,
+    repeat: task.repeat,
     deadline: task.deadline ?? task.dueAt,
     inbox: task.inbox,
     checklistTotal: task.checklistTotal,
@@ -73,6 +74,9 @@ export function applicationTaskToTask(
     planAt: Object.prototype.hasOwnProperty.call(task, "planAt")
       ? task.planAt
       : existing?.planAt,
+    repeat: Object.prototype.hasOwnProperty.call(task, "repeat")
+      ? task.repeat
+      : existing?.repeat,
     inbox: Object.prototype.hasOwnProperty.call(task, "inbox")
       ? task.inbox
       : existing?.inbox,

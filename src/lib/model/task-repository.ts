@@ -43,6 +43,7 @@ import {
   setTaskDeadline,
   setTaskChecklistItemChecked,
   setTaskInbox,
+  setTaskRepeat,
   setTaskStart,
   skipOccurrence,
 } from "./task-mutations";
@@ -116,6 +117,23 @@ export function taskRowToSummary(row: AppDatabaseTaskRecord): TaskSummary {
     checklistTotal: row.checklistTotal,
     checklistCompleted: row.checklistCompleted,
     commentCount: row.commentCount,
+    repeat:
+      row.repeatStrategy === "rolling" &&
+      ["daily", "weekly", "monthly", "yearly"].includes(
+        row.repeatFrequency ?? "",
+      ) &&
+      ["schedule", "completion"].includes(row.repeatAnchor ?? "")
+        ? {
+            strategy: "rolling",
+            frequency: row.repeatFrequency as
+              | "daily"
+              | "weekly"
+              | "monthly"
+              | "yearly",
+            interval: row.repeatInterval ?? 1,
+            anchor: row.repeatAnchor as "schedule" | "completion",
+          }
+        : undefined,
   };
 }
 
@@ -878,6 +896,14 @@ export class TaskRepository {
     at: string,
   ): Promise<TaskSummary> {
     return this.mutate(path, (document) => setTaskInbox(document, inbox, at));
+  }
+
+  async setRepeat(
+    path: string,
+    repeat: TaskDocument["task"]["repeat"],
+    at: string,
+  ): Promise<TaskSummary> {
+    return this.mutate(path, (document) => setTaskRepeat(document, repeat, at));
   }
 
   async moveToList(

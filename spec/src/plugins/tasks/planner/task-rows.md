@@ -21,6 +21,34 @@ expanded inline editor. Only the trailing detail control opens Task detail.
 The detail control, checkbox, title line, and leading hover/focus drag handle
 share one vertical center.
 
+## Structured metadata editor
+
+The expanded row editor and Task detail use the same field definitions. Their
+controls update the active Task value immediately and send one complete patch
+through the owning callback. Canonical runtime adapters then route the changed
+fields through `TaskRepository`, so the Markdown file is edited, reparsed, and
+reprojected instead of leaving the interaction as catalog-only state.
+
+The canonical controls are:
+
+| Control | Task effect |
+| --- | --- |
+| Status | Opens, completes, or cancels the Task and maintains completion time |
+| Deadline | Sets or clears `task.deadline` |
+| Plan date | Sets or clears `task.plan.date` |
+| Plan time | Sets `task.plan.at` to a day part or valid local `HH:mm` value |
+| List | Moves the structural Task link to the selected Task List |
+| Repeat | Sets or clears the complete rolling `task.repeat` object |
+
+Priority is retained only by catalog compatibility adapters. Changing it may
+update an `ApplicationTask`, but it does not create a priority field in the
+canonical Task document.
+
+Plan time uses a Command View popover with the four day parts, common `09:00`,
+`12:00`, and `17:00` shortcuts, and a Design Core Time Picker for an exact
+clock value. The List control uses the standard Command View presentation
+without Tasks-owned panel heading chrome. See LN-TASK-013 and LN-TASK-045–046.
+
 When present, the List chip uses the projected Task List display title. The
 display title prefers front matter `title`, then the first H1, then a humanized
 stable id such as `List Docs` for `list-docs`.

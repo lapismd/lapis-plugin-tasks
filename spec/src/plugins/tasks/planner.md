@@ -44,6 +44,11 @@ fields. Daily section placement is derived from `plan.date`, `plan.at`, status,
 completion time, and the configured clock boundaries. See [Daily
 agenda](./planner/daily-agenda.md).
 
+Every named planner destination repeats its navigation icon before the title in
+the planner-column header. The label, icon, navigation count, rendered rows,
+and empty state all come from the same selected bucket rather than separate
+view-specific headers.
+
 Today presents its selected weekday and week strip in one sticky calendar
 surface. That surface paints through the same inline overflow as the task rows
 beneath it, while retaining the surrounding planner padding and scrollbar
@@ -52,6 +57,10 @@ and the Today actions menu names its persisted overdue toggle for the action it
 will perform: **Hide overdue tasks** or **Show overdue tasks**. Day-part
 boundaries and the overdue default are available through both the host's public
 Tasks settings section and the legacy plugin settings tab.
+
+The shared quick-create row supplies the same compact input, focused actions,
+normal-weight label, and block-end separation in daily sections, named views,
+and Markdown TaskRuns. Individual pages do not add their own spacing fixes.
 
 ## Component map
 

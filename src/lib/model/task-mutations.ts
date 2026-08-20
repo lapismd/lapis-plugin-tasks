@@ -6,6 +6,7 @@ import {
   type ParsedTaskFile,
   type TaskDocument,
   type TaskPlan,
+  type TaskRepeat,
   type TaskStart,
 } from "./task-document";
 
@@ -214,6 +215,31 @@ export function setTaskInbox(
     ...task,
     updated: at,
     task: { ...task.task, inbox },
+  };
+}
+
+export function setTaskRepeat(
+  document: ParsedTaskFile,
+  repeat: TaskRepeat | undefined,
+  at: string,
+): TaskDocument {
+  const task = requireTask(document);
+  const currentRepeat = task.task.repeat;
+  const nextRepeat = repeat
+    ? {
+        ...repeat,
+        ...(repeat.lastCompletedAt == null && currentRepeat?.lastCompletedAt
+          ? { lastCompletedAt: currentRepeat.lastCompletedAt }
+          : {}),
+        ...(repeat.completionCount == null && currentRepeat?.completionCount != null
+          ? { completionCount: currentRepeat.completionCount }
+          : {}),
+      }
+    : undefined;
+  return {
+    ...task,
+    updated: at,
+    task: { ...task.task, repeat: nextRepeat },
   };
 }
 

@@ -21,6 +21,7 @@
   import ApplicationTaskAreaFormField from "../application-task-area-form-field/ApplicationTaskAreaFormField.svelte";
   import ApplicationTaskInlineOptionFormField from "../application-task-inline-option-form-field/ApplicationTaskInlineOptionFormField.svelte";
   import ApplicationTaskAtFormField from "../application-task-at-form-field/ApplicationTaskAtFormField.svelte";
+  import ApplicationTaskRepeatFormField from "../application-task-repeat-form-field/ApplicationTaskRepeatFormField.svelte";
   import ApplicationTaskWhenFormField from "../application-task-when-form-field/ApplicationTaskWhenFormField.svelte";
   import ApplicationMarkdownPreview from "../../model/ReferenceMarkdownPreview.svelte";
 
@@ -224,6 +225,7 @@
         set: (value, areas) => ({
           ...value,
           areas,
+          listId: areas[0],
         }),
         renderers: {
           edit: {
@@ -233,6 +235,18 @@
               options: areaOptions,
               ariaLabel: "Task area",
             }),
+          },
+        },
+      }),
+      customField<ApplicationTask, undefined, ApplicationTask["repeat"]>({
+        id: "task-detail-repeat",
+        label: "Repeat",
+        get: (value) => value.repeat,
+        set: (value, repeat) => ({ ...value, repeat }),
+        renderers: {
+          edit: {
+            component: ApplicationTaskRepeatFormField,
+            wrapper: "none",
           },
         },
       }),
@@ -276,6 +290,8 @@
       planDate: nextTask.planDate,
       planAt: nextTask.planAt,
       areas: nextTask.areas,
+      listId: nextTask.listId,
+      repeat: nextTask.repeat,
     });
   }
 </script>

@@ -89,6 +89,20 @@ describe("resolveTaskPlanAt", () => {
     });
   });
 
+  it("writes an exact clock time and preserves an existing date", () => {
+    expect(
+      resolveTaskPlanAt(
+        "14:30",
+        { planDate: "2026-08-22", scheduledAt: "2026-08-22" },
+        now,
+      ),
+    ).toMatchObject({
+      planDate: "2026-08-22",
+      planAt: "14:30",
+      when: null,
+    });
+  });
+
   it("clears this-evening when anytime is chosen on a dated task", () => {
     expect(
       resolveTaskPlanAt(

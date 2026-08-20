@@ -210,6 +210,20 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
   white-space: nowrap;
 }
 
+.task-column-canvas-story__planner-title {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.task-column-canvas-story__planner-title svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex: 0 0 auto;
+  color: var(--ui-tasks-muted);
+}
+
 .task-list-tree {
   --task-list-tree-disclosure-size: 1.1rem;
   --task-list-tree-guide-width: var(--ui-workspace-explorer-guide-width, 1px);

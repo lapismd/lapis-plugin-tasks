@@ -36,6 +36,9 @@ describe("planner Markdown fixtures", () => {
     expect(
       tasks.find((task) => task.id === "story-task-today-2"),
     ).toMatchObject({ checklistTotal: 3, checklistCompleted: 1 });
+    expect(
+      tasks.find((task) => task.id === "story-task-daily-reflection")?.repeat,
+    ).toMatchObject({ frequency: "daily", interval: 1, anchor: "schedule" });
   });
 
   it("queries the same fixture set through TaskRepository summaries", async () => {
@@ -74,6 +77,9 @@ describe("planner Markdown fixtures", () => {
     expect(upcomingTitles(catalogSnapshot)).toEqual([
       "Draft design critique",
       "Prepare model serving examples",
+      "Coordinate the launch",
+      "Ship the release",
+      "Verify the status page",
     ]);
 
     const database = new MemoryAppDatabase("planner-upcoming");
@@ -88,6 +94,9 @@ describe("planner Markdown fixtures", () => {
     expect(upcomingTitles(repositorySnapshot)).toEqual([
       "Draft design critique",
       "Prepare model serving examples",
+      "Coordinate the launch",
+      "Ship the release",
+      "Verify the status page",
     ]);
   });
 
@@ -141,6 +150,7 @@ describe("planner Markdown fixtures", () => {
       "Applications",
       "Docs",
       "CV",
+      "Long Flow",
     ]);
     expect(
       snapshot.listTree.sections
@@ -148,7 +158,20 @@ describe("planner Markdown fixtures", () => {
         ?.lists[0]?.children.map((child) => child.title),
     ).toEqual(["Writing"]);
     expect(snapshot.areas.map((area) => area.title)).toEqual(
-      expect.arrayContaining(["Applications", "Docs", "CV", "Writing"]),
+      expect.arrayContaining([
+        "Applications",
+        "Docs",
+        "CV",
+        "Writing",
+        "Release Flow",
+        "Release Train",
+        "Launch Operations",
+      ]),
     );
+    expect(
+      snapshot.listTree.sections
+        .find((section) => section.title === "Long Flow")
+        ?.lists[0]?.children.map((child) => child.title),
+    ).toEqual(["Release Train"]);
   });
 });

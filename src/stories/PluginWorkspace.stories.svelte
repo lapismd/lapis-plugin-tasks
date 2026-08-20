@@ -169,6 +169,7 @@
     const firstTaskRow = quickCreateRow?.nextElementSibling as HTMLElement | null;
     expect(quickCreateRow).not.toBeNull();
     expect(firstTaskRow).not.toBeNull();
+    expect(Number.parseFloat(getComputedStyle(quickCreateRow!).marginBottom)).toBeGreaterThanOrEqual(4);
     expect(
       firstTaskRow!.getBoundingClientRect().top -
         quickCreateRow!.getBoundingClientRect().bottom,
@@ -197,7 +198,7 @@
     const expectedViews = [
       { name: "Inbox", total: 1 },
       { name: "Review", total: 1 },
-      { name: "Upcoming", total: 2 },
+      { name: "Upcoming", total: 5 },
       { name: "Anytime", total: 2 },
       { name: "Someday", total: 1 },
       { name: "Logbook", total: 3 },
@@ -217,9 +218,13 @@
       );
       await userEvent.click(navigationItem!);
       await waitFor(() => {
-        expect(plannerColumn.querySelector("h1")).toHaveTextContent(
+        const plannerTitle = plannerColumn.querySelector<HTMLElement>(
+          ".task-column-canvas-story__planner-title",
+        );
+        expect(plannerTitle).toHaveTextContent(
           expectedView.name,
         );
+        expect(plannerTitle?.querySelector("svg")).toBeVisible();
         expect(
           plannerColumn.querySelectorAll("[data-planner-sortable-row]"),
         ).toHaveLength(expectedView.total);
@@ -238,15 +243,16 @@
           button.getClientRects().length > 0,
       );
     expect(todayNavigation).toBeDefined();
-    expect(todayNavigation!.querySelector("small")).toHaveTextContent("7");
+    expect(todayNavigation!.querySelector("small")).toHaveTextContent("8");
     await userEvent.click(todayNavigation!);
     await waitFor(() => {
       expect(
         plannerColumn.querySelectorAll("[data-planner-sortable-row]"),
-      ).toHaveLength(7);
+      ).toHaveLength(8);
       expect(
         plannerColumn.querySelectorAll("[data-day-section]"),
       ).toHaveLength(5);
+      expect(plannerColumn).toHaveTextContent("Daily stand-up reflection");
     });
   }
 
@@ -276,16 +282,25 @@
     canvas: ReturnType<typeof within>,
     app: App,
   ) {
-    if (!canvas.queryByRole("button", { name: "Open settings", exact: true })) {
+    const visibleOpenSettings = () =>
+      canvas
+        .queryAllByRole("button", { name: "Open settings", exact: true })
+        .find(
+          (button) =>
+            getComputedStyle(button).pointerEvents !== "none" &&
+            button.getClientRects().length > 0,
+        );
+    if (!visibleOpenSettings()) {
       await userEvent.click(
         canvas.getByRole("button", { name: "Open left sidebar", exact: true }),
       );
     }
-    const openSettings = await canvas.findByRole("button", {
-      name: "Open settings",
-      exact: true,
+    let openSettings: HTMLElement | undefined;
+    await waitFor(() => {
+      openSettings = visibleOpenSettings();
+      expect(openSettings).toBeDefined();
     });
-    await userEvent.click(openSettings);
+    await userEvent.click(openSettings!);
     const dialog = await canvas.findByRole("dialog", {
       name: "Settings",
       exact: true,
@@ -696,13 +711,28 @@
     await fireEvent.click(initiallySelectedRow!);
     expect(initiallySelectedRow).toHaveAttribute("data-planner-selected", "true");
     expect(
+      canvasElement.querySelector("[data-task-markdown-surface]"),
+    ).toHaveAttribute("data-editing", "false");
+    expect(
+      canvasElement.querySelector("[data-structural-task-run]"),
+    ).toBeVisible();
+    expect(
       canvasElement.querySelector("[data-task-sidebar-detail]"),
     ).not.toBeInTheDocument();
 
-    await userEvent.click(taskTitle);
+    const selectedTaskTitle = canvas.getByRole("button", {
+      name: "Review interview notes",
+      exact: true,
+    });
+    await userEvent.click(selectedTaskTitle);
     await waitFor(() => {
+      const currentSurface = canvasElement.querySelector<HTMLElement>(
+        "[data-task-markdown-surface]",
+      );
       expect(
-        surface.querySelector('[role="textbox"][aria-label="Task title"]'),
+        currentSurface?.querySelector(
+          '[role="textbox"][aria-label="Task title"]',
+        ),
       ).toHaveFocus();
     });
     await userEvent.keyboard("{Escape}");
@@ -749,7 +779,7 @@
     ).toBeVisible();
     await fireEvent.dblClick(taskRow!);
 
-    await userEvent.click(
+    await fireEvent.click(
       canvas.getByRole("button", {
         name: "Open task details for Review interview notes",
         exact: true,
@@ -1270,6 +1300,7 @@
     expect(
       canvas.getByRole("button", { name: "Open Tasks" }),
     ).toBeVisible();
+    await exerciseTasksWorkspaceSettings(canvasElement, canvas, app);
     expect(
       await canvas.findByText("Tailor platform CV variant"),
     ).toBeVisible();
@@ -1419,8 +1450,6 @@
       expect(app.workspace.getActiveFile()?.path).toBe("lists/applications.md");
     });
 
-    await exerciseTasksWorkspaceSettings(canvasElement, canvas, app);
-
     // Leave this visual story on the feature-rich daily agenda instead of the
     // final mutation assertion, so the app-backed shell documents the current
     // Tasks surface when opened directly in Storybook.
@@ -1457,7 +1486,26 @@
     ).toBeVisible();
     expect(canvas.getByLabelText("Mobile left sidebar")).toBeInTheDocument();
     expect(canvas.getByLabelText("Mobile right sidebar")).toBeInTheDocument();
-    await exerciseMarkdownNativeList(canvasElement, canvas);
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Applications", exact: true }),
+    );
+    expect(
+      await canvas.findByText(
+        "Track application work here. The Markdown heading and task run remain in their authored position.",
+      ),
+    ).toBeVisible();
+    const mobileTaskRow = canvas
+      .getByRole("button", {
+        name: "Review interview notes",
+        exact: true,
+      })
+      .closest<HTMLElement>(".application-planner-task-row");
+    expect(mobileTaskRow).not.toBeNull();
+    await fireEvent.click(mobileTaskRow!);
+    expect(mobileTaskRow).toHaveAttribute("data-planner-selected", "true");
+    expect(
+      canvasElement.querySelector("[data-task-sidebar-detail]"),
+    ).not.toBeInTheDocument();
     await showDailyAgendaChecklistSummary(canvasElement, canvas);
     await collapseLapisLeftSidebar(canvas);
   }}
@@ -1640,6 +1688,110 @@
 />
 
 <Story
+  name="Deep Navigation Flow"
+  args={{ displayMode: "desktop" }}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          "Present a complete List to nested List to Task to nested List to Task to subtask fixture for end-to-end navigation review.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    canvasElement.style.height = "100%";
+    canvasElement.style.maxHeight = "100%";
+    canvasElement.style.overflow = "hidden";
+    const canvas = await waitForReady(canvasElement);
+    const app = storyApp(canvasElement);
+    const deepFixturePaths = [
+      "lists/release-flow.md",
+      "lists/release-train.md",
+      "upcoming/coordinate-launch.md",
+      "lists/launch-operations.md",
+      "upcoming/ship-release.md",
+      "upcoming/verify-status-page.md",
+    ];
+    await waitFor(
+      () => {
+        for (const path of deepFixturePaths) {
+          const file = app.vault.getFileByPath(path);
+          expect(file).toBeTruthy();
+          expect(app.metadataCache.getFileCache(file!)?.frontmatter?.type).toMatch(
+            /^task(?:-list)?$/,
+          );
+        }
+      },
+      { timeout: 10_000 },
+    );
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Release Flow", exact: true }),
+    );
+    expect(
+      await canvas.findByRole("button", {
+        name: "Open list Release Train to the right",
+        exact: true,
+      }),
+    ).toBeVisible();
+    const expectedLinks = [
+      ["lists/release-flow.md", "./release-train.md"],
+      ["lists/release-train.md", "../upcoming/coordinate-launch.md"],
+      ["upcoming/coordinate-launch.md", "../lists/launch-operations.md"],
+      ["lists/launch-operations.md", "../upcoming/ship-release.md"],
+      ["upcoming/ship-release.md", "./verify-status-page.md"],
+    ] as const;
+    for (const [path, target] of expectedLinks) {
+      const file = app.vault.getFileByPath(path)!;
+      expect(await app.vault.cachedRead(file)).toContain(`](${target})`);
+    }
+    expect(
+      await app.vault.cachedRead(
+        app.vault.getFileByPath("upcoming/verify-status-page.md")!,
+      ),
+    ).toContain("- [ ] Confirm every region is healthy");
+    await fireEvent.click(
+      canvas.getByRole("button", {
+        name: "Open list Release Train to the right",
+        exact: true,
+      }),
+    );
+    await fireEvent.click(
+      await canvas.findByRole("button", {
+        name: "Open task details for Coordinate the launch",
+        exact: true,
+      }, { timeout: 5_000 }),
+    );
+    await fireEvent.click(
+      await canvas.findByRole("button", {
+        name: "Open list Launch Operations to the right",
+        exact: true,
+      }, { timeout: 5_000 }),
+    );
+    await fireEvent.click(
+      await canvas.findByRole("button", {
+        name: "Open task details for Ship the release",
+        exact: true,
+      }, { timeout: 5_000 }),
+    );
+    await fireEvent.click(
+      await canvas.findByRole("button", {
+        name: "Open task details for Verify the status page",
+        exact: true,
+      }, { timeout: 5_000 }),
+    );
+    expect(
+      await canvas.findByText(
+        "Confirm every region is healthy",
+        {},
+        { timeout: 5_000 },
+      ),
+    ).toBeVisible();
+    expect(canvas.getByText("Publish the final release note")).toBeVisible();
+    await collapseLapisLeftSidebar(canvas);
+  }}
+/>
+
+<Story
   name="Markdown Task Runs"
   args={{ displayMode: "desktop" }}
   parameters={{
@@ -1718,23 +1870,24 @@
       "anytime",
       "morning",
       "afternoon",
+      "evening",
     ]);
     await waitFor(() => {
       expect(
         canvasElement.querySelectorAll<HTMLElement>("[data-task-list-row]"),
-      ).toHaveLength(3);
+      ).toHaveLength(4);
     });
     expect(
       Array.from(
         canvasElement.querySelectorAll<HTMLElement>("[data-task-list-row]"),
       ).map((row) => row.getAttribute("aria-label")),
-    ).toEqual(["Applications", "Docs", "CV"]);
+    ).toEqual(["Applications", "Docs", "CV", "Release Flow"]);
     const navigationRuns = Array.from(
       canvasElement.querySelectorAll<HTMLElement>(
         "[data-structural-task-run]",
       ),
     ).filter((candidate) => candidate.getClientRects().length > 0);
-    expect(navigationRuns).toHaveLength(3);
+    expect(navigationRuns).toHaveLength(4);
     expect(
       navigationRuns.some((candidate) =>
         candidate.querySelector("[data-task-drag-handle]"),

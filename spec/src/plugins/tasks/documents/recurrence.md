@@ -43,6 +43,21 @@ history records. The Markdown document remains authoritative for the complete
 repeat object. The disposable projection indexes only strategy, frequency,
 interval, and anchor for summary queries.
 
+## Recurrence editor
+
+The shared recurrence popover is a structured editor for this schema. Its
+Command View presets are Does not repeat, Daily, Weekly, Monthly, and Yearly.
+Choosing a frequency preset writes interval `1` with schedule anchoring while
+preserving an existing `lastCompletedAt` and `completionCount`.
+
+Custom recurrence exposes interval, frequency, schedule/completion anchor, and
+checklist reset. Applying it writes the scheduling fields through the Task
+callback; the canonical mutation merges retained completion metadata from the
+current Markdown document before serialization. Removing
+recurrence clears only `task.repeat`; it does not change the Task's plan or
+checklist. Reserved `on` metadata is not exposed because the scheduler does not
+currently interpret it. See LN-TASK-045–046.
+
 ## Completion lifecycle
 
 Completing a non-recurring Task sets `status: completed` and `completedAt`.

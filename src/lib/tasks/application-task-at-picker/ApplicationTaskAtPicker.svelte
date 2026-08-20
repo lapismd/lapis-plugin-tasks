@@ -2,17 +2,18 @@
   import "./ApplicationTaskAtPicker.css";
   import CalendarClockIcon from "@lucide/svelte/icons/calendar-clock";
   import CalendarDaysIcon from "@lucide/svelte/icons/calendar-days";
-  import CheckIcon from "@lucide/svelte/icons/check";
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
+  import Clock3Icon from "@lucide/svelte/icons/clock-3";
   import MoonIcon from "@lucide/svelte/icons/moon";
   import SunIcon from "@lucide/svelte/icons/sun";
   import SunriseIcon from "@lucide/svelte/icons/sunrise";
+  import { TimePicker } from "@lapismd/design-core/forms";
+  import * as CommandView from "@lapismd/design-core/shadcn/command-view";
   import * as Popover from "@lapismd/design-core/shadcn/popover";
 
   import {
     formatTaskPlanAtLabel,
     isTaskPlanAtDayPart,
-    type TaskPlanAtDayPart,
   } from "../../model";
 
   let {
@@ -24,12 +25,13 @@
     pickerId?: string;
     when?: string | null;
     planAt?: string | null;
-    onSelect?: ((at: TaskPlanAtDayPart) => void | Promise<void>) | null;
+    onSelect?: ((at: string) => void | Promise<void>) | null;
   } = $props();
 
   let open = $state(false);
+  let timeDraft = $state<string | undefined>(undefined);
 
-  const selectedAt = $derived.by((): TaskPlanAtDayPart | string => {
+  const selectedAt = $derived.by((): string => {
     if (when === "this-evening" || planAt === "evening") return "evening";
     if (isTaskPlanAtDayPart(planAt)) return planAt;
     if (planAt && /^\d{2}:\d{2}$/.test(planAt)) return planAt;
@@ -46,10 +48,17 @@
     open = false;
   }
 
-  async function select(at: TaskPlanAtDayPart) {
+  async function select(at: string) {
     await onSelect?.(at);
     closePopover();
   }
+
+  $effect(() => {
+    if (!open) return;
+    timeDraft = /^\d{2}:\d{2}$/.test(planAt ?? "")
+      ? (planAt ?? undefined)
+      : undefined;
+  });
 </script>
 
 <div class="task-at-picker" data-task-at-picker>
@@ -90,82 +99,49 @@
       align="start"
       sideOffset={6}
       class="task-at-picker__panel"
-      role="listbox"
+      role="dialog"
       aria-label="Choose planner day part"
       data-task-at-picker
       trapFocus={false}
       onFocusOutside={closePopover}
       onpointerdown={(event) => event.stopPropagation()}
     >
-      <div class="task-at-picker__list">
-        <button
-          type="button"
-          class="task-at-picker__option"
-          role="option"
-          aria-selected={isMorning}
-          onclick={() => void select("morning")}
-        >
-          <span class="task-at-picker__icon task-at-picker__icon--sunrise">
-            <SunriseIcon />
-          </span>
-          <span>Morning</span>
-          {#if isMorning}
-            <span class="task-at-picker__check">
-              <CheckIcon />
-            </span>
-          {/if}
-        </button>
-        <button
-          type="button"
-          class="task-at-picker__option"
-          role="option"
-          aria-selected={isAfternoon}
-          onclick={() => void select("afternoon")}
-        >
-          <span class="task-at-picker__icon task-at-picker__icon--sun">
-            <SunIcon />
-          </span>
-          <span>Afternoon</span>
-          {#if isAfternoon}
-            <span class="task-at-picker__check">
-              <CheckIcon />
-            </span>
-          {/if}
-        </button>
-        <button
-          type="button"
-          class="task-at-picker__option"
-          role="option"
-          aria-selected={isEvening}
-          onclick={() => void select("evening")}
-        >
-          <span class="task-at-picker__icon task-at-picker__icon--moon">
-            <MoonIcon />
-          </span>
-          <span>Evening</span>
-          {#if isEvening}
-            <span class="task-at-picker__check">
-              <CheckIcon />
-            </span>
-          {/if}
-        </button>
-        <button
-          type="button"
-          class="task-at-picker__option"
-          role="option"
-          aria-selected={isAnytime}
-          onclick={() => void select("anytime")}
-        >
-          <span class="task-at-picker__icon">
-            <CalendarDaysIcon />
-          </span>
-          <span>Anytime</span>
-          {#if isAnytime}
-            <span class="task-at-picker__check">
-              <CheckIcon />
-            </span>
-          {/if}
-        </button>
+      <CommandView.Root label="Choose planner time" loop>
+        <CommandView.List aria-label="Planner time shortcuts">
+          <CommandView.Group value="day-parts" heading="Day parts">
+            <CommandView.Item value="morning" data-checked={isMorning} onSelect={() => void select("morning")}>
+              <CommandView.ItemIcon><SunriseIcon aria-hidden="true" /></CommandView.ItemIcon>
+              <CommandView.ItemLabel>Morning</CommandView.ItemLabel>
+            </CommandView.Item>
+            <CommandView.Item value="afternoon" data-checked={isAfternoon} onSelect={() => void select("afternoon")}>
+              <CommandView.ItemIcon><SunIcon aria-hidden="true" /></CommandView.ItemIcon>
+              <CommandView.ItemLabel>Afternoon</CommandView.ItemLabel>
+            </CommandView.Item>
+            <CommandView.Item value="evening" data-checked={isEvening} onSelect={() => void select("evening")}>
+              <CommandView.ItemIcon><MoonIcon aria-hidden="true" /></CommandView.ItemIcon>
+              <CommandView.ItemLabel>Evening</CommandView.ItemLabel>
+            </CommandView.Item>
+            <CommandView.Item value="anytime" data-checked={isAnytime} onSelect={() => void select("anytime")}>
+              <CommandView.ItemIcon><CalendarDaysIcon aria-hidden="true" /></CommandView.ItemIcon>
+              <CommandView.ItemLabel>Anytime</CommandView.ItemLabel>
+            </CommandView.Item>
+          </CommandView.Group>
+          <CommandView.Group value="shortcuts" heading="Shortcuts">
+            {#each ["09:00", "12:00", "17:00"] as time (time)}
+              <CommandView.Item value={time} data-checked={selectedAt === time} onSelect={() => void select(time)}>
+                <CommandView.ItemIcon><Clock3Icon aria-hidden="true" /></CommandView.ItemIcon>
+                <CommandView.ItemLabel>{time}</CommandView.ItemLabel>
+              </CommandView.Item>
+            {/each}
+          </CommandView.Group>
+        </CommandView.List>
+      </CommandView.Root>
+      <div class="task-at-picker__custom">
+        <span>Custom time</span>
+        <div>
+          <TimePicker bind:value={timeDraft} ariaLabel="Custom planner time" clearable={false} />
+          <button type="button" disabled={!timeDraft} onclick={() => timeDraft && void select(timeDraft)}>Apply</button>
+        </div>
       </div>
     </Popover.Content>
   </Popover.Root>

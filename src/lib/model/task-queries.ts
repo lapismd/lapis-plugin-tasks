@@ -1,4 +1,9 @@
-import type { CanonicalTaskStatus, ParsedTaskFile, TaskDocument } from "./task-document";
+import type {
+  CanonicalTaskStatus,
+  ParsedTaskFile,
+  TaskDocument,
+  TaskRepeat,
+} from "./task-document";
 
 export type TaskView =
   | "inbox"
@@ -28,6 +33,7 @@ export type TaskSummary = {
   checklistTotal: number;
   checklistCompleted: number;
   commentCount: number;
+  repeat?: TaskRepeat;
 };
 
 export function isTaskDocument(document: ParsedTaskFile): document is TaskDocument {
@@ -82,6 +88,7 @@ export function taskDocumentToSummary(document: ParsedTaskFile): TaskSummary {
     checklistTotal: document.checklist.length,
     checklistCompleted: document.checklist.filter((item) => item.checked).length,
     commentCount: document.task.comments.length,
+    repeat: document.task.repeat,
   };
 }
 

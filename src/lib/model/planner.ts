@@ -599,7 +599,7 @@ export function resolveTaskPlannerPlacement(
 }
 
 export function resolveTaskPlanAt(
-  at: TaskPlanAtDayPart,
+  at: TaskPlanAtDayPart | string,
   current?: {
     scheduledAt?: string | null;
     planDate?: string | null;
@@ -635,13 +635,23 @@ export function resolveTaskPlanAt(
       planAt: date ? "anytime" : null,
     };
   }
+  const normalizedAt = /^([01]\d|2[0-3]):[0-5]\d$/.test(at) ? at : null;
+  if (!isTaskPlanAtDayPart(at) && !normalizedAt) {
+    return {
+      scheduledAt: date,
+      when: current?.when ?? null,
+      start: current?.start ?? "anytime",
+      planDate: date,
+      planAt: date ? "anytime" : null,
+    };
+  }
   const plannedDate = date ?? today;
   return {
     scheduledAt: plannedDate,
     when: at === "evening" ? "this-evening" : null,
     start: "anytime",
     planDate: plannedDate,
-    planAt: at,
+    planAt: normalizedAt ?? at,
   };
 }
 

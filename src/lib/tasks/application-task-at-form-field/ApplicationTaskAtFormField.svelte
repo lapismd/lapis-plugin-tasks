@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { TaskCatalogPlanAt, TaskPlanAtDayPart, TaskWhen } from "../../model";
+  import type { TaskCatalogPlanAt, TaskWhen } from "../../model";
   import { resolveTaskPlanAt } from "../../model";
 
   import ApplicationTaskAtPicker from "../application-task-at-picker/ApplicationTaskAtPicker.svelte";
@@ -24,7 +24,7 @@
 
   const scheduleValue = $derived((value as TaskAtValue | null | undefined) ?? {});
 
-  function selectAt(at: TaskPlanAtDayPart) {
+  function selectAt(at: string) {
     const patch = resolveTaskPlanAt(at, scheduleValue);
     void update({
       scheduledAt: patch.scheduledAt ?? undefined,

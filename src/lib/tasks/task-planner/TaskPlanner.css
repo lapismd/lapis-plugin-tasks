@@ -509,12 +509,6 @@
     border-top: 0;
   }
 
-  .tasks-planner__day-section
-    .tasks-planner__list
-    > .task-quick-create-row {
-    margin-block-end: 0.25rem;
-  }
-
   .tasks-planner__day-collapsed-drop {
     min-height: 0.4rem;
     overflow: hidden;

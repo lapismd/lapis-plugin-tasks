@@ -108,6 +108,7 @@ export function applyApplicationTaskPatch(
 		start: has('start') ? patch.start : task.start,
 		planDate: has('planDate') ? patch.planDate : task.planDate,
 		planAt: has('planAt') ? patch.planAt : task.planAt,
+		repeat: has('repeat') ? patch.repeat : task.repeat,
 		deadline: has('deadline') ? patch.deadline : task.deadline,
 		inbox: has('inbox') ? patch.inbox : task.inbox,
 		listId: has('listId') ? patch.listId : task.listId,

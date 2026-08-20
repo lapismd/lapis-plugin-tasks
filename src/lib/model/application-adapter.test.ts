@@ -23,4 +23,23 @@ describe("application task checklist aggregates", () => {
       },
     );
   });
+
+  it("preserves recurrence through both catalog adapters", () => {
+    const task = createTask({
+      id: "task-repeat",
+      title: "Weekly review",
+      repeat: {
+        strategy: "rolling",
+        frequency: "weekly",
+        interval: 2,
+        anchor: "completion",
+        resetChecklist: true,
+      },
+    });
+    const applicationTask = taskToApplicationTask(task);
+    expect(applicationTask.repeat).toEqual(task.repeat);
+    expect(applicationTaskToTask("tasks", applicationTask).repeat).toEqual(
+      task.repeat,
+    );
+  });
 });

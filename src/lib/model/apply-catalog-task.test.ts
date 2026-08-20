@@ -113,6 +113,55 @@ describe("applyCatalogTaskToRepository", () => {
     );
     expect(await files.read("buy.md")).toContain("at: morning");
 
+    const beforeClockTime = catalogTaskFromSummary(
+      (await repository.get("t_buy"))!,
+    );
+    await applyCatalogTaskToRepository(
+      repository,
+      {
+        ...beforeClockTime,
+        planDate: "2026-08-20",
+        planAt: "14:45",
+        updatedAt: "2026-08-20T12:40:00Z",
+      },
+      beforeClockTime,
+    );
+    expect(await files.read("buy.md")).toContain("at: 14:45");
+
+    const beforeRepeat = catalogTaskFromSummary((await repository.get("t_buy"))!);
+    await applyCatalogTaskToRepository(
+      repository,
+      {
+        ...beforeRepeat,
+        repeat: {
+          strategy: "rolling",
+          frequency: "weekly",
+          interval: 2,
+          anchor: "completion",
+          resetChecklist: true,
+        },
+        updatedAt: "2026-08-20T12:45:00Z",
+      },
+      beforeRepeat,
+    );
+    const repeated = await files.read("buy.md");
+    expect(repeated).toContain("frequency: weekly");
+    expect(repeated).toContain("interval: 2");
+    expect(repeated).toContain("anchor: completion");
+    expect(repeated).toContain("resetChecklist: true");
+    const beforeClearRepeat = catalogTaskFromSummary(
+      (await repository.get("t_buy"))!,
+    );
+    await applyCatalogTaskToRepository(
+      repository,
+      {
+        ...beforeClearRepeat,
+        repeat: undefined,
+        updatedAt: "2026-08-20T12:50:00Z",
+      },
+      beforeClearRepeat,
+    );
+
     await applyCatalogTaskToRepository(
       repository,
       {

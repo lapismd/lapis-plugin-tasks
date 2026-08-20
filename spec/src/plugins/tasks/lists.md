@@ -108,7 +108,11 @@ The list-row context menu offers Open note, Rename, New nested list, Unpin for a
 pinned root, Archive, and Delete. Navigation folders offer Rename except All
 lists, and New list.
 
-`ApplicationTaskAreaPicker` remains the catalog List picker. Choosing an
-existing List attaches the Task through a structural entry and never mints a
-duplicate identifier such as `list-list-applications`. Planning and day-part
+`ApplicationTaskAreaPicker` remains the catalog List picker. It uses Design
+Core's standard Command View search, group, item, icon, label, and selected
+state without a Tasks-owned panel heading. Choosing an existing List carries
+the selected value through compatibility `areas` and `listId`; the repository
+resolves that value against existing List ids and display titles before it
+attaches the Task through a structural entry. It never mints a duplicate
+identifier such as `list-list-applications`. Planning, time, and recurrence
 changes do not alter structural parenthood.

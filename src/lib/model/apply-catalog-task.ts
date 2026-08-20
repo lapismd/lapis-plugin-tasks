@@ -1,7 +1,7 @@
 import { listsMatch } from "./list-navigation";
 import { taskDateOnly } from "./planner";
 import type { Task, TaskQuickCreateInput } from "./types";
-import type { TaskPlan, TaskStart } from "./task-document";
+import type { TaskPlan, TaskRepeat, TaskStart } from "./task-document";
 import { catalogTaskFromSummary } from "./catalog-adapter";
 import type { TaskRepository } from "./task-repository";
 
@@ -78,6 +78,13 @@ function plansEqual(
     left.at === right.at &&
     left.time === right.time
   );
+}
+
+function repeatsEqual(
+  left: TaskRepeat | undefined,
+  right: TaskRepeat | undefined,
+): boolean {
+  return JSON.stringify(left) === JSON.stringify(right);
 }
 
 function uniquePath(
@@ -167,6 +174,10 @@ export async function applyCatalogTaskToRepository(
   const previousDeadline = previous?.deadline ?? previous?.dueAt;
   if (deadline !== previousDeadline) {
     await repository.setDeadline(path, deadline, at);
+  }
+
+  if (!repeatsEqual(next.repeat, previous?.repeat)) {
+    await repository.setRepeat(path, next.repeat, at);
   }
 
   if (next.listId !== previous?.listId) {

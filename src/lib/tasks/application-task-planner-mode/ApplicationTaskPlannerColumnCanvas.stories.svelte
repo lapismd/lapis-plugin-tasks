@@ -135,7 +135,7 @@
     const expectedViewTotals = [
       { name: "Inbox", total: 1 },
       { name: "Review", total: 1 },
-      { name: "Upcoming", total: 2 },
+      { name: "Upcoming", total: 5 },
       { name: "Anytime", total: 2 },
       { name: "Someday", total: 1 },
       { name: "Logbook", total: 3 },
@@ -173,12 +173,12 @@
       canvas.queryByRole("heading", { name: "Logbook", level: 1 }),
     ).not.toBeInTheDocument();
     const todayNavigation = canvas.getByRole("button", { name: "Today" });
-    expect(todayNavigation.querySelector("small")).toHaveTextContent("7");
+    expect(todayNavigation.querySelector("small")).toHaveTextContent("8");
     await userEvent.click(todayNavigation);
     await waitFor(() =>
       expect(
         plannerColumn.querySelectorAll("[data-planner-sortable-row]"),
-      ).toHaveLength(7),
+      ).toHaveLength(8),
     );
 
     const alignedTitle = await canvas.findByRole("button", {

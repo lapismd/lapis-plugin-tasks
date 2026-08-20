@@ -27,6 +27,9 @@ id: lists-nav
 
 ## CV
 - [CV](./lists/cv.md)
+
+## Long Flow
+- [Release Flow](./lists/release-flow.md)
 `,
   },
   {
@@ -48,10 +51,55 @@ Track application work here. The Markdown heading and task run remain in their a
 - [Prepare model serving examples](../upcoming/serving.md)
 - [Organize reference letters](../anytime/letters.md)
 - [Submit Nova Bank application](../logbook/nova.md)
+- [Daily stand-up reflection](../inbox/daily-reflection.md)
 
 ## Notes
 
 Keep interview preparation and follow-up context beneath the live task list.
+`,
+  },
+  {
+    path: "lists/release-flow.md",
+    raw: `---
+type: task-list
+id: list-release-flow
+list:
+  status: active
+---
+# Release Flow
+
+This fixture deliberately exercises navigation across alternating Lists and Tasks.
+
+## Planning
+- [Release Train](./release-train.md)
+`,
+  },
+  {
+    path: "lists/release-train.md",
+    raw: `---
+type: task-list
+id: list-release-train
+list:
+  status: active
+---
+# Release Train
+
+## Coordination
+- [Coordinate the launch](../upcoming/coordinate-launch.md)
+`,
+  },
+  {
+    path: "lists/launch-operations.md",
+    raw: `---
+type: task-list
+id: list-launch-operations
+list:
+  status: active
+---
+# Launch Operations
+
+## Shipping
+- [Ship the release](../upcoming/ship-release.md)
 `,
   },
   {
@@ -220,6 +268,28 @@ task:
 `,
   },
   {
+    path: "inbox/daily-reflection.md",
+    raw: `---
+type: task
+id: story-task-daily-reflection
+created: 2026-08-01T08:00:00.000Z
+updated: 2026-08-18T09:00:00.000Z
+task:
+  status: open
+  start: anytime
+  plan:
+    date: 2026-08-19
+    at: morning
+  repeat:
+    strategy: rolling
+    frequency: daily
+    interval: 1
+    anchor: schedule
+---
+# Daily stand-up reflection
+`,
+  },
+  {
     path: "inbox/afternoon-boundary.md",
     raw: `---
 type: task
@@ -321,6 +391,62 @@ task:
   deadline: 2026-08-22
 ---
 # Draft design critique
+`,
+  },
+  {
+    path: "upcoming/coordinate-launch.md",
+    raw: `---
+type: task
+id: story-task-coordinate-launch
+task:
+  status: open
+  start: anytime
+  plan:
+    date: 2026-09-01
+    at: anytime
+---
+# Coordinate the launch
+
+## Operations
+- [Launch Operations](../lists/launch-operations.md)
+`,
+  },
+  {
+    path: "upcoming/ship-release.md",
+    raw: `---
+type: task
+id: story-task-ship-release
+task:
+  status: open
+  start: anytime
+  plan:
+    date: 2026-09-02
+    at: anytime
+---
+# Ship the release
+
+## Verification
+- [Verify the status page](./verify-status-page.md)
+`,
+  },
+  {
+    path: "upcoming/verify-status-page.md",
+    raw: `---
+type: task
+id: story-task-verify-status-page
+task:
+  status: open
+  start: anytime
+  plan:
+    date: 2026-09-03
+    at: anytime
+---
+# Verify the status page
+
+## Subtasks
+
+- [ ] Confirm every region is healthy
+- [ ] Publish the final release note
 `,
   },
   {

@@ -47,6 +47,130 @@
 </Story>
 
 <Story
+  name="Expanded metadata actions"
+  tags={["test", "visual-pending"]}
+  parameters={{
+    a11y: { test: "off" },
+    docs: {
+      description: {
+        story:
+          "The double-click editor persists status, priority, schedule, exact time, List, and rolling recurrence changes through the shared row callback.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const state = () =>
+      JSON.parse(canvas.getByTestId("task-preview-state").textContent ?? "{}") as Record<string, unknown>;
+
+    await userEvent.click(canvas.getByRole("button", { name: "Task priority" }));
+    await userEvent.click(page.getByRole("option", { name: "High" }));
+    await waitFor(() => expect(state().priority).toBe("high"));
+
+    await userEvent.click(canvas.getByRole("button", { name: "Set due date" }));
+    await userEvent.click(
+      within(page.getByRole("dialog", { name: "Choose due date" }))
+        .getByRole("button", { name: "Today" }),
+    );
+    await waitFor(() => expect(state().dueAt).toBeTruthy());
+
+    await userEvent.click(canvas.getByRole("button", { name: "Set planner schedule" }));
+    await userEvent.click(
+      within(page.getByRole("dialog", { name: "Choose planner schedule" }))
+        .getByRole("button", { name: "Tomorrow" }),
+    );
+    await waitFor(() => expect(state().planDate).toBeTruthy());
+
+    await userEvent.click(canvas.getByRole("button", { name: "Set planner day part" }));
+    await userEvent.click(page.getByRole("option", { name: "12:00" }));
+    await waitFor(() => expect(state().planAt).toBe("12:00"));
+
+    await userEvent.click(canvas.getByRole("button", { name: "Set planner day part" }));
+    const timeDialog = page.getByRole("dialog", {
+      name: "Choose planner day part",
+    });
+    const customTime = within(timeDialog).getByLabelText("Custom planner time");
+    await userEvent.clear(customTime);
+    await userEvent.type(customTime, "14:45");
+    await userEvent.click(
+      within(timeDialog).getByRole("button", { name: "Apply" }),
+    );
+    await waitFor(() => expect(state().planAt).toBe("14:45"));
+
+    await userEvent.click(canvas.getByRole("button", { name: "Task area" }));
+    await userEvent.click(page.getByRole("option", { name: "Applications" }));
+    await waitFor(() => {
+      expect(state().areas).toEqual(["Applications"]);
+      expect(state().listId).toBe("Applications");
+    });
+
+    await userEvent.click(canvas.getByRole("button", { name: "Set task recurrence" }));
+    await userEvent.click(page.getByRole("option", { name: "Weekly" }));
+    await waitFor(() =>
+      expect(state().repeat).toMatchObject({
+        frequency: "weekly",
+        interval: 1,
+        anchor: "schedule",
+        lastCompletedAt: "2026-08-18T09:15:00.000Z",
+        completionCount: 4,
+      }),
+    );
+
+    await userEvent.click(canvas.getByRole("button", { name: "Set task recurrence" }));
+    await userEvent.click(page.getByRole("option", { name: "Custom recurrence" }));
+    const recurrenceDialog = page.getByRole("dialog", {
+      name: "Choose task recurrence",
+    });
+    const interval = within(recurrenceDialog).getByRole("spinbutton", {
+      name: "Recurrence interval",
+    });
+    await userEvent.clear(interval);
+    await userEvent.type(interval, "2");
+    await userEvent.selectOptions(
+      within(recurrenceDialog).getByLabelText("Recurrence frequency"),
+      "monthly",
+    );
+    await userEvent.selectOptions(
+      within(recurrenceDialog).getByLabelText("Recurrence anchor"),
+      "completion",
+    );
+    await userEvent.click(
+      within(recurrenceDialog).getByRole("checkbox", {
+        name: "Reset checklist on completion",
+      }),
+    );
+    await userEvent.click(
+      within(recurrenceDialog).getByRole("button", {
+        name: "Apply recurrence",
+      }),
+    );
+    await waitFor(() =>
+      expect(state().repeat).toMatchObject({
+        frequency: "monthly",
+        interval: 2,
+        anchor: "completion",
+        resetChecklist: true,
+        lastCompletedAt: "2026-08-18T09:15:00.000Z",
+        completionCount: 4,
+      }),
+    );
+
+    await userEvent.click(canvas.getByRole("button", { name: "Task status" }));
+    await userEvent.click(page.getByRole("option", { name: "Completed" }));
+    await waitFor(() => {
+      expect(state().status).toBe("completed");
+      expect(state().done).toBe(true);
+      expect(state().completedAt).toBeTruthy();
+    });
+  }}
+>
+  {#snippet template()}
+    <ApplicationTaskPreviewRowSampleStory expandedByDefault recurringByDefault />
+  {/snippet}
+</Story>
+
+<Story
   name="Open checklist refreshes after an external edit"
   tags={["test"]}
   parameters={{

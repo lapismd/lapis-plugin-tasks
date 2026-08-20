@@ -217,13 +217,6 @@
     );
     selectedTaskIds = selection.taskIds;
     selectionAnchorTaskId = selection.anchorTaskId;
-    if (
-      controller?.activeTaskId != null &&
-      mode === "replace" &&
-      task.id !== controller.activeTaskId
-    ) {
-      void controller.onActiveTaskChange?.(task.id);
-    }
   }
 
   function selectList(row: ResolvedEntry) {
@@ -260,11 +253,6 @@
       expandedListPaths = expandedListPaths.filter((path) => path !== row.path);
       error = cause instanceof Error ? cause.message : String(cause);
     }
-  }
-
-  function clearTaskSelection() {
-    selectedTaskIds = [];
-    selectionAnchorTaskId = null;
   }
 
   async function updateTask(task: Task, patch: Partial<ApplicationTask>) {
@@ -457,6 +445,7 @@
   class="task-list-items-block"
   data-structural-task-run
   data-task-list-surface={controller ? "tasks" : "markdown"}
+  data-editable-markdown-ignore-click
 >
   {#if onRevealSource}
     <header class="task-list-items-block__header">
@@ -501,10 +490,9 @@
             )}
             expanded={expandedTaskId === row.task.id}
             reorderable={Boolean(controller)}
-            selectOnSurfaceClick={controller?.activeTaskId != null}
+            selectOnSurfaceClick={false}
             areaOptions={[]}
             onSelectTask={selectTask}
-            onStartTitleEdit={clearTaskSelection}
             onRequestOpen={(_taskId, source) =>
               void requestOpenTask(row.task!, source)}
             onToggleDone={(task) => void toggleDone(task)}

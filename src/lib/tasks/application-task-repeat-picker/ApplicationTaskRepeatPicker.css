@@ -1,0 +1,97 @@
+.task-repeat-picker {
+  display: inline-flex;
+  max-width: 100%;
+}
+
+.task-repeat-picker__trigger {
+  display: inline-flex;
+  max-width: 100%;
+  min-height: 1.75rem;
+  align-items: center;
+  gap: 0.35rem;
+  border: 0;
+  border-radius: 0.32rem;
+  background: transparent;
+  color: var(--kanban-foreground, var(--foreground));
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 0.15rem 0.35rem;
+}
+
+.task-repeat-picker__trigger:hover,
+.task-repeat-picker__trigger:focus-visible,
+.task-repeat-picker__trigger[data-state="open"] {
+  background: color-mix(in srgb, var(--kanban-border, var(--border)) 45%, transparent);
+  outline: 0;
+}
+
+.task-repeat-picker__trigger svg {
+  width: 0.86rem;
+  height: 0.86rem;
+  flex: 0 0 auto;
+}
+
+.task-repeat-picker__trigger span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-repeat-picker__panel {
+  z-index: 1400;
+  width: min(22rem, calc(100vw - 1rem));
+  --ui-popover-padding: 0;
+  overflow: hidden;
+}
+
+.task-repeat-picker__custom {
+  display: grid;
+  gap: 0.55rem;
+  border-top: 1px solid var(--ui-border, var(--border));
+  padding: 0.65rem;
+}
+
+.task-repeat-picker__custom label {
+  display: grid;
+  grid-template-columns: minmax(6rem, 1fr) minmax(7rem, 1fr);
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--ui-foreground, var(--foreground));
+  font-size: 0.78rem;
+}
+
+.task-repeat-picker__custom input[type="number"],
+.task-repeat-picker__custom select {
+  min-width: 0;
+  min-height: 2rem;
+  border: 1px solid var(--ui-border, var(--border));
+  border-radius: var(--radius, 0.4rem);
+  background: var(--ui-background, var(--background));
+  color: inherit;
+  font: inherit;
+  padding: 0.25rem 0.45rem;
+}
+
+.task-repeat-picker__custom .task-repeat-picker__check {
+  display: flex;
+  grid-template-columns: none;
+}
+
+.task-repeat-picker__check input {
+  accent-color: var(--ui-primary, var(--primary));
+}
+
+.task-repeat-picker__apply {
+  min-height: 2rem;
+  border: 1px solid var(--ui-border, var(--border));
+  border-radius: var(--radius, 0.4rem);
+  background: var(--ui-accent, var(--accent));
+  color: var(--ui-accent-foreground, var(--accent-foreground));
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+}
