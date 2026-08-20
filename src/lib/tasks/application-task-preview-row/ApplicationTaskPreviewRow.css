@@ -126,7 +126,7 @@
 
   .task-preview-row__drag-handle {
     position: absolute;
-    top: 0.55rem;
+    top: 0.45rem;
     left: 0;
     z-index: 2;
     display: grid;

@@ -546,6 +546,9 @@
     const checkboxRect = taskRow!
       .querySelector<HTMLElement>("[data-task-checkbox]")!
       .getBoundingClientRect();
+    const dragHandleRect = taskRow!
+      .querySelector<HTMLElement>("[data-task-drag-handle]")!
+      .getBoundingClientRect();
     const titleRect = taskRow!
       .querySelector<HTMLElement>(".task-line__title")!
       .getBoundingClientRect();
@@ -555,6 +558,20 @@
           (titleRect.top + titleRect.height / 2),
       ),
     ).toBeLessThan(2);
+    expect(
+      Math.abs(
+        dragHandleRect.top +
+          dragHandleRect.height / 2 -
+          (checkboxRect.top + checkboxRect.height / 2),
+      ),
+    ).toBeLessThan(1);
+    expect(
+      Math.abs(
+        dragHandleRect.top +
+          dragHandleRect.height / 2 -
+          (titleRect.top + titleRect.height / 2),
+      ),
+    ).toBeLessThan(1);
     await fireEvent.dblClick(taskRow!);
     expect(
       surface.querySelector('input[aria-label="Task title"]'),

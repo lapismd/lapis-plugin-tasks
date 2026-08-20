@@ -66,6 +66,8 @@ uses normal non-bold weight in both surfaces. Rich TaskRun rows reuse the
 planner's selection resolver and task-patch helper: a row click selects,
 modifiers toggle or extend selection, the title edits, a title/body double-click
 expands inline, and only the trailing details control opens the detail column.
+The leading hover/focus drag handle shares the vertical center of the Tasks
+checkbox and title line rather than following the full row height.
 Linked task-list entries use the same row rhythm and selection surface, replacing
 the task checkbox with a list icon. Tasks-owned surfaces expose their drag handle
 on row hover or focus. They support recursive disclosure, within-run ordering,
