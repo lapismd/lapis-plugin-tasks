@@ -146,6 +146,16 @@
     buildTaskPlannerDaySnapshot(tasks, selectedDate, settings, actualToday),
   );
   const selectedWeek = $derived(buildTaskPlannerWeek(selectedDate, actualToday));
+  const selectedDateHeading = $derived.by(() => {
+    const date = new Date(`${selectedDate}T00:00:00`);
+    return {
+      weekday: new Intl.DateTimeFormat("en", { weekday: "long" }).format(date),
+      monthYear: new Intl.DateTimeFormat("en", {
+        month: "long",
+        year: "numeric",
+      }).format(date),
+    };
+  });
   const selectedTaskIdSet = $derived(new Set(selectedTaskIds));
   const draggedTaskIdSet = $derived(new Set(draggedTaskIds));
   const selectedArea = $derived.by(() => {
@@ -774,6 +784,10 @@
     >
     {#if !selectedArea && view === "today"}
       <section class="tasks-planner__agenda-calendar" aria-label="Daily agenda date">
+        <header class="tasks-planner__agenda-heading" aria-live="polite">
+          <h1>{selectedDateHeading.weekday}</h1>
+          <p>{selectedDateHeading.monthYear}</p>
+        </header>
         <div class="tasks-planner__week-navigation">
           <button
             type="button"

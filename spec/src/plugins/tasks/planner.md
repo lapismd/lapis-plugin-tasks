@@ -122,10 +122,14 @@ resting focus.
 The Today planner is a controlled selected-date surface. Its default date and
 all completion timestamps come from the injected local clock. A Monday-first
 seven-day strip selects the displayed date, with previous- and next-week
-controls. The selected day and actual today have distinct states, and the strip
-itself communicates the selected weekday and date without a redundant large
-weekday/month banner. When they differ, the existing Column Canvas header-action
-slot contains a Today shortcut; choosing a date or week never changes task files.
+controls. The selected weekday and uppercase month/year sit above that strip in
+one compact calendar header. The complete header remains sticky in the planner
+scroll viewport. Both week controls remain ghost buttons at rest. Hover shows a
+semantic grey border without an outline ring, while keyboard focus retains its
+visible ring. The selected day and actual today have distinct states. When they
+differ, the existing Column Canvas header-action slot contains a Today shortcut;
+choosing a date or week updates the calendar labels but never changes task
+files.
 See LN-TASK-030.
 
 ## Bucket classification

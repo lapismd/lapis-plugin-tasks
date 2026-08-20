@@ -113,9 +113,26 @@
       "evening",
       "done",
     ]);
+    const agendaCalendar = canvasElement.querySelector<HTMLElement>(
+      ".tasks-planner__agenda-calendar",
+    );
+    expect(agendaCalendar).toBeVisible();
+    expect(getComputedStyle(agendaCalendar!).position).toBe("sticky");
     expect(
-      canvasElement.querySelector(".tasks-planner__agenda-heading"),
-    ).not.toBeInTheDocument();
+      within(agendaCalendar!).getByRole("heading", {
+        name: "Wednesday",
+        level: 1,
+      }),
+    ).toBeVisible();
+    expect(within(agendaCalendar!).getByText("August 2026")).toBeVisible();
+    for (const name of ["Previous week", "Next week"]) {
+      const control = within(agendaCalendar!).getByRole("button", { name });
+      const style = getComputedStyle(control);
+      expect(style.borderStyle).toBe("solid");
+      expect(Number.parseFloat(style.borderTopWidth)).toBeGreaterThan(0);
+      expect(style.borderTopColor).toBe("rgba(0, 0, 0, 0)");
+      expect(style.outlineStyle).toBe("none");
+    }
     const quickCreateLabel = visibleElements(
       canvasElement,
       ".task-quick-create-row__label",

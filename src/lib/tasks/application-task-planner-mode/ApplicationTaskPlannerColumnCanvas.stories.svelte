@@ -112,9 +112,25 @@
         '[data-planner-drop-id="planner-sidebar:inbox"]',
       ),
     ).toBeVisible();
+    const agendaCalendar = context.canvasElement.querySelector<HTMLElement>(
+      ".tasks-planner__agenda-calendar",
+    )!;
+    expect(getComputedStyle(agendaCalendar).position).toBe("sticky");
     expect(
-      context.canvasElement.querySelector(".tasks-planner__agenda-heading"),
-    ).not.toBeInTheDocument();
+      within(agendaCalendar).getByRole("heading", {
+        name: "Wednesday",
+        level: 1,
+      }),
+    ).toBeVisible();
+    expect(within(agendaCalendar).getByText("August 2026")).toBeVisible();
+    for (const name of ["Previous week", "Next week"]) {
+      const control = within(agendaCalendar).getByRole("button", { name });
+      const style = getComputedStyle(control);
+      expect(style.borderStyle).toBe("solid");
+      expect(Number.parseFloat(style.borderTopWidth)).toBeGreaterThan(0);
+      expect(style.borderTopColor).toBe("rgba(0, 0, 0, 0)");
+      expect(style.outlineStyle).toBe("none");
+    }
     const alignedTitle = canvas.getByRole("button", {
       name: "Finish yesterday's review",
       exact: true,
@@ -185,6 +201,13 @@
     await userEvent.click(
       canvas.getByRole("button", { name: /Thu 2026-08-20/ }),
     );
+    expect(
+      within(agendaCalendar).getByRole("heading", {
+        name: "Thursday",
+        level: 1,
+      }),
+    ).toBeVisible();
+    expect(within(agendaCalendar).getByText("August 2026")).toBeVisible();
     const returnToToday = await canvas.findByRole("button", {
       name: "Return to today",
     });
@@ -193,6 +216,12 @@
     expect(
       canvas.getByRole("button", { name: "Wed 2026-08-19, today" }),
     ).toHaveAttribute("aria-pressed", "true");
+    expect(
+      within(agendaCalendar).getByRole("heading", {
+        name: "Wednesday",
+        level: 1,
+      }),
+    ).toBeVisible();
 
     const afternoonSection = context.canvasElement.querySelector<HTMLElement>(
       '[data-day-section="afternoon"]',
