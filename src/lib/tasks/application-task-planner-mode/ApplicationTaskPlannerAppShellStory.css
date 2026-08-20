@@ -56,7 +56,7 @@ body.sb-main-fullscreen #storybook-root:has(.task-app-shell-story) {
     var(--ui-tasks-accent) 14%,
     var(--ui-tasks-card)
   );
-  color: var(--ui-tasks-accent);
+  color: var(--ui-tasks-accent-text);
 }
 
 .task-app-shell-story__brand-mark {
@@ -190,7 +190,7 @@ body.sb-main-fullscreen #storybook-root:has(.task-app-shell-story) {
   width: 1rem;
   height: 1rem;
   flex: none;
-  color: var(--ui-tasks-accent);
+  color: var(--ui-tasks-accent-text);
 }
 
 .task-app-shell-story__planner-body nav {
@@ -271,7 +271,7 @@ body.sb-main-fullscreen #storybook-root:has(.task-app-shell-story) {
     var(--ui-tasks-accent) 11%,
     var(--ui-tasks-card)
   );
-  color: var(--ui-tasks-accent);
+  color: var(--ui-tasks-accent-text);
 }
 
 .task-app-shell-story__planner-item--active svg {
@@ -301,7 +301,7 @@ body.sb-main-fullscreen #storybook-root:has(.task-app-shell-story) {
       ),
     0 0.35rem 1rem
       color-mix(in srgb, var(--ui-tasks-accent) 16%, transparent);
-  color: var(--ui-tasks-accent);
+  color: var(--ui-tasks-accent-text);
 }
 
 .task-app-shell-story__planner-item--drop-active svg {
@@ -503,7 +503,7 @@ body.sb-main-fullscreen #storybook-root:has(.task-app-shell-story) {
     var(--ui-tasks-accent) 11%,
     var(--ui-tasks-card)
   );
-  color: var(--ui-tasks-accent);
+  color: var(--ui-tasks-accent-text);
 }
 
 [data-ui-part="sidebar"][data-state="collapsed"][data-presentation="inline"]

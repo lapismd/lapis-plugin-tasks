@@ -24,9 +24,11 @@
   --ui-tasks-muted-surface: var(--muted);
   --ui-tasks-border: var(--border);
   --ui-tasks-accent: var(--primary);
+  --ui-tasks-accent-text: var(--ui-tasks-accent);
   --ui-tasks-accent-foreground: var(--primary-foreground);
   --ui-tasks-card: var(--card);
   --ui-tasks-destructive: var(--destructive);
+  --ui-tasks-destructive-text: var(--ui-tasks-destructive);
   --ui-tasks-warning: var(--warning, var(--chart-4, #c99700));
   --ui-tasks-success: var(--success, var(--chart-2, #3d9a5f));
   --ui-tasks-info: var(--info, var(--chart-3, #4f7fd8));
@@ -36,4 +38,18 @@
   --ui-tasks-day-evening: var(--ui-tasks-accent);
   --ui-tasks-day-done: var(--ui-tasks-success);
   --ui-tasks-radius: var(--radius, 0.625rem);
+}
+
+:is(.dark, .theme-dark),
+:is(.dark, .theme-dark) .tasks-planner {
+  --ui-tasks-accent-text: color-mix(
+    in srgb,
+    var(--ui-tasks-accent) 45%,
+    var(--ui-tasks-foreground)
+  );
+  --ui-tasks-destructive-text: color-mix(
+    in srgb,
+    var(--ui-tasks-destructive) 60%,
+    var(--ui-tasks-foreground)
+  );
 }

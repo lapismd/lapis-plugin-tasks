@@ -265,7 +265,7 @@
   .task-line__due--overdue,
   .task-line__due--overdue svg,
   .task-line__due--overdue .task-line__due-distance {
-    color: var(--ui-tasks-destructive);
+    color: var(--ui-tasks-destructive-text);
   }
 
   [data-ui-component="tooltip"][data-ui-part="tooltip-content"].task-line__due-tooltip {

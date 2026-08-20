@@ -160,7 +160,13 @@ Explicit day parts do not depend on settings. The default clock boundaries are
 stored settings migrate to those defaults. Invalid task clock values remain
 readable and route to Anytime. Canceled tasks do not enter Done. Section colors
 use Tasks tokens derived from semantic roles rather than product-specific
-hard-coded colors. Disclosure state is session-only, survives selected-date
+hard-coded colors. Accent and destructive fills remain distinct from their
+foreground roles: dark themes mix those foreground roles toward the active
+theme foreground so selected navigation, Evening, quick-create affordances,
+and overdue labels retain their required contrast without bleaching filled
+actions. The same foreground treatment applies to Markdown grouping pills so
+Mira heading selectors cannot replace the Tasks category color. Disclosure
+state is session-only, survives selected-date
 changes, and leaves even collapsed or empty sections as sortable drop targets.
 Every header keeps its icon and title at the leading edge and groups the item
 count with the disclosure chevron at the trailing edge, so counts align across

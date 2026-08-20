@@ -29,7 +29,7 @@
     var(--ui-tasks-accent, var(--primary)) 10%,
     transparent
   );
-  color: var(--ui-tasks-accent, var(--primary));
+  color: var(--ui-tasks-accent-text, var(--primary));
   outline: 0;
 }
 
@@ -118,5 +118,5 @@
   .task-quick-create-actions__check {
   width: 0.72rem;
   height: 0.72rem;
-  color: var(--ui-tasks-accent, var(--primary));
+  color: var(--ui-tasks-accent-text, var(--primary));
 }

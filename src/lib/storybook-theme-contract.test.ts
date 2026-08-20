@@ -9,6 +9,14 @@ describe("Storybook theme contract", () => {
       ".storybook/manager-color-mode-toggle.tsx",
       "utf8",
     );
+    const shellStories = readFileSync(
+      "src/stories/PluginWorkspace.stories.svelte",
+      "utf8",
+    );
+    const quickCreateStyles = readFileSync(
+      "src/lib/tasks/task-planner/TaskQuickCreateRow.css",
+      "utf8",
+    );
 
     expect(preview).toContain("globalTypes");
     expect(preview).toContain('icon: "paintbrush"');
@@ -24,5 +32,19 @@ describe("Storybook theme contract", () => {
     );
     expect(toggle).toContain("Switch to dark mode");
     expect(toggle).toContain("Switch to light mode");
+    expect(shellStories).toContain('name="Obsidian Dark Contrast"');
+    expect(shellStories).toContain('name="Default Dark Contrast"');
+    expect(shellStories).toContain(
+      'globals={{ theme: "lapis", colorMode: "dark" }}',
+    );
+    expect(shellStories).toContain(
+      'globals={{ theme: "default", colorMode: "dark" }}',
+    );
+    expect(shellStories).toContain("computedContrastRatio");
+    expect(shellStories).toContain("toBeGreaterThanOrEqual(4.5)");
+    expect(shellStories).toContain("toBeGreaterThanOrEqual(3)");
+    expect(quickCreateStyles).toContain(
+      "border-color: var(--ui-tasks-accent-text)",
+    );
   });
 });

@@ -100,7 +100,7 @@
   }
 
   .tasks-planner__week > button.tasks-planner__week-day--today:not(.tasks-planner__week-day--selected) {
-    color: var(--ui-tasks-accent);
+    color: var(--ui-tasks-accent-text);
   }
 
   .tasks-planner__week button span {
@@ -144,7 +144,7 @@
     place-items: center;
     border-radius: 999px;
     background: color-mix(in srgb, var(--ui-tasks-accent) 12%, transparent);
-    color: var(--ui-tasks-accent);
+    color: var(--ui-tasks-accent-text);
     font-size: 0.8rem;
     font-weight: 800;
   }
@@ -271,7 +271,7 @@
 
   .tasks-planner__priority {
     gap: 0.25rem;
-    color: var(--ui-tasks-destructive);
+    color: var(--ui-tasks-destructive-text);
     font-size: 0.72rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -364,6 +364,11 @@
 
   .tasks-planner__day-section {
     --tasks-day-section-color: var(--ui-tasks-day-anytime);
+    --tasks-day-section-foreground: color-mix(
+      in srgb,
+      var(--tasks-day-section-color) 78%,
+      var(--ui-tasks-foreground)
+    );
     gap: 0.4rem;
   }
 
@@ -377,6 +382,7 @@
 
   .tasks-planner__day-section[data-day-section="evening"] {
     --tasks-day-section-color: var(--ui-tasks-day-evening);
+    --tasks-day-section-foreground: var(--ui-tasks-accent-text);
   }
 
   .tasks-planner__day-section[data-day-section="done"] {
@@ -393,7 +399,7 @@
     border: 1px solid color-mix(in srgb, var(--tasks-day-section-color) 20%, transparent);
     border-radius: 999px;
     background: color-mix(in srgb, var(--tasks-day-section-color) 10%, var(--ui-tasks-card));
-    color: color-mix(in srgb, var(--tasks-day-section-color) 78%, var(--ui-tasks-foreground));
+    color: var(--tasks-day-section-foreground);
     cursor: pointer;
     font: inherit;
     padding: 0.35rem 0.7rem;

@@ -80,7 +80,7 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
     var(--ui-tasks-accent) 11%,
     var(--ui-tasks-card)
   );
-  --ui-column-canvas-item-selected-foreground: var(--ui-tasks-accent);
+  --ui-column-canvas-item-selected-foreground: var(--ui-tasks-accent-text);
 
   box-sizing: border-box;
   border: 0;
@@ -256,7 +256,10 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
     --ui-column-canvas-item-selected,
     color-mix(in srgb, var(--ui-tasks-accent) 11%, var(--ui-tasks-card))
   );
-  color: var(--ui-column-canvas-item-selected-foreground, var(--ui-tasks-accent));
+  color: var(
+    --ui-column-canvas-item-selected-foreground,
+    var(--ui-tasks-accent-text)
+  );
 }
 
 .task-list-tree .task-list-tree__row [data-ui-component="column-canvas"][data-ui-part="column-item"] {
@@ -300,7 +303,7 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
       color-mix(in srgb, var(--ui-tasks-accent) 30%, transparent),
     inset 0 0 0 2rem
       color-mix(in srgb, var(--ui-tasks-accent) 16%, var(--ui-tasks-card));
-  color: var(--ui-tasks-accent);
+  color: var(--ui-tasks-accent-text);
 }
 
 .task-list-tree__row--dragging {
@@ -395,7 +398,7 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
   border: 1px solid var(--ui-tasks-border);
   border-radius: 999px;
   background: color-mix(in srgb, var(--ui-tasks-accent) 9%, transparent);
-  color: var(--ui-tasks-accent);
+  color: var(--ui-tasks-accent-text);
   cursor: pointer;
   font: inherit;
   font-size: 0.75rem;

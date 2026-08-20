@@ -5,6 +5,10 @@
 
   import PluginWorkspaceDemo from "./PluginWorkspaceDemo.svelte";
   import { PluginWorkspaceExample } from "./PluginWorkspace.example-sources";
+  import {
+    computedContrastRatio,
+    customPropertyContrastRatio,
+  } from "./contrast";
 
   const { Story } = defineMeta({
     title: "Plugins/Tasks/Shell",
@@ -26,6 +30,18 @@
       },
     },
   });
+
+  const darkContrastA11y = {
+    test: "error",
+    config: {
+      rules: [
+        // Full-shell rows intentionally compose nested task controls.
+        { id: "nested-interactive", enabled: false },
+        // CodeMirror owns its aria-hidden gutter focus behavior upstream.
+        { id: "aria-hidden-focus", enabled: false },
+      ],
+    },
+  } as const;
 
   function storyApp(canvasElement: HTMLElement): App {
     const root = canvasElement.querySelector<
@@ -207,6 +223,87 @@
     });
     expect(new Set(headings.map((heading) => getComputedStyle(heading).backgroundColor)).size)
       .toBe(tones.length);
+  }
+
+  function visibleElements(canvasElement: HTMLElement, selector: string) {
+    return Array.from(
+      canvasElement.querySelectorAll<HTMLElement>(selector),
+    ).filter((element) => element.getClientRects().length > 0);
+  }
+
+  function expectTextContrast(element: HTMLElement) {
+    expect(computedContrastRatio(element)).toBeGreaterThanOrEqual(4.5);
+  }
+
+  async function exerciseDarkThemeContrast(canvasElement: HTMLElement) {
+    const canvas = await waitForReady(canvasElement);
+    await waitFor(() => {
+      expect(canvasElement.ownerDocument.documentElement).toHaveClass("dark");
+      expect(
+        getComputedStyle(canvasElement.ownerDocument.documentElement)
+          .colorScheme,
+      ).toBe("dark");
+    });
+
+    await showDailyAgendaChecklistSummary(canvasElement, canvas);
+
+    const selectedNavigation = visibleElements(
+      canvasElement,
+      '[data-ui-component="column-canvas"][data-ui-part="column-item"][data-selected="true"]',
+    )[0];
+    expect(selectedNavigation).toBeDefined();
+    expectTextContrast(selectedNavigation!);
+
+    const daySectionHeaders = visibleElements(
+      canvasElement,
+      "[data-day-section] .tasks-planner__day-section-header > button",
+    );
+    expect(daySectionHeaders).toHaveLength(5);
+    daySectionHeaders.forEach(expectTextContrast);
+
+    const overdue = visibleElements(canvasElement, ".task-line__due--overdue")[0];
+    expect(overdue).toBeDefined();
+    expectTextContrast(overdue!);
+
+    const quickCreate = visibleElements(
+      canvasElement,
+      ".task-quick-create-row--collapsed",
+    )[0];
+    expect(quickCreate).toBeDefined();
+    const quickCreateBox = quickCreate!.querySelector<HTMLElement>(
+      ".task-quick-create-row__box",
+    );
+    expect(quickCreateBox).toBeDefined();
+    expect(
+      customPropertyContrastRatio(quickCreateBox!, "--ui-tasks-accent-text"),
+    ).toBeGreaterThanOrEqual(3);
+
+    const app = storyApp(canvasElement);
+    await openMarkdownFixture(canvasElement, app, "lists/cv.md", "preview");
+    await expectTaskGroupHeadingTones(canvasElement, ["anytime", "morning"]);
+    const preview = visibleElements(canvasElement, ".mira-markdown-preview")[0];
+    expect(preview).toBeDefined();
+    expectTextContrast(preview!);
+    visibleElements(
+      canvasElement,
+      '.mira-markdown-preview [data-task-group-heading="true"]',
+    ).forEach(expectTextContrast);
+
+    await openMarkdownFixture(
+      canvasElement,
+      app,
+      "lists/cv.md",
+      "live-preview",
+    );
+    await expectTaskGroupHeadingTones(canvasElement, ["anytime", "morning"]);
+    const liveContent = visibleElements(canvasElement, ".cm-editor .cm-content")[0];
+    expect(liveContent).toBeDefined();
+    expectTextContrast(liveContent!);
+    visibleElements(
+      canvasElement,
+      '.cm-editor .cm-line[data-task-group-heading="true"]',
+    ).forEach(expectTextContrast);
+    await collapseLapisLeftSidebar(canvas);
   }
 
   async function expectContainedMarkdownRun(
@@ -1383,5 +1480,47 @@
       await expectContainedMarkdownRun(navigationRun, "hidden");
     }
     await collapseLapisLeftSidebar(within(canvasElement));
+  }}
+/>
+
+<Story
+  name="Obsidian Dark Contrast"
+  args={{ displayMode: "desktop" }}
+  globals={{ theme: "lapis", colorMode: "dark" }}
+  parameters={{
+    a11y: darkContrastA11y,
+    docs: {
+      description: {
+        story:
+          "Guard the Obsidian-dark shell, daily agenda, and Markdown reading/live-preview surfaces with explicit WCAG text and non-text contrast assertions.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    canvasElement.style.height = "100%";
+    canvasElement.style.maxHeight = "100%";
+    canvasElement.style.overflow = "hidden";
+    await exerciseDarkThemeContrast(canvasElement);
+  }}
+/>
+
+<Story
+  name="Default Dark Contrast"
+  args={{ displayMode: "desktop" }}
+  globals={{ theme: "default", colorMode: "dark" }}
+  parameters={{
+    a11y: darkContrastA11y,
+    docs: {
+      description: {
+        story:
+          "Guard the Default-dark shell, daily agenda, and Markdown reading/live-preview surfaces with the same explicit WCAG contrast assertions as Obsidian dark.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    canvasElement.style.height = "100%";
+    canvasElement.style.maxHeight = "100%";
+    canvasElement.style.overflow = "hidden";
+    await exerciseDarkThemeContrast(canvasElement);
   }}
 />

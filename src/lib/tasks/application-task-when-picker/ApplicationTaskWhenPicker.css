@@ -129,7 +129,7 @@
   width: 0.85rem;
   height: 0.85rem;
   flex-shrink: 0;
-  color: var(--ui-tasks-destructive, var(--destructive));
+  color: var(--ui-tasks-destructive-text, var(--destructive));
 }
 
 .task-when-picker__trigger--footer.task-when-picker__trigger--empty {
@@ -154,7 +154,7 @@
   .task-when-picker__footer-date,
 .task-when-picker__trigger--footer.task-when-picker__trigger--overdue
   .task-when-picker__footer-distance {
-  color: var(--ui-tasks-destructive, var(--destructive));
+  color: var(--ui-tasks-destructive-text, var(--destructive));
 }
 
 .task-when-picker__footer-date,

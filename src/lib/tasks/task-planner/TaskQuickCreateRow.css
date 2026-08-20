@@ -74,8 +74,8 @@
 .task-quick-create-row--collapsed:hover .task-quick-create-row__box,
 .task-quick-create-row--collapsed:focus-visible .task-quick-create-row__box,
 .task-quick-create-row--editing .task-quick-create-row__box {
-  border-color: var(--ui-tasks-accent);
-  color: var(--ui-tasks-accent);
+  border-color: var(--ui-tasks-accent-text);
+  color: var(--ui-tasks-accent-text);
 }
 
 .task-quick-create-row__label {
@@ -142,5 +142,5 @@
 .task-quick-create-row--collapsed:focus-visible
   .task-quick-create-row__shortcut {
   background: color-mix(in srgb, var(--ui-tasks-accent) 10%, transparent);
-  color: var(--ui-tasks-accent);
+  color: var(--ui-tasks-accent-text);
 }

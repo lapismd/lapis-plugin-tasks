@@ -143,7 +143,7 @@
 }
 
 .task-checklist-progress__error {
-  color: var(--ui-tasks-destructive, var(--destructive));
+  color: var(--ui-tasks-destructive-text, var(--destructive));
 }
 
 @media (prefers-reduced-motion: reduce) {

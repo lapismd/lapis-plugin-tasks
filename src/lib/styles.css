@@ -2,6 +2,11 @@
 
 [data-task-group-heading="true"] {
   --tasks-markdown-group-color: var(--ui-tasks-day-anytime);
+  --tasks-markdown-group-foreground: color-mix(
+    in srgb,
+    var(--tasks-markdown-group-color) 78%,
+    var(--ui-tasks-foreground)
+  );
 
   box-sizing: border-box;
   width: 100%;
@@ -15,11 +20,7 @@
     var(--tasks-markdown-group-color) 10%,
     var(--ui-tasks-card)
   );
-  color: color-mix(
-    in srgb,
-    var(--tasks-markdown-group-color) 78%,
-    var(--ui-tasks-foreground)
-  );
+  color: var(--tasks-markdown-group-foreground);
   font-family: var(--font-sans, inherit);
   font-size: 0.78rem;
   font-weight: 850;
@@ -38,6 +39,7 @@
 
 [data-task-group-tone="evening"] {
   --tasks-markdown-group-color: var(--ui-tasks-day-evening);
+  --tasks-markdown-group-foreground: var(--ui-tasks-accent-text);
 }
 
 [data-task-group-tone="done"] {
@@ -48,6 +50,7 @@
   display: flex;
   align-items: center;
   margin-block: 1rem 0.5rem;
+  color: var(--tasks-markdown-group-foreground) !important;
   font-family: var(--font-sans, inherit) !important;
   font-size: 0.78rem !important;
   font-weight: 850 !important;
@@ -62,6 +65,7 @@
   align-items: center;
   margin-block: 0.5rem;
   padding: 0.45rem 0.75rem !important;
+  color: var(--tasks-markdown-group-foreground) !important;
   font-family: var(--font-sans, inherit) !important;
   font-size: 0.78rem !important;
   font-weight: 850 !important;
@@ -111,7 +115,7 @@
 }
 
 .catalog-boundary__eyebrow {
-  color: var(--ui-tasks-accent);
+  color: var(--ui-tasks-accent-text);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
