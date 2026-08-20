@@ -5,6 +5,7 @@ import { catalogTaskFromSummary } from "./catalog-adapter";
 import { parseTaskDocument } from "./task-document";
 import { indexTaskDocument } from "./task-index";
 import { createMemoryTaskFileStore, TaskRepository } from "./task-repository";
+import { taskForTasksMarkdownMutation } from "../task-list-surface";
 
 const FILES: Record<string, string> = {
   "lists/home.md": `---
@@ -53,6 +54,31 @@ async function openRepository() {
 }
 
 describe("applyCatalogTaskToRepository", () => {
+  it("does not remove a list link when a rich Items row edits a child field", async () => {
+    const { repository, files } = await openRepository();
+    const projected = catalogTaskFromSummary((await repository.get("t_buy"))!);
+    const canonical = {
+      ...projected,
+      listId: "list_home",
+      areas: ["Home"],
+    };
+
+    await applyCatalogTaskToRepository(
+      repository,
+      {
+        ...taskForTasksMarkdownMutation(projected, [canonical]),
+        title: "Buy a better filter",
+        updatedAt: "2026-08-20T10:00:00Z",
+      },
+      canonical,
+    );
+
+    expect(await files.read("buy.md")).toContain("# Buy a better filter");
+    expect(await files.read("lists/home.md")).toContain(
+      "- [Buy filter](../buy.md)",
+    );
+  });
+
   it("maps planner patches onto file-backed repository mutations", async () => {
     const { repository, files } = await openRepository();
     const previous = catalogTaskFromSummary((await repository.get("t_buy"))!);

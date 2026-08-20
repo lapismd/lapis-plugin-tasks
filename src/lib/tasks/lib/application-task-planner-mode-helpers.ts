@@ -87,6 +87,38 @@ export function taskProgressFor(taskList: ApplicationTask[]) {
 	};
 }
 
+export function applyApplicationTaskPatch(
+	task: Task,
+	patch: Partial<ApplicationTask>,
+	updatedAt: string
+): Task {
+	const has = (key: keyof ApplicationTask) =>
+		Object.prototype.hasOwnProperty.call(patch, key);
+	return {
+		...task,
+		title: patch.body ?? task.title,
+		status:
+			patch.status ??
+			(patch.done === undefined ? task.status : patch.done ? 'completed' : 'open'),
+		priority: has('priority') ? patch.priority : task.priority,
+		linkedTo: has('linkedTo') ? patch.linkedTo : task.linkedTo,
+		dueAt: has('dueAt') ? patch.dueAt : task.dueAt,
+		scheduledAt: has('scheduledAt') ? patch.scheduledAt : task.scheduledAt,
+		when: has('when') ? patch.when : task.when,
+		start: has('start') ? patch.start : task.start,
+		planDate: has('planDate') ? patch.planDate : task.planDate,
+		planAt: has('planAt') ? patch.planAt : task.planAt,
+		deadline: has('deadline') ? patch.deadline : task.deadline,
+		inbox: has('inbox') ? patch.inbox : task.inbox,
+		listId: has('listId') ? patch.listId : task.listId,
+		completedAt: has('completedAt') ? patch.completedAt : task.completedAt,
+		order: has('order') ? patch.order : task.order,
+		areas: has('areas') ? (patch.areas ?? []) : task.areas,
+		notes: has('notes') ? (patch.notes ?? '') : task.notes,
+		updatedAt: patch.updatedAt ?? updatedAt
+	};
+}
+
 export function arrayMove<T>(values: T[], from: number, to: number) {
 	const next = [...values];
 	const [item] = next.splice(from, 1);

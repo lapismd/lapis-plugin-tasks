@@ -151,6 +151,22 @@ describe("TaskRepository", () => {
     ]);
   });
 
+  it("preserves authored order when a run mixes tasks and nested lists", async () => {
+    const fixtures = {
+      "work.md": `---\ntype: task-list\nid: l_work\n---\n# Work\n- [Project](project.md)\n- [Reply](reply.md)\n- [Archive](archive.md)\n`,
+      "project.md": `---\ntype: task-list\nid: l_project\n---\n# Project\n`,
+      "reply.md": `---\ntype: task\nid: t_reply\ntask:\n  status: open\n  start: anytime\n---\n# Reply\n`,
+      "archive.md": `---\ntype: task-list\nid: l_archive\n---\n# Archive\n`,
+    };
+    const { repository } = await openRepository(fixtures);
+
+    await expect(repository.items("l_work")).resolves.toMatchObject([
+      { id: "l_project" },
+      { id: "t_reply" },
+      { id: "l_archive" },
+    ]);
+  });
+
   it("removes conflicting derived edges after whole-vault graph validation", async () => {
     const fixtures = {
       "first.md": `---\ntype: task-list\nid: l_first\n---\n# First\n- [Child](child.md)\n`,

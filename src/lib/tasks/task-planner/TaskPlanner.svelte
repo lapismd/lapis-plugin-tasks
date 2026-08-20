@@ -13,7 +13,6 @@
   import CircleEllipsisIcon from "@lucide/svelte/icons/circle-ellipsis";
   import FlagIcon from "@lucide/svelte/icons/flag";
   import FolderKanbanIcon from "@lucide/svelte/icons/folder-kanban";
-  import PlusIcon from "@lucide/svelte/icons/plus";
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
@@ -56,6 +55,7 @@
   import PlannerSortableList from "./PlannerSortableList.svelte";
   import PlannerSortableRow from "./PlannerSortableRow.svelte";
   import TaskQuickCreateActions from "./TaskQuickCreateActions.svelte";
+  import TaskQuickCreateRow from "./TaskQuickCreateRow.svelte";
 
   type ApplicationSummary = {
     title: string;
@@ -580,85 +580,32 @@
 
 {#snippet quickCreateRow(group: string)}
   {#if quickCreateEnabled}
-    {#if quickCreateActiveGroup === group}
-      <form
-        class="task-preview-add-shell task-preview-add-shell--editing tasks-planner__inline-add"
-        data-task-quick-create-editor={group}
-        onsubmit={(event) => event.preventDefault()}
-        onfocusout={(event) => handleQuickCreateFocusOut(event, group)}
-      >
-        <div class="task-preview-add task-preview-add--editing">
-          <span class="task-preview-add__box" aria-hidden="true">
-            <PlusIcon />
-          </span>
-          <div class="task-preview-add__editor">
-            <input
-              data-task-quick-create={group}
-              value={quickCreateTitleFor(group)}
-              placeholder="New task"
-              aria-label="New task"
-              aria-keyshortcuts="Meta+N Control+N"
-              oninput={(event) =>
-                setQuickCreateTitle(group, event.currentTarget.value)}
-              onkeydown={(event) => {
-                if (event.key !== "Enter" || event.isComposing) return;
-                event.preventDefault();
-                void submitQuickCreate(group);
-              }}
-            />
-            <TaskQuickCreateActions
-              dueAt={quickCreateDueDateFor(group)}
-              priority={quickCreatePriorityFor(group)}
-              scheduledAt={quickCreateScheduleFor(group).scheduledAt}
-              when={quickCreateScheduleFor(group).when}
-              planAt={quickCreateScheduleFor(group).planAt}
-              onDueAtChange={(dueAt) => setQuickCreateDueDate(group, dueAt)}
-              onPriorityChange={(priority) =>
-                setQuickCreatePriority(group, priority)}
-              onScheduleChange={(schedule) =>
-                setQuickCreateSchedule(group, schedule)}
-              onInteractionChange={(open) =>
-                handleQuickCreateInteraction(group, open)}
-            />
-          </div>
-        </div>
-      </form>
-    {:else}
-      <div
-        class="task-preview-add-shell tasks-planner__inline-add"
-        data-task-quick-create-collapsed={group}
-      >
-        <div
-          class="task-preview-add task-preview-add--collapsed"
-          data-task-quick-create-trigger={group}
-          role="button"
-          tabindex="0"
-          aria-label="New task"
-          aria-keyshortcuts="Meta+N Control+N"
-          onclick={() => void activateQuickCreate(group)}
-          onkeydown={(event) => {
-            if (event.key !== "Enter" && event.key !== " ") return;
-            event.preventDefault();
-            void activateQuickCreate(group);
-          }}
-        >
-          <span class="task-preview-add__box" aria-hidden="true">
-            <PlusIcon />
-          </span>
-          <span
-            class="task-preview-add__label"
-            class:task-preview-add__label--draft={Boolean(
-              quickCreateTitleFor(group),
-            )}
-          >
-            {quickCreateTitleFor(group) || "New task"}
-          </span>
-          {#if !quickCreateTitleFor(group)}
-            <kbd class="task-preview-add__shortcut" aria-hidden="true">⌘N</kbd>
-          {/if}
-        </div>
-      </div>
-    {/if}
+    <TaskQuickCreateRow
+      {group}
+      value={quickCreateTitleFor(group)}
+      active={quickCreateActiveGroup === group}
+      onActivate={() => activateQuickCreate(group)}
+      onValueChange={(value) => setQuickCreateTitle(group, value)}
+      onSubmit={() => submitQuickCreate(group)}
+      onFocusOut={(event) => handleQuickCreateFocusOut(event, group)}
+    >
+      {#snippet actions()}
+        <TaskQuickCreateActions
+          dueAt={quickCreateDueDateFor(group)}
+          priority={quickCreatePriorityFor(group)}
+          scheduledAt={quickCreateScheduleFor(group).scheduledAt}
+          when={quickCreateScheduleFor(group).when}
+          planAt={quickCreateScheduleFor(group).planAt}
+          onDueAtChange={(dueAt) => setQuickCreateDueDate(group, dueAt)}
+          onPriorityChange={(priority) =>
+            setQuickCreatePriority(group, priority)}
+          onScheduleChange={(schedule) =>
+            setQuickCreateSchedule(group, schedule)}
+          onInteractionChange={(open) =>
+            handleQuickCreateInteraction(group, open)}
+        />
+      {/snippet}
+    </TaskQuickCreateRow>
   {/if}
 {/snippet}
 

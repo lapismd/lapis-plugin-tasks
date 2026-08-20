@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { buildTaskPlannerSnapshot, createTask, type Task } from '../../model';
 import {
+	applyApplicationTaskPatch,
 	buildPlannerDragLayout,
 	changedPlannerPlacementTaskIds,
 	normalizePlannerDragLayout,
@@ -97,6 +98,29 @@ describe('planner Task selection', () => {
 		).toEqual({
 			taskIds: ['second', 'third', 'fourth'],
 			anchorTaskId: 'second'
+		});
+	});
+});
+
+describe('shared planner row mutation', () => {
+	it('applies the same title, status, and scheduling patch in every row host', () => {
+		const task = plannerTask('shared-row', 1024, {
+			status: 'open',
+			planDate: '2026-07-28',
+			planAt: 'morning'
+		});
+		expect(
+			applyApplicationTaskPatch(
+				task,
+				{ body: 'Renamed', done: true, planAt: 'afternoon' },
+				'2026-07-28T13:00:00.000Z'
+			)
+		).toMatchObject({
+			title: 'Renamed',
+			status: 'completed',
+			planDate: '2026-07-28',
+			planAt: 'afternoon',
+			updatedAt: '2026-07-28T13:00:00.000Z'
 		});
 	});
 });

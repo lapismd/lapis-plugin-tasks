@@ -1,0 +1,75 @@
+.task-list-markdown-surface {
+  --task-list-document-background: var(
+    --markdown-surface-background,
+    var(--background-primary, var(--background, #fff))
+  );
+
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: var(--task-list-document-background);
+}
+
+.task-list-markdown-surface--editing {
+  overflow: hidden;
+}
+
+.task-list-markdown-surface__content {
+  min-height: 100%;
+  padding: 1rem 1.25rem 2rem;
+  background: var(--task-list-document-background);
+}
+
+.task-list-markdown-surface .lapis-markdown-file-surface,
+.task-list-markdown-surface .mira-editable-markdown-preview,
+.task-list-markdown-surface .mira-editable-markdown-preview__preview,
+.task-list-markdown-surface .mira-editable-markdown-preview__editor-shell,
+.task-list-markdown-surface .mira-editable-markdown-preview__editor,
+.task-list-markdown-surface .mira-markdown-preview,
+.task-list-markdown-surface .mira-code-editor,
+.task-list-markdown-surface .cm-editor,
+.task-list-markdown-surface .cm-scroller,
+.task-list-markdown-surface .cm-gutters {
+  background: var(--task-list-document-background) !important;
+  background-color: var(--task-list-document-background) !important;
+}
+
+.task-list-markdown-surface .mira-code-editor .cm-editor .cm-scroller {
+  background: var(--task-list-document-background) !important;
+  background-color: var(--task-list-document-background) !important;
+}
+
+.task-list-markdown-surface--editing .task-list-markdown-surface__content {
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.task-list-markdown-surface__fallback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--ui-border, currentColor);
+  padding: 0.45rem 0.75rem;
+  color: var(--ui-muted-foreground, currentColor);
+  font-size: 0.8rem;
+}
+
+.task-list-markdown-surface__fallback button {
+  border: 0;
+  border-radius: 0.35rem;
+  padding: 0.25rem 0.5rem;
+  background: var(--ui-muted, transparent);
+  color: inherit;
+  font: inherit;
+}
+
+.task-list-markdown-surface__error {
+  margin: 0.75rem;
+  color: var(--ui-destructive, #b42318);
+}

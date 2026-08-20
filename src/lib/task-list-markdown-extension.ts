@@ -5,33 +5,42 @@ import {
   type MarkdownPostProcessorContext,
   type MarkdownSurfaceContext,
 } from "@lapis-notes/api";
-import { EditorSelection } from "@codemirror/state";
+import {
+  EditorSelection,
+  StateEffect,
+  StateField,
+  type EditorState,
+} from "@codemirror/state";
 import {
   Decoration,
   EditorView,
   ViewPlugin,
   WidgetType,
   type DecorationSet,
-  type ViewUpdate,
 } from "@codemirror/view";
 import { mount, unmount } from "svelte";
 import type { TaskRepository } from "./model/task-repository";
 import {
-  replaceTaskListItemsSection,
-  scanTaskListItemsSections,
-  type TaskListItemsEntry,
-  type TaskListItemsSection,
+  scanStructuralTaskRuns,
+  structuralTaskRunDecorationRange,
+  structuralTaskRunEditorChange,
+  type StructuralTaskRun,
+  type StructuralTaskRunEntryInput,
+  type StructuralTaskTargetResolver,
 } from "./model/task-list-items";
 import TaskListItemsBlock from "./task-list-items-block/TaskListItemsBlock.svelte";
+import { asTasksMarkdownSurfaceController } from "./task-list-surface";
 
 type BlockProps = {
   app: App;
   repository: TaskRepository;
   sourcePath: string;
-  section: TaskListItemsSection;
+  section: StructuralTaskRun;
   surface: MarkdownSurfaceContext;
   onRevealSource?: () => void;
-  onReplaceEntries?: (entries: TaskListItemsEntry[]) => void | Promise<void>;
+  onReplaceEntries?: (
+    entries: ReadonlyArray<StructuralTaskRunEntryInput>,
+  ) => void | Promise<void>;
 };
 
 class MountedTaskListItemsChild extends MarkdownRenderChild {
@@ -54,9 +63,8 @@ class TaskListItemsWidget extends WidgetType {
     private readonly app: App,
     private readonly repository: TaskRepository,
     private readonly sourcePath: string,
-    private readonly section: TaskListItemsSection,
+    private readonly section: StructuralTaskRun,
     private readonly surface: MarkdownSurfaceContext,
-    private readonly view: EditorView,
   ) {
     super();
   }
@@ -70,7 +78,7 @@ class TaskListItemsWidget extends WidgetType {
     );
   }
 
-  toDOM(): HTMLElement {
+  toDOM(view: EditorView): HTMLElement {
     const container = document.createElement("div");
     container.className = "task-list-items-widget";
     this.instance = mount(TaskListItemsBlock, {
@@ -82,31 +90,22 @@ class TaskListItemsWidget extends WidgetType {
         section: this.section,
         surface: this.surface,
         onRevealSource: () => {
-          this.view.dispatch({
-            selection: EditorSelection.cursor(this.section.contentFrom),
+          view.dispatch({
+            selection: EditorSelection.cursor(this.section.from),
             scrollIntoView: true,
           });
-          this.view.focus();
+          view.focus();
         },
         onReplaceEntries: (entries) => {
-          const source = this.view.state.doc.toString();
-          const next = replaceTaskListItemsSection(
+          const source = view.state.doc.toString();
+          const change = structuralTaskRunEditorChange(
             source,
             this.section,
             entries,
             this.sourcePath,
           );
-          const suffixLength = source.length - this.section.to;
-          const insert = next.slice(
-            this.section.from,
-            suffixLength ? -suffixLength : undefined,
-          );
-          this.view.dispatch({
-            changes: {
-              from: this.section.from,
-              to: this.section.to,
-              insert,
-            },
+          view.dispatch({
+            changes: change,
           });
         },
       },
@@ -120,28 +119,37 @@ class TaskListItemsWidget extends WidgetType {
   }
 
   ignoreEvent(): boolean {
-    return false;
+    return true;
   }
 }
 
-function selectionTouchesSection(view: EditorView, section: TaskListItemsSection) {
-  return view.state.selection.ranges.some(
+function selectionTouchesSection(state: EditorState, section: StructuralTaskRun) {
+  return state.selection.ranges.some(
     (range) => range.from <= section.to && range.to >= section.from,
   );
 }
 
-export function taskListItemsDecorations(
-  view: EditorView,
+const refreshStructuralTaskRuns = StateEffect.define<null>();
+
+export function structuralTaskRunDecorations(
+  state: EditorState,
   app: App,
   repository: TaskRepository,
   sourcePath: string,
   surface: MarkdownSurfaceContext,
 ): DecorationSet {
-  const source = view.state.doc.toString();
-  const ranges = scanTaskListItemsSections(source, sourcePath)
-    .filter((section) => !selectionTouchesSection(view, section))
-    .map((section) =>
-      Decoration.replace({
+  const source = state.doc.toString();
+  const controller = asTasksMarkdownSurfaceController(surface.context);
+  const resolveTarget = createCachedTargetResolver(app);
+  const ranges = scanStructuralTaskRuns(source, sourcePath, resolveTarget)
+    .filter(
+      (section) =>
+        section.ordinal !== controller?.sourceRunOrdinal &&
+        !selectionTouchesSection(state, section),
+    )
+    .map((section) => {
+      const range = structuralTaskRunDecorationRange(section);
+      return Decoration.replace({
         block: true,
         widget: new TaskListItemsWidget(
           app,
@@ -149,126 +157,167 @@ export function taskListItemsDecorations(
           sourcePath,
           section,
           surface,
-          view,
         ),
-      }).range(section.from, section.to),
-    );
+      }).range(range.from, range.to);
+    });
   return Decoration.set(ranges, true);
 }
 
-export function createTaskListItemsCodeMirrorExtension(
+export function createStructuralTaskRunCodeMirrorExtension(
   app: App,
   repository: TaskRepository,
   sourcePath: string,
   surface: MarkdownSurfaceContext,
 ) {
-  return ViewPlugin.fromClass(
-    class {
-      decorations: DecorationSet;
-
-      constructor(view: EditorView) {
-        this.decorations = taskListItemsDecorations(
-          view,
-          app,
-          repository,
-          sourcePath,
-          surface,
-        );
-      }
-
-      update(update: ViewUpdate) {
-        if (update.docChanged || update.selectionSet) {
-          this.decorations = taskListItemsDecorations(
-            update.view,
+  const decorations = StateField.define<DecorationSet>({
+    create: (state) =>
+      structuralTaskRunDecorations(
+        state,
+        app,
+        repository,
+        sourcePath,
+        surface,
+      ),
+    update: (current, transaction) =>
+      transaction.docChanged ||
+      transaction.selection ||
+      transaction.effects.some((effect) => effect.is(refreshStructuralTaskRuns))
+        ? structuralTaskRunDecorations(
+            transaction.state,
             app,
             repository,
             sourcePath,
             surface,
-          );
-        }
+          )
+        : current,
+    provide: (field) => EditorView.decorations.from(field),
+  });
+  const metadataRefresh = ViewPlugin.fromClass(
+    class {
+      private readonly cleanup: () => void;
+
+      constructor(view: EditorView) {
+        const changed = app.metadataCache.on("changed", () => {
+          view.dispatch({ effects: refreshStructuralTaskRuns.of(null) });
+        });
+        const deleted = app.metadataCache.on("deleted", () => {
+          view.dispatch({ effects: refreshStructuralTaskRuns.of(null) });
+        });
+        this.cleanup = () => {
+          app.metadataCache.offref(changed);
+          app.metadataCache.offref(deleted);
+        };
+      }
+
+      destroy() {
+        this.cleanup();
       }
     },
-    { decorations: (value) => value.decorations },
   );
+  return [decorations, metadataRefresh];
 }
 
-function isSupportedRenderedList(list: Element): list is HTMLUListElement {
-  if (list.tagName !== "UL") return false;
-  return Array.from(list.children).every((child) => {
-    if (child.tagName !== "LI") return false;
-    const elements = Array.from(child.children);
-    if (elements.length !== 1 || elements[0]?.tagName !== "A") return false;
-    return Array.from(child.childNodes).every(
-      (node) => node.nodeType === Node.ELEMENT_NODE || !node.textContent?.trim(),
-    );
-  });
+function isRenderedBulletList(list: Element): list is HTMLUListElement {
+  return list.tagName === "UL";
 }
 
-function renderedSection(
-  heading: HTMLHeadingElement,
-  ordinal: number,
-): { section: TaskListItemsSection; nodes: Element[] } | null {
-  const nodes: Element[] = [heading];
-  let sibling = heading.nextElementSibling;
-  const lists: HTMLUListElement[] = [];
-  while (sibling && !/^H[12]$/.test(sibling.tagName)) {
-    nodes.push(sibling);
-    if (!isSupportedRenderedList(sibling)) return null;
-    lists.push(sibling);
-    sibling = sibling.nextElementSibling;
+function matchingRenderedItems(
+  list: HTMLUListElement,
+  sourceRun: StructuralTaskRun,
+): HTMLLIElement[] | null {
+  const items = Array.from(list.children).filter(
+    (child): child is HTMLLIElement => child instanceof HTMLLIElement,
+  );
+  for (let start = 0; start <= items.length - sourceRun.entries.length; start += 1) {
+    const segment = items.slice(start, start + sourceRun.entries.length);
+    const matches = segment.every((item, index) => {
+      if (item.hasAttribute("data-task-run-processed")) return false;
+      if (item.querySelector("ul,ol,pre,input[type='checkbox']")) return false;
+      const links = item.querySelectorAll<HTMLElement>(
+        "[data-mira-internal-link][data-link-preview-path], a[href]",
+      );
+      if (links.length !== 1) return false;
+      const link = links[0]!;
+      return (
+        item.textContent?.trim() === link.textContent?.trim() &&
+        link.textContent?.trim() === sourceRun.entries[index]?.label
+      );
+    });
+    if (matches) return segment;
   }
-  if (lists.length > 1) return null;
-  const entries = (lists[0] ? Array.from(lists[0].children) : []).map(
-    (item, index): TaskListItemsEntry => {
-      const link = item.querySelector(":scope > a")!;
-      const label = link.textContent?.trim() ?? "";
-      const target = link.getAttribute("href") ?? "";
-      const source = `- [${label}](${target})`;
-      return { label, target, source, from: index, to: index + source.length };
-    },
-  );
-  const source = `## Items\n${entries.map((entry) => entry.source).join("\n")}${entries.length ? "\n" : ""}`;
-  return {
-    section: {
-      ordinal,
-      from: 0,
-      to: source.length,
-      contentFrom: "## Items\n".length,
-      contentTo: source.length,
-      source,
-      entries,
-    },
-    nodes,
+  return null;
+}
+
+function createCachedTargetResolver(app: App): StructuralTaskTargetResolver {
+  return (sourcePath, href) => {
+    const file = app.metadataCache.getFirstLinkpathDest(href, sourcePath);
+    if (!file) return null;
+    const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter;
+    if (frontmatter?.type !== "task" && frontmatter?.type !== "task-list") {
+      return null;
+    }
+    return {
+      id: typeof frontmatter.id === "string" ? frontmatter.id : file.path,
+      path: file.path,
+      kind: frontmatter.type,
+      title:
+        typeof frontmatter.title === "string"
+          ? frontmatter.title
+          : file.basename,
+    };
   };
 }
 
 function createPostProcessor(app: App, repository: TaskRepository) {
-  return (el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
-    if (ctx.frontmatter?.type !== "task-list") return;
-    const headings = [
-      ...(el.matches("h2") ? [el] : []),
-      ...Array.from(el.querySelectorAll("h2")),
+  return async (el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
+    if (ctx.frontmatter?.type !== "task-list" && ctx.frontmatter?.type !== "task") {
+      return;
+    }
+    const file = app.vault.getFileByPath(ctx.sourcePath);
+    const source = file ? await app.vault.cachedRead(file) : "";
+    const sourceSections = source
+      ? scanStructuralTaskRuns(
+          source,
+          ctx.sourcePath,
+          createCachedTargetResolver(app),
+        )
+      : [];
+    const lists = [
+      ...(el.matches("ul") ? [el] : []),
+      ...Array.from(el.querySelectorAll("ul")),
     ].filter(
-      (heading, index, all) =>
-        heading.textContent?.trim() === "Items" &&
-        !heading.hasAttribute("data-task-list-items-processed") &&
-        all.indexOf(heading) === index,
-    ) as HTMLHeadingElement[];
+      (list, index, all) =>
+        isRenderedBulletList(list) &&
+        all.indexOf(list) === index,
+    ) as HTMLUListElement[];
 
-    headings.forEach((heading, localIndex) => {
-      const parsed = renderedSection(heading, localIndex);
-      if (!parsed) return;
-      const container = document.createElement("div");
-      container.setAttribute("data-task-list-items-processed", "true");
-      heading.before(container);
-      for (const node of parsed.nodes) node.remove();
+    sourceSections.forEach((sourceRun) => {
+      const match = lists
+        .map((list) => ({ list, items: matchingRenderedItems(list, sourceRun) }))
+        .find((candidate) => candidate.items);
+      if (!match?.items) return;
+      const replacesWholeList = match.items.length === match.list.children.length;
+      const container = document.createElement(replacesWholeList ? "div" : "li");
+      container.setAttribute("data-task-run-processed", "true");
+      if (replacesWholeList) {
+        match.list.before(container);
+        match.list.remove();
+      } else {
+        match.items[0]!.before(container);
+        for (const item of match.items) item.remove();
+      }
       const child = new MountedTaskListItemsChild(container, {
         app,
         repository,
         sourcePath: ctx.sourcePath,
-        section: parsed.section,
+        section: sourceRun,
         surface: ctx.surface ?? { id: ctx.mode ?? "reading" },
         onRevealSource: async () => {
+          const controller = asTasksMarkdownSurfaceController(ctx.surface?.context);
+          if (controller?.onRevealSource) {
+            await controller.onRevealSource(sourceRun);
+            return;
+          }
           const file = app.vault.getFileByPath(ctx.sourcePath);
           if (file) await app.openFile(file);
         },
@@ -278,15 +327,15 @@ function createPostProcessor(app: App, repository: TaskRepository) {
   };
 }
 
-export function createTaskListMarkdownContribution(
+export function createTaskStructureMarkdownContribution(
   app: App,
   repository: TaskRepository,
 ): MarkdownExtensionContribution {
   return {
-    id: "task-list-items",
+    id: "task-structure-runs",
     codeMirror: ({ mode, sourcePath, surface }) =>
       mode === "live-preview"
-        ? createTaskListItemsCodeMirrorExtension(
+        ? createStructuralTaskRunCodeMirrorExtension(
             app,
             repository,
             sourcePath,

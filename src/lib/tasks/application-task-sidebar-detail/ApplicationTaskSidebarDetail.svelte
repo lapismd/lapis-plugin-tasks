@@ -40,6 +40,9 @@
     application = null,
     creatorLabel = "Steve",
     closeAction,
+    documentModeAction,
+    documentBody,
+    documentBodyEnabled = false,
     messages,
     onToggleDone = () => {},
     onUpdateTitle = () => {},
@@ -52,6 +55,9 @@
     application?: ApplicationSummary | null;
     creatorLabel?: string;
     closeAction?: Snippet;
+    documentModeAction?: Snippet;
+    documentBody?: Snippet;
+    documentBodyEnabled?: boolean;
     messages?: Snippet;
     onToggleDone?: (task: Task) => void;
     onUpdateTitle?: (task: Task, title: string) => void;
@@ -185,6 +191,9 @@
         {/if}
       </div>
       <div class="task-sidebar-detail__top-end">
+        {#if documentModeAction}
+          {@render documentModeAction()}
+        {/if}
         <div class="task-sidebar-detail__menu-wrap">
           <Button
             type="button"
@@ -374,50 +383,54 @@
   </header>
 
   <section class="task-sidebar-detail__body">
-    <ScrollArea.Root
-      class="task-sidebar-detail__scroll"
-      aria-label="Task notes and messages"
-    >
-      <div class="task-sidebar-detail__scroll-content">
-        <div class="task-sidebar-detail__notes">
-          {#if task.notes?.trim()}
-            <ApplicationMarkdownPreview value={task.notes} compact />
-          {:else}
-            <p class="task-sidebar-detail__notes-empty">No notes yet.</p>
-          {/if}
-        </div>
-        <p class="task-sidebar-detail__created">
-          Created by {creatorLabel} • {createdRelative}
-        </p>
-
-        <div class="task-sidebar-detail__messages">
-          <MessageList density="compact" aria-label="Task messages">
-            {#if messages}
-              {@render messages()}
+    {#if documentBodyEnabled && documentBody}
+      {@render documentBody()}
+    {:else}
+      <ScrollArea.Root
+        class="task-sidebar-detail__scroll"
+        aria-label="Task notes and messages"
+      >
+        <div class="task-sidebar-detail__scroll-content">
+          <div class="task-sidebar-detail__notes">
+            {#if task.notes?.trim()}
+              <ApplicationMarkdownPreview value={task.notes} compact />
             {:else}
-              <Message sender="user">
-                {#snippet name()}Alex{/snippet}
-                <MessageBubble>
-                  Can we land this before Friday?
-                  {#snippet metadata()}
-                    <MessageMetadata timestamp="2d" />
-                  {/snippet}
-                </MessageBubble>
-              </Message>
-              <Message sender="user">
-                {#snippet name()}Steve{/snippet}
-                <MessageBubble>
-                  Yes — wrapping the remaining polish today.
-                  {#snippet metadata()}
-                    <MessageMetadata timestamp="1d" />
-                  {/snippet}
-                </MessageBubble>
-              </Message>
+              <p class="task-sidebar-detail__notes-empty">No notes yet.</p>
             {/if}
-          </MessageList>
+          </div>
+          <p class="task-sidebar-detail__created">
+            Created by {creatorLabel} • {createdRelative}
+          </p>
+
+          <div class="task-sidebar-detail__messages">
+            <MessageList density="compact" aria-label="Task messages">
+              {#if messages}
+                {@render messages()}
+              {:else}
+                <Message sender="user">
+                  {#snippet name()}Alex{/snippet}
+                  <MessageBubble>
+                    Can we land this before Friday?
+                    {#snippet metadata()}
+                      <MessageMetadata timestamp="2d" />
+                    {/snippet}
+                  </MessageBubble>
+                </Message>
+                <Message sender="user">
+                  {#snippet name()}Steve{/snippet}
+                  <MessageBubble>
+                    Yes — wrapping the remaining polish today.
+                    {#snippet metadata()}
+                      <MessageMetadata timestamp="1d" />
+                    {/snippet}
+                  </MessageBubble>
+                </Message>
+              {/if}
+            </MessageList>
+          </div>
         </div>
-      </div>
-    </ScrollArea.Root>
+      </ScrollArea.Root>
+    {/if}
   </section>
 
   <footer class="task-sidebar-detail__footer">

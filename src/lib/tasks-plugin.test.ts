@@ -30,7 +30,7 @@ describe("TasksPlugin", () => {
     expect(source).toContain("async onload()");
     expect(source).toContain("registerIndexProjection");
     expect(source).toContain("registerMarkdownExtension");
-    expect(source).toContain("createTaskListMarkdownContribution");
+    expect(source).toContain("createTaskStructureMarkdownContribution");
     expect(source).toContain("registerView");
     expect(source).toContain("TASKS_VIEW_TYPE");
     expect(source).toContain('id: "open"');

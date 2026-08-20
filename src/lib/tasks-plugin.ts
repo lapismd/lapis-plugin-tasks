@@ -4,7 +4,10 @@ import {
   type PluginManifest,
   type WorkspaceLeaf,
 } from "@lapis-notes/api";
-import { createTasksProjectionRegistration } from "./model/task-index";
+import {
+  createAppTaskStructureResolver,
+  createTasksProjectionRegistration,
+} from "./model/task-index";
 import { TaskRepository } from "./model/task-repository";
 import { createVaultTaskFileStore } from "./model/vault-task-file-store";
 import {
@@ -17,7 +20,7 @@ import {
 } from "./tasks-settings";
 import { TasksSettingsTab } from "./tasks-settings-tab";
 import { TASKS_VIEW_TYPE, TasksView } from "./tasks-view";
-import { createTaskListMarkdownContribution } from "./task-list-markdown-extension";
+import { createTaskStructureMarkdownContribution } from "./task-list-markdown-extension";
 
 export const TASKS_PLUGIN_ID = "tasks";
 
@@ -47,9 +50,11 @@ export class TasksPlugin extends Plugin {
 
   async onload(): Promise<void> {
     this.data = migrateTasksPluginData(await this.loadData());
-    this.registerIndexProjection(createTasksProjectionRegistration());
+    this.registerIndexProjection(
+      createTasksProjectionRegistration(createAppTaskStructureResolver(this.app)),
+    );
     this.registerMarkdownExtension(
-      createTaskListMarkdownContribution(this.app, this.repository),
+      createTaskStructureMarkdownContribution(this.app, this.repository),
     );
     this.registerView(
       TASKS_VIEW_TYPE,

@@ -467,10 +467,18 @@ export class TaskRepository {
   }
 
   async children(idOrPath: string): Promise<TaskSummary[]> {
-    return this.related(idOrPath, "task-entry");
+    return (
+      (await this.structuralItems(idOrPath, ["task-entry"])) ??
+      this.related(idOrPath, "task-entry")
+    );
   }
 
   async items(idOrPath: string): Promise<TaskSummary[]> {
+    const indexed = await this.structuralItems(idOrPath, [
+      "task-entry",
+      "list-entry",
+    ]);
+    if (indexed) return indexed;
     const [tasks, lists] = await Promise.all([
       this.related(idOrPath, "task-entry"),
       this.related(idOrPath, "list-entry"),
@@ -1294,6 +1302,33 @@ export class TaskRepository {
       relation,
     });
     return result.rows.map(taskRowToSummary);
+  }
+
+  private async structuralItems(
+    idOrPath: string,
+    kinds: Array<"task-entry" | "list-entry">,
+  ): Promise<TaskSummary[] | null> {
+    const rowId = await this.resolveRowId(idOrPath);
+    if (!rowId) return [];
+    const source = await this.database.getProjectionRow<AppDatabaseTaskRecord>(
+      PUBLIC_TASKS_PROJECTION_ID,
+      rowId,
+    );
+    if (!source?.structure) return null;
+    const allowed = new Set(kinds);
+    const rows = await Promise.all(
+      source.structure.entries
+        .filter((entry) => allowed.has(entry.kind))
+        .map((entry) =>
+          this.database.getProjectionRow<AppDatabaseTaskRecord>(
+            PUBLIC_TASKS_PROJECTION_ID,
+            entry.targetDocumentId,
+          ),
+        ),
+    );
+    return rows
+      .filter((row): row is AppDatabaseTaskRecord => Boolean(row))
+      .map(taskRowToSummary);
   }
 
   private async resolveRowId(idOrPath: string): Promise<string | null> {

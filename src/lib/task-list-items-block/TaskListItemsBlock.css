@@ -3,6 +3,28 @@
   gap: 0.5rem;
   margin-block: 0.75rem;
   color: var(--ui-foreground, inherit);
+  font-family: var(--font-sans, inherit);
+  line-height: normal;
+  white-space: normal;
+}
+
+.task-list-items-widget {
+  --kanban-card: var(--ui-tasks-card, var(--background, #fff));
+  --kanban-foreground: var(--ui-tasks-foreground, var(--foreground, #171717));
+  --kanban-muted: var(--ui-tasks-muted-foreground, #737373);
+  --kanban-muted-surface: var(--ui-tasks-muted-surface, #f5f5f5);
+  --kanban-border: var(--ui-tasks-border, #e5e5e5);
+
+  font-family: var(--font-sans, inherit);
+  line-height: normal;
+  white-space: normal;
+}
+
+.task-list-items-widget .application-planner-task-row,
+.task-list-items-widget .application-planner-task-row__columns,
+.task-list-items-widget
+  .application-planner-task-row__swipe-content[data-ui-component="swipe-item"][data-ui-part="content"] {
+  background-color: var(--task-row-surface, var(--kanban-card));
 }
 
 .task-list-items-block__header {
@@ -24,12 +46,21 @@
 }
 
 .task-list-items-block__source {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  place-items: center;
   border: 0;
   border-radius: 0.35rem;
-  padding: 0.2rem 0.45rem;
+  padding: 0;
   background: transparent;
   color: var(--ui-muted-foreground, currentColor);
   cursor: pointer;
+}
+
+.task-list-items-block__source svg {
+  width: 0.95rem;
+  height: 0.95rem;
 }
 
 .task-list-items-block__source:hover,
@@ -42,11 +73,20 @@
   gap: 0.25rem;
 }
 
-.task-list-items-block__task[draggable="true"] {
+.task-list-items-block .task-line,
+.task-list-items-block .task-line__checkbox {
+  align-items: center;
+}
+
+.task-list-items-block .task-line__checkbox {
+  align-self: center;
+}
+
+.task-list-items-block__task[draggable="true"],
+.task-list-items-block__list[draggable="true"] {
   cursor: grab;
 }
 
-.task-list-items-block__list,
 .task-list-items-block__fallback {
   display: flex;
   align-items: center;
@@ -61,7 +101,6 @@
   cursor: pointer;
 }
 
-.task-list-items-block__list small,
 .task-list-items-block__fallback small {
   color: var(--ui-muted-foreground, currentColor);
 }
@@ -70,30 +109,169 @@
   border-style: dashed;
 }
 
+.task-list-items-list-row {
+  --task-list-row-surface: var(--kanban-card, var(--ui-background, #fff));
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  min-width: 0;
+  min-height: 2.65rem;
+  margin: 0 -0.5rem 2px;
+  border-radius: 0.45rem;
+  padding: 0.3rem 0.5rem;
+  background: var(--task-list-row-surface);
+  color: inherit;
+  outline: none;
+  transition:
+    background-color 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.task-list-items-list-row:hover,
+.task-list-items-list-row:focus-visible {
+  --task-list-row-surface: color-mix(
+    in srgb,
+    var(--primary, #6d4aff) 8%,
+    var(--kanban-card, var(--ui-background, #fff))
+  );
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--primary, #6d4aff) 12%, transparent);
+}
+
+.task-list-items-list-row--selected {
+  --task-list-row-surface: color-mix(
+    in srgb,
+    var(--primary, #6d4aff) 14%,
+    var(--kanban-card, var(--ui-background, #fff))
+  );
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--primary, #6d4aff) 28%, transparent);
+}
+
+.task-list-items-list-row__primary {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.2rem 0.25rem;
+}
+
+.task-list-items-list-row__disclosure {
+  display: inline-grid;
+  width: 1.35rem;
+  height: 1.35rem;
+  flex: none;
+  place-items: center;
+  border: 0;
+  border-radius: var(--radius-sm, 0.3rem);
+  padding: 0;
+  background: transparent;
+  color: var(--ui-muted-foreground, currentColor);
+}
+
+.task-list-items-list-row__disclosure svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.task-list-items-block__nested {
+  margin-inline-start: 1.15rem;
+  border-inline-start: 1px solid var(--ui-border, currentColor);
+  padding-inline-start: 0.45rem;
+}
+
+.task-list-items-block__nested .task-list-items-block__header {
+  display: none;
+}
+
+.task-list-items-list-row__icon {
+  display: grid;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 0.3rem;
+  background: color-mix(in srgb, var(--primary, #6d4aff) 10%, transparent);
+  color: var(--primary, #6d4aff);
+}
+
+.task-list-items-list-row__icon svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  stroke-width: 2.1;
+}
+
+.task-list-items-list-row__content {
+  display: block;
+  min-width: 0;
+}
+
+.task-list-items-list-row__content strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-list-items-list-row__content strong {
+  font-weight: 620;
+}
+
+.task-list-items-list-row__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.task-list-items-list-row__actions button {
+  display: grid;
+  width: 1.65rem;
+  height: 1.65rem;
+  place-items: center;
+  border: 0;
+  border-radius: 0.35rem;
+  padding: 0;
+  background: transparent;
+  color: var(--kanban-muted, var(--ui-muted-foreground, currentColor));
+  cursor: pointer;
+}
+
+.task-list-items-list-row__actions svg {
+  width: 0.82rem;
+  height: 0.82rem;
+}
+
+.task-list-items-list-row__actions button:hover,
+.task-list-items-list-row__actions button:focus-visible {
+  background: var(--kanban-muted-surface, var(--ui-muted, #f5f5f5));
+  color: var(--kanban-foreground, currentColor);
+  outline: none;
+}
+
+.task-list-items-list-row__actions .task-list-items-list-row__delete:hover,
+.task-list-items-list-row__actions .task-list-items-list-row__delete:focus-visible {
+  background: color-mix(in srgb, var(--ui-destructive, #b42318) 10%, transparent);
+  color: var(--ui-destructive, #b42318);
+}
+
+@media (hover: hover) {
+  .task-list-items-list-row__delete {
+    opacity: 0;
+  }
+
+  .task-list-items-list-row:hover .task-list-items-list-row__delete,
+  .task-list-items-list-row:focus-within .task-list-items-list-row__delete,
+  .task-list-items-list-row--selected .task-list-items-list-row__delete {
+    opacity: 1;
+  }
+}
+
 .task-list-items-block__error {
   margin: 0;
   color: var(--ui-destructive, #b42318);
 }
 
-.task-list-items-block__create {
-  display: flex;
-  gap: 0.4rem;
-}
-
-.task-list-items-block__create input {
-  min-width: 0;
-  flex: 1;
-  border: 1px solid var(--ui-border, currentColor);
-  border-radius: 0.4rem;
-  padding: 0.45rem 0.6rem;
-  background: var(--ui-background, transparent);
-  color: inherit;
-}
-
-.task-list-items-block__create button {
-  border: 0;
-  border-radius: 0.4rem;
-  padding-inline: 0.75rem;
-  background: var(--ui-primary, currentColor);
-  color: var(--ui-primary-foreground, white);
+.task-list-items-block > .task-quick-create-row {
+  margin-top: 0.1rem;
 }

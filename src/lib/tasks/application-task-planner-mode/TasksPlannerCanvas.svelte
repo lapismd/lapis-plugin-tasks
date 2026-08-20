@@ -1,12 +1,15 @@
 <script lang="ts">
   import ArchiveIcon from "@lucide/svelte/icons/archive";
+  import BookOpenIcon from "@lucide/svelte/icons/book-open";
   import CalendarClockIcon from "@lucide/svelte/icons/calendar-clock";
   import CalendarDaysIcon from "@lucide/svelte/icons/calendar-days";
   import CircleAlertIcon from "@lucide/svelte/icons/circle-alert";
   import CircleEllipsisIcon from "@lucide/svelte/icons/circle-ellipsis";
   import InboxIcon from "@lucide/svelte/icons/inbox";
   import ListTodoIcon from "@lucide/svelte/icons/list-todo";
+  import PencilIcon from "@lucide/svelte/icons/pencil";
   import * as ColumnCanvas from "@lapismd/design-core/shadcn/column-canvas";
+  import type { App } from "@lapis-notes/api";
   import {
     findListNavNode,
     listTreeFromAreas,
@@ -18,6 +21,9 @@
     type TaskPlannerSnapshot,
     type TaskQuickCreateInput,
     type ChecklistItem,
+    type StructuralTaskRunEntryInput,
+    type StructuralTaskRun,
+    type TaskRepository,
     todayDateOnly,
   } from "../../model";
   import {
@@ -27,6 +33,8 @@
   import ApplicationTaskSidebarDetail from "../application-task-sidebar-detail/ApplicationTaskSidebarDetail.svelte";
   import ApplicationTaskPlannerMode from "./ApplicationTaskPlannerMode.svelte";
   import TaskListNavTree from "./TaskListNavTree.svelte";
+  import TaskMarkdownSurface from "../../task-list-markdown-surface/TaskListMarkdownSurface.svelte";
+  import type { TasksMarkdownSurfaceController } from "../../task-list-surface";
   import "./ApplicationTaskPlannerColumnCanvasStory.css";
 
   type ApplicationSummary = {
@@ -62,6 +70,10 @@
     onUnpinList,
     onArchiveList,
     onDeleteList,
+    app,
+    repository,
+    onRefreshWorkspace,
+    onCreateTaskListItem,
   }: {
     tasks: Task[];
     now?: Date;
@@ -93,6 +105,17 @@
     onUnpinList?: (path: string) => void;
     onArchiveList?: (path: string) => void;
     onDeleteList?: (path: string) => void;
+    app?: App;
+    repository?: TaskRepository;
+    onRefreshWorkspace?: () => void | Promise<void>;
+    onCreateTaskListItem?: (
+      listPath: string,
+      section: StructuralTaskRun,
+      input: TaskQuickCreateInput,
+    ) =>
+      | StructuralTaskRunEntryInput
+      | void
+      | Promise<StructuralTaskRunEntryInput | void>;
   } = $props();
 
   const listTree = $derived(
@@ -158,7 +181,28 @@
   let selectedDate = $state("");
   let taskArea = $state<string | null>(null);
   let activeTaskId = $state<string | null>(null);
+  let activeListPath = $state<string | null>(null);
+  let activeLinkedList = $state<{ path: string; title: string } | null>(null);
   let activeDropTargetId = $state<string | null>(null);
+  let taskListEditing = $state(false);
+  let taskListSourceOrdinal = $state<number | null>(null);
+  let taskListSurface = $state<{
+    enter: () => void;
+    exit: () => Promise<boolean>;
+  } | null>(null);
+  let linkedListEditing = $state(false);
+  let linkedListSourceOrdinal = $state<number | null>(null);
+  let linkedListSurface = $state<{
+    enter: () => void;
+    exit: () => Promise<boolean>;
+  } | null>(null);
+  let taskDocumentEditing = $state(false);
+  let taskDocumentSourceOrdinal = $state<number | null>(null);
+  let taskDocumentSurface = $state<{
+    enter: () => void;
+    exit: () => Promise<boolean>;
+  } | null>(null);
+  let previousTaskArea: string | null | undefined;
 
   const activePlannerLabel = $derived(
     taskArea
@@ -168,7 +212,24 @@
       : (plannerBuckets.find((bucket) => bucket.id === taskView)?.label ??
         "Today"),
   );
+  const selectedListNode = $derived(
+    taskArea ? findListNavNode(listTree, taskArea) : null,
+  );
   const actualToday = $derived(todayDateOnly(now ?? clock()));
+
+  $effect(() => {
+    const nextTaskArea = taskArea;
+    if (nextTaskArea === previousTaskArea) return;
+    previousTaskArea = nextTaskArea;
+    taskListEditing = false;
+    taskListSourceOrdinal = null;
+  });
+
+  $effect(() => {
+    activeTaskId;
+    taskDocumentEditing = false;
+    taskDocumentSourceOrdinal = null;
+  });
 
   $effect.pre(() => {
     if (!selectedDate) selectedDate = actualToday;
@@ -206,6 +267,8 @@
       taskArea = id;
     }
     activeTaskId = null;
+    activeListPath = null;
+    activeLinkedList = null;
     if (!canvas.isSelected(0, id)) {
       canvas.select(0, id);
       return;
@@ -215,6 +278,8 @@
 
   function handleActiveTaskChange(taskId: string | null) {
     if (taskId) {
+      activeListPath = null;
+      activeLinkedList = null;
       activeTaskId = taskId;
       if (canvas.pathAt(1) === taskId) {
         canvas.open("detail");
@@ -228,9 +293,56 @@
     if (canvas.pathAt(1)) canvas.clearFrom(1);
   }
 
-  function closeDetailColumn() {
+  async function closeDetailColumn(): Promise<boolean> {
+    if (
+      activeLinkedList &&
+      linkedListSurface &&
+      !(await linkedListSurface.exit())
+    ) {
+      return false;
+    }
     activeTaskId = null;
+    activeListPath = null;
+    activeLinkedList = null;
+    linkedListEditing = false;
+    linkedListSourceOrdinal = null;
     canvas.clearFrom(1);
+    return true;
+  }
+
+  function handleActiveListChange(path: string | null) {
+    activeListPath = path;
+  }
+
+  async function handleOpenList(path: string, title: string) {
+    if (
+      activeLinkedList?.path !== path &&
+      linkedListEditing &&
+      !(await linkedListSurface?.exit())
+    ) {
+      return;
+    }
+    activeTaskId = null;
+    activeListPath = path;
+    activeLinkedList = { path, title };
+    linkedListEditing = false;
+    linkedListSourceOrdinal = null;
+    const pathKey = `list:${path}`;
+    if (canvas.pathAt(1) === pathKey) {
+      canvas.open("detail");
+      return;
+    }
+    canvas.select(1, pathKey);
+  }
+
+  async function deleteLinkedList(path: string, parentPath: string) {
+    if (!repository) return;
+    if (activeLinkedList?.path === path && !(await closeDetailColumn())) return;
+    await repository.deleteList(path, (now ?? clock()).toISOString(), {
+      skipParentPaths: [parentPath],
+    });
+    if (activeListPath === path) activeListPath = null;
+    await onRefreshWorkspace?.();
   }
 
   function handleOpenApplication(applicationId: string) {
@@ -273,6 +385,181 @@
   function removeActiveTask(task: Task) {
     onDeleteTask(task);
     handleActiveTaskChange(null);
+  }
+
+  async function moveStructuralEntry(
+    source: { documentPath: string; runId: string; index: number },
+    target: { run: StructuralTaskRun; index: number },
+  ) {
+    if (!repository) return;
+    const sourceRun = (await repository.getStructuralTaskRuns(
+      source.documentPath,
+    )).find((run) => run.id === source.runId);
+    const targetRun = (await repository.getStructuralTaskRuns(
+      target.run.documentPath,
+    )).find((run) => run.id === target.run.id);
+    if (!sourceRun || !targetRun) {
+      throw new Error("The task run changed before the move could be saved.");
+    }
+    await repository.moveStructuralEntry(
+      source.documentPath,
+      sourceRun,
+      source.index,
+      target.run.documentPath,
+      targetRun,
+      target.index,
+    );
+    await onRefreshWorkspace?.();
+  }
+
+  const listSurfaceController: TasksMarkdownSurfaceController = {
+    kind: "tasks-markdown",
+    get tasks() {
+      return tasks;
+    },
+    get activeTaskId() {
+      return activeTaskId;
+    },
+    get activeListPath() {
+      return activeListPath;
+    },
+    onActiveTaskChange: handleActiveTaskChange,
+    onActiveListChange: handleActiveListChange,
+    onOpenList: handleOpenList,
+    onSaveTask: (task) => onSaveTask(task),
+    onDeleteTask: (task) => onDeleteTask(task),
+    onDeleteList: deleteLinkedList,
+    onRefresh: () => onRefreshWorkspace?.(),
+    onOpenNote: (path) => onOpenNote?.(path),
+    get sourceRunOrdinal() {
+      return taskListSourceOrdinal;
+    },
+    onRevealSource: (section) => {
+      taskListSourceOrdinal = section.ordinal;
+      taskListSurface?.enter();
+    },
+    onCreateInSection: (section, input) => {
+      return onCreateTaskListItem?.(section.documentPath, section, input);
+    },
+    onReorderSection: async (section, entries) => {
+      if (!repository) return;
+      await repository.replaceStructuralTaskRun(
+        section.documentPath,
+        section,
+        entries,
+      );
+      await onRefreshWorkspace?.();
+    },
+    onMoveEntry: moveStructuralEntry,
+  };
+
+  const linkedListSurfaceController: TasksMarkdownSurfaceController = {
+    kind: "tasks-markdown",
+    get tasks() {
+      return tasks;
+    },
+    get activeTaskId() {
+      return activeTaskId;
+    },
+    get activeListPath() {
+      return activeListPath;
+    },
+    onActiveTaskChange: handleActiveTaskChange,
+    onActiveListChange: handleActiveListChange,
+    onOpenList: handleOpenList,
+    onSaveTask: (task) => onSaveTask(task),
+    onDeleteTask: (task) => onDeleteTask(task),
+    onDeleteList: deleteLinkedList,
+    onRefresh: () => onRefreshWorkspace?.(),
+    onOpenNote: (path) => onOpenNote?.(path),
+    get sourceRunOrdinal() {
+      return linkedListSourceOrdinal;
+    },
+    onRevealSource: (section) => {
+      linkedListSourceOrdinal = section.ordinal;
+      linkedListSurface?.enter();
+    },
+    onCreateInSection: (section, input) => {
+      return onCreateTaskListItem?.(section.documentPath, section, input);
+    },
+    onReorderSection: async (section, entries) => {
+      if (!repository) return;
+      await repository.replaceStructuralTaskRun(
+        section.documentPath,
+        section,
+        entries,
+      );
+      await onRefreshWorkspace?.();
+    },
+    onMoveEntry: moveStructuralEntry,
+  };
+
+  const taskDocumentSurfaceController: TasksMarkdownSurfaceController = {
+    kind: "tasks-markdown",
+    get tasks() {
+      return tasks;
+    },
+    get activeTaskId() {
+      return activeTaskId;
+    },
+    get activeListPath() {
+      return activeListPath;
+    },
+    onActiveTaskChange: handleActiveTaskChange,
+    onActiveListChange: handleActiveListChange,
+    onOpenList: handleOpenList,
+    onSaveTask: (task) => onSaveTask(task),
+    onDeleteTask: (task) => onDeleteTask(task),
+    onDeleteList: deleteLinkedList,
+    onRefresh: () => onRefreshWorkspace?.(),
+    onOpenNote: (path) => onOpenNote?.(path),
+    get sourceRunOrdinal() {
+      return taskDocumentSourceOrdinal;
+    },
+    onRevealSource: (run) => {
+      taskDocumentSourceOrdinal = run.ordinal;
+      taskDocumentSurface?.enter();
+    },
+    onCreateInSection: (run, input) => {
+      return onCreateTaskListItem?.(run.documentPath, run, input);
+    },
+    onReorderSection: async (run, entries) => {
+      if (!repository) return;
+      await repository.replaceStructuralTaskRun(
+        run.documentPath,
+        run,
+        entries,
+      );
+      await onRefreshWorkspace?.();
+    },
+    onMoveEntry: moveStructuralEntry,
+  };
+
+  function editTaskListDocument() {
+    taskListSourceOrdinal = null;
+    taskListSurface?.enter();
+  }
+
+  async function readTaskListDocument() {
+    if (await taskListSurface?.exit()) taskListSourceOrdinal = null;
+  }
+
+  function editLinkedListDocument() {
+    linkedListSourceOrdinal = null;
+    linkedListSurface?.enter();
+  }
+
+  function editTaskDocument() {
+    taskDocumentSourceOrdinal = null;
+    taskDocumentSurface?.enter();
+  }
+
+  async function readTaskDocument() {
+    if (await taskDocumentSurface?.exit()) taskDocumentSourceOrdinal = null;
+  }
+
+  async function readLinkedListDocument() {
+    if (await linkedListSurface?.exit()) linkedListSourceOrdinal = null;
   }
 
   function bucketCount(bucket: TaskBucket) {
@@ -379,22 +666,54 @@
           >
             <ColumnCanvas.Title>{activePlannerLabel}</ColumnCanvas.Title>
           </div>
-          {#if showTodayShortcut}
+          {#if showTodayShortcut || (taskArea && selectedListNode && app && repository)}
             <ColumnCanvas.HeaderActions>
-              <button
-                type="button"
-                class="task-column-canvas-story__today-shortcut"
-                aria-label="Return to today"
-                onclick={() => (selectedDate = actualToday)}
-              >
-                <CalendarDaysIcon aria-hidden="true" />
-                <span>Today</span>
-              </button>
+              {#if showTodayShortcut}
+                <button
+                  type="button"
+                  class="task-column-canvas-story__today-shortcut"
+                  aria-label="Return to today"
+                  onclick={() => (selectedDate = actualToday)}
+                >
+                  <CalendarDaysIcon aria-hidden="true" />
+                  <span>Today</span>
+                </button>
+              {/if}
+              {#if taskArea && selectedListNode && app && repository}
+                <button
+                  type="button"
+                  class="task-column-canvas-story__markdown-mode"
+                  aria-label={taskListEditing
+                    ? `Read ${activePlannerLabel}`
+                    : `Edit ${activePlannerLabel}`}
+                  title={taskListEditing ? "Reading view" : "Edit"}
+                  onclick={() =>
+                    taskListEditing
+                      ? void readTaskListDocument()
+                      : editTaskListDocument()}
+                >
+                  {#if taskListEditing}
+                    <BookOpenIcon aria-hidden="true" />
+                  {:else}
+                    <PencilIcon aria-hidden="true" />
+                  {/if}
+                </button>
+              {/if}
             </ColumnCanvas.HeaderActions>
           {/if}
         </ColumnCanvas.Header>
         <div class="task-column-canvas-story__pane">
-          <ApplicationTaskPlannerMode
+          {#if taskArea && selectedListNode && app && repository}
+            <TaskMarkdownSurface
+              bind:this={taskListSurface}
+              bind:editing={taskListEditing}
+              {app}
+              {repository}
+              path={selectedListNode.path}
+              controller={listSurfaceController}
+            />
+          {:else}
+            <ApplicationTaskPlannerMode
             {tasks}
             {now}
             {clock}
@@ -417,27 +736,105 @@
             {onSaveApplication}
             onOpenApplication={handleOpenApplication}
             onDragTargetChange={(targetId) => (activeDropTargetId = targetId)}
-          />
+            />
+          {/if}
         </div>
       </ColumnCanvas.Column>
 
       <ColumnCanvas.Column id="detail">
-        {#if activeTask}
+        {#if activeLinkedList && app && repository}
+          <ColumnCanvas.Header>
+            <div
+              data-ui-component="column-canvas"
+              data-ui-part="column-header-main"
+            >
+              <ColumnCanvas.Title>{activeLinkedList.title}</ColumnCanvas.Title>
+            </div>
+            <ColumnCanvas.HeaderActions>
+              <button
+                type="button"
+                class="task-column-canvas-story__markdown-mode"
+                aria-label={linkedListEditing
+                  ? `Read ${activeLinkedList.title}`
+                  : `Edit ${activeLinkedList.title}`}
+                title={linkedListEditing ? "Reading view" : "Edit"}
+                onclick={() =>
+                  linkedListEditing
+                    ? void readLinkedListDocument()
+                    : editLinkedListDocument()}
+              >
+                {#if linkedListEditing}
+                  <BookOpenIcon aria-hidden="true" />
+                {:else}
+                  <PencilIcon aria-hidden="true" />
+                {/if}
+              </button>
+              <ColumnCanvas.Close onclick={() => void closeDetailColumn()} />
+            </ColumnCanvas.HeaderActions>
+          </ColumnCanvas.Header>
+          <div class="task-column-canvas-story__pane">
+            <TaskMarkdownSurface
+              bind:this={linkedListSurface}
+              bind:editing={linkedListEditing}
+              {app}
+              {repository}
+              path={activeLinkedList.path}
+              controller={linkedListSurfaceController}
+            />
+          </div>
+        {:else if activeTask}
           <ApplicationTaskSidebarDetail
             task={activeTask}
             application={activeTaskApplication}
+            documentBodyEnabled={Boolean(
+              app && repository && activeTask.sourcePath,
+            )}
             onToggleDone={toggleActiveTaskDone}
             onUpdateTitle={updateActiveTaskTitle}
             onRemoveTask={removeActiveTask}
             onOpenApplication={handleOpenApplication}
           >
             {#snippet closeAction()}
-              <ColumnCanvas.Close onclick={closeDetailColumn} />
+              <ColumnCanvas.Close onclick={() => void closeDetailColumn()} />
+            {/snippet}
+            {#snippet documentModeAction()}
+              {#if app && repository && activeTask.sourcePath}
+                <button
+                  type="button"
+                  class="task-column-canvas-story__markdown-mode"
+                  aria-label={taskDocumentEditing
+                    ? `Read ${activeTask.title}`
+                    : `Edit ${activeTask.title}`}
+                  title={taskDocumentEditing ? "Reading view" : "Edit"}
+                  onclick={() =>
+                    taskDocumentEditing
+                      ? void readTaskDocument()
+                      : editTaskDocument()}
+                >
+                  {#if taskDocumentEditing}
+                    <BookOpenIcon aria-hidden="true" />
+                  {:else}
+                    <PencilIcon aria-hidden="true" />
+                  {/if}
+                </button>
+              {/if}
+            {/snippet}
+            {#snippet documentBody()}
+              {#if app && repository && activeTask.sourcePath}
+                <TaskMarkdownSurface
+                  bind:this={taskDocumentSurface}
+                  bind:editing={taskDocumentEditing}
+                  {app}
+                  {repository}
+                  path={activeTask.sourcePath!}
+                  controller={taskDocumentSurfaceController}
+                />
+              {/if}
             {/snippet}
           </ApplicationTaskSidebarDetail>
         {:else}
           <div class="task-column-canvas-story__related-empty">
-            <ColumnCanvas.Close onclick={closeDetailColumn} />
+            <ColumnCanvas.Close onclick={() => void closeDetailColumn()} />
             <p>Select a Task’s details control to open it here.</p>
           </div>
         {/if}

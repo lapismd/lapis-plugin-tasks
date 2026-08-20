@@ -20,13 +20,30 @@
     checklistCompleted: 1,
   });
   let checklist = $state<ChecklistItem[]>([
-    { position: 1, text: "Pull the incident timeline", checked: true },
+    {
+      position: 1,
+      text: "Pull the incident timeline",
+      checked: true,
+      sourceStart: 0,
+      sourceEnd: 0,
+      source: "- [x] Pull the incident timeline",
+    },
     {
       position: 2,
       text: "Note the Kubernetes upgrade cadence",
       checked: false,
+      sourceStart: 0,
+      sourceEnd: 0,
+      source: "- [ ] Note the Kubernetes upgrade cadence",
     },
-    { position: 3, text: "Prepare a mentoring example", checked: false },
+    {
+      position: 3,
+      text: "Prepare a mentoring example",
+      checked: false,
+      sourceStart: 0,
+      sourceEnd: 0,
+      source: "- [ ] Prepare a mentoring example",
+    },
   ]);
   let checklistRefreshVersion = $state(0);
 

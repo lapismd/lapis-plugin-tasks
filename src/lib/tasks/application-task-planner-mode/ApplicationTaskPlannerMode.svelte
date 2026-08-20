@@ -28,6 +28,7 @@
 	import ApplicationTaskPlannerShell from '../application-task-planner-shell/ApplicationTaskPlannerShell.svelte';
 	import {
 		arrayMove,
+		applyApplicationTaskPatch,
 		buildPlannerDragLayout,
 		buildPlannerPlacementPatch,
 		changedPlannerPlacementTaskIds,
@@ -375,45 +376,7 @@
 	async function saveTaskPatch(task: Task, patch: Partial<ApplicationTask>) {
 		const updatedAt = currentTime().toISOString();
 		if (!task.applicationId) {
-			await onSaveTask({
-				...task,
-				title: patch.body ?? task.title,
-				status:
-					patch.status ??
-					(patch.done === undefined ? task.status : patch.done ? 'completed' : 'open'),
-				priority: Object.prototype.hasOwnProperty.call(patch, 'priority')
-					? patch.priority
-					: task.priority,
-				linkedTo: Object.prototype.hasOwnProperty.call(patch, 'linkedTo')
-					? patch.linkedTo
-					: task.linkedTo,
-				dueAt: Object.prototype.hasOwnProperty.call(patch, 'dueAt') ? patch.dueAt : task.dueAt,
-				scheduledAt: Object.prototype.hasOwnProperty.call(patch, 'scheduledAt')
-					? patch.scheduledAt
-					: task.scheduledAt,
-				when: Object.prototype.hasOwnProperty.call(patch, 'when') ? patch.when : task.when,
-				start: Object.prototype.hasOwnProperty.call(patch, 'start') ? patch.start : task.start,
-				planDate: Object.prototype.hasOwnProperty.call(patch, 'planDate')
-					? patch.planDate
-					: task.planDate,
-				planAt: Object.prototype.hasOwnProperty.call(patch, 'planAt') ? patch.planAt : task.planAt,
-				deadline: Object.prototype.hasOwnProperty.call(patch, 'deadline')
-					? patch.deadline
-					: task.deadline,
-				inbox: Object.prototype.hasOwnProperty.call(patch, 'inbox') ? patch.inbox : task.inbox,
-				listId: Object.prototype.hasOwnProperty.call(patch, 'listId') ? patch.listId : task.listId,
-				completedAt: Object.prototype.hasOwnProperty.call(patch, 'completedAt')
-					? patch.completedAt
-					: task.completedAt,
-				order: Object.prototype.hasOwnProperty.call(patch, 'order') ? patch.order : task.order,
-				areas: Object.prototype.hasOwnProperty.call(patch, 'areas')
-					? (patch.areas ?? [])
-					: task.areas,
-				notes: Object.prototype.hasOwnProperty.call(patch, 'notes')
-					? (patch.notes ?? '')
-					: task.notes,
-				updatedAt: patch.updatedAt ?? updatedAt
-			});
+			await onSaveTask(applyApplicationTaskPatch(task, patch, updatedAt));
 			return;
 		}
 

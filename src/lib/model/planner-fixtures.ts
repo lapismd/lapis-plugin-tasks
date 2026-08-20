@@ -39,13 +39,19 @@ list:
 ---
 # Applications
 
-## Items
+Track application work here. The Markdown heading and task run remain in their authored position.
+
+## Current Work
 - [Tailor platform CV variant](../inbox/today-1.md)
 - [Review interview notes](../inbox/today-2.md)
 - [Send follow-up email](../inbox/evening.md)
 - [Prepare model serving examples](../upcoming/serving.md)
 - [Organize reference letters](../anytime/letters.md)
 - [Submit Nova Bank application](../logbook/nova.md)
+
+## Notes
+
+Keep interview preparation and follow-up context beneath the live task list.
 `,
   },
   {
@@ -58,7 +64,7 @@ list:
 ---
 # Docs
 
-## Items
+## Projects
 - [Writing](./writing.md)
 - [Draft design critique](../upcoming/critique.md)
 - [Write flashcards for system design](../inbox/docs-1.md)
@@ -74,7 +80,9 @@ list:
 ---
 # Writing
 
-## Items
+Capture drafting notes and reusable documentation work in this nested list.
+
+## Drafts
 `,
   },
   {
@@ -87,7 +95,7 @@ list:
 ---
 # CV
 
-## Items
+## Portfolio
 - [Update portfolio case study](../anytime/portfolio.md)
 - [Explore conference talks](../someday/talks.md)
 `,
@@ -407,7 +415,6 @@ function listTitleForPath(path: string): { listId: string; title: string } | nul
     if (
       document.structuralLinks.some(
         (link) =>
-          link.kind === "list-item" &&
           (link.href === path || link.href.endsWith(`/${path.split("/").pop()}`)),
       )
     ) {

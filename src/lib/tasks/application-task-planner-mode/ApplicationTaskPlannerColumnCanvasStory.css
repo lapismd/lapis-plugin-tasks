@@ -408,6 +408,31 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
   height: 0.85rem;
 }
 
+.task-column-canvas-story__markdown-mode {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  place-items: center;
+  border: 0;
+  border-radius: 0.35rem;
+  padding: 0;
+  background: transparent;
+  color: var(--ui-tasks-muted-foreground);
+  cursor: pointer;
+}
+
+.task-column-canvas-story__markdown-mode:hover,
+.task-column-canvas-story__markdown-mode:focus-visible {
+  background: var(--ui-tasks-muted-surface);
+  color: var(--ui-tasks-foreground);
+  outline: 0;
+}
+
+.task-column-canvas-story__markdown-mode svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
 .task-column-canvas-story__pane .application-task-view,
 .task-column-canvas-story__canvas
   [data-column-id="detail"]

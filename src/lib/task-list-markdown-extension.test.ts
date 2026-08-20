@@ -1,0 +1,112 @@
+import { readFileSync } from "node:fs";
+import { describe, expect, it } from "vitest";
+import {
+  scanStructuralTaskRuns,
+  structuralTaskRunEditorChange,
+  type StructuralTaskTargetResolver,
+} from "./model/task-list-items";
+
+const DOCUMENT = `---
+type: task-list
+id: list-applications
+list:
+  status: active
+---
+# Applications
+
+Before
+
+## Items
+- [One](../tasks/one.md)
+- [Two](../tasks/two.md)
+
+## Notes
+
+After
+`;
+
+const resolve: StructuralTaskTargetResolver = (_source, href) => ({
+  id: href,
+  path: href,
+  kind: "task",
+  title: href,
+});
+
+function applyChange(
+  source: string,
+  change: { from: number; to: number; insert: string },
+): string {
+  return `${source.slice(0, change.from)}${change.insert}${source.slice(change.to)}`;
+}
+
+describe("task-list Markdown contribution", () => {
+  it("keeps source mode literal and contributes a live-preview field", () => {
+    const source = readFileSync(
+      "src/lib/task-list-markdown-extension.ts",
+      "utf8",
+    );
+    expect(source).toContain('mode === "live-preview"');
+    expect(source).toContain("StateField.define<DecorationSet>");
+    expect(source).toContain("EditorView.decorations.from(field)");
+    expect(source).toContain("selectionTouchesSection");
+    expect(source).toContain("ignoreEvent(): boolean");
+    expect(source).toContain("return true");
+    expect(source).toContain("sourceRunOrdinal");
+    expect(source).toContain("ctx.addChild(child)");
+  });
+
+  it.each([
+    {
+      mutation: "create",
+      entries: [
+        { label: "One", target: "../tasks/one.md" },
+        { label: "Two", target: "../tasks/two.md" },
+        { label: "Three", target: "../tasks/three.md" },
+      ],
+      expected: ["One", "Two", "Three"],
+    },
+    {
+      mutation: "reorder",
+      entries: [
+        { label: "Two", target: "../tasks/two.md" },
+        { label: "One", target: "../tasks/one.md" },
+      ],
+      expected: ["Two", "One"],
+    },
+    {
+      mutation: "delete",
+      entries: [{ label: "Two", target: "../tasks/two.md" }],
+      expected: ["Two"],
+    },
+  ])("transacts $mutation through the active editor without changing surrounding Markdown", ({
+    entries,
+    expected,
+  }) => {
+    const section = scanStructuralTaskRuns(
+      DOCUMENT,
+      "lists/applications.md",
+      resolve,
+    )[0]!;
+    const next = applyChange(
+      DOCUMENT,
+      structuralTaskRunEditorChange(
+        DOCUMENT,
+        section,
+        entries,
+        "lists/applications.md",
+      ),
+    );
+
+    expect(next.slice(0, section.from)).toBe(DOCUMENT.slice(0, section.from));
+    expect(next).toContain("## Notes\n\nAfter\n");
+    expect(
+      scanStructuralTaskRuns(
+        next,
+        "lists/applications.md",
+        resolve,
+      )[0]!.entries.map(
+        (entry) => entry.label,
+      ),
+    ).toEqual(expected);
+  });
+});

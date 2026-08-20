@@ -1,0 +1,146 @@
+.task-quick-create-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.1rem minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: start;
+  min-height: 2.35rem;
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid var(--kanban-border);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0.55rem 1.35rem 0.55rem 1rem;
+}
+
+.task-quick-create-row--collapsed {
+  grid-template-columns: 1.1rem auto minmax(0, 1fr);
+  align-items: center;
+  color: var(--kanban-muted);
+  cursor: text;
+  outline: 0;
+}
+
+.task-quick-create-row--collapsed:hover,
+.task-quick-create-row--collapsed:focus-visible {
+  color: var(--kanban-foreground);
+}
+
+.task-quick-create-row--collapsed:focus-visible::after {
+  position: absolute;
+  inset: 0.2rem 0.45rem;
+  border: 1px solid
+    color-mix(in srgb, var(--ui-tasks-accent) 35%, transparent);
+  border-radius: 0.42rem;
+  content: "";
+  pointer-events: none;
+}
+
+.task-quick-create-row--editing {
+  padding-top: 0.65rem;
+  padding-bottom: 0.62rem;
+}
+
+.task-quick-create-row__box {
+  position: relative;
+  display: grid;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.12rem;
+  place-items: center;
+  border: 1.5px solid var(--kanban-border);
+  border-radius: 0.36rem;
+  background: transparent;
+  color: var(--kanban-muted);
+  flex-shrink: 0;
+  padding: 0;
+  transition:
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.task-quick-create-row__box svg {
+  position: absolute;
+  top: -0.27rem;
+  right: -0.3rem;
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 999px;
+  background: var(--kanban-card);
+  stroke-width: 2.2;
+}
+
+.task-quick-create-row--collapsed:hover .task-quick-create-row__box,
+.task-quick-create-row--collapsed:focus-visible .task-quick-create-row__box,
+.task-quick-create-row--editing .task-quick-create-row__box {
+  border-color: var(--ui-tasks-accent);
+  color: var(--ui-tasks-accent);
+}
+
+.task-quick-create-row__label {
+  min-width: 0;
+  overflow: hidden;
+  color: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-quick-create-row__label--draft {
+  color: var(--kanban-foreground);
+  font-weight: 650;
+}
+
+.task-quick-create-row__editor {
+  display: grid;
+  min-width: 0;
+  gap: 0.35rem;
+}
+
+.task-quick-create-row__editor > input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--kanban-foreground);
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.35;
+  padding: 0.05rem 0;
+}
+
+.task-quick-create-row__editor > input:focus {
+  outline: 0;
+}
+
+.task-quick-create-row__editor > input::placeholder {
+  color: var(--kanban-muted);
+  font-weight: 500;
+}
+
+.task-quick-create-row__shortcut {
+  display: inline-flex;
+  width: fit-content;
+  height: 1.35rem;
+  align-items: center;
+  justify-self: start;
+  border: 0;
+  border-radius: 0.42rem;
+  background: color-mix(in srgb, var(--kanban-muted) 10%, transparent);
+  color: var(--kanban-muted);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 0 0.38rem;
+}
+
+.task-quick-create-row--collapsed:focus-visible
+  .task-quick-create-row__shortcut {
+  background: color-mix(in srgb, var(--ui-tasks-accent) 10%, transparent);
+  color: var(--ui-tasks-accent);
+}

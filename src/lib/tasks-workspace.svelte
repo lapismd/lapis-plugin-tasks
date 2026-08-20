@@ -9,6 +9,7 @@
     replaceListNavChildren,
     toListNavNode,
     uniqueListPath,
+    navigationPinHref,
     type ListTreeDropTarget,
     type TaskListCreateInput,
     type Task,
@@ -16,6 +17,7 @@
     type TaskQuickCreateInput,
     type TaskRepository,
     type ChecklistItem,
+    type StructuralTaskRun,
   } from "./model";
   import {
     DEFAULT_TASKS_PLUGIN_SETTINGS,
@@ -110,6 +112,27 @@
       now: currentTime(),
     });
     await queueRefresh();
+  }
+
+  async function createTaskListItem(
+    listPath: string,
+    section: StructuralTaskRun,
+    input: TaskQuickCreateInput,
+  ) {
+    const task = await createCatalogTaskInRepository(
+      repository,
+      { ...input, area: null, order: section.entries.length },
+      {
+        existingPaths: app.vault.getMarkdownFiles().map((file) => file.path),
+        now: currentTime(),
+      },
+    );
+    if (!task.sourcePath) throw new Error("Created task is missing its vault path.");
+    await queueRefresh();
+    return {
+      label: task.title,
+      target: navigationPinHref(listPath, task.sourcePath),
+    };
   }
 
   async function deleteTask(task: Task) {
@@ -253,6 +276,8 @@
     {clock}
     {settings}
     {snapshot}
+    {app}
+    {repository}
     applications={[]}
     applicationSummaries={{}}
     showRelated={false}
@@ -271,6 +296,8 @@
     onUnpinList={(path) => void unpinList(path)}
     onArchiveList={(path) => void archiveList(path)}
     onDeleteList={(path) => void deleteList(path)}
+    onRefreshWorkspace={queueRefresh}
+    onCreateTaskListItem={createTaskListItem}
   />
 {/if}
 
