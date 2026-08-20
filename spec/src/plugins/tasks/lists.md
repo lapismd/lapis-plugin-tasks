@@ -82,3 +82,6 @@ identity rule. Catalog writes through `apply-catalog-task.ts` map `planAt`
 `morning`, `afternoon`, `evening`, or `HH:mm` onto the task file; `all-day`
 is not a stored task token. Catalog `status` `canceled` persists through
 `TaskRepository.cancel` as YAML `task.status: canceled`.
+Daily-agenda quick-create gives an existing selected list the same structural
+membership treatment while taking its plan date and day part from the agenda
+section. Scheduling never changes the task's list parent.

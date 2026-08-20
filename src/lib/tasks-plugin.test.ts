@@ -33,7 +33,9 @@ describe("TasksPlugin", () => {
     expect(source).toContain("TASKS_VIEW_TYPE");
     expect(source).toContain('id: "open"');
     expect(source).toContain("addRibbonIcon");
-    expect(source).not.toContain("addSettingTab");
+    expect(source).toContain("await this.loadData()");
+    expect(source).toContain("this.saveData(snapshot)");
+    expect(source).toContain("addSettingTab");
     expect(view).toContain('export const TASKS_VIEW_TYPE = "tasks"');
     expect(index).toContain("TasksPlugin");
     expect(index).toContain("TasksView");

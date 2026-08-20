@@ -52,6 +52,54 @@
       ),
     ).toBeVisible();
     await playTitleClickStartsInlineEdit(context);
+    const daySections = Array.from(
+      context.canvasElement.querySelectorAll<HTMLElement>("[data-day-section]"),
+    );
+    expect(daySections.map((section) => section.dataset.daySection)).toEqual([
+      "anytime",
+      "morning",
+      "afternoon",
+      "evening",
+      "done",
+    ]);
+    expect(daySections[0]).toHaveAttribute("data-day-section-expanded", "true");
+    expect(daySections[4]).toHaveAttribute("data-day-section-expanded", "false");
+    expect(
+      context.canvasElement.querySelector(
+        '[data-planner-sortable-list="today:done"]',
+      ),
+    ).toBeInTheDocument();
+
+    const morningDisclosure = daySections[1]!.querySelector<HTMLButtonElement>(
+      ":scope > header button",
+    )!;
+    await userEvent.click(morningDisclosure);
+    expect(daySections[1]).toHaveAttribute("data-day-section-expanded", "false");
+    await userEvent.click(morningDisclosure);
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: /Thu 2026-08-20/ }),
+    );
+    const returnToToday = await canvas.findByRole("button", {
+      name: "Return to today",
+    });
+    expect(returnToToday).toBeVisible();
+    await userEvent.click(returnToToday);
+    expect(
+      canvas.getByRole("button", { name: "Wed 2026-08-19, today" }),
+    ).toHaveAttribute("aria-pressed", "true");
+
+    const afternoonSection = context.canvasElement.querySelector<HTMLElement>(
+      '[data-day-section="afternoon"]',
+    )!;
+    await userEvent.click(
+      within(afternoonSection).getByRole("button", { name: "New task" }),
+    );
+    await userEvent.type(
+      within(afternoonSection).getByRole("textbox", { name: "New task" }),
+      "Agenda interaction task{Enter}",
+    );
+    expect(within(afternoonSection).getByText("Agenda interaction task")).toBeVisible();
     const applications = canvas.getByRole("button", { name: "Applications" });
     await userEvent.pointer({ keys: "[MouseRight]", target: applications });
     const menu = within(context.canvasElement.ownerDocument.body);

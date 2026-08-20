@@ -1,4 +1,29 @@
 export { TasksPlugin, TASKS_PLUGIN_ID, default } from "./tasks-plugin";
-export { TASKS_VIEW_TYPE, TasksView } from "./tasks-view";
+export { TASKS_VIEW_TYPE, TasksView, type TasksSettingsSource } from "./tasks-view";
+export {
+  DEFAULT_TASKS_PLUGIN_SETTINGS,
+  TASKS_PLUGIN_DATA_VERSION,
+  TasksSettingsValidationError,
+  cloneTasksPluginSettings,
+  isTaskClockTime,
+  mergeTasksPluginSettings,
+  migrateTasksPluginData,
+  patchTasksPluginSettings,
+  validateTasksDayPartSettings,
+  type TasksDayPartSettings,
+  type TasksPluginDataV1,
+  type TasksPluginSettings,
+  type TasksPluginSettingsPatch,
+} from "./tasks-settings";
+export {
+  addPlannerDays,
+  buildTaskPlannerDaySectionPatch,
+  buildTaskPlannerDaySnapshot,
+  buildTaskPlannerWeek,
+  resolveTaskDaySection,
+  type TaskDaySection,
+  type TaskPlannerDaySnapshot,
+  type TaskPlannerWeekDay,
+} from "./model";
 export { default as CatalogBoundary } from "./CatalogBoundary.svelte";
 export * from "./tasks";

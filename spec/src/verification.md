@@ -14,7 +14,7 @@
 | LPT-SPEC-010 | Implemented | Canonical plugin chapters and stories use the `Plugins/Tasks` hierarchy. |
 | LPT-SPEC-011 | Implemented | `AGENTS.md` requires unrelated-work preservation, independently verified Jujutsu commits, and review-context messages that record the change, rationale, and passing validation. |
 | LN-TASK-001 | Implemented | Package identity, manifest, build, and pack inspection. |
-| LN-TASK-002 | Implemented | Plugin onload registers the tasks projection, `tasks` view, `tasks:open`, and ribbon. |
+| LN-TASK-002 | Implemented | Plugin onload registers the tasks projection, `tasks` view, `tasks:open`, ribbon, and Tasks settings tab backed by versioned plugin data. |
 | LN-TASK-003 | Implemented | Application-ownership audit excludes `globalThis.app`. |
 | LN-TASK-004 | Implemented | Catalog sources import public Design Core primitives and native Tasks CSS. |
 | LN-TASK-005 | Implemented | Published runtime excludes forbidden packages; Storybook may depend on workspace hosts and pins one CodeMirror copy. |
@@ -41,3 +41,7 @@
 | LN-TASK-026 | Implemented | Navigation and `## Items` rewrites cover pin reorder, restack, nest, unnest, and rename. `createList` writes a new list file; area-picker and tree create use it. Nested create writes a parent `list-item`. `archiveList` sets `list.status` to archived. `deleteList` unlinks parent/nav pins and removes the list file while leaving child tasks. Creating a task in Applications with area `list-applications` attaches to that list and does not mint `list-list-applications`. |
 | LN-TASK-027 | Implemented | TaskListNavTree uses Explorer guide tokens, nested sublists, inline rename, HTML5 drag with auto-expand, and a Design Core context menu for Open note, Rename, New nested list, Unpin, Archive, Delete, plus section Rename/New list. |
 | LN-TASK-028 | Implemented | Column Canvas first-column buckets and list rows carry planner drop-host attributes; dragging a task over Inbox morphs the App Shell drag preview. |
+| LN-TASK-029 | Implemented | `tasks-settings` validates and migrates versioned day-part settings; plugin tests assert serialized persistence, queue recovery, and subscriber snapshots; live views receive settings without task writes. |
+| LN-TASK-030 | Implemented | Pure week tests cover Monday-first month, year, and daylight-saving boundaries; the Column Canvas story selects another date, exposes the Today header action, and resets to the injected date. |
+| LN-TASK-031 | Implemented | Daily snapshot tests assert exact boundary routing, overdue inclusion, completion-date Done grouping, and canceled exclusion; the governed story asserts the five ordered sections, defaults, and empty collapsed Done target. |
+| LN-TASK-032 | Implemented | Drag-layout tests cover all daily groups, cross-section completion and reopening at a selected date; deterministic stories quick-create into a day part and use canonical statuses. |

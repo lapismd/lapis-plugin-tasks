@@ -13,21 +13,37 @@
   import CircleEllipsisIcon from "@lucide/svelte/icons/circle-ellipsis";
   import FlagIcon from "@lucide/svelte/icons/flag";
   import FolderKanbanIcon from "@lucide/svelte/icons/folder-kanban";
-  import ListTodoIcon from "@lucide/svelte/icons/list-todo";
   import PlusIcon from "@lucide/svelte/icons/plus";
+  import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
+  import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
+  import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
+  import Clock3Icon from "@lucide/svelte/icons/clock-3";
+  import SunriseIcon from "@lucide/svelte/icons/sunrise";
+  import SunIcon from "@lucide/svelte/icons/sun";
+  import MoonIcon from "@lucide/svelte/icons/moon";
+  import CheckCheckIcon from "@lucide/svelte/icons/check-check";
   import { tick, type Snippet } from "svelte";
 
   import {
     buildTaskPlannerSnapshot,
+    buildTaskPlannerDaySnapshot,
+    buildTaskPlannerWeek,
+    addPlannerDays,
     comparePlannerTasks,
     getPlannerSelectionPosition,
     listIdentitySlug,
     listsMatch,
     taskDateOnly,
+    todayDateOnly,
+    type TaskDaySection,
     type TaskPlannerDateGroup,
     type TaskPlannerRowContext,
     type TaskPlannerUpcomingRow,
   } from '../../model';
+  import {
+    DEFAULT_TASKS_PLUGIN_SETTINGS,
+    type TasksPluginSettings,
+  } from "../../tasks-settings";
   import type {
     Task,
     TaskBucket,
@@ -49,9 +65,25 @@
 
   type PlannerView = TaskBucket;
 
+  const daySections = [
+    { id: "anytime", label: "Anytime", icon: Clock3Icon },
+    { id: "morning", label: "Morning", icon: SunriseIcon },
+    { id: "afternoon", label: "Afternoon", icon: SunIcon },
+    { id: "evening", label: "Evening", icon: MoonIcon },
+    { id: "done", label: "Done", icon: CheckCheckIcon },
+  ] as const satisfies ReadonlyArray<{
+    id: TaskDaySection;
+    label: string;
+    icon: typeof Clock3Icon;
+  }>;
+
   let {
     tasks = [],
     now,
+    clock = () => now ?? new Date(),
+    settings = DEFAULT_TASKS_PLUGIN_SETTINGS,
+    selectedDate = $bindable(todayDateOnly(now ?? clock())),
+    actualToday = todayDateOnly(now ?? clock()),
     view = "today",
     area = null,
     taskRow,
@@ -64,6 +96,10 @@
   }: {
     tasks?: Task[];
     now?: Date;
+    clock?: () => Date;
+    settings?: TasksPluginSettings;
+    selectedDate?: string;
+    actualToday?: string;
     view?: PlannerView;
     area?: string | null;
     taskRow?: Snippet<[Task, TaskPlannerRowContext]>;
@@ -86,6 +122,13 @@
   let quickCreateActiveGroup = $state<string | null>(null);
   let quickCreateInteractionGroup = $state<string | null>(null);
   let plannerElement = $state<HTMLElement | null>(null);
+  let expandedDaySections = $state<Record<TaskDaySection, boolean>>({
+    anytime: true,
+    morning: true,
+    afternoon: true,
+    evening: true,
+    done: false,
+  });
   const dragController = usePlannerDragController();
   const plannerSensors = [
     PointerSensor.configure({
@@ -99,6 +142,21 @@
     KeyboardSensor,
   ];
   const snapshot = $derived(buildTaskPlannerSnapshot(tasks, now));
+  const daySnapshot = $derived(
+    buildTaskPlannerDaySnapshot(tasks, selectedDate, settings, actualToday),
+  );
+  const selectedWeek = $derived(buildTaskPlannerWeek(selectedDate, actualToday));
+  const selectedDateValue = $derived(
+    new Date(`${selectedDate}T00:00:00`),
+  );
+  const selectedWeekday = $derived(
+    new Intl.DateTimeFormat("en", { weekday: "long" }).format(selectedDateValue),
+  );
+  const selectedMonth = $derived(
+    new Intl.DateTimeFormat("en", { month: "long", year: "numeric" }).format(
+      selectedDateValue,
+    ),
+  );
   const selectedTaskIdSet = $derived(new Set(selectedTaskIds));
   const draggedTaskIdSet = $derived(new Set(draggedTaskIds));
   const selectedArea = $derived.by(() => {
@@ -135,7 +193,12 @@
   const headingCount = $derived.by(() => {
     if (selectedArea) return areaTasks.length;
     if (view === "today")
-      return snapshot.today.length + snapshot.thisEvening.length;
+      return (
+        daySnapshot.anytime.length +
+        daySnapshot.morning.length +
+        daySnapshot.afternoon.length +
+        daySnapshot.evening.length
+      );
     if (view === "upcoming")
       return snapshot.upcoming.reduce(
         (total, group) => total + group.tasks.length,
@@ -207,7 +270,7 @@
   }
 
   function bucketForGroup(group: string): TaskBucket {
-    if (group === "this-evening") return "today";
+    if (group.startsWith("today:")) return "today";
     if (group.startsWith("upcoming:")) return "upcoming";
     if (group === "today" || group === "anytime" || group === "someday" || group === "logbook") {
       return group;
@@ -275,7 +338,22 @@
   } {
     const date = dateForGroup(group);
     if (date) return { scheduledAt: date };
-    if (group === "this-evening") return { when: "this-evening" };
+    if (group === "today:anytime") {
+      return { scheduledAt: selectedDate, planAt: "anytime" };
+    }
+    if (group === "today:morning") {
+      return { scheduledAt: selectedDate, planAt: "morning" };
+    }
+    if (group === "today:afternoon") {
+      return { scheduledAt: selectedDate, planAt: "afternoon" };
+    }
+    if (group === "today:evening") {
+      return {
+        scheduledAt: selectedDate,
+        when: "this-evening",
+        planAt: "evening",
+      };
+    }
     const bucket = bucketForGroup(group);
     if (bucket === "today") return { when: "today" };
     if (bucket === "anytime") return { when: "anytime" };
@@ -305,8 +383,10 @@
 
   function quickCreateTasksForGroup(group: string) {
     if (selectedArea) return areaTasks;
-    if (group === "today") return snapshot.today;
-    if (group === "this-evening") return snapshot.thisEvening;
+    if (group === "today:anytime") return daySnapshot.anytime;
+    if (group === "today:morning") return daySnapshot.morning;
+    if (group === "today:afternoon") return daySnapshot.afternoon;
+    if (group === "today:evening") return daySnapshot.evening;
     if (group === "anytime") return snapshot.anytime;
     if (group === "someday") return snapshot.someday;
     if (group.startsWith("upcoming:")) {
@@ -379,6 +459,17 @@
     quickCreateActiveGroup = group;
     await tick();
     quickCreateInputElement(group)?.focus();
+  }
+
+  function toggleDaySection(section: TaskDaySection) {
+    expandedDaySections = {
+      ...expandedDaySections,
+      [section]: !expandedDaySections[section],
+    };
+  }
+
+  function shiftSelectedWeek(days: number) {
+    selectedDate = addPlannerDays(selectedDate, days);
   }
 
   function handleQuickCreateFocusOut(event: FocusEvent, group: string) {
@@ -620,16 +711,77 @@
   </section>
 {/snippet}
 
-{#snippet todaySection(title: string, items: Task[], listLabel: string, group: string)}
-  {#if items.length || quickCreateEnabled}
-    <section class="tasks-planner__section">
-      <header class="tasks-planner__section-header">
-        <h2>{title}</h2>
-        <span>{items.length}</span>
-      </header>
-      {@render taskList(items, listLabel, group)}
-    </section>
-  {/if}
+{#snippet dayTaskList(
+  items: Task[],
+  listLabel: string,
+  group: string,
+  allowQuickCreate: boolean,
+)}
+  <PlannerSortableList id={group} label={listLabel}>
+    {#if allowQuickCreate}
+      {@render quickCreateRow(group)}
+    {/if}
+    {#each items as task, index (task.id)}
+      <PlannerSortableRow
+        id={task.id}
+        {index}
+        {group}
+        dragged={draggedTaskIdSet.has(task.id)}
+      >
+        {#if taskRow}
+          {@render taskRow(task, taskRowContext(items, task, index, group))}
+        {:else}
+          {@render defaultTaskRow(task)}
+        {/if}
+      </PlannerSortableRow>
+    {/each}
+  </PlannerSortableList>
+{/snippet}
+
+{#snippet daySection(
+  section: TaskDaySection,
+  title: string,
+  icon: typeof Clock3Icon,
+  items: Task[],
+)}
+  {@const expanded = expandedDaySections[section]}
+  {@const group = `today:${section}`}
+  {@const SectionIcon = icon}
+  <section
+    class="tasks-planner__section tasks-planner__day-section"
+    data-day-section={section}
+    data-day-section-expanded={expanded ? "true" : "false"}
+  >
+    <header class="tasks-planner__day-section-header">
+      <button
+        type="button"
+        aria-expanded={expanded}
+        aria-controls={`tasks-day-section-${section}`}
+        onclick={() => toggleDaySection(section)}
+      >
+        <span class="tasks-planner__day-section-label">
+          <SectionIcon aria-hidden="true" />
+          <span>{title}</span>
+          <small>{items.length}</small>
+        </span>
+        <ChevronDownIcon aria-hidden="true" />
+      </button>
+    </header>
+    <div id={`tasks-day-section-${section}`}>
+      {#if expanded}
+        {@render dayTaskList(
+          items,
+          `${title} tasks`,
+          group,
+          section !== "done",
+        )}
+      {:else}
+        <div class="tasks-planner__day-collapsed-drop" aria-hidden="true">
+          {@render dayTaskList([], `${title} tasks`, group, false)}
+        </div>
+      {/if}
+    </div>
+  </section>
 {/snippet}
 
 {#snippet upcomingRows(rows: TaskPlannerUpcomingRow[])}
@@ -682,46 +834,84 @@
             : "row"
         : "row"}
     >
-    <header class="tasks-planner__header">
-    <div>
-      <h1>
-        <span class="tasks-planner__title-icon" aria-hidden="true">
-          {#if selectedArea}
-            <FolderKanbanIcon />
-          {:else if view === "today"}
-            <ListTodoIcon />
-          {:else if view === "upcoming"}
-            <CalendarDaysIcon />
-          {:else if view === "anytime"}
-            <CircleEllipsisIcon />
-          {:else if view === "someday"}
-            <CalendarClockIcon />
-          {:else}
-            <ArchiveIcon />
-          {/if}
-        </span>
-        {heading}
-      </h1>
-    </div>
-    <span class="tasks-planner__count">{headingCount}</span>
-    </header>
+    {#if !selectedArea && view === "today"}
+      <section class="tasks-planner__agenda-calendar" aria-label="Daily agenda date">
+        <header class="tasks-planner__agenda-heading">
+          <div>
+            <h1>{selectedWeekday}</h1>
+            <p>{selectedMonth}</p>
+          </div>
+          <span class="tasks-planner__count">{headingCount}</span>
+        </header>
+        <div class="tasks-planner__week-navigation">
+          <button
+            type="button"
+            aria-label="Previous week"
+            onclick={() => shiftSelectedWeek(-7)}
+          >
+            <ChevronLeftIcon aria-hidden="true" />
+          </button>
+          <div class="tasks-planner__week" role="group" aria-label="Select agenda date">
+            {#each selectedWeek as day (day.date)}
+              <button
+                type="button"
+                class:tasks-planner__week-day--selected={day.selected}
+                class:tasks-planner__week-day--today={day.today}
+                aria-pressed={day.selected}
+                aria-label={`${day.weekday} ${day.date}${day.today ? ", today" : ""}`}
+                onclick={() => (selectedDate = day.date)}
+              >
+                <span>{day.weekday}</span>
+                <strong>{day.dayNumber}</strong>
+              </button>
+            {/each}
+          </div>
+          <button
+            type="button"
+            aria-label="Next week"
+            onclick={() => shiftSelectedWeek(7)}
+          >
+            <ChevronRightIcon aria-hidden="true" />
+          </button>
+        </div>
+      </section>
+    {:else}
+      <header class="tasks-planner__header">
+        <div>
+          <h1>
+            <span class="tasks-planner__title-icon" aria-hidden="true">
+              {#if selectedArea}
+                <FolderKanbanIcon />
+              {:else if view === "upcoming"}
+                <CalendarDaysIcon />
+              {:else if view === "anytime"}
+                <CircleEllipsisIcon />
+              {:else if view === "someday"}
+                <CalendarClockIcon />
+              {:else}
+                <ArchiveIcon />
+              {/if}
+            </span>
+            {heading}
+          </h1>
+        </div>
+        <span class="tasks-planner__count">{headingCount}</span>
+      </header>
+    {/if}
 
     {#if selectedArea}
       {@render taskList(areaTasks, selectedArea.title, `area:${selectedArea.id}`)}
     {:else if view === "today"}
-      {#if snapshot.today.length || snapshot.thisEvening.length}
-        {@render todaySection("Today", snapshot.today, "Today tasks", "today")}
-        {#if snapshot.thisEvening.length || quickCreateEnabled}
-          {@render todaySection(
-            "This Evening",
-            snapshot.thisEvening,
-            "This evening tasks",
-            "this-evening",
+      <div class="tasks-planner__day-sections">
+        {#each daySections as section (section.id)}
+          {@render daySection(
+            section.id,
+            section.label,
+            section.icon,
+            daySnapshot[section.id],
           )}
-        {/if}
-      {:else}
-        {@render todaySection("Today", snapshot.today, "Today tasks", "today")}
-      {/if}
+        {/each}
+      </div>
     {:else if view === "upcoming"}
       {#if snapshot.upcomingRows.length}
         {@render upcomingRows(snapshot.upcomingRows)}

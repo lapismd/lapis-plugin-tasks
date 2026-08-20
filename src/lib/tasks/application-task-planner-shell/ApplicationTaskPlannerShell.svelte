@@ -3,13 +3,18 @@
   import * as Dialog from "@lapismd/design-core/shadcn/dialog";
   import type { Snippet } from "svelte";
   import TaskPlanner from "../../tasks/task-planner/TaskPlanner.svelte";
-  import type {
-    Task,
-    TaskBucket,
-    TaskPlannerQuickPlacement,
-    TaskPlannerRowContext,
-    TaskQuickCreateInput,
+  import {
+    todayDateOnly,
+    type Task,
+    type TaskBucket,
+    type TaskPlannerQuickPlacement,
+    type TaskPlannerRowContext,
+    type TaskQuickCreateInput,
   } from "../../model";
+  import {
+    DEFAULT_TASKS_PLUGIN_SETTINGS,
+    type TasksPluginSettings,
+  } from "../../tasks-settings";
 
   import {
     TASK_PREVIEW_CLOSE_ANIMATION_MS,
@@ -30,6 +35,10 @@
     rootElement = $bindable<HTMLElement | null>(null),
     tasks = [],
     now,
+    clock = () => now ?? new Date(),
+    settings = DEFAULT_TASKS_PLUGIN_SETTINGS,
+    selectedDate = $bindable(todayDateOnly(now ?? clock())),
+    actualToday = todayDateOnly(now ?? clock()),
     view = "today",
     area = null,
     taskRow,
@@ -57,6 +66,10 @@
     rootElement?: HTMLElement | null;
     tasks?: Task[];
     now?: Date;
+    clock?: () => Date;
+    settings?: TasksPluginSettings;
+    selectedDate?: string;
+    actualToday?: string;
     view?: TaskBucket;
     area?: string | null;
     taskRow?: Snippet<[Task, TaskPlannerRowContext]>;
@@ -116,6 +129,10 @@
   <TaskPlanner
     {tasks}
     {now}
+    {clock}
+    {settings}
+    bind:selectedDate
+    {actualToday}
     {view}
     {area}
     {taskRow}

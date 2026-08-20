@@ -6,6 +6,11 @@ import {
 } from "./list-navigation";
 import type { TaskRepository } from "./task-repository";
 import type { Task, TaskBucket, TaskCatalogPlanAt, TaskStatus, TaskWhen } from "./types";
+import {
+  DEFAULT_TASKS_PLUGIN_SETTINGS,
+  isTaskClockTime,
+  type TasksPluginSettings,
+} from "../tasks-settings";
 
 export type TaskPlannerDateGroup = {
   date: string;
@@ -133,6 +138,30 @@ export type TaskPlannerSnapshot = {
   listTree: TaskListNavigationSnapshot;
 };
 
+export type TaskDaySection =
+  | "anytime"
+  | "morning"
+  | "afternoon"
+  | "evening"
+  | "done";
+
+export type TaskPlannerDaySnapshot = {
+  date: string;
+  anytime: Task[];
+  morning: Task[];
+  afternoon: Task[];
+  evening: Task[];
+  done: Task[];
+};
+
+export type TaskPlannerWeekDay = {
+  date: string;
+  weekday: string;
+  dayNumber: number;
+  selected: boolean;
+  today: boolean;
+};
+
 const DAY_IN_MS = 24 * 60 * 60 * 1000;
 
 export function taskDateOnly(value: string | undefined | null) {
@@ -165,6 +194,31 @@ function addDays(date: Date, days: number) {
   const next = new Date(date);
   next.setDate(next.getDate() + days);
   return next;
+}
+
+export function addPlannerDays(dateOnly: string, days: number): string {
+  const date = parseDateOnly(dateOnly);
+  return date ? formatDateOnly(addDays(date, days)) : dateOnly;
+}
+
+export function buildTaskPlannerWeek(
+  selectedDate: string,
+  today: string,
+): TaskPlannerWeekDay[] {
+  const selected = parseDateOnly(selectedDate) ?? startOfLocalDay(new Date());
+  const mondayOffset = (selected.getDay() + 6) % 7;
+  const monday = addDays(selected, -mondayOffset);
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = addDays(monday, index);
+    const dateOnly = formatDateOnly(date);
+    return {
+      date: dateOnly,
+      weekday: new Intl.DateTimeFormat("en", { weekday: "short" }).format(date),
+      dayNumber: date.getDate(),
+      selected: dateOnly === selectedDate,
+      today: dateOnly === today,
+    };
+  });
 }
 
 function dayCount(startDate: string, endDate: string) {
@@ -271,6 +325,92 @@ function isCompleted(task: Task) {
     task.status === "canceled" ||
     Boolean(task.completedAt)
   );
+}
+
+function isCanceled(task: Task) {
+  return task.status === "canceled";
+}
+
+function isTerminalCompleted(task: Task) {
+  return !isCanceled(task) && isCompleted(task);
+}
+
+export function resolveTaskDaySection(
+  task: Pick<Task, "planAt" | "when">,
+  settings: TasksPluginSettings = DEFAULT_TASKS_PLUGIN_SETTINGS,
+): Exclude<TaskDaySection, "done"> {
+  if (task.planAt === "morning" || task.planAt === "afternoon") {
+    return task.planAt;
+  }
+  if (task.planAt === "evening" || task.when === "this-evening") {
+    return "evening";
+  }
+  if (!isTaskClockTime(task.planAt)) return "anytime";
+  if (task.planAt < settings.dayParts.afternoonStartsAt) return "morning";
+  if (task.planAt < settings.dayParts.eveningStartsAt) return "afternoon";
+  return "evening";
+}
+
+function taskEligibleForDay(
+  task: Task,
+  selectedDate: string,
+  actualToday: string,
+) {
+  const planDate = taskDateOnly(task.planDate) ?? taskDateOnly(task.scheduledAt);
+  const deadline = taskDateOnly(task.deadline) ?? taskDateOnly(task.dueAt);
+  if (
+    (planDate && planDate <= selectedDate) ||
+    (deadline && deadline <= selectedDate)
+  ) {
+    return true;
+  }
+  return (
+    selectedDate === actualToday &&
+    (task.when === "today" || task.when === "this-evening")
+  );
+}
+
+function compareDaySectionTasks(left: Task, right: Task) {
+  const leftOrder = left.order ?? left.todayOrder;
+  const rightOrder = right.order ?? right.todayOrder;
+  if (leftOrder !== undefined || rightOrder !== undefined) {
+    return comparePlannerTasks(left, right);
+  }
+  const leftTime = isTaskClockTime(left.planAt) ? left.planAt : "";
+  const rightTime = isTaskClockTime(right.planAt) ? right.planAt : "";
+  return leftTime.localeCompare(rightTime) || comparePlannerTasks(left, right);
+}
+
+export function buildTaskPlannerDaySnapshot(
+  tasks: Task[],
+  selectedDate: string,
+  settings: TasksPluginSettings = DEFAULT_TASKS_PLUGIN_SETTINGS,
+  actualToday = selectedDate,
+): TaskPlannerDaySnapshot {
+  const snapshot: TaskPlannerDaySnapshot = {
+    date: selectedDate,
+    anytime: [],
+    morning: [],
+    afternoon: [],
+    evening: [],
+    done: [],
+  };
+  for (const task of tasks) {
+    if (isTerminalCompleted(task)) {
+      if (taskDateOnly(task.completedAt) === selectedDate) snapshot.done.push(task);
+      continue;
+    }
+    if (isCanceled(task) || !taskEligibleForDay(task, selectedDate, actualToday)) {
+      continue;
+    }
+    snapshot[resolveTaskDaySection(task, settings)].push(task);
+  }
+  snapshot.anytime.sort(compareDaySectionTasks);
+  snapshot.morning.sort(compareDaySectionTasks);
+  snapshot.afternoon.sort(compareDaySectionTasks);
+  snapshot.evening.sort(compareDaySectionTasks);
+  snapshot.done.sort(comparePlannerTasks);
+  return snapshot;
 }
 
 function taskPlannerDate(task: Task) {
@@ -555,6 +695,31 @@ export function buildTaskPlannerMovePatch(
   }
 
   return compactMovePatch({ ...activePatch, updatedAt });
+}
+
+export function buildTaskPlannerDaySectionPatch(
+  task: Task,
+  section: TaskDaySection,
+  selectedDate: string,
+  now = new Date(),
+): TaskPlannerMovePatch {
+  const updatedAt = now.toISOString();
+  if (section === "done") {
+    return compactMovePatch({
+      status: "completed",
+      completedAt: task.completedAt ?? updatedAt,
+      updatedAt,
+    });
+  }
+  return compactMovePatch({
+    ...activeTaskPatch(task),
+    scheduledAt: selectedDate,
+    planDate: selectedDate,
+    planAt: section,
+    when: section === "evening" ? "this-evening" : null,
+    start: "anytime",
+    updatedAt,
+  });
 }
 
 export function comparePlannerTasks(left: Task, right: Task) {

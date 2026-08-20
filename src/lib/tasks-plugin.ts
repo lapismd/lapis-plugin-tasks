@@ -7,6 +7,15 @@ import {
 import { createTasksProjectionRegistration } from "./model/task-index";
 import { TaskRepository } from "./model/task-repository";
 import { createVaultTaskFileStore } from "./model/vault-task-file-store";
+import {
+  cloneTasksPluginSettings,
+  migrateTasksPluginData,
+  patchTasksPluginSettings,
+  type TasksPluginDataV1,
+  type TasksPluginSettings,
+  type TasksPluginSettingsPatch,
+} from "./tasks-settings";
+import { TasksSettingsTab } from "./tasks-settings-tab";
 import { TASKS_VIEW_TYPE, TasksView } from "./tasks-view";
 
 export const TASKS_PLUGIN_ID = "tasks";
@@ -23,6 +32,9 @@ const MANIFEST: PluginManifest = {
 export class TasksPlugin extends Plugin {
   readonly repository: TaskRepository;
   clock: () => Date = () => new Date();
+  private data: TasksPluginDataV1 = migrateTasksPluginData(null);
+  private saveQueue: Promise<void> = Promise.resolve();
+  private readonly settingsListeners = new Set<(settings: TasksPluginSettings) => void>();
 
   constructor(app: App, pluginManifest: PluginManifest = MANIFEST) {
     super(app, pluginManifest);
@@ -33,11 +45,15 @@ export class TasksPlugin extends Plugin {
   }
 
   async onload(): Promise<void> {
+    this.data = migrateTasksPluginData(await this.loadData());
     this.registerIndexProjection(createTasksProjectionRegistration());
     this.registerView(
       TASKS_VIEW_TYPE,
       (leaf: WorkspaceLeaf) =>
-        new TasksView(leaf, this.repository, () => this.clock()),
+        new TasksView(leaf, this.repository, () => this.clock(), {
+          get: () => this.getSettings(),
+          subscribe: (listener) => this.subscribeSettings(listener),
+        }),
     );
     this.addCommand({
       id: "open",
@@ -45,6 +61,36 @@ export class TasksPlugin extends Plugin {
       callback: () => void this.openTasks(),
     });
     this.addRibbonIcon("list-todo", "Open Tasks", () => void this.openTasks());
+    this.addSettingTab(new TasksSettingsTab(this.app, this));
+  }
+
+  getSettings(): TasksPluginSettings {
+    return cloneTasksPluginSettings(this.data.settings);
+  }
+
+  async updateSettings(patch: TasksPluginSettingsPatch): Promise<void> {
+    this.data = {
+      ...this.data,
+      settings: patchTasksPluginSettings(this.data.settings, patch),
+    };
+    const snapshot: TasksPluginDataV1 = {
+      version: this.data.version,
+      settings: this.getSettings(),
+    };
+    this.saveQueue = this.saveQueue
+      .catch(() => undefined)
+      .then(() => this.saveData(snapshot));
+    await this.saveQueue;
+    for (const listener of this.settingsListeners) {
+      listener(cloneTasksPluginSettings(snapshot.settings));
+    }
+  }
+
+  subscribeSettings(
+    listener: (settings: TasksPluginSettings) => void,
+  ): () => void {
+    this.settingsListeners.add(listener);
+    return () => this.settingsListeners.delete(listener);
   }
 
   async openTasks(): Promise<void> {

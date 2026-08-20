@@ -31,7 +31,7 @@
   }
 
   function createPlannerTask(input: TaskQuickCreateInput) {
-    const createdAt = new Date().toISOString();
+    const createdAt = now.toISOString();
     const when =
       input.when ??
       (input.view === "today"
@@ -46,7 +46,7 @@
       createTask({
         id: `story-canvas-task-${tasks.length + 1}`,
         title: input.title,
-        status: "todo",
+        status: "open",
         dueAt: input.dueAt,
         priority: input.priority,
         scheduledAt: input.scheduledAt,
@@ -55,15 +55,17 @@
         areas: input.area ? [input.area] : [],
         start: when === "someday" ? "someday" : "anytime",
         planDate:
-          when === "today" || when === "this-evening"
+          input.scheduledAt ??
+          (when === "today" || when === "this-evening"
             ? PLANNER_FIXTURE_TODAY
-            : undefined,
+            : undefined),
         planAt:
-          when === "this-evening"
+          input.planAt ??
+          (when === "this-evening"
             ? "evening"
             : when === "today"
               ? "anytime"
-              : undefined,
+              : undefined),
         order: input.order,
         createdAt,
         updatedAt: createdAt,

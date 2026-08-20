@@ -1,9 +1,15 @@
 import { View, type WorkspaceLeaf } from "@lapis-notes/api";
 import { mount, unmount } from "svelte";
 import type { TaskRepository } from "./model";
+import type { TasksPluginSettings } from "./tasks-settings";
 import TasksWorkspace from "./tasks-workspace.svelte";
 
 export const TASKS_VIEW_TYPE = "tasks";
+
+export type TasksSettingsSource = {
+  get(): TasksPluginSettings;
+  subscribe(listener: (settings: TasksPluginSettings) => void): () => void;
+};
 
 export class TasksView extends View {
   private component: Record<string, unknown> | null = null;
@@ -12,6 +18,7 @@ export class TasksView extends View {
     leaf: WorkspaceLeaf,
     private readonly repository: TaskRepository,
     private readonly clock: () => Date = () => new Date(),
+    private readonly settings?: TasksSettingsSource,
   ) {
     super(leaf);
   }
@@ -46,7 +53,8 @@ export class TasksView extends View {
       props: {
         app: this.app,
         repository: this.repository,
-        now: this.clock(),
+        clock: this.clock,
+        settingsSource: this.settings,
       },
     }) as Record<string, unknown>;
   }

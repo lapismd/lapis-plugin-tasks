@@ -24,6 +24,124 @@
     margin: 0 auto;
   }
 
+  .tasks-planner__agenda-calendar {
+    display: grid;
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
+    gap: 0.85rem;
+  }
+
+  .tasks-planner__agenda-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .tasks-planner__agenda-heading h1,
+  .tasks-planner__agenda-heading p {
+    margin: 0;
+  }
+
+  .tasks-planner__agenda-heading h1 {
+    font-size: clamp(1.55rem, 4vw, 2.15rem);
+    line-height: 1;
+  }
+
+  .tasks-planner__agenda-heading p {
+    margin-top: 0.3rem;
+    color: var(--ui-tasks-muted);
+    font-size: 0.78rem;
+    font-weight: 750;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .tasks-planner__week-navigation {
+    display: grid;
+    grid-template-columns: 1.8rem minmax(0, 1fr) 1.8rem;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .tasks-planner__week-navigation > button {
+    display: grid;
+    width: 1.8rem;
+    height: 2.9rem;
+    place-items: center;
+    border: 0;
+    border-radius: 0.45rem;
+    background: transparent;
+    color: var(--ui-tasks-muted);
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .tasks-planner__week-navigation > button:hover,
+  .tasks-planner__week-navigation > button:focus-visible {
+    background: var(--ui-tasks-muted-surface);
+    color: var(--ui-tasks-foreground);
+    outline: 2px solid color-mix(in srgb, var(--ui-tasks-accent) 32%, transparent);
+  }
+
+  .tasks-planner__week-navigation > button svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .tasks-planner__week {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.3rem;
+  }
+
+  .tasks-planner__week > button {
+    display: grid;
+    min-width: 0;
+    min-height: 3.15rem;
+    place-items: center;
+    gap: 0.15rem;
+    border: 1px solid transparent;
+    border-radius: 0.65rem;
+    background: transparent;
+    color: var(--ui-tasks-muted);
+    cursor: pointer;
+    font: inherit;
+    padding: 0.35rem 0.15rem;
+  }
+
+  .tasks-planner__week > button:hover,
+  .tasks-planner__week > button:focus-visible {
+    border-color: var(--ui-tasks-border);
+    background: var(--ui-tasks-muted-surface);
+    color: var(--ui-tasks-foreground);
+    outline: 0;
+  }
+
+  .tasks-planner__week > button.tasks-planner__week-day--selected {
+    border-color: color-mix(in srgb, var(--ui-tasks-accent) 34%, transparent);
+    background: color-mix(in srgb, var(--ui-tasks-accent) 12%, var(--ui-tasks-card));
+    color: var(--ui-tasks-foreground);
+  }
+
+  .tasks-planner__week > button.tasks-planner__week-day--today:not(.tasks-planner__week-day--selected) {
+    color: var(--ui-tasks-accent);
+  }
+
+  .tasks-planner__week button span {
+    overflow: hidden;
+    font-size: 0.66rem;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+  }
+
+  .tasks-planner__week button strong {
+    font-size: 1rem;
+    font-weight: 650;
+  }
+
   .tasks-planner__title-icon {
     display: inline-flex;
     align-items: center;
@@ -419,6 +537,108 @@
 
   .tasks-planner__section {
     gap: 0.5rem;
+  }
+
+  .tasks-planner__day-sections {
+    display: grid;
+    width: 100%;
+    max-width: 860px;
+    margin: 0 auto;
+    gap: 0.85rem;
+  }
+
+  .tasks-planner__day-section {
+    --tasks-day-section-color: var(--ui-tasks-day-anytime);
+    gap: 0.4rem;
+  }
+
+  .tasks-planner__day-section[data-day-section="morning"] {
+    --tasks-day-section-color: var(--ui-tasks-day-morning);
+  }
+
+  .tasks-planner__day-section[data-day-section="afternoon"] {
+    --tasks-day-section-color: var(--ui-tasks-day-afternoon);
+  }
+
+  .tasks-planner__day-section[data-day-section="evening"] {
+    --tasks-day-section-color: var(--ui-tasks-day-evening);
+  }
+
+  .tasks-planner__day-section[data-day-section="done"] {
+    --tasks-day-section-color: var(--ui-tasks-day-done);
+  }
+
+  .tasks-planner__day-section-header button {
+    display: flex;
+    width: 100%;
+    min-height: 2.35rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border: 1px solid color-mix(in srgb, var(--tasks-day-section-color) 20%, transparent);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--tasks-day-section-color) 10%, var(--ui-tasks-card));
+    color: color-mix(in srgb, var(--tasks-day-section-color) 78%, var(--ui-tasks-foreground));
+    cursor: pointer;
+    font: inherit;
+    padding: 0.35rem 0.7rem;
+    text-align: left;
+  }
+
+  .tasks-planner__day-section-header button:hover,
+  .tasks-planner__day-section-header button:focus-visible {
+    background: color-mix(in srgb, var(--tasks-day-section-color) 16%, var(--ui-tasks-card));
+    outline: 2px solid color-mix(in srgb, var(--tasks-day-section-color) 30%, transparent);
+    outline-offset: 1px;
+  }
+
+  .tasks-planner__day-section-label {
+    display: inline-flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.48rem;
+    font-size: 0.78rem;
+    font-weight: 850;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .tasks-planner__day-section-label svg,
+  .tasks-planner__day-section-header button > svg {
+    width: 0.95rem;
+    height: 0.95rem;
+    flex: none;
+  }
+
+  .tasks-planner__day-section-label small {
+    min-width: 1.35rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--tasks-day-section-color) 13%, transparent);
+    font-size: 0.68rem;
+    line-height: 1.35rem;
+    text-align: center;
+  }
+
+  .tasks-planner__day-section-header button > svg {
+    transition: rotate 150ms ease;
+  }
+
+  .tasks-planner__day-section[data-day-section-expanded="true"]
+    .tasks-planner__day-section-header button > svg {
+    rotate: 180deg;
+  }
+
+  .tasks-planner__day-section .tasks-planner__list {
+    border-top: 0;
+  }
+
+  .tasks-planner__day-collapsed-drop {
+    min-height: 0.4rem;
+    overflow: hidden;
+  }
+
+  .tasks-planner__day-collapsed-drop .tasks-planner__list {
+    min-height: 0.4rem;
   }
 
   .tasks-planner__section-header {

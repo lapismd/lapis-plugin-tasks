@@ -12,8 +12,12 @@ export const tasksTokenNames = {
   accentForeground: "--ui-tasks-accent-foreground",
   card: "--ui-tasks-card",
   destructive: "--ui-tasks-destructive",
+  dayAnytime: "--ui-tasks-day-anytime",
+  dayMorning: "--ui-tasks-day-morning",
+  dayAfternoon: "--ui-tasks-day-afternoon",
+  dayEvening: "--ui-tasks-day-evening",
+  dayDone: "--ui-tasks-day-done",
   radius: "--ui-tasks-radius",
 } as const;
 
 export type TasksToken = (typeof tasksTokenNames)[keyof typeof tasksTokenNames];
-

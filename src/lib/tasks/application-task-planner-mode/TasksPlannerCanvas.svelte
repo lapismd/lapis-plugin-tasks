@@ -17,7 +17,12 @@
     type TaskBucket,
     type TaskPlannerSnapshot,
     type TaskQuickCreateInput,
+    todayDateOnly,
   } from "../../model";
+  import {
+    DEFAULT_TASKS_PLUGIN_SETTINGS,
+    type TasksPluginSettings,
+  } from "../../tasks-settings";
   import ApplicationTaskSidebarDetail from "../application-task-sidebar-detail/ApplicationTaskSidebarDetail.svelte";
   import ApplicationTaskPlannerMode from "./ApplicationTaskPlannerMode.svelte";
   import TaskListNavTree from "./TaskListNavTree.svelte";
@@ -32,6 +37,8 @@
   let {
     tasks,
     now,
+    clock = () => now ?? new Date(),
+    settings = DEFAULT_TASKS_PLUGIN_SETTINGS,
     snapshot,
     applications = [],
     applicationSummaries = {},
@@ -54,6 +61,8 @@
   }: {
     tasks: Task[];
     now?: Date;
+    clock?: () => Date;
+    settings?: TasksPluginSettings;
     snapshot: TaskPlannerSnapshot;
     applications?: JobApplication[];
     applicationSummaries?: Record<string, ApplicationSummary>;
@@ -135,6 +144,7 @@
   });
 
   let taskView = $state<TaskBucket>("today");
+  let selectedDate = $state("");
   let taskArea = $state<string | null>(null);
   let activeTaskId = $state<string | null>(null);
   let activeDropTargetId = $state<string | null>(null);
@@ -146,6 +156,14 @@
         taskArea)
       : (plannerBuckets.find((bucket) => bucket.id === taskView)?.label ??
         "Today"),
+  );
+  const actualToday = $derived(todayDateOnly(now ?? clock()));
+
+  $effect.pre(() => {
+    if (!selectedDate) selectedDate = actualToday;
+  });
+  const showTodayShortcut = $derived(
+    taskView === "today" && selectedDate !== actualToday,
   );
   const activeTask = $derived(
     activeTaskId
@@ -227,17 +245,17 @@
     onSaveTask({
       ...task,
       title,
-      updatedAt: new Date().toISOString(),
+      updatedAt: (now ?? clock()).toISOString(),
     });
   }
 
   function toggleActiveTaskDone(task: Task) {
-    const done = task.status !== "done";
+    const done = task.status !== "done" && task.status !== "completed";
     onSaveTask({
       ...task,
-      status: done ? "done" : "todo",
-      completedAt: done ? (task.completedAt ?? new Date().toISOString()) : undefined,
-      updatedAt: new Date().toISOString(),
+      status: done ? "completed" : "open",
+      completedAt: done ? (task.completedAt ?? (now ?? clock()).toISOString()) : undefined,
+      updatedAt: (now ?? clock()).toISOString(),
     });
   }
 
@@ -342,11 +360,35 @@
         </ColumnCanvas.Body>
       </ColumnCanvas.Column>
 
-      <ColumnCanvas.Column id="planner" title={activePlannerLabel}>
+      <ColumnCanvas.Column id="planner" aria-label={activePlannerLabel}>
+        <ColumnCanvas.Header>
+          <div
+            data-ui-component="column-canvas"
+            data-ui-part="column-header-main"
+          >
+            <ColumnCanvas.Title>{activePlannerLabel}</ColumnCanvas.Title>
+          </div>
+          {#if showTodayShortcut}
+            <ColumnCanvas.HeaderActions>
+              <button
+                type="button"
+                class="task-column-canvas-story__today-shortcut"
+                aria-label="Return to today"
+                onclick={() => (selectedDate = actualToday)}
+              >
+                <CalendarDaysIcon aria-hidden="true" />
+                <span>Today</span>
+              </button>
+            </ColumnCanvas.HeaderActions>
+          {/if}
+        </ColumnCanvas.Header>
         <div class="task-column-canvas-story__pane">
           <ApplicationTaskPlannerMode
             {tasks}
             {now}
+            {clock}
+            {settings}
+            bind:selectedDate
             {applications}
             view={taskView}
             area={taskArea}

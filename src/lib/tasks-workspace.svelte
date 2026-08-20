@@ -16,16 +16,23 @@
     type TaskQuickCreateInput,
     type TaskRepository,
   } from "./model";
+  import {
+    DEFAULT_TASKS_PLUGIN_SETTINGS,
+    type TasksPluginSettings,
+  } from "./tasks-settings";
+  import type { TasksSettingsSource } from "./tasks-view";
   import TasksPlannerCanvas from "./tasks/application-task-planner-mode/TasksPlannerCanvas.svelte";
 
   let {
     app,
     repository,
-    now,
+    clock = () => new Date(),
+    settingsSource,
   }: {
     app: App;
     repository: TaskRepository;
-    now?: Date;
+    clock?: () => Date;
+    settingsSource?: TasksSettingsSource;
   } = $props();
 
   let tasks = $state<Task[]>([]);
@@ -44,6 +51,9 @@
   });
   let loadError = $state<string | null>(null);
   let refreshQueue = $state(Promise.resolve());
+  let settings = $state<TasksPluginSettings>(DEFAULT_TASKS_PLUGIN_SETTINGS);
+
+  const currentTime = () => clock();
 
   function isTaskSourcePath(path: string): boolean {
     return path.endsWith(".md") && !path.startsWith(".obsidian/");
@@ -53,7 +63,7 @@
     try {
       const nextSnapshot = await buildTaskPlannerSnapshotFromRepository(
         repository,
-        now ?? new Date(),
+        currentTime(),
       );
       snapshot = nextSnapshot;
       const seen = new Set<string>();
@@ -95,7 +105,7 @@
   async function createTask(input: TaskQuickCreateInput) {
     await createCatalogTaskInRepository(repository, input, {
       existingPaths: app.vault.getMarkdownFiles().map((file) => file.path),
-      now: now ?? new Date(),
+      now: currentTime(),
     });
     await queueRefresh();
   }
@@ -128,13 +138,13 @@
     await repository.applyListTreeDrop(
       sourcePath,
       target,
-      (now ?? new Date()).toISOString(),
+      currentTime().toISOString(),
     );
     await queueRefresh();
   }
 
   async function renameList(path: string, title: string) {
-    await repository.renameList(path, title, (now ?? new Date()).toISOString());
+    await repository.renameList(path, title, currentTime().toISOString());
     await queueRefresh();
   }
 
@@ -142,7 +152,7 @@
     await repository.renameNavigationSection(
       from,
       to,
-      (now ?? new Date()).toISOString(),
+      currentTime().toISOString(),
     );
     await queueRefresh();
   }
@@ -153,7 +163,7 @@
   }
 
   async function createList(input: TaskListCreateInput) {
-    const at = (now ?? new Date()).toISOString();
+    const at = currentTime().toISOString();
     const title = "Untitled list";
     const path = uniqueListPath(
       app.vault.getMarkdownFiles().map((file) => file.path),
@@ -175,22 +185,26 @@
   }
 
   async function unpinList(path: string) {
-    await repository.unpinList(path, (now ?? new Date()).toISOString());
+    await repository.unpinList(path, currentTime().toISOString());
     await queueRefresh();
   }
 
   async function archiveList(path: string) {
-    await repository.archiveList(path, (now ?? new Date()).toISOString());
+    await repository.archiveList(path, currentTime().toISOString());
     await queueRefresh();
   }
 
   async function deleteList(path: string) {
-    await repository.deleteList(path, (now ?? new Date()).toISOString());
+    await repository.deleteList(path, currentTime().toISOString());
     await queueRefresh();
   }
 
   onMount(() => {
+    settings = settingsSource?.get() ?? DEFAULT_TASKS_PLUGIN_SETTINGS;
     void queueRefresh();
+    const unsubscribeSettings = settingsSource?.subscribe((nextSettings) => {
+      settings = nextSettings;
+    });
     const changed = app.metadataCache.on("changed", (file) => {
       if (isTaskSourcePath(file.path)) void queueRefresh();
     });
@@ -200,6 +214,7 @@
     return () => {
       app.metadataCache.offref(changed);
       app.metadataCache.offref(deleted);
+      unsubscribeSettings?.();
     };
   });
 </script>
@@ -210,7 +225,8 @@
   <TasksPlannerCanvas
     variant="workspace"
     {tasks}
-    {now}
+    {clock}
+    {settings}
     {snapshot}
     applications={[]}
     applicationSummaries={{}}

@@ -196,7 +196,7 @@
   }
 
   function createPlannerTask(input: TaskQuickCreateInput) {
-    const now = new Date().toISOString();
+    const createdAt = now.toISOString();
     const when =
       input.when ??
       (input.view === "today"
@@ -211,7 +211,7 @@
       createTask({
         id: `story-shell-task-${tasks.length + 1}`,
         title: input.title,
-        status: "todo",
+        status: "open",
         dueAt: input.dueAt,
         priority: input.priority,
         scheduledAt: input.scheduledAt,
@@ -219,11 +219,15 @@
         listId: input.area ?? undefined,
         areas: input.area ? [input.area] : [],
         start: when === "someday" ? "someday" : "anytime",
-        planDate: when === "today" || when === "this-evening" ? PLANNER_FIXTURE_TODAY : undefined,
-        planAt: when === "this-evening" ? "evening" : when === "today" ? "anytime" : undefined,
+        planDate:
+          input.scheduledAt ??
+          (when === "today" || when === "this-evening" ? PLANNER_FIXTURE_TODAY : undefined),
+        planAt:
+          input.planAt ??
+          (when === "this-evening" ? "evening" : when === "today" ? "anytime" : undefined),
         order: input.order,
-        createdAt: now,
-        updatedAt: now,
+        createdAt,
+        updatedAt: createdAt,
       }),
     ];
   }

@@ -41,6 +41,10 @@ export * from "./task-repository";
 export { createVaultTaskFileStore } from "./vault-task-file-store";
 export {
   buildTaskPlannerMovePatch,
+  buildTaskPlannerDaySectionPatch,
+  buildTaskPlannerDaySnapshot,
+  buildTaskPlannerWeek,
+  addPlannerDays,
   buildListNavigationSnapshot,
   buildTaskPlannerSnapshot,
   buildTaskPlannerSnapshotFromRepository,
@@ -53,6 +57,7 @@ export {
   keptPlanAtForDate,
   resolveTaskPlanAt,
   resolveTaskPlannerPlacement,
+  resolveTaskDaySection,
   taskDateOnly,
   TASK_PLAN_AT_DAY_PARTS,
   type PlannerSelectionPosition,
@@ -66,6 +71,9 @@ export {
   type TaskPlannerQuickPlacement,
   type TaskPlannerRowContext,
   type TaskPlannerSnapshot,
+  type TaskDaySection,
+  type TaskPlannerDaySnapshot,
+  type TaskPlannerWeekDay,
   type TaskPlannerUpcomingRow,
 } from "./planner";
 export {

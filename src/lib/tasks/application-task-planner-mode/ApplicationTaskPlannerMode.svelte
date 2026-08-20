@@ -7,6 +7,7 @@
 		applicationTaskToTask,
 		resolveTaskPlannerPlacement,
 		taskToApplicationTask,
+		todayDateOnly,
 		type Task,
 		type TaskBucket,
 		type TaskAreaSummary,
@@ -15,6 +16,10 @@
 		type TaskPlannerRowContext,
 		type TaskQuickCreateInput
 	} from '../../model';
+	import {
+		DEFAULT_TASKS_PLUGIN_SETTINGS,
+		type TasksPluginSettings
+	} from '../../tasks-settings';
 	import { getDueSummary, taskPreviewCloseAnimationMs } from '../../model';
 	import type { ApplicationTask, JobApplication } from '../../model';
 	import ApplicationPlannerTaskRow from '../application-planner-task-row/ApplicationPlannerTaskRow.svelte';
@@ -64,6 +69,9 @@
 	let {
 		tasks = [],
 		now,
+		clock = () => now ?? new Date(),
+		settings = DEFAULT_TASKS_PLUGIN_SETTINGS,
+		selectedDate = $bindable(todayDateOnly(now ?? clock())),
 		applications = [],
 		view = 'today',
 		area = null,
@@ -82,6 +90,9 @@
 	}: {
 		tasks?: Task[];
 		now?: Date;
+		clock?: () => Date;
+		settings?: TasksPluginSettings;
+		selectedDate?: string;
 		applications?: JobApplication[];
 		view?: TaskBucket;
 		area?: string | null;
@@ -141,6 +152,8 @@
 	let closeAnimationTimer: ReturnType<typeof setTimeout> | null = null;
 
 	const displayTasks = $derived(pointerProjectedTasks ?? optimisticTasks ?? tasks);
+	const actualToday = $derived(todayDateOnly(now ?? clock()));
+	const currentTime = () => now ?? clock();
 	const dragPreviewTask = $derived.by(() =>
 		draggedTaskIds[0]
 			? (displayTasks.find((task) => task.id === draggedTaskIds[0]) ?? null)
@@ -349,7 +362,7 @@
 	});
 
 	async function saveTaskPatch(task: Task, patch: Partial<ApplicationTask>) {
-		const updatedAt = new Date().toISOString();
+		const updatedAt = currentTime().toISOString();
 		if (!task.applicationId) {
 			await onSaveTask({
 				...task,
@@ -453,7 +466,7 @@
 		void saveTaskPatch(task, {
 			done,
 			status: done ? 'completed' : 'open',
-			completedAt: done ? (currentTask.completedAt ?? new Date().toISOString()) : undefined
+			completedAt: done ? (currentTask.completedAt ?? currentTime().toISOString()) : undefined
 		});
 	}
 
@@ -474,13 +487,21 @@
 			...application,
 			tasks: nextTasks.length ? nextTasks : undefined,
 			steps: nextTasks.length ? taskProgressFor(nextTasks) : undefined,
-			updatedAt: new Date().toISOString()
+			updatedAt: currentTime().toISOString()
 		});
 	}
 
 	function resolveDragTaskIds(sourceTaskId: string, sourceTasks = displayTasks) {
 		return selectedTaskIds.includes(sourceTaskId)
-			? orderTaskIdsByVisiblePosition(sourceTasks, view, area, selectedTaskIds, now)
+			? orderTaskIdsByVisiblePosition(
+					sourceTasks,
+					view,
+					area,
+					selectedTaskIds,
+					currentTime(),
+					selectedDate,
+					settings
+				)
 			: [sourceTaskId];
 	}
 
@@ -493,7 +514,9 @@
 	function selectTask(task: Task, event: MouseEvent) {
 		const mode = event.shiftKey ? 'range' : event.metaKey || event.ctrlKey ? 'toggle' : 'replace';
 		const selection = resolvePlannerTaskSelection(
-			visiblePlannerTasks(displayTasks, view, area, now).map((visibleTask) => visibleTask.id),
+			visiblePlannerTasks(displayTasks, view, area, currentTime(), selectedDate, settings).map(
+				(visibleTask) => visibleTask.id
+			),
 			selectedTaskIds,
 			selectionAnchorTaskId,
 			task.id,
@@ -522,6 +545,12 @@
 			dueAt: task.dueAt,
 			scheduledAt: task.scheduledAt,
 			when: task.when,
+			start: task.start,
+			planDate: task.planDate,
+			planAt: task.planAt,
+			deadline: task.deadline,
+			inbox: task.inbox,
+			listId: task.listId,
 			status: task.status,
 			done:
 				task.status === 'done' ||
@@ -577,7 +606,7 @@
 		if (!sourceTaskId) return;
 
 		const baseTasks = [...displayTasks];
-		const timestamp = new Date();
+		const timestamp = currentTime();
 		const nextDraggedTaskIds = resolveDragTaskIds(sourceTaskId, baseTasks);
 		if (!nextDraggedTaskIds.length) return;
 
@@ -585,7 +614,14 @@
 		pointerDragActive = true;
 		pointerDragTimestamp = timestamp;
 		pointerDragBaseTasks = baseTasks;
-		pointerDragLayout = buildPlannerDragLayout(baseTasks, view, area, now ?? timestamp);
+		pointerDragLayout = buildPlannerDragLayout(
+			baseTasks,
+			view,
+			area,
+			timestamp,
+			selectedDate,
+			settings
+		);
 		pointerDragSourceTaskId = sourceTaskId;
 
 		const activator = event.nativeEvent ?? event.operation.activatorEvent;
@@ -627,7 +663,8 @@
 			baseTasks,
 			draggedTaskIds,
 			normalizedLayout,
-			now ?? pointerDragTimestamp ?? new Date()
+			pointerDragTimestamp ?? currentTime(),
+			selectedDate
 		);
 	}
 
@@ -738,10 +775,10 @@
 		const movingTasks = tasksByIds(scheduleDropTaskIds);
 		closeScheduleDropDialog();
 		for (const task of movingTasks) {
-			saveMovePatch(task, {
-				...resolveTaskPlannerPlacement('clear'),
-				updatedAt: new Date().toISOString()
-			});
+				saveMovePatch(task, {
+					...resolveTaskPlannerPlacement('clear'),
+					updatedAt: currentTime().toISOString()
+				});
 		}
 	}
 
@@ -800,6 +837,10 @@
 	bind:rootElement
 	tasks={displayTasks}
 	{now}
+	{clock}
+	{settings}
+	bind:selectedDate
+	{actualToday}
 	{view}
 	{area}
 	taskRow={asSnippet(plannerTaskRow)}

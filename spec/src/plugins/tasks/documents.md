@@ -171,6 +171,12 @@ The original design notes combined selected concepts from Things, Superlist, and
 | Tiimo | Daily intention, loose day-parts, estimated duration, deliberate review of overdue plans, rolling recurrence, and resettable routine checklists |
 | Markdown-first design | YAML state, Markdown content, structural links in reserved sections, Markdown-owned order, stable resource IDs, and a disposable database projection |
 
+The daily agenda adapts, rather than copies, the Things daily-planning and
+Tiimo day-part ideas. Its five fixed sections, configurable clock boundaries,
+selected-date week strip, and completion-date Done grouping are Tasks-owned
+rules. Canonical `plan.date`, `plan.at`, `deadline`, and completion state remain
+authoritative; settings alter classification only.
+
 The current repository does not implement every possibility in those source notes:
 
 | Concept from the notes | Current repository position |

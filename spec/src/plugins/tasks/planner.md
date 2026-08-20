@@ -28,6 +28,13 @@ Markdown, and `TasksPlugin`, seeds planner Markdown, and restores a `tasks`
 leaf. The live planner uses the same pinned clock as the repository
 snapshot.
 
+The Today planner is a controlled selected-date surface. Its default date and
+all completion timestamps come from the injected local clock. A Monday-first
+seven-day strip selects the displayed date, with previous- and next-week
+controls. The selected day and actual today have distinct states. When they
+differ, the existing Column Canvas header-action slot contains a Today shortcut;
+choosing a date or week never changes task files. See LN-TASK-030.
+
 ## Bucket classification
 
 Named query views live in `matchesTaskView`. The planner body uses
@@ -52,8 +59,31 @@ cancels.
 
 `plan.at` is a label within that day, not a separate query view. `anytime`
 has no preferred window. `morning`, `afternoon`, and `evening` are loose
-windows. `HH:mm` is time-blocked. Evening still fills the This evening Today
-subgroup. Morning and afternoon stay in the main Today list. See LN-TASK-016.
+windows. `HH:mm` is time-blocked. The selected agenda includes every open task
+whose plan date or deadline is on or before the selected date. This does not
+consume or clear the separate Review view: an overdue plan can appear in the
+selected daily agenda and remain eligible for Review until it is handled.
+
+## Daily agenda sections
+
+The selected date always renders these sections in this order:
+
+| Section | Routing rule | Default disclosure | Color role |
+| --- | --- | --- | --- |
+| Anytime | `plan.at: anytime`, absent, or invalid | Expanded | Neutral |
+| Morning | Explicit `morning`, or a clock before `afternoonStartsAt` | Expanded | Warning |
+| Afternoon | Explicit `afternoon`, or a clock from `afternoonStartsAt` until `eveningStartsAt` | Expanded | Info |
+| Evening | Explicit `evening`, legacy `when: this-evening`, or a clock from `eveningStartsAt` | Expanded | Accent |
+| Done | Completed on the selected date | Collapsed | Success |
+
+Explicit day parts do not depend on settings. The default clock boundaries are
+`12:00` and `17:00`; both belong to the section they start. Missing or malformed
+stored settings migrate to those defaults. Invalid task clock values remain
+readable and route to Anytime. Canceled tasks do not enter Done. Section colors
+use Tasks tokens derived from semantic roles rather than product-specific
+hard-coded colors. Disclosure state is session-only, survives selected-date
+changes, and leaves even collapsed or empty sections as sortable drop targets.
+See LN-TASK-029 and LN-TASK-031.
 
 When is the date or undated-bucket picker: Today, Tomorrow, a calendar date,
 Anytime, or Someday. It does not offer morning, afternoon, or evening. Those
@@ -61,9 +91,9 @@ day-parts live on the `At` dropdown. Changing the date keeps the current
 `plan.at`. Anytime and Someday clear the date and day-part.
 
 `At` writes `plan.at` as `morning`, `afternoon`, `evening`, or `anytime`.
-Evening still sets catalog `when: this-evening` and fills the This evening
-Today subgroup. A clock value stays visible until the user picks a day-part.
-The dropdown does not add Morning or Afternoon Today sections.
+Evening may retain catalog compatibility `when: this-evening`, but section
+routing is owned by the canonical `plan.at`. A clock value stays visible until
+the user picks a day-part.
 
 Planner status pickers use YAML `task.status`: Open, Completed, and Canceled.
 The row checkbox still toggles open and completed. Canceled leaves Today and
@@ -82,6 +112,16 @@ drag preview and highlights the drop target. See LN-TASK-028.
 `ApplicationTaskPlannerMode` then calls `saveTaskPatch`: a bucket drop
 updates plan, inbox, or start; a list drop sets `listId` and `areas` so the
 task gains a `list-item` on that list.
+
+Within the daily agenda, quick-create writes the selected date and the open
+section's day part. Sortable layouts include all five sections even when they
+are empty or collapsed. Cross-section drops persist both ordering and
+placement. Done completes with the injected clock. Moving a completed row back
+to an open section clears completion, writes the selected date, and assigns that
+section's `plan.at`. Because Done groups by actual completion date, completing
+while viewing another date can remove the row. Rolling recurring completion
+continues to advance the task rather than adding an artificial history row.
+See LN-TASK-032.
 
 ## Branding versus catalog
 

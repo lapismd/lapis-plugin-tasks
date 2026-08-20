@@ -187,6 +187,40 @@ comp that should shape the thank-you note.
 `,
   },
   {
+    path: "inbox/morning.md",
+    raw: `---
+type: task
+id: story-task-morning
+created: 2026-08-10T08:00:00.000Z
+updated: 2026-08-18T09:00:00.000Z
+task:
+  status: open
+  start: anytime
+  plan:
+    date: 2026-08-19
+    at: morning
+---
+# Prepare the morning brief
+`,
+  },
+  {
+    path: "inbox/afternoon-boundary.md",
+    raw: `---
+type: task
+id: story-task-afternoon-boundary
+created: 2026-08-10T08:00:00.000Z
+updated: 2026-08-18T09:30:00.000Z
+task:
+  status: open
+  start: anytime
+  plan:
+    date: 2026-08-19
+    at: "12:00"
+---
+# Review the midday handoff
+`,
+  },
+  {
     path: "inbox/evening.md",
     applicationId: "nova-bank-platform-lead",
     raw: `---
@@ -203,6 +237,42 @@ task:
   deadline: 2026-08-19
 ---
 # Send follow-up email
+`,
+  },
+  {
+    path: "logbook/today-done.md",
+    raw: `---
+type: task
+id: story-task-today-done
+created: 2026-08-18T08:00:00.000Z
+updated: 2026-08-19T10:30:00.000Z
+task:
+  status: completed
+  completedAt: 2026-08-19T10:30:00.000Z
+  start: anytime
+  plan:
+    date: 2026-08-19
+    at: morning
+---
+# Publish the daily status
+`,
+  },
+  {
+    path: "logbook/today-canceled.md",
+    raw: `---
+type: task
+id: story-task-today-canceled
+created: 2026-08-18T08:00:00.000Z
+updated: 2026-08-19T11:00:00.000Z
+task:
+  status: canceled
+  completedAt: 2026-08-19T11:00:00.000Z
+  start: anytime
+  plan:
+    date: 2026-08-19
+    at: afternoon
+---
+# Cancel the duplicate reminder
 `,
   },
   {

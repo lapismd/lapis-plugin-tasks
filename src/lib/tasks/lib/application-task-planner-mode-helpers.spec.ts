@@ -105,7 +105,7 @@ describe('planner drag layouts', () => {
 	it('builds stable groups, including empty planner lists', () => {
 		const layout = buildPlannerDragLayout(
 			[
-				plannerTask('morning', 1024),
+				plannerTask('morning', 1024, { planAt: 'morning' }),
 				plannerTask('evening', 2048, { when: 'this-evening' })
 			],
 			'today',
@@ -114,12 +114,18 @@ describe('planner drag layouts', () => {
 		);
 
 		expect(layout).toEqual({
-			today: ['morning'],
-			'this-evening': ['evening']
+			'today:anytime': [],
+			'today:morning': ['morning'],
+			'today:afternoon': [],
+			'today:evening': ['evening'],
+			'today:done': []
 		});
 		expect(buildPlannerDragLayout([plannerTask('morning', 1024)], 'today', null, now)).toEqual({
-			today: ['morning'],
-			'this-evening': []
+			'today:anytime': ['morning'],
+			'today:morning': [],
+			'today:afternoon': [],
+			'today:evening': [],
+			'today:done': []
 		});
 	});
 
@@ -177,7 +183,7 @@ describe('projectPlannerDragLayout', () => {
 			plannerTask('second', 2048),
 			plannerTask('third', 3072)
 		];
-		const finalLayout = { today: ['second', 'third', 'first'] };
+		const finalLayout = { 'today:anytime': ['second', 'third', 'first'] };
 		const projected = projectPlannerDragLayout(tasks, ['first'], finalLayout, now);
 		const replayed = projectPlannerDragLayout(tasks, ['first'], finalLayout, now);
 
@@ -201,7 +207,7 @@ describe('projectPlannerDragLayout', () => {
 			})
 		];
 		const layout = {
-			today: ['first'],
+			'today:anytime': ['first'],
 			'upcoming:2026-07-30': ['scheduled', 'second']
 		};
 		const projected = projectPlannerDragLayout(tasks, ['second'], layout, now);
@@ -232,7 +238,49 @@ describe('projectPlannerDragLayout', () => {
 
 	it('returns the immutable snapshot when a drag is canceled before a target resolves', () => {
 		const tasks = [plannerTask('first', 1024), plannerTask('second', 2048)];
-		expect(projectPlannerDragLayout(tasks, ['first'], { today: ['second'] }, now)).toBe(tasks);
+		expect(projectPlannerDragLayout(tasks, ['first'], { 'today:anytime': ['second'] }, now)).toBe(tasks);
+	});
+
+	it('moves between daily sections and completes or reopens with the selected date', () => {
+		const tasks = [
+			plannerTask('open', 1024, { planDate: '2026-07-28', planAt: 'morning' }),
+			plannerTask('done', 1024, {
+				status: 'completed',
+				completedAt: '2026-07-28T08:00:00.000Z'
+			})
+		];
+		const movedToDone = projectPlannerDragLayout(
+			tasks,
+			['open'],
+			{
+				'today:morning': [],
+				'today:done': ['done', 'open']
+			},
+			now,
+			'2026-07-28'
+		);
+		expect(movedToDone.find((task) => task.id === 'open')).toMatchObject({
+			status: 'completed',
+			completedAt: now.toISOString(),
+			order: 2048
+		});
+
+		const reopened = projectPlannerDragLayout(
+			tasks,
+			['done'],
+			{
+				'today:afternoon': ['done'],
+				'today:done': []
+			},
+			now,
+			'2026-07-30'
+		);
+		expect(reopened.find((task) => task.id === 'done')).toMatchObject({
+			status: 'open',
+			completedAt: undefined,
+			planDate: '2026-07-30',
+			planAt: 'afternoon'
+		});
 	});
 
 	it('compares only persisted placement fields for optimistic reconciliation', () => {

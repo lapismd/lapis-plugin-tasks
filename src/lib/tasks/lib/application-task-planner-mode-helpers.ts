@@ -1,14 +1,21 @@
 import {
 	buildTaskPlannerMovePatch,
+	buildTaskPlannerDaySectionPatch,
+	buildTaskPlannerDaySnapshot,
 	buildTaskPlannerSnapshot,
 	comparePlannerTasks,
 	resolveTaskPlannerPlacement,
+	todayDateOnly,
 	type Task,
 	type TaskBucket,
 	type TaskPlannerDropTarget,
 	type TaskPlannerMovePatch,
 	type TaskPlannerQuickPlacement
 } from '../../model';
+import {
+	DEFAULT_TASKS_PLUGIN_SETTINGS,
+	type TasksPluginSettings
+} from '../../tasks-settings';
 
 import type { ApplicationTask } from '../../model';
 
@@ -28,6 +35,11 @@ export type PlannerTaskSelection = {
 };
 
 export type PlannerDropDescriptor =
+	| {
+			type: 'planner-day-section';
+			listId: string;
+			section: 'anytime' | 'morning' | 'afternoon' | 'evening' | 'done';
+	  }
 	| {
 			type: 'planner-list';
 			listId: string;
@@ -90,6 +102,11 @@ export function plannerMovePatchToApplicationPatch(
 	if ('dueAt' in patch) nextPatch.dueAt = patch.dueAt ?? undefined;
 	if ('scheduledAt' in patch) nextPatch.scheduledAt = patch.scheduledAt ?? undefined;
 	if ('when' in patch) nextPatch.when = patch.when ?? undefined;
+	if ('start' in patch) nextPatch.start = patch.start ?? undefined;
+	if ('planDate' in patch) nextPatch.planDate = patch.planDate ?? undefined;
+	if ('planAt' in patch) nextPatch.planAt = patch.planAt ?? undefined;
+	if ('inbox' in patch) nextPatch.inbox = patch.inbox;
+	if ('listId' in patch) nextPatch.listId = patch.listId ?? undefined;
 	if ('deadline' in patch) nextPatch.dueAt = patch.deadline ?? nextPatch.dueAt;
 	if ('status' in patch) nextPatch.status = patch.status;
 	if ('completedAt' in patch) nextPatch.completedAt = patch.completedAt ?? undefined;
@@ -105,7 +122,9 @@ export function visiblePlannerTasks(
 	tasks: Task[],
 	taskView: TaskBucket,
 	taskArea: string | null,
-	now = new Date()
+	now = new Date(),
+	selectedDate = todayDateOnly(now),
+	settings: TasksPluginSettings = DEFAULT_TASKS_PLUGIN_SETTINGS
 ) {
 	const snapshot = buildTaskPlannerSnapshot(tasks, now);
 	if (taskArea) {
@@ -121,7 +140,10 @@ export function visiblePlannerTasks(
 			);
 	}
 	if (taskView === 'inbox') return snapshot.inbox;
-	if (taskView === 'today') return [...snapshot.today, ...snapshot.thisEvening];
+	if (taskView === 'today') {
+		const day = buildTaskPlannerDaySnapshot(tasks, selectedDate, settings, todayDateOnly(now));
+		return [...day.anytime, ...day.morning, ...day.afternoon, ...day.evening, ...day.done];
+	}
 	if (taskView === 'upcoming')
 		return snapshot.upcomingRows.flatMap((row) => (row.kind === 'day' ? row.tasks : []));
 	if (taskView === 'anytime') return snapshot.anytime;
@@ -133,12 +155,22 @@ export function visiblePlannerTasks(
 export function plannerTasksForListId(
 	tasks: Task[],
 	listId: string,
-	now = new Date()
+	now = new Date(),
+	selectedDate = todayDateOnly(now),
+	settings: TasksPluginSettings = DEFAULT_TASKS_PLUGIN_SETTINGS
 ) {
 	const snapshot = buildTaskPlannerSnapshot(tasks, now);
 	if (listId === 'inbox') return snapshot.inbox;
-	if (listId === 'today') return snapshot.today;
-	if (listId === 'this-evening') return snapshot.thisEvening;
+	if (listId.startsWith('today:')) {
+		const section = listId.slice('today:'.length) as
+			| 'anytime'
+			| 'morning'
+			| 'afternoon'
+			| 'evening'
+			| 'done';
+		const day = buildTaskPlannerDaySnapshot(tasks, selectedDate, settings, todayDateOnly(now));
+		return day[section] ?? [];
+	}
 	if (listId === 'anytime') return snapshot.anytime;
 	if (listId === 'someday') return snapshot.someday;
 	if (listId === 'review') return snapshot.review;
@@ -169,7 +201,9 @@ export function buildPlannerDragLayout(
 	tasks: Task[],
 	taskView: TaskBucket,
 	taskArea: string | null,
-	now = new Date()
+	now = new Date(),
+	selectedDate = todayDateOnly(now),
+	settings: TasksPluginSettings = DEFAULT_TASKS_PLUGIN_SETTINGS
 ): PlannerDragLayout {
 	if (taskArea) {
 		const area = taskArea.toLowerCase();
@@ -193,9 +227,13 @@ export function buildPlannerDragLayout(
 		return { inbox: snapshot.inbox.map((task) => task.id) };
 	}
 	if (taskView === 'today') {
+		const day = buildTaskPlannerDaySnapshot(tasks, selectedDate, settings, todayDateOnly(now));
 		return {
-			today: snapshot.today.map((task) => task.id),
-			'this-evening': snapshot.thisEvening.map((task) => task.id)
+			'today:anytime': day.anytime.map((task) => task.id),
+			'today:morning': day.morning.map((task) => task.id),
+			'today:afternoon': day.afternoon.map((task) => task.id),
+			'today:evening': day.evening.map((task) => task.id),
+			'today:done': day.done.map((task) => task.id)
 		};
 	}
 	if (taskView === 'review') {
@@ -256,8 +294,17 @@ export function normalizePlannerDragLayout(
 }
 
 export function plannerDropDescriptorForList(listId: string): PlannerDropDescriptor | null {
-	if (listId === 'today' || listId === 'this-evening') {
-		return { type: 'planner-list', listId, bucket: 'today' };
+	if (listId.startsWith('today:')) {
+		const section = listId.slice('today:'.length);
+		if (
+			section === 'anytime' ||
+			section === 'morning' ||
+			section === 'afternoon' ||
+			section === 'evening' ||
+			section === 'done'
+		) {
+			return { type: 'planner-day-section', listId, section };
+		}
 	}
 	if (listId === 'inbox' || listId === 'anytime' || listId === 'someday' || listId === 'review') {
 		return { type: 'planner-list', listId, bucket: listId };
@@ -283,7 +330,8 @@ export function projectPlannerDragLayout(
 	baseTasks: Task[],
 	movingTaskIds: string[],
 	layout: PlannerDragLayout,
-	now = new Date()
+	now = new Date(),
+	selectedDate = todayDateOnly(now)
 ) {
 	const movingIds = new Set(movingTaskIds);
 	const targetEntry = Object.entries(layout).find(([, taskIds]) =>
@@ -304,8 +352,8 @@ export function projectPlannerDragLayout(
 		let nextTask = task;
 		if (movingIds.has(task.id) && !('orderOnly' in descriptor)) {
 			const patch =
-				targetListId === 'this-evening'
-					? buildPlannerPlacementPatch(task, 'this-evening')
+				descriptor.type === 'planner-day-section'
+					? buildTaskPlannerDaySectionPatch(task, descriptor.section, selectedDate, now)
 					: buildTaskPlannerMovePatch(
 							task,
 							descriptor.bucket === 'upcoming'
@@ -325,9 +373,18 @@ export function orderTaskIdsByVisiblePosition(
 	taskView: TaskBucket,
 	taskArea: string | null,
 	taskIds: string[],
-	now = new Date()
+	now = new Date(),
+	selectedDate = todayDateOnly(now),
+	settings: TasksPluginSettings = DEFAULT_TASKS_PLUGIN_SETTINGS
 ) {
-	const visibleIds = visiblePlannerTasks(tasks, taskView, taskArea, now).map((task) => task.id);
+	const visibleIds = visiblePlannerTasks(
+		tasks,
+		taskView,
+		taskArea,
+		now,
+		selectedDate,
+		settings
+	).map((task) => task.id);
 	const uniqueIds = [...new Set(taskIds)];
 	return uniqueIds.sort(
 		(left, right) => visibleIds.indexOf(left) - visibleIds.indexOf(right)

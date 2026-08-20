@@ -380,6 +380,34 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
   overflow: hidden;
 }
 
+.task-column-canvas-story__today-shortcut {
+  display: inline-flex;
+  min-height: 1.75rem;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--ui-tasks-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ui-tasks-accent) 9%, transparent);
+  color: var(--ui-tasks-accent);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0 0.6rem;
+}
+
+.task-column-canvas-story__today-shortcut:hover,
+.task-column-canvas-story__today-shortcut:focus-visible {
+  background: color-mix(in srgb, var(--ui-tasks-accent) 16%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--ui-tasks-accent) 32%, transparent);
+  outline-offset: 1px;
+}
+
+.task-column-canvas-story__today-shortcut svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
 .task-column-canvas-story__pane .application-task-view,
 .task-column-canvas-story__canvas
   [data-column-id="detail"]

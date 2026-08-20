@@ -66,7 +66,15 @@ through the public `App` vault. Tests and some catalog paths inject
 `createMemoryTaskFileStore`.
 
 `TasksPlugin.onload` registers the public tasks projection, constructs the
-repository, and mounts `TasksView` with that repository.
+repository, loads versioned plugin data, registers the Tasks settings tab, and
+mounts `TasksView` with the repository, injected clock, and live settings
+source. Plugin data owns only presentation settings; task and list state stays
+in Markdown.
+
+Settings saves are serialized. The two local `HH:mm` day-part boundaries must
+be valid and ordered. Absent, older, or malformed data uses `12:00` and `17:00`.
+After a successful save, every open view receives the persisted snapshot and
+reclassifies clock-valued tasks without a file mutation. See LN-TASK-029.
 
 ## Mutations
 

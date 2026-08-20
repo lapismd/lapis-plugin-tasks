@@ -218,11 +218,8 @@ export async function createCatalogTaskInRepository(
     when,
     start: when === "someday" ? "someday" : "anytime",
     planDate:
-      when === "today" || when === "this-evening"
-        ? today
-        : input.scheduledAt
-          ? taskDateOnly(input.scheduledAt) ?? undefined
-          : undefined,
+      (input.scheduledAt ? taskDateOnly(input.scheduledAt) : undefined) ??
+      (when === "today" || when === "this-evening" ? today : undefined),
     planAt:
       input.planAt ??
       (when === "this-evening"

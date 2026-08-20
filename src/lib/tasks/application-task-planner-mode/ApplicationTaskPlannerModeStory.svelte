@@ -20,13 +20,14 @@
   );
 
   const summaries = buildPlannerApplicationSummaries(sampleApplicationBoard);
+  const storyNow = new Date(`${PLANNER_FIXTURE_TODAY}T12:00:00`);
 
   function saveTask(task: Task) {
     tasks = tasks.map((entry) => (entry.id === task.id ? task : entry));
   }
 
   function createPlannerTask(input: TaskQuickCreateInput) {
-    const now = new Date().toISOString();
+    const createdAt = storyNow.toISOString();
     const when =
       input.when ??
       (input.view === "today"
@@ -46,11 +47,24 @@
         priority: input.priority,
         scheduledAt: input.scheduledAt,
         when,
+        start: when === "someday" ? "someday" : "anytime",
+        planDate:
+          input.scheduledAt ??
+          (when === "today" || when === "this-evening"
+            ? PLANNER_FIXTURE_TODAY
+            : undefined),
+        planAt:
+          input.planAt ??
+          (when === "this-evening"
+            ? "evening"
+            : when === "today"
+              ? "anytime"
+              : undefined),
         listId: input.area ?? undefined,
         areas: input.area ? [input.area] : [],
         order: input.order,
-        createdAt: now,
-        updatedAt: now,
+        createdAt,
+        updatedAt: createdAt,
       }),
     ];
   }
@@ -68,7 +82,7 @@
 
 <ApplicationTaskPlannerMode
   {tasks}
-  now={new Date(`${PLANNER_FIXTURE_TODAY}T12:00:00`)}
+  now={storyNow}
   {applications}
   view="today"
   applicationSummaries={summaries}
