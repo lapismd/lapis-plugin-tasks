@@ -19,10 +19,37 @@ hosts the lanes. The first column is buckets plus the Lists tree from
 When navigation selects a task list, the middle column keeps its list title as
 workspace chrome but replaces the bucket planner body with the complete
 Markdown file surface. Its Tasks surface context preserves task selection,
-detail opening, checklist interaction, completion, exact-section quick-create,
-and drag ordering without allowing row controls to activate document editing.
+detail opening, checklist interaction, completion, TaskRun quick-create,
+drag ordering, title-click editing, and double-click inline task expansion
+without allowing row controls to activate document editing or structural source.
 Ordinary Markdown surfaces deliberately omit planner-only selection, creation,
 and drag behavior. See LN-TASK-035 and LN-TASK-037.
+The middle-column toolbar uses the Markdown pencil and book-open affordances to
+enter and leave full-document live preview, so the same control remains
+available at phone width without claiming document-body double-click. The
+TaskRun block's code icon is the only pointer control that reveals its literal
+source. The preview, CodeMirror editor, scroller, and gutters share the
+active Lapis Markdown theme background and retain the Lapis document margins.
+The rich widget resets CodeMirror whitespace and typography inheritance so its
+task rows retain their normal compact layout and card surfaces without consuming
+the next heading's boundary decoration. TaskRuns and the daily planner both render
+`TaskQuickCreateRow` and `TaskQuickCreateActions`, rather than maintaining
+separate add forms. Rich TaskRun rows reuse the planner's selection resolver and task-patch
+helper: a row click selects, modifiers toggle or extend selection, the title
+edits, a title/body double-click expands inline, and only the trailing details
+control opens the detail column.
+Linked task-list entries use the same row rhythm and selection surface, replacing
+the task checkbox with a list icon. They support recursive disclosure, within-run
+ordering, explicit cross-run movement, delete, and a trailing open control. Open mounts the linked
+list's complete Markdown surface in the closeable column to the right without
+replacing the parent list or forcing its active editor back to preview.
+Child-task refreshes update those rows in place. The Markdown file surface is
+keyed by its container and list path, so a task title, schedule, status, or
+checklist mutation cannot remount CodeMirror or leave live preview. Structural
+create, reorder, and delete operations transact through that active editor.
+The real-App shell fixture keeps authored prose before and after an arbitrarily
+named grouping heading and structural run, so desktop and phone acceptance
+exercise source-order authority rather than a list-only special case.
 
 `tasks-workspace.svelte` wires a live `App` and `TaskRepository`: refresh
 from `buildTaskPlannerSnapshotFromRepository`, persist through
@@ -30,6 +57,12 @@ from `buildTaskPlannerSnapshotFromRepository`, persist through
 Catalog and Storybook fixtures may build a snapshot from in-memory `Task`
 rows instead of a vault. Those fixtures must still round-trip through task
 documents. See LN-TASK-021 and LN-TASK-022.
+
+Opening task detail retains the task checkbox, editable title, metadata chips,
+actions, and close control, but its body mounts the complete Task `TFile` rather
+than a notes-only projection. The same pencil/book-open affordance toggles live
+preview. A Task document may therefore render its own heading-aware TaskRuns and
+lightweight checklists in source order.
 
 When a task row shows its list chip, it prefers the projected task-list page
 title over the internal `listId`. A legacy row with only that id shows its
@@ -129,7 +162,7 @@ drag preview and highlights the drop target. See LN-TASK-028.
 `planner-sidebar-bucket` and `planner-sidebar-list` payloads.
 `ApplicationTaskPlannerMode` then calls `saveTaskPatch`: a bucket drop
 updates plan, inbox, or start; a list drop sets `listId` and `areas` so the
-task gains a `list-item` on that list.
+task gains a `task-entry` from that List.
 
 Within the daily agenda, quick-create writes the selected date and the open
 section's day part. Sortable layouts include all five sections even when they

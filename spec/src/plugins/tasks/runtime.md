@@ -7,8 +7,10 @@ See LN-TASK-020.
 
 ```mermaid
 flowchart TD
-  vault["Vault Markdown files"] --> parse["parseTaskDocument"]
-  parse --> project["projectTask"]
+  vault["Vault Markdown files"] --> parse["front matter + Markdown CST"]
+  parse --> resolve["resolve candidate targets"]
+  resolve --> validate["validate parents and cycles"]
+  validate --> project["project rows, entries, and TaskRuns"]
   project --> db["AppDatabase tasks/task"]
   db --> summary["TaskSummary queries"]
   summary --> planner["Planner snapshot and UI"]
@@ -20,9 +22,13 @@ flowchart TD
 
 `parseTaskDocument` in `src/lib/model/task-document.ts` returns a
 `TaskDocument`, `TaskListDocument`, or `TaskNavigationDocument`.
-`projectTask` in `src/lib/model/task-projection.ts` writes a typed projection
-row. `task-index.ts` registers that projection and emits edges for reserved
-section links.
+`task-structure.ts` scans CST ranges, derives heading context, resolves targets,
+forms contiguous TaskRuns, and validates the whole structural graph.
+`projectTask` writes the summary fields, while `task-index.ts` registers the
+projection and emits `task-entry`, `list-entry`, or `navigation-item` edges.
+Every structural row includes source ranges and a source hash. An unresolved or
+unsupported candidate remains ordinary Markdown and contributes a diagnostic,
+not an active edge.
 
 Planner lists and cards read `TaskSummary` rows through `TaskRepository`
 query wrappers. Detail and editor surfaces may reload the Markdown
@@ -79,7 +85,7 @@ mounts `TasksView` with the repository, injected clock, and live settings
 source. Plugin data owns only presentation settings; task and list state stays
 in Markdown.
 
-The same onload registers the plugin-scoped `task-list-items` Markdown
+The same onload registers the plugin-scoped `task-structure-runs` Markdown
 contribution through the public API. The contribution supplies a CodeMirror
 extension and rendered-Markdown postprocessor but imports neither Lapis
 Markdown nor Mira. The API surface context carries an opaque Tasks controller
@@ -93,20 +99,37 @@ reclassifies clock-valued tasks without a file mutation. See LN-TASK-029.
 
 ## Mutations
 
-`task-mutations.ts` and repository methods rewrite one Markdown file, or the
-parent reserved-section links, then upsert the projection from that parse.
+`task-mutations.ts` and repository methods rewrite exact Markdown ranges, then
+upsert the projection from the new parse.
 See LN-TASK-019. `TaskRepository.cancel` writes `task.status: canceled`.
 
 - Completing a linked child updates the child file, not a checkbox on the
   parent.
+- A rich TaskRun row merges canonical planner relationship fields into its fresh
+  projection-backed task so an absent `listId` cannot become an implicit unlink.
+  Title, schedule, completion, reopen, and checklist changes preserve the
+  authored structural entry.
 - `getTaskDocument` lazily reads checklist contents. A checkbox mutation
   requires its checklist ordinal and expected text, replaces only that marker,
   reparses the file, writes it, and reprojects the new counts. A stale ordinal
   or text raises `TaskChecklistMutationError` without writing.
-- Rolling complete may reset only `## Checklist`.
+- Rolling complete with reset enabled resets every lightweight checkbox in the
+  Task, independent of heading text.
 - List graph edits (pin, nest, rename, archive, delete) still go through the
   repository and then reproject. See [Lists](./lists.md).
-- An Items edit uses an editor transaction while its list document is actively
-  edited. A read-only edit rereads the file, verifies the exact scanned section
-  text, replaces only that range, and reparses before writing and reprojecting.
-  Stale source fails closed. See LN-TASK-036.
+- TaskRun create, reorder, and delete use an editor transaction while the
+  document is actively edited; the repository does not write behind that
+  buffer. A read-only edit rereads the file, verifies the exact scanned run,
+  replaces only that range, and reparses before writing and reprojecting. A
+  cross-run move produces exact remove and insert changes and recomputes the
+  href if the destination document differs. Stale source fails closed. See
+  LN-TASK-036.
+- Heading rename and creation operate on ordinary Markdown heading ranges.
+  Adding an entry under a heading inserts a normal Markdown list link at that
+  heading boundary. No front matter grouping field is written.
+- Before planner snapshots consume relationships, whole-vault validation
+  rebuilds the active structure, removes conflicting/cyclic edges, and surfaces
+  diagnostics. The underlying source remains unchanged.
+- Deleting a linked sublist after its active-parent link transaction removes the
+  child file and other parent/navigation references while explicitly skipping a
+  duplicate repository rewrite of that editor-owned parent.
