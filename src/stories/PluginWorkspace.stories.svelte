@@ -88,6 +88,9 @@
       "evening",
       "done",
     ]);
+    expect(
+      canvasElement.querySelector(".tasks-planner__agenda-heading"),
+    ).not.toBeInTheDocument();
     const disclosure = await canvas.findByRole("button", {
       name: "Show checklist for Review interview notes",
     });

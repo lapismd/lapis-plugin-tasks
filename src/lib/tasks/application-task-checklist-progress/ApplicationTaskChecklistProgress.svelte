@@ -15,6 +15,7 @@
     onToggleChecklistItem,
     checklistRefreshVersion = 0,
     layout = "inline",
+    selected = false,
     class: className = "",
   }: {
     task: ApplicationTask;
@@ -25,6 +26,7 @@
     ) => Promise<ChecklistItem[]>;
     checklistRefreshVersion?: number;
     layout?: "inline" | "planner";
+    selected?: boolean;
     class?: string;
   } = $props();
 
@@ -119,6 +121,7 @@
     class={["task-checklist-progress", className].filter(Boolean).join(" ")}
     data-task-checklist-progress
     data-layout={layout}
+    data-selected={selected ? "true" : undefined}
   >
     <button
       type="button"

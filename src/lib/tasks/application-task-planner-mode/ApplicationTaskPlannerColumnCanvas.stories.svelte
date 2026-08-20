@@ -51,6 +51,27 @@
         '[data-planner-drop-id="planner-sidebar:inbox"]',
       ),
     ).toBeVisible();
+    expect(
+      context.canvasElement.querySelector(".tasks-planner__agenda-heading"),
+    ).not.toBeInTheDocument();
+    const alignedTitle = canvas.getByRole("button", {
+      name: "Finish yesterday's review",
+      exact: true,
+    });
+    const alignedRow = alignedTitle.closest<HTMLElement>(
+      ".application-planner-task-row",
+    )!;
+    const alignedDetails = within(alignedRow).getByRole("button", {
+      name: "Open task details for Finish yesterday's review",
+    });
+    const titleRect = alignedTitle.getBoundingClientRect();
+    const detailsRect = alignedDetails.getBoundingClientRect();
+    expect(
+      Math.abs(
+        titleRect.top + titleRect.height / 2 -
+          (detailsRect.top + detailsRect.height / 2),
+      ),
+    ).toBeLessThan(1);
     await playTitleClickStartsInlineEdit(context);
     const daySections = Array.from(
       context.canvasElement.querySelectorAll<HTMLElement>("[data-day-section]"),
@@ -167,7 +188,40 @@
       ),
     );
     expect(getComputedStyle(checklistBody).backgroundColor).toBe(bodySurface);
-    await userEvent.click(checklistDisclosure);
+    const checklistTaskId = (checklistRow as HTMLElement).dataset.plannerTaskId!;
+    (checklistRow as HTMLElement).focus();
+    await userEvent.keyboard(" ");
+    let selectedChecklistRow: HTMLElement | undefined;
+    await waitFor(() => {
+      selectedChecklistRow = Array.from(
+        context.canvasElement.querySelectorAll<HTMLElement>(
+          "[data-planner-task-id]",
+        ),
+      ).find((row) => row.dataset.plannerTaskId === checklistTaskId);
+      expect(selectedChecklistRow).toHaveAttribute(
+        "data-planner-selected",
+        "true",
+      );
+    });
+    const selectedChecklistBody =
+      selectedChecklistRow!.querySelector<HTMLElement>(
+        ".application-planner-task-row__columns",
+      )!;
+    const selectedChecklistFooter =
+      selectedChecklistRow!.querySelector<HTMLElement>(
+        "[data-task-checklist-progress]",
+      )!;
+    expect(selectedChecklistFooter).toHaveAttribute("data-selected", "true");
+    await waitFor(() =>
+      expect(getComputedStyle(selectedChecklistFooter).backgroundColor).toBe(
+        getComputedStyle(selectedChecklistBody).backgroundColor,
+      ),
+    );
+    await userEvent.click(
+      canvas.getByRole("button", {
+        name: "Show checklist for Review interview notes",
+      }),
+    );
     const interviewChecklist = await canvas.findByRole("group", {
       name: "Checklist for Review interview notes",
     });

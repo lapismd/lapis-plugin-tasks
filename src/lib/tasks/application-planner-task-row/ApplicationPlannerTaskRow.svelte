@@ -291,6 +291,7 @@
   <ApplicationTaskChecklistProgress
     task={applicationTask}
     layout="planner"
+    selected={showSelectedSurface}
     onLoadChecklist={onLoadChecklist ? () => onLoadChecklist(task) : undefined}
     onToggleChecklistItem={onToggleChecklistItem
       ? (item, checked) => onToggleChecklistItem(task, item, checked)

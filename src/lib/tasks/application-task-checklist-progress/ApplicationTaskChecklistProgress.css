@@ -24,6 +24,22 @@
   );
 }
 
+.task-checklist-progress[data-selected="true"] {
+  --task-checklist-footer-surface: var(
+    --task-row-surface,
+    color-mix(in srgb, var(--ui-tasks-accent) 13%, var(--kanban-card))
+  );
+}
+
+.task-checklist-progress[data-selected="true"]:hover,
+.task-checklist-progress[data-selected="true"]:focus-within {
+  --task-checklist-footer-surface: color-mix(
+    in srgb,
+    var(--ui-tasks-accent) 17%,
+    var(--kanban-card)
+  );
+}
+
 .task-checklist-progress[data-layout="planner"] {
   box-sizing: border-box;
   margin: 0.45rem -0.5rem -0.5rem;

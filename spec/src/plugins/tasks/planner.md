@@ -31,9 +31,11 @@ snapshot.
 The Today planner is a controlled selected-date surface. Its default date and
 all completion timestamps come from the injected local clock. A Monday-first
 seven-day strip selects the displayed date, with previous- and next-week
-controls. The selected day and actual today have distinct states. When they
-differ, the existing Column Canvas header-action slot contains a Today shortcut;
-choosing a date or week never changes task files. See LN-TASK-030.
+controls. The selected day and actual today have distinct states, and the strip
+itself communicates the selected weekday and date without a redundant large
+weekday/month banner. When they differ, the existing Column Canvas header-action
+slot contains a Today shortcut; choosing a date or week never changes task files.
+See LN-TASK-030.
 
 ## Bucket classification
 
@@ -138,9 +140,12 @@ reads as the card footer rather than another chip-column item. A top divider and
 slightly darker semantic surface distinguish it without introducing a separate
 card. The body and footer own separate interaction surfaces: body hover does not
 recolor the footer, while hover or focus within the footer applies its own
-subtle surface change. Opening the disclosure lazily reads the current
-`TaskDocument` through `TaskRepository`. Expanded items reuse the public Tasks
-`ApplicationTaskCheckbox` rather than a separate native-checkbox presentation.
+subtle surface change. The trailing details control is vertically centered with
+the title line. A selected row carries its selection surface through the footer,
+so a checklist does not visually interrupt the selected card. Opening the
+disclosure lazily reads the current `TaskDocument` through `TaskRepository`.
+Expanded items reuse the public Tasks `ApplicationTaskCheckbox` rather than a
+separate native-checkbox presentation.
 
 Expanded checkboxes optimistically update progress while the guarded Markdown
 mutation runs. Success replaces the local items with the reparsed document and
