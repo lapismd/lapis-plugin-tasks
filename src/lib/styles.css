@@ -57,14 +57,24 @@
 }
 
 .cm-editor .cm-line[data-task-group-heading="true"] {
-  display: block;
+  display: flex !important;
+  align-items: center;
   margin-block: 0.5rem;
+  padding: 0.45rem 0.75rem !important;
   font-family: var(--font-sans, inherit) !important;
   font-size: 0.78rem !important;
   font-weight: 850 !important;
   letter-spacing: 0.05em !important;
   line-height: 1.2 !important;
   text-transform: uppercase !important;
+}
+
+.cm-editor
+  .cm-line[data-task-group-heading="true"]
+  > .cm-fold-indicator {
+  display: inline-flex;
+  height: 1rem;
+  align-items: center;
 }
 
 .cm-editor .cm-line[data-task-group-heading="true"] .cm-heading {

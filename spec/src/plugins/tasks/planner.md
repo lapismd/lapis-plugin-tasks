@@ -29,10 +29,12 @@ enter and leave full-document live preview, so the same control remains
 available at phone width without claiming document-body double-click. The
 planner column also exposes the controller-owned collapse toggle. The TaskRun
 block's code icon is the only pointer control that reveals its literal source.
-It overlays the run's inline end beside the authored grouping heading instead
-of consuming a standalone row. The preview, CodeMirror editor, scroller, and
-gutters share the
-active Lapis Markdown theme background and retain the Lapis document margins.
+It overlays the run's inline end, inset within and vertically centered on the
+authored grouping-heading pill, instead of consuming a standalone row. Live
+preview also centers its fold affordance, source markers, and heading label
+within that pill rather than inheriting CodeMirror's top-aligned line box. The
+preview, CodeMirror editor, scroller, and gutters share the active Lapis
+Markdown theme background and retain the Lapis document margins.
 The rich widget resets CodeMirror whitespace and typography inheritance so its
 task rows retain their normal compact layout and card surfaces without consuming
 the next heading's boundary decoration. In ordinary Markdown surfaces, rich rows

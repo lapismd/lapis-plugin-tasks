@@ -67,6 +67,8 @@ describe("task-list Markdown contribution", () => {
       "utf8",
     );
     expect(styles).toContain(".task-list-items-block__header {\n  position: absolute;");
+    expect(styles).toContain("inset-block-start: -2.9rem;");
+    expect(styles).toContain("inset-inline-end: 0.5rem;");
     expect(styles).toContain(
       '.task-list-items-block[data-task-list-surface="markdown"]',
     );
@@ -84,6 +86,8 @@ describe("task-list Markdown contribution", () => {
     expect(globalStyles).toContain(
       '.cm-editor .cm-line[data-task-group-heading="true"]',
     );
+    expect(globalStyles).toContain("display: flex !important;");
+    expect(globalStyles).toContain("padding: 0.45rem 0.75rem !important;");
   });
 
   it.each([

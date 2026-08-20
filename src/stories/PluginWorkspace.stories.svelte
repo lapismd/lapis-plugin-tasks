@@ -226,6 +226,49 @@
       expect(row).toBeTruthy();
     });
     expect(getComputedStyle(sourceHeader).position).toBe("absolute");
+    const sourceButton = sourceHeader.querySelector<HTMLElement>(
+      ".task-list-items-block__source",
+    )!;
+    const sourceButtonBox = sourceButton.getBoundingClientRect();
+    const heading = Array.from(
+      run.ownerDocument.querySelectorAll<HTMLElement>(
+        '[data-task-group-heading="true"]',
+      ),
+    )
+      .filter((candidate) => candidate.getClientRects().length > 0)
+      .sort((left, right) => {
+        const sourceCenter =
+          sourceButtonBox.top + sourceButtonBox.height / 2;
+        const leftBox = left.getBoundingClientRect();
+        const rightBox = right.getBoundingClientRect();
+        return (
+          Math.abs(leftBox.top + leftBox.height / 2 - sourceCenter) -
+          Math.abs(rightBox.top + rightBox.height / 2 - sourceCenter)
+        );
+      })[0]!;
+    const headingBox = heading.getBoundingClientRect();
+    expect(
+      Math.abs(
+        sourceButtonBox.top +
+          sourceButtonBox.height / 2 -
+          (headingBox.top + headingBox.height / 2),
+      ),
+    ).toBeLessThan(4);
+    expect(headingBox.right - sourceButtonBox.right).toBeGreaterThanOrEqual(6);
+    expect(headingBox.right - sourceButtonBox.right).toBeLessThanOrEqual(10);
+    if (heading.matches(".cm-line")) {
+      const label = Array.from(
+        heading.querySelectorAll<HTMLElement>(".cm-heading:not(.cm-meta)"),
+      ).findLast((candidate) => candidate.textContent?.trim())!;
+      const labelBox = label.getBoundingClientRect();
+      expect(
+        Math.abs(
+          labelBox.top +
+            labelBox.height / 2 -
+            (headingBox.top + headingBox.height / 2),
+        ),
+      ).toBeLessThan(4);
+    }
     expect(
       Math.abs(
         rows.getBoundingClientRect().top - run.getBoundingClientRect().top,

@@ -30,8 +30,8 @@
 
 .task-list-items-block__header {
   position: absolute;
-  inset-block-start: -2.15rem;
-  inset-inline-end: 0;
+  inset-block-start: -2.9rem;
+  inset-inline-end: 0.5rem;
   z-index: 2;
   display: flex;
   align-items: center;
