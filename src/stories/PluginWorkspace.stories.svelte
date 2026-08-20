@@ -129,6 +129,34 @@
       ),
     ).toBeVisible();
 
+    expect(
+      canvas.getByRole("progressbar", { name: "Checklist progress: 1 of 3" }),
+    ).toBeVisible();
+    await userEvent.click(
+      canvas.getByRole("button", {
+        name: "Show checklist for Review interview notes",
+      }),
+    );
+    const cadenceItem = await canvas.findByRole("checkbox", {
+      name: "Note the Kubernetes upgrade cadence",
+    });
+    await userEvent.click(cadenceItem);
+    await waitFor(async () => {
+      const file = app.vault.getFileByPath("inbox/today-2.md");
+      expect(file).toBeTruthy();
+      expect(await app.vault.cachedRead(file!)).toContain(
+        "- [x] Note the Kubernetes upgrade cadence",
+      );
+    });
+    await userEvent.click(cadenceItem);
+    await waitFor(async () => {
+      const file = app.vault.getFileByPath("inbox/today-2.md");
+      expect(file).toBeTruthy();
+      expect(await app.vault.cachedRead(file!)).toContain(
+        "- [ ] Note the Kubernetes upgrade cadence",
+      );
+    });
+
     const writing = canvas.getByRole("button", { name: "Writing" });
     const applications = canvas.getByRole("button", { name: "Applications" });
     const dataTransfer = new DataTransfer();

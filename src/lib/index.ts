@@ -25,5 +25,11 @@ export {
   type TaskPlannerDaySnapshot,
   type TaskPlannerWeekDay,
 } from "./model";
+export {
+  TaskChecklistMutationError,
+  setTaskChecklistItemChecked,
+  type ChecklistItem,
+  type TaskDocument,
+} from "./model";
 export { default as CatalogBoundary } from "./CatalogBoundary.svelte";
 export * from "./tasks";

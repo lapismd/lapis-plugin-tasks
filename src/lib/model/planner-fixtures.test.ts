@@ -33,6 +33,9 @@ describe("planner Markdown fixtures", () => {
     );
     expect(tasks.find((task) => task.id === "story-task-today-1")?.applicationId)
       .toBe("nova-bank-platform-lead");
+    expect(
+      tasks.find((task) => task.id === "story-task-today-2"),
+    ).toMatchObject({ checklistTotal: 3, checklistCompleted: 1 });
   });
 
   it("queries the same fixture set through TaskRepository summaries", async () => {

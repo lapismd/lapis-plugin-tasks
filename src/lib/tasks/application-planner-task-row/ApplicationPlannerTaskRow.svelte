@@ -8,6 +8,7 @@
   import type { SwipeItemOpen } from "@lapismd/design-core/shadcn/swipe-item";
   import {
     taskToApplicationTask,
+    type ChecklistItem,
     type PlannerSelectionPosition,
     type Task,
   } from "../../model";
@@ -47,6 +48,9 @@
     onToggleDone = () => {},
     onUpdateTask = () => {},
     onRemoveTask = () => {},
+    onLoadChecklist,
+    onToggleChecklistItem,
+    checklistRefreshVersion = 0,
     onMoveTask = () => {},
     onOpenApplication = () => {},
   }: {
@@ -73,6 +77,13 @@
     onToggleDone?: (task: Task, event: Event) => void;
     onUpdateTask?: (task: Task, patch: Partial<ApplicationTask>) => void;
     onRemoveTask?: (task: Task) => void;
+    onLoadChecklist?: (task: Task) => Promise<ChecklistItem[]>;
+    onToggleChecklistItem?: (
+      task: Task,
+      item: ChecklistItem,
+      checked: boolean,
+    ) => Promise<ChecklistItem[]>;
+    checklistRefreshVersion?: number;
     onMoveTask?: (task: Task, direction: -1 | 1) => void;
     onOpenApplication?: (applicationId: string) => void;
   } = $props();
@@ -117,6 +128,7 @@
       "[data-task-when-picker]",
       "[data-task-at-picker]",
       "[data-task-area-picker]",
+      "[data-task-checklist-progress]",
       "[popover]",
       "[role='dialog']",
     ];
@@ -298,6 +310,13 @@
       onToggleDone={(_, event) => onToggleDone(task, event)}
       onUpdateTask={(_, patch) => onUpdateTask(task, patch)}
       onRemoveTask={() => onRemoveTask(task)}
+      onLoadChecklist={onLoadChecklist
+        ? () => onLoadChecklist(task)
+        : undefined}
+      onToggleChecklistItem={onToggleChecklistItem
+        ? (item, checked) => onToggleChecklistItem(task, item, checked)
+        : undefined}
+      {checklistRefreshVersion}
       onMoveTask={(_, direction) => onMoveTask(task, direction)}
     />
   </div>

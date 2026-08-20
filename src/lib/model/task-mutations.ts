@@ -3,6 +3,7 @@ import {
   replaceChecklistSection,
   replaceReservedLinks,
   serializeTaskDocument,
+  type ChecklistItem,
   type ParsedTaskFile,
   type TaskDocument,
   type TaskPlan,
@@ -14,6 +15,65 @@ function requireTask(document: ParsedTaskFile): TaskDocument {
     throw new Error("Expected a task document.");
   }
   return document;
+}
+
+export class TaskChecklistMutationError extends Error {
+  readonly code = "stale-checklist-item";
+
+  constructor(message = "The checklist changed before this item could be updated.") {
+    super(message);
+    this.name = "TaskChecklistMutationError";
+  }
+}
+
+function replaceChecklistMarker(
+  body: string,
+  position: number,
+  expectedText: string,
+  checked: boolean,
+): string {
+  const lines = body.split("\n");
+  let inChecklist = false;
+  let checklistPosition = 0;
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index]!;
+    const heading = line.match(/^#{1,6}\s+(.+?)\s*$/);
+    if (heading) {
+      inChecklist = heading[1]!.trim().toLowerCase() === "checklist";
+      continue;
+    }
+    if (!inChecklist) continue;
+    const checkbox = line.match(/^(\s*[-*]\s+\[)( |x|X)(\]\s+)(.*)$/);
+    if (!checkbox) continue;
+    if (checklistPosition !== position) {
+      checklistPosition += 1;
+      continue;
+    }
+    if (checkbox[4]!.trim() !== expectedText.trim()) {
+      throw new TaskChecklistMutationError();
+    }
+    lines[index] = `${checkbox[1]}${checked ? "x" : " "}${checkbox[3]}${checkbox[4]}`;
+    return lines.join("\n");
+  }
+  throw new TaskChecklistMutationError();
+}
+
+export function setTaskChecklistItemChecked(
+  document: ParsedTaskFile,
+  position: number,
+  expectedText: string,
+  checked: boolean,
+): TaskDocument {
+  const task = requireTask(document);
+  const item = task.checklist[position];
+  if (!item || item.position !== position || item.text !== expectedText.trim()) {
+    throw new TaskChecklistMutationError();
+  }
+  const body = replaceChecklistMarker(task.body, position, expectedText, checked);
+  const checklist: ChecklistItem[] = task.checklist.map((entry) =>
+    entry.position === position ? { ...entry, checked } : entry,
+  );
+  return { ...task, body, checklist };
 }
 
 function addDays(date: string, days: number): string {

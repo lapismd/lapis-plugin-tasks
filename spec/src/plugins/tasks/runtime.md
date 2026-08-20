@@ -30,6 +30,8 @@ query wrappers. Detail and editor surfaces may reload the Markdown
 start, plan, deadline, checklist counts, and comment count. Plan kind is
 `anytime`, `morning`, `afternoon`, `evening`, or `time`, with `planTime` for
 clock values. It does not include body prose or comments text.
+Catalog adapters preserve the optional checklist total and completed counts
+while continuing to exclude checklist item text. See LN-TASK-033.
 
 ## Query views
 
@@ -84,6 +86,10 @@ See LN-TASK-019. `TaskRepository.cancel` writes `task.status: canceled`.
 
 - Completing a linked child updates the child file, not a checkbox on the
   parent.
+- `getTaskDocument` lazily reads checklist contents. A checkbox mutation
+  requires its checklist ordinal and expected text, replaces only that marker,
+  reparses the file, writes it, and reprojects the new counts. A stale ordinal
+  or text raises `TaskChecklistMutationError` without writing.
 - Rolling complete may reset only `## Checklist`.
 - List graph edits (pin, nest, rename, archive, delete) still go through the
   repository and then reproject. See [Lists](./lists.md).

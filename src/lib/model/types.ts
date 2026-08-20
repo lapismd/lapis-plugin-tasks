@@ -64,6 +64,8 @@ export type Task = {
   todayOrder?: number;
   areaOrder?: number;
   sourcePath?: string;
+  checklistTotal?: number;
+  checklistCompleted?: number;
   notes: string;
 };
 
@@ -98,6 +100,8 @@ export type CreateTaskInput = {
   todayOrder?: number;
   areaOrder?: number;
   sourcePath?: string;
+  checklistTotal?: number;
+  checklistCompleted?: number;
   notes?: string;
 };
 
@@ -133,6 +137,8 @@ export type ApplicationTaskAdapter = {
   planAt?: TaskCatalogPlanAt;
   deadline?: string;
   inbox?: boolean;
+  checklistTotal?: number;
+  checklistCompleted?: number;
   notes?: string;
   order?: number;
 };

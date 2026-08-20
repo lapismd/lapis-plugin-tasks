@@ -15,6 +15,7 @@
     type TaskPlannerSnapshot,
     type TaskQuickCreateInput,
     type TaskRepository,
+    type ChecklistItem,
   } from "./model";
   import {
     DEFAULT_TASKS_PLUGIN_SETTINGS,
@@ -51,6 +52,7 @@
   });
   let loadError = $state<string | null>(null);
   let refreshQueue = $state(Promise.resolve());
+  let checklistRefreshVersion = $state(0);
   let settings = $state<TasksPluginSettings>(DEFAULT_TASKS_PLUGIN_SETTINGS);
 
   const currentTime = () => clock();
@@ -113,6 +115,26 @@
   async function deleteTask(task: Task) {
     await deleteCatalogTaskFromRepository(repository, task);
     await queueRefresh();
+  }
+
+  async function loadChecklist(task: Task): Promise<ChecklistItem[]> {
+    const document = await repository.getTaskDocument(task.sourcePath ?? task.id);
+    return document.checklist;
+  }
+
+  async function toggleChecklistItem(
+    task: Task,
+    item: ChecklistItem,
+    checked: boolean,
+  ): Promise<ChecklistItem[]> {
+    const document = await repository.setChecklistItemChecked(
+      task.sourcePath ?? task.id,
+      item.position,
+      item.text,
+      checked,
+    );
+    await queueRefresh();
+    return document.checklist;
   }
 
   async function expandList(id: string) {
@@ -206,7 +228,10 @@
       settings = nextSettings;
     });
     const changed = app.metadataCache.on("changed", (file) => {
-      if (isTaskSourcePath(file.path)) void queueRefresh();
+      if (isTaskSourcePath(file.path)) {
+        checklistRefreshVersion += 1;
+        void queueRefresh();
+      }
     });
     const deleted = app.metadataCache.on("deleted", (file) => {
       if (isTaskSourcePath(file.path)) void queueRefresh();
@@ -234,6 +259,9 @@
     onSaveTask={(task) => void saveTask(task)}
     onCreateTask={(input) => void createTask(input)}
     onDeleteTask={(task) => void deleteTask(task)}
+    onLoadChecklist={loadChecklist}
+    onToggleChecklistItem={toggleChecklistItem}
+    {checklistRefreshVersion}
     onExpandList={(id) => void expandList(id)}
     onDropList={(sourcePath, target) => void dropList(sourcePath, target)}
     onRenameList={(path, title) => void renameList(path, title)}

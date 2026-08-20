@@ -100,6 +100,31 @@
       "Agenda interaction task{Enter}",
     );
     expect(within(afternoonSection).getByText("Agenda interaction task")).toBeVisible();
+
+    const checklistDisclosure = canvas.getByRole("button", {
+      name: "Show checklist for Review interview notes",
+    });
+    expect(
+      canvas.getByRole("progressbar", { name: "Checklist progress: 1 of 3" }),
+    ).toBeVisible();
+    await userEvent.click(checklistDisclosure);
+    const interviewChecklist = await canvas.findByRole("group", {
+      name: "Checklist for Review interview notes",
+    });
+    const cadenceItem = within(interviewChecklist).getByRole("checkbox", {
+      name: "Note the Kubernetes upgrade cadence",
+    });
+    await userEvent.click(cadenceItem);
+    expect(cadenceItem).toBeChecked();
+    expect(
+      canvas.getByRole("progressbar", { name: "Checklist progress: 2 of 3" }),
+    ).toBeVisible();
+    await userEvent.click(cadenceItem);
+    expect(cadenceItem).not.toBeChecked();
+    expect(
+      canvas.getByRole("progressbar", { name: "Checklist progress: 1 of 3" }),
+    ).toBeVisible();
+
     const applications = canvas.getByRole("button", { name: "Applications" });
     await userEvent.pointer({ keys: "[MouseRight]", target: applications });
     const menu = within(context.canvasElement.ownerDocument.body);

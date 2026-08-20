@@ -3,8 +3,10 @@
     buildPlannerApplicationSummaries,
     buildTaskPlannerSnapshot,
     createTask,
+    parsePlannerFixtures,
     PLANNER_FIXTURE_TODAY,
     sampleApplicationBoard,
+    type ChecklistItem,
     type JobApplication,
     type Task,
     type TaskQuickCreateInput,
@@ -16,6 +18,16 @@
     buildPlannerApplicationSummaries(sampleApplicationBoard);
 
   let tasks = $state(samplePlannerTasks());
+  let checklists = $state<Record<string, ChecklistItem[]>>(
+    Object.fromEntries(
+      parsePlannerFixtures()
+        .filter((document) => document.kind === "task")
+        .map((document) => [
+          document.id,
+          document.checklist.map((item) => ({ ...item })),
+        ]),
+    ),
+  );
   let applications = $state<JobApplication[]>(
     sampleApplicationBoard.applications.map((application) => ({
       ...application,
@@ -28,6 +40,27 @@
 
   function saveTask(task: Task) {
     tasks = tasks.map((entry) => (entry.id === task.id ? task : entry));
+  }
+
+  async function loadChecklist(task: Task): Promise<ChecklistItem[]> {
+    return (checklists[task.id] ?? []).map((item) => ({ ...item }));
+  }
+
+  async function toggleChecklistItem(
+    task: Task,
+    item: ChecklistItem,
+    checked: boolean,
+  ): Promise<ChecklistItem[]> {
+    const next = (checklists[task.id] ?? []).map((entry) =>
+      entry.position === item.position ? { ...entry, checked } : entry,
+    );
+    checklists = { ...checklists, [task.id]: next };
+    saveTask({
+      ...task,
+      checklistTotal: next.length,
+      checklistCompleted: next.filter((entry) => entry.checked).length,
+    });
+    return next.map((entry) => ({ ...entry }));
   }
 
   function createPlannerTask(input: TaskQuickCreateInput) {
@@ -92,6 +125,8 @@
   {applicationSummaries}
   showRelated={true}
   onSaveTask={saveTask}
+  onLoadChecklist={loadChecklist}
+  onToggleChecklistItem={toggleChecklistItem}
   onCreateTask={createPlannerTask}
   onDeleteTask={deleteTask}
   onSaveApplication={saveApplication}

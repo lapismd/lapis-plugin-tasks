@@ -17,6 +17,7 @@
     type TaskBucket,
     type TaskPlannerSnapshot,
     type TaskQuickCreateInput,
+    type ChecklistItem,
     todayDateOnly,
   } from "../../model";
   import {
@@ -47,6 +48,9 @@
     onSaveTask,
     onCreateTask,
     onDeleteTask,
+    onLoadChecklist,
+    onToggleChecklistItem,
+    checklistRefreshVersion = 0,
     onSaveApplication = () => {},
     onOpenApplication = () => {},
     onExpandList,
@@ -71,6 +75,13 @@
     onSaveTask: (task: Task) => void;
     onCreateTask: (input: TaskQuickCreateInput) => void;
     onDeleteTask: (task: Task) => void;
+    onLoadChecklist?: (task: Task) => Promise<ChecklistItem[]>;
+    onToggleChecklistItem?: (
+      task: Task,
+      item: ChecklistItem,
+      checked: boolean,
+    ) => Promise<ChecklistItem[]>;
+    checklistRefreshVersion?: number;
     onSaveApplication?: (application: JobApplication) => void;
     onOpenApplication?: (applicationId: string) => void;
     onExpandList?: (id: string) => void;
@@ -400,6 +411,9 @@
             {onSaveTask}
             {onCreateTask}
             {onDeleteTask}
+            {onLoadChecklist}
+            {onToggleChecklistItem}
+            {checklistRefreshVersion}
             {onSaveApplication}
             onOpenApplication={handleOpenApplication}
             onDragTargetChange={(targetId) => (activeDropTargetId = targetId)}

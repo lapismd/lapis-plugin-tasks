@@ -157,6 +157,12 @@ task:
 ---
 # Review interview notes
 
+## Checklist
+
+- [x] Pull the incident timeline
+- [ ] Note the Kubernetes upgrade cadence
+- [ ] Prepare a mentoring example
+
 ## Atlas AI loop
 
 Capture the strongest signals from the infra interview before drafting the follow-up.

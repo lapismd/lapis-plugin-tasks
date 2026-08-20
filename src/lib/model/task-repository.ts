@@ -13,6 +13,7 @@ import {
   parseTaskDocument,
   serializeTaskDocument,
   type ParsedTaskFile,
+  type TaskDocument,
   type TaskPlan,
   type TaskStart,
 } from "./task-document";
@@ -23,6 +24,7 @@ import {
   reopenTaskDocument,
   setReservedLinks,
   setTaskDeadline,
+  setTaskChecklistItemChecked,
   setTaskInbox,
   setTaskStart,
   skipOccurrence,
@@ -109,6 +111,49 @@ export class TaskRepository {
         id,
       )) ?? (await this.database.getTaskRow({ id }));
     return row ? taskRowToSummary(row) : null;
+  }
+
+  async getTaskDocument(idOrPath: string): Promise<TaskDocument> {
+    const path = await this.resolvePath(idOrPath);
+    if (!path) throw new Error(`Missing task document: ${idOrPath}`);
+    const document = await this.loadDocument(path);
+    if (document.kind !== "task") {
+      throw new Error(`Not a task document: ${path}`);
+    }
+    return document;
+  }
+
+  async setChecklistItemChecked(
+    idOrPath: string,
+    position: number,
+    expectedText: string,
+    checked: boolean,
+  ): Promise<TaskDocument> {
+    if (!this.files) {
+      throw new Error("TaskRepository mutations require a file store.");
+    }
+    const path = await this.resolvePath(idOrPath);
+    if (!path) throw new Error(`Missing task document: ${idOrPath}`);
+    const raw = await this.files.read(path);
+    const current = parseTaskDocument(raw, path);
+    if (!current || current.kind !== "task") {
+      throw new Error(`Not a task document: ${path}`);
+    }
+    const next = setTaskChecklistItemChecked(
+      current,
+      position,
+      expectedText,
+      checked,
+    );
+    const prefix = raw.slice(0, raw.length - current.body.length);
+    const nextRaw = `${prefix}${next.body}`;
+    const reparsed = parseTaskDocument(nextRaw, path);
+    if (!reparsed || reparsed.kind !== "task") {
+      throw new Error(`Checklist mutation produced an invalid task: ${path}`);
+    }
+    await this.files.write(path, nextRaw);
+    await indexTaskDocument(this.database, { ...reparsed, raw: nextRaw });
+    return { ...reparsed, raw: nextRaw };
   }
 
   async inbox(today?: string): Promise<TaskSummary[]> {

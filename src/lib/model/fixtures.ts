@@ -45,6 +45,8 @@ export function createTask(input: CreateTaskInput): Task {
     todayOrder: input.todayOrder,
     areaOrder: input.areaOrder,
     sourcePath: input.sourcePath,
+    checklistTotal: input.checklistTotal,
+    checklistCompleted: input.checklistCompleted,
     notes: input.notes ?? "",
   };
 }

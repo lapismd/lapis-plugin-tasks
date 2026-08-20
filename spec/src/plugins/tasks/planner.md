@@ -123,6 +123,23 @@ while viewing another date can remove the row. Rolling recurring completion
 continues to advance the task rather than adding an artificial history row.
 See LN-TASK-032.
 
+## Checklist progress
+
+Catalog task rows use projected checklist aggregates for their collapsed
+footer. Rows with no checklist do not render that footer. A nonzero total shows
+a progress bar, completed/total count, and disclosure control without putting
+item text into the planner snapshot. Opening the disclosure lazily reads the
+current `TaskDocument` through `TaskRepository`.
+
+Expanded checkboxes optimistically update progress while the guarded Markdown
+mutation runs. Success replaces the local items with the reparsed document and
+refreshes the planner projection. Failure restores the prior state, reloads the
+current checklist, and presents the repository error inline. The disclosure and
+checkboxes own their pointer and keyboard interaction: they do not select,
+open, or start dragging the containing row. An aggregate revision received
+after an external metadata refresh reloads an already-open checklist. See
+LN-TASK-033.
+
 ## Branding versus catalog
 
 Canonical planner types use the Markdown-first schema. CV-only

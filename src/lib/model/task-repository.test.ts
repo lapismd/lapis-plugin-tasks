@@ -34,6 +34,10 @@ task:
 ---
 # Buy filter
 
+## Checklist
+- [x] Measure the opening
+- [ ] Order the filter
+
 ## Subtasks
 - [Replace cartridge](./child.md)
 `,
@@ -152,6 +156,40 @@ describe("TaskRepository", () => {
     const raw = await files.read("buy.md");
     expect(raw).toContain("status: completed");
     expect(raw).not.toContain("inbox: true");
+  });
+
+  it("lazily loads and safely reprojects one checklist marker", async () => {
+    const { repository, files } = await openRepository();
+    const before = await files.read("buy.md");
+    const document = await repository.getTaskDocument("t_buy");
+    expect(document.checklist).toEqual([
+      { text: "Measure the opening", checked: true, position: 0 },
+      { text: "Order the filter", checked: false, position: 1 },
+    ]);
+
+    const next = await repository.setChecklistItemChecked(
+      "t_buy",
+      1,
+      "Order the filter",
+      true,
+    );
+    expect(await files.read("buy.md")).toBe(
+      before.replace("- [ ] Order the filter", "- [x] Order the filter"),
+    );
+    expect(next.checklist.every((item) => item.checked)).toBe(true);
+    await expect(repository.get("t_buy")).resolves.toMatchObject({
+      checklistTotal: 2,
+      checklistCompleted: 2,
+    });
+  });
+
+  it("rejects stale checklist positions without changing another item", async () => {
+    const { repository, files } = await openRepository();
+    const before = await files.read("buy.md");
+    await expect(
+      repository.setChecklistItemChecked("buy.md", 0, "Order the filter", false),
+    ).rejects.toMatchObject({ code: "stale-checklist-item" });
+    await expect(files.read("buy.md")).resolves.toBe(before);
   });
 
   it("reopens, retitles, creates, and removes Markdown-backed tasks", async () => {

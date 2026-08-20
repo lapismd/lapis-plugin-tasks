@@ -160,6 +160,22 @@ documents then remap every link to `navigation-item`.
 Other body prose is ordinary Markdown. Membership of a task in a list is the
 parent’s `## Items` link, not a field on the child. See LN-TASK-021.
 
+### Checklist identity and edits
+
+Checklist contents remain Markdown body content rather than projection data.
+The projection stores only total and completed counts. When a task row opens
+its checklist disclosure, the repository loads the current `TaskDocument` and
+returns the ordered checkbox items.
+
+A checkbox does not have a stored id. A guarded edit therefore addresses the
+item by its parser-provided ordinal within `## Checklist` plus its exact parsed text.
+Both values must still match the current file. The mutation changes only the
+single `[ ]` or `[x]` marker and preserves headings, whitespace, prose, links,
+and every other checklist line byte-for-byte. The changed Markdown is reparsed
+before the file and projection are updated. A stale ordinal or text mismatch
+does not fall through to another checkbox and does not write the file. See
+LN-TASK-033.
+
 ## Design influences and current differences
 
 The original design notes combined selected concepts from Things, Superlist, and Tiimo with rules introduced by the Markdown-first architecture. The product names record provenance only. They do not imply file-format compatibility, feature parity, or a dependency on those products.
@@ -176,6 +192,12 @@ Tiimo day-part ideas. Its five fixed sections, configurable clock boundaries,
 selected-date week strip, and completion-date Done grouping are Tasks-owned
 rules. Canonical `plan.date`, `plan.at`, `deadline`, and completion state remain
 authoritative; settings alter classification only.
+
+The row footer retains the lightweight checklist idea from Things and Tiimo,
+but its lazy document load, aggregate-only projection, and guarded Markdown
+marker mutation are repository-specific rules. Checklist items remain embedded
+content; they are not promoted to independent task resources by checking or
+unchecking them.
 
 The current repository does not implement every possibility in those source notes:
 

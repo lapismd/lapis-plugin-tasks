@@ -3,7 +3,9 @@ import { parseTaskDocument } from "./task-document";
 import {
   completeTaskDocument,
   planTaskDocument,
+  setTaskChecklistItemChecked,
   skipOccurrence,
+  TaskChecklistMutationError,
 } from "./task-mutations";
 
 const ROUTINE = `---
@@ -77,5 +79,27 @@ task:
     if (next.kind !== "task") return;
     expect(next.task.start).toEqual({ kind: "anytime" });
     expect(next.task.plan?.date).toBe("2026-08-22");
+  });
+
+  it("updates one checklist marker while preserving surrounding Markdown", () => {
+    const parsed = parseTaskDocument(ROUTINE, "morning.md");
+    const next = setTaskChecklistItemChecked(parsed!, 1, "Breakfast", true);
+    expect(next.body).toBe(
+      parsed!.body.replace("- [ ] Breakfast", "- [x] Breakfast"),
+    );
+    expect(next.checklist).toEqual([
+      { text: "Shower", checked: true, position: 0 },
+      { text: "Breakfast", checked: true, position: 1 },
+    ]);
+  });
+
+  it("rejects a stale checklist ordinal or expected label", () => {
+    const parsed = parseTaskDocument(ROUTINE, "morning.md");
+    expect(() =>
+      setTaskChecklistItemChecked(parsed!, 1, "Pack lunch", true),
+    ).toThrow(TaskChecklistMutationError);
+    expect(() =>
+      setTaskChecklistItemChecked(parsed!, 4, "Breakfast", true),
+    ).toThrow("checklist changed");
   });
 });

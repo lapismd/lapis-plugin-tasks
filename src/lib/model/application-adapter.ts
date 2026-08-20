@@ -26,6 +26,8 @@ export function taskToApplicationTask(task: Task): ApplicationTaskAdapter {
     planAt: task.planAt,
     deadline: task.deadline ?? task.dueAt,
     inbox: task.inbox,
+    checklistTotal: task.checklistTotal,
+    checklistCompleted: task.checklistCompleted,
     notes: task.notes.trim() || undefined,
     order: task.order,
   };
@@ -74,6 +76,8 @@ export function applicationTaskToTask(
     inbox: Object.prototype.hasOwnProperty.call(task, "inbox")
       ? task.inbox
       : existing?.inbox,
+    checklistTotal: task.checklistTotal ?? existing?.checklistTotal,
+    checklistCompleted: task.checklistCompleted ?? existing?.checklistCompleted,
     tags: existing?.tags,
     order: task.order ?? existing?.order,
     todayOrder: existing?.todayOrder,
@@ -94,4 +98,3 @@ export function hydrateApplicationTasks<
     tasks: applicationTasks.length ? applicationTasks : undefined,
   };
 }
-

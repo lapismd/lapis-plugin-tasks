@@ -45,3 +45,4 @@
 | LN-TASK-030 | Implemented | Pure week tests cover Monday-first month, year, and daylight-saving boundaries; the Column Canvas story selects another date, exposes the Today header action, and resets to the injected date. |
 | LN-TASK-031 | Implemented | Daily snapshot tests assert exact boundary routing, overdue inclusion, completion-date Done grouping, and canceled exclusion; the governed story asserts the five ordered sections, defaults, and empty collapsed Done target. |
 | LN-TASK-032 | Implemented | Drag-layout tests cover all daily groups, cross-section completion and reopening at a selected date; deterministic stories quick-create into a day part and use canonical statuses. |
+| LN-TASK-033 | Implemented | Projection and adapter tests retain aggregate counts; repository tests prove lazy load, exact marker preservation, reprojection, and stale-write rejection; governed Storybook plays cover interactive toggling and optimistic rollback with inline error. |

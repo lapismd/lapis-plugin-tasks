@@ -14,7 +14,8 @@
 		type TaskPlannerMovePatch,
 		type TaskPlannerQuickPlacement,
 		type TaskPlannerRowContext,
-		type TaskQuickCreateInput
+		type TaskQuickCreateInput,
+		type ChecklistItem
 	} from '../../model';
 	import {
 		DEFAULT_TASKS_PLUGIN_SETTINGS,
@@ -83,6 +84,9 @@
 		onSaveTask = () => {},
 		onCreateTask = () => {},
 		onDeleteTask = () => {},
+		onLoadChecklist,
+		onToggleChecklistItem,
+		checklistRefreshVersion = 0,
 		onSaveApplication = () => {},
 		onOpenApplication = () => {},
 		onDragTargetChange = () => {},
@@ -110,6 +114,13 @@
 		onSaveTask?: (task: Task) => void | Promise<void>;
 		onCreateTask?: (input: TaskQuickCreateInput) => void | Promise<void>;
 		onDeleteTask?: (task: Task) => void | Promise<void>;
+		onLoadChecklist?: (task: Task) => Promise<ChecklistItem[]>;
+		onToggleChecklistItem?: (
+			task: Task,
+			item: ChecklistItem,
+			checked: boolean
+		) => Promise<ChecklistItem[]>;
+		checklistRefreshVersion?: number;
 		onSaveApplication?: (application: JobApplication) => void | Promise<void>;
 		onOpenApplication?: (applicationId: string) => void | Promise<void>;
 		onDragTargetChange?: (targetId: string | null) => void;
@@ -810,6 +821,9 @@
 		onToggleDone={toggleTaskDone}
 		onUpdateTask={(updatedTask, patch) => void saveTaskPatch(updatedTask, patch)}
 		onRemoveTask={removeTask}
+		{onLoadChecklist}
+		{onToggleChecklistItem}
+		{checklistRefreshVersion}
 		onMoveTask={(updatedTask, direction) => moveTask(updatedTask, direction, context)}
 		onOpenApplication={onOpenApplication}
 	/>

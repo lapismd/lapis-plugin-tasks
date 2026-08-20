@@ -43,6 +43,8 @@ export function catalogTaskFromSummary(summary: TaskSummary): Task {
     }),
     completedAt: summary.completedAt,
     sourcePath: summary.path,
+    checklistTotal: summary.checklistTotal,
+    checklistCompleted: summary.checklistCompleted,
     notes: "",
   });
 }
@@ -83,6 +85,8 @@ export function catalogTaskFromDocument(document: ParsedTaskFile): Task {
     }),
     completedAt: document.task.completedAt,
     sourcePath: document.path,
+    checklistTotal: document.checklist.length,
+    checklistCompleted: document.checklist.filter((item) => item.checked).length,
     notes: document.body,
   });
 }
