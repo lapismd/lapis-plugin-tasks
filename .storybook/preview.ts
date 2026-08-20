@@ -57,7 +57,21 @@ const preview: Preview = {
           [
             "Specification governance",
             "Plugins",
-            ["Tasks", ["Documents", "Runtime", "Lists", "Planner"]],
+            [
+              "Tasks",
+              [
+                "Documents",
+                ["Recurrence"],
+                "Runtime",
+                "Lists",
+                "Planner",
+                [
+                  "Workspace surfaces",
+                  "Daily agenda",
+                  "Task rows and checklists",
+                ],
+              ],
+            ],
             "Verification",
           ],
           "Plugins",

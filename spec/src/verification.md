@@ -10,7 +10,7 @@
 | LPT-SPEC-006 | Implemented | Package scripts and supervisor smoke checks cover stop, reuse, and restart on the checkout-owned 7030 lane. |
 | LPT-SPEC-007 | Implemented | `AGENTS.md` defines App ownership and the required source audit. |
 | LPT-SPEC-008 | Implemented | The repository taxonomy audit covers every story title under `Plugins/Tasks`. |
-| LPT-SPEC-009 | Implemented | Exact Storybook mirror validation covers every SUMMARY chapter. |
+| LPT-SPEC-009 | Implemented | Exact Storybook mirror validation covers every SUMMARY chapter and rejects any preview order that is not first or does not match SUMMARY. |
 | LPT-SPEC-010 | Implemented | Canonical plugin chapters and stories use the `Plugins/Tasks` hierarchy. |
 | LPT-SPEC-011 | Implemented | `AGENTS.md` requires unrelated-work preservation, independently verified Jujutsu commits, and review-context messages that record the change, rationale, and passing validation. |
 | LN-TASK-001 | Implemented | Package identity, manifest, build, and pack inspection. |
@@ -56,3 +56,4 @@
 | LN-TASK-041 | Implemented | Pure/repository tests cover heading rename/create, add-under-heading, within-run reorder, cross-run/cross-document movement; rich List rows expose recursive disclosure and cross-run drag hooks. Focused source and shell acceptance verify the recursive indentation guide follows `--interactive-accent` and resolves to Lapis `--ui-workspace-focus-ring` inside the full-file surface. Full-document live preview remains the ordinary-heading editor. |
 | LN-TASK-042 | Implemented | Public API and Tasks types expose disposable structural entries/runs; parser dependencies are runtime dependencies; focused pure tests run without importing Markdown or Mira implementations. |
 | LN-TASK-043 | Implemented | Storybook source-contract coverage and browser acceptance verify the host brand picker, Lapis/light defaults, manager sun/moon control, and preview-root dark-class switching. Governed Obsidian-dark and Default-dark shell stories measure the effective contrast of selected navigation, overdue labels, all daily-section labels, quick-create affordances, Markdown body text, and task-group headings in reading and live preview while asserting the document resolves the dark color scheme. |
+| LN-TASK-044 | Implemented | `parseRepeat` normalizes the rolling schema and diagnoses an invalid frequency; `nextRollingDate`, `completeTaskDocument`, and `skipOccurrence` implement the documented anchors, fixed-day increments, plan preservation, counters, and checklist behavior. Focused mutation tests assert daily schedule-anchored roll-forward with full checklist reset and skip without a completion-count change. |

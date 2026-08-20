@@ -45,7 +45,8 @@ Compatibility notes remain ordinary prose.
 - `inbox` controls capture state
 - `plan.date` selects a day and `plan.at` selects a day part or `HH:mm`
 - `deadline` is a hard due date and does not imply a plan
-- `repeat` describes rolling recurrence
+- `repeat` describes the normalized [rolling recurrence
+  model](./documents/recurrence.md)
 - `comments` stores task-owned comment metadata
 
 Today, Review, Upcoming, and Logbook are derived views, never stored flags.

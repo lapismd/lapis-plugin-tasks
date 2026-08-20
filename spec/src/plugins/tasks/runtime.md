@@ -113,8 +113,9 @@ See LN-TASK-019. `TaskRepository.cancel` writes `task.status: canceled`.
   requires its checklist ordinal and expected text, replaces only that marker,
   reparses the file, writes it, and reprojects the new counts. A stale ordinal
   or text raises `TaskChecklistMutationError` without writing.
-- Rolling complete with reset enabled resets every lightweight checkbox in the
-  Task, independent of heading text.
+- Rolling completion and skip follow the normalized repeat schema, anchor, date
+  advancement, counter, and checklist rules in [Rolling
+  recurrence](./documents/recurrence.md). See LN-TASK-044.
 - List graph edits (pin, nest, rename, archive, delete) still go through the
   repository and then reproject. See [Lists](./lists.md).
 - TaskRun create, reorder, and delete use an editor transaction while the
