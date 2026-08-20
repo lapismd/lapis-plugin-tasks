@@ -55,6 +55,12 @@ has no preferred window. `morning`, `afternoon`, and `evening` are loose
 windows. `HH:mm` is time-blocked. Evening still fills the This evening Today
 subgroup. Morning and afternoon stay in the main Today list. See LN-TASK-016.
 
+Expanded planner rows and task detail include an `At` dropdown next to When.
+It writes `plan.at` as `morning`, `afternoon`, `evening`, or `anytime` using
+the same icon-and-label picker chrome as When. Evening still sets catalog
+`when: this-evening`. A clock value stays visible until the user picks a
+day-part. The dropdown does not add Morning or Afternoon Today sections.
+
 ## Drag hosts
 
 The first Column Canvas column uses the same planner drop-host attributes as

@@ -33,6 +33,7 @@
   } from '../../model';
   import ApplicationTaskAreaFormField from "../application-task-area-form-field/ApplicationTaskAreaFormField.svelte";
   import ApplicationTaskInlineOptionFormField from "../application-task-inline-option-form-field/ApplicationTaskInlineOptionFormField.svelte";
+  import ApplicationTaskAtFormField from "../application-task-at-form-field/ApplicationTaskAtFormField.svelte";
   import ApplicationTaskWhenFormField from "../application-task-when-form-field/ApplicationTaskWhenFormField.svelte";
   import ApplicationMarkdownPreview from "../../model/ReferenceMarkdownPreview.svelte";
   import { asSnippet } from "../../as-snippet";
@@ -240,18 +241,24 @@
       customField<
         ApplicationTask,
         undefined,
-        Pick<ApplicationTask, "scheduledAt" | "when">
+        Pick<ApplicationTask, "scheduledAt" | "when" | "start" | "planDate" | "planAt">
       >({
         id: "task-preview-when",
         label: "When",
         get: (value) => ({
           scheduledAt: value.scheduledAt,
           when: value.when,
+          start: value.start,
+          planDate: value.planDate,
+          planAt: value.planAt,
         }),
         set: (value, schedule) => ({
           ...value,
           scheduledAt: schedule.scheduledAt,
           when: schedule.when,
+          start: schedule.start,
+          planDate: schedule.planDate,
+          planAt: schedule.planAt,
         }),
         renderers: {
           edit: {
@@ -259,6 +266,38 @@
             wrapper: "none",
             props: ({ root }) => ({
               pickerId: `task-when-picker-${root.id}`,
+            }),
+          },
+        },
+      }),
+      customField<
+        ApplicationTask,
+        undefined,
+        Pick<ApplicationTask, "scheduledAt" | "when" | "start" | "planDate" | "planAt">
+      >({
+        id: "task-preview-at",
+        label: "At",
+        get: (value) => ({
+          scheduledAt: value.scheduledAt,
+          when: value.when,
+          start: value.start,
+          planDate: value.planDate,
+          planAt: value.planAt,
+        }),
+        set: (value, schedule) => ({
+          ...value,
+          scheduledAt: schedule.scheduledAt,
+          when: schedule.when,
+          start: schedule.start,
+          planDate: schedule.planDate,
+          planAt: schedule.planAt,
+        }),
+        renderers: {
+          edit: {
+            component: ApplicationTaskAtFormField,
+            wrapper: "none",
+            props: ({ root }) => ({
+              pickerId: `task-at-picker-${root.id}`,
             }),
           },
         },
@@ -490,6 +529,9 @@
       dueAt: nextTask.dueAt,
       scheduledAt: nextTask.scheduledAt,
       when: nextTask.when,
+      start: nextTask.start,
+      planDate: nextTask.planDate,
+      planAt: nextTask.planAt,
       areas: nextTask.areas,
     });
   }

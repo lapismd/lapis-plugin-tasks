@@ -328,9 +328,12 @@
           "[data-slot='alert-dialog-overlay']",
           "[data-task-due-picker]",
           "[data-task-when-picker]",
+          "[data-task-at-picker]",
           "[data-task-area-picker]",
           ".task-when-picker",
           ".task-when-picker__panel",
+          ".task-at-picker",
+          ".task-at-picker__panel",
           ".application-task-area-picker__panel",
         ].join(","),
       )

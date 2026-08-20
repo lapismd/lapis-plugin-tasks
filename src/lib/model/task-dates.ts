@@ -70,6 +70,19 @@ export function formatShortTaskDate(dateOnly: string) {
 
 const CLOCK_RE = /^\d{2}:\d{2}$/;
 
+export function formatTaskPlanAtLabel(input: {
+  when?: string | null;
+  planAt?: string | null;
+}): string {
+  if (input.when === "this-evening" || input.planAt === "evening") {
+    return "Evening";
+  }
+  if (input.planAt === "morning") return "Morning";
+  if (input.planAt === "afternoon") return "Afternoon";
+  if (input.planAt && CLOCK_RE.test(input.planAt)) return input.planAt;
+  return "Anytime";
+}
+
 export function formatTaskScheduleLabel(input: {
   when?: string | null;
   planAt?: string | null;

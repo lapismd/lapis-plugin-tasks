@@ -115,6 +115,7 @@
       "[contenteditable='true']",
       "[data-task-due-picker]",
       "[data-task-when-picker]",
+      "[data-task-at-picker]",
       "[data-task-area-picker]",
       "[popover]",
       "[role='dialog']",

@@ -7,7 +7,8 @@ matter. The filesystem is authoritative. AppDatabase owns the public
 Host movable panels remain unspecified.
 Reusable leaf controls come from public Design Core APIs.
 `ApplicationTaskAreaPicker` is the catalog list picker and composes Design
-Core Command View. A vault MAY include one `task-list-navigation` Markdown
+Core Command View. `ApplicationTaskAtPicker` is the planner `plan.at`
+day-part dropdown. A vault MAY include one `task-list-navigation` Markdown
 file whose headings are sidebar sections and whose links pin root lists.
 Nested lists stay in each list’s `## Items`. The
 `Plugins/Tasks/Panels` catalog story composes planner navigation, planner

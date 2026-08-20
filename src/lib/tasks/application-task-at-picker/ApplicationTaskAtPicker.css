@@ -1,0 +1,128 @@
+.task-at-picker {
+  position: relative;
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  width: fit-content;
+  border-radius: 0.32rem;
+  background: transparent;
+  padding: 0.15rem 0.2rem 0.15rem 0.35rem;
+  transition: background-color 140ms ease;
+}
+
+.task-at-picker:hover,
+.task-at-picker:focus-within,
+.task-at-picker:has(.task-at-picker__trigger[data-state="open"]) {
+  background: color-mix(
+    in srgb,
+    var(--kanban-border, var(--border)) 45%,
+    transparent
+  );
+}
+
+.task-at-picker__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 0;
+  background: transparent;
+  color: var(--kanban-foreground, var(--foreground));
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.task-at-picker__trigger:hover,
+.task-at-picker__trigger:focus-visible,
+.task-at-picker:has(.task-at-picker__trigger[data-state="open"])
+  .task-at-picker__trigger {
+  color: var(--kanban-foreground, var(--foreground));
+  outline: 0;
+}
+
+.task-at-picker__trigger svg {
+  width: 0.86rem;
+  height: 0.86rem;
+  flex: 0 0 auto;
+}
+
+.task-at-picker__icon {
+  display: inline-grid;
+  place-items: center;
+  color: var(--kanban-muted, var(--muted-foreground));
+}
+
+.task-at-picker__icon--sunrise,
+.task-at-picker__icon--sun {
+  color: var(--ui-tasks-warning, var(--warning));
+}
+
+.task-at-picker__icon--moon {
+  color: var(--kanban-primary, var(--primary));
+}
+
+.task-at-picker__panel {
+  z-index: 1400;
+  width: min(12.5rem, calc(100vw - 1rem));
+  --ui-popover-gap: 0;
+  --ui-popover-padding: 0;
+  border: 1px solid var(--kanban-border, var(--border));
+  border-radius: 0.5rem;
+  background: var(--kanban-card, var(--card));
+  box-shadow:
+    0 18px 40px
+      color-mix(in srgb, var(--kanban-foreground, #000) 16%, transparent),
+    0 0 0 1px
+      color-mix(in srgb, var(--kanban-border, var(--border)) 55%, transparent);
+  color: var(--kanban-foreground, var(--foreground));
+  padding: 0.3rem;
+}
+
+.task-at-picker__list {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.task-at-picker__option {
+  display: grid;
+  grid-template-columns: 1.1rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+  min-height: 1.75rem;
+  border: 0;
+  border-radius: 0.3rem;
+  background: transparent;
+  color: var(--kanban-foreground, var(--foreground));
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 650;
+  padding: 0.2rem 0.3rem;
+  text-align: left;
+}
+
+.task-at-picker__option > span:nth-child(2) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-at-picker__option:hover,
+.task-at-picker__option:focus-visible {
+  background: color-mix(in srgb, var(--kanban-border, var(--border)) 45%, transparent);
+  outline: 0;
+}
+
+.task-at-picker__option svg,
+.task-at-picker__check svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.task-at-picker__check {
+  color: var(--kanban-accent, var(--accent-foreground));
+}

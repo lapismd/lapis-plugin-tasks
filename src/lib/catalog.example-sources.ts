@@ -69,6 +69,20 @@ export const ApplicationTaskWhenFormFieldExample = `<script lang="ts">
 <ApplicationTaskWhenFormField />
 `;
 
+export const ApplicationTaskAtPickerExample = `<script lang="ts">
+  import { ApplicationTaskAtPicker } from "@lapis-notes/lapis-plugin-tasks";
+</script>
+
+<ApplicationTaskAtPicker />
+`;
+
+export const ApplicationTaskAtFormFieldExample = `<script lang="ts">
+  import { ApplicationTaskAtFormField } from "@lapis-notes/lapis-plugin-tasks";
+</script>
+
+<ApplicationTaskAtFormField />
+`;
+
 export const ApplicationTaskInlineOptionFormFieldExample = `<script lang="ts">
   import { ApplicationTaskInlineOptionFormField } from "@lapis-notes/lapis-plugin-tasks";
 </script>

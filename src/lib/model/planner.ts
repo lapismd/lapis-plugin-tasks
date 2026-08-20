@@ -71,6 +71,26 @@ export type TaskPlannerQuickPlacement = Extract<
   | "someday"
 >;
 
+export type TaskPlanAtDayPart = "anytime" | "morning" | "afternoon" | "evening";
+
+export const TASK_PLAN_AT_DAY_PARTS = [
+  "morning",
+  "afternoon",
+  "evening",
+  "anytime",
+] as const satisfies readonly TaskPlanAtDayPart[];
+
+export function isTaskPlanAtDayPart(
+  value: string | null | undefined,
+): value is TaskPlanAtDayPart {
+  return (
+    value === "anytime" ||
+    value === "morning" ||
+    value === "afternoon" ||
+    value === "evening"
+  );
+}
+
 export type TaskPlannerPlacementSource =
   | "scheduledAt"
   | "dueAt"
@@ -406,6 +426,53 @@ export function resolveTaskPlannerPlacement(
     when: null,
     planDate: null,
     planAt: null,
+  };
+}
+
+export function resolveTaskPlanAt(
+  at: TaskPlanAtDayPart,
+  current?: {
+    scheduledAt?: string | null;
+    planDate?: string | null;
+    when?: TaskWhen | null;
+    start?: string | null;
+  },
+  now = new Date(),
+): Pick<
+  TaskPlannerMovePatch,
+  "scheduledAt" | "when" | "start" | "planDate" | "planAt"
+> {
+  const today = formatDateOnly(now);
+  const date =
+    taskDateOnly(current?.planDate) ?? taskDateOnly(current?.scheduledAt);
+  if (at === "anytime" && (current?.when === "someday" || current?.start === "someday") && !date) {
+    return {
+      scheduledAt: null,
+      when: "someday",
+      start: "someday",
+      planDate: null,
+      planAt: null,
+    };
+  }
+  if (at === "anytime") {
+    return {
+      scheduledAt: date,
+      when: current?.when === "this-evening" ? null : (current?.when ?? null),
+      start:
+        current?.start === "someday"
+          ? "anytime"
+          : (current?.start ?? "anytime"),
+      planDate: date,
+      planAt: date ? "anytime" : null,
+    };
+  }
+  const plannedDate = date ?? today;
+  return {
+    scheduledAt: plannedDate,
+    when: at === "evening" ? "this-evening" : null,
+    start: "anytime",
+    planDate: plannedDate,
+    planAt: at,
   };
 }
 
