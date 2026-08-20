@@ -8,6 +8,15 @@ under each list’s `## Items`. Owning code is
 `src/lib/tasks/application-task-planner-mode/TaskListNavTree.svelte`.
 See LN-TASK-023 through LN-TASK-027.
 
+The list page is the complete authored Markdown document. Selecting a list
+mounts its real `TFile` through the public Markdown surface provider; Tasks does
+not extract a body, relocate `## Items`, or render a second filtered task list.
+Recognized Items sections become rich blocks in place, so prose may precede,
+follow, or separate multiple sections. Double-clicking non-interactive prose
+enters the provider's editable live preview. Preview and edit modes share one
+scroll owner, and a missing provider falls back to host Markdown rendering plus
+Open note. See LN-TASK-037.
+
 ```mermaid
 flowchart LR
   nav["lists.md headings"] -->|"navigation-item pins"| roots["Pinned root lists"]

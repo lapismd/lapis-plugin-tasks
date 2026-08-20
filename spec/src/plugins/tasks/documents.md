@@ -164,6 +164,16 @@ documents then remap every link to `navigation-item`.
 Other body prose is ordinary Markdown. Membership of a task in a list is the
 parent’s `## Items` link, not a field on the child. See LN-TASK-021.
 
+Canonical Items sections are also Markdown extension boundaries. Tasks scans
+the complete source and recognizes each exact `## Items` heading independently
+only when the section contains top-level Markdown list links and whitespace.
+The scanner records source ranges and authored labels/targets; it does not
+normalize, move, or serialize the document during rendering. A nested list,
+checkbox, paragraph, code block, or other unsupported row makes that section
+ordinary Markdown rather than allowing a partial replacement. Multiple valid
+Items sections may occur before, between, or after prose and retain those
+positions. See LN-TASK-034.
+
 ### Checklist identity and edits
 
 Checklist contents remain Markdown body content rather than projection data.
@@ -202,6 +212,13 @@ but its lazy document load, aggregate-only projection, and guarded Markdown
 marker mutation are repository-specific rules. Checklist items remain embedded
 content; they are not promoted to independent task resources by checking or
 unchecking them.
+
+The shared rich Items rendering is presentation over the original Markdown,
+not a replacement document model. Reading mode, embedded previews, live
+preview, and the Tasks list page all resolve the same authored links while
+source mode remains literal. This preserves the Markdown-first influence:
+section order and surrounding prose remain author-owned even when Tasks adds
+interactive controls. See LN-TASK-035 and LN-TASK-037.
 
 The current repository does not implement every possibility in those source notes:
 

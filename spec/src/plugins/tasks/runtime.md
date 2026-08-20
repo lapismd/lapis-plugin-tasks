@@ -79,6 +79,13 @@ mounts `TasksView` with the repository, injected clock, and live settings
 source. Plugin data owns only presentation settings; task and list state stays
 in Markdown.
 
+The same onload registers the plugin-scoped `task-list-items` Markdown
+contribution through the public API. The contribution supplies a CodeMirror
+extension and rendered-Markdown postprocessor but imports neither Lapis
+Markdown nor Mira. The API surface context carries an opaque Tasks controller
+only for the Tasks-owned file surface; ordinary Markdown surfaces use document
+interaction rules. See LN-TASK-035.
+
 Settings saves are serialized. The two local `HH:mm` day-part boundaries must
 be valid and ordered. Absent, older, or malformed data uses `12:00` and `17:00`.
 After a successful save, every open view receives the persisted snapshot and
@@ -99,3 +106,7 @@ See LN-TASK-019. `TaskRepository.cancel` writes `task.status: canceled`.
 - Rolling complete may reset only `## Checklist`.
 - List graph edits (pin, nest, rename, archive, delete) still go through the
   repository and then reproject. See [Lists](./lists.md).
+- An Items edit uses an editor transaction while its list document is actively
+  edited. A read-only edit rereads the file, verifies the exact scanned section
+  text, replaces only that range, and reparses before writing and reprojecting.
+  Stale source fails closed. See LN-TASK-036.

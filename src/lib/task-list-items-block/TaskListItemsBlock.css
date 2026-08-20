@@ -1,0 +1,99 @@
+.task-list-items-block {
+  display: grid;
+  gap: 0.5rem;
+  margin-block: 0.75rem;
+  color: var(--ui-foreground, inherit);
+}
+
+.task-list-items-block__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.task-list-items-block__header h2 {
+  margin: 0;
+  font: inherit;
+  font-weight: 650;
+}
+
+.task-list-items-block button,
+.task-list-items-block input {
+  font: inherit;
+}
+
+.task-list-items-block__source {
+  border: 0;
+  border-radius: 0.35rem;
+  padding: 0.2rem 0.45rem;
+  background: transparent;
+  color: var(--ui-muted-foreground, currentColor);
+  cursor: pointer;
+}
+
+.task-list-items-block__source:hover,
+.task-list-items-block__source:focus-visible {
+  background: var(--ui-muted, color-mix(in srgb, currentColor 8%, transparent));
+}
+
+.task-list-items-block__rows {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.task-list-items-block__task[draggable="true"] {
+  cursor: grab;
+}
+
+.task-list-items-block__list,
+.task-list-items-block__fallback {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border: 1px solid var(--ui-border, color-mix(in srgb, currentColor 15%, transparent));
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  background: var(--ui-background, transparent);
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.task-list-items-block__list small,
+.task-list-items-block__fallback small {
+  color: var(--ui-muted-foreground, currentColor);
+}
+
+.task-list-items-block__fallback {
+  border-style: dashed;
+}
+
+.task-list-items-block__error {
+  margin: 0;
+  color: var(--ui-destructive, #b42318);
+}
+
+.task-list-items-block__create {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.task-list-items-block__create input {
+  min-width: 0;
+  flex: 1;
+  border: 1px solid var(--ui-border, currentColor);
+  border-radius: 0.4rem;
+  padding: 0.45rem 0.6rem;
+  background: var(--ui-background, transparent);
+  color: inherit;
+}
+
+.task-list-items-block__create button {
+  border: 0;
+  border-radius: 0.4rem;
+  padding-inline: 0.75rem;
+  background: var(--ui-primary, currentColor);
+  color: var(--ui-primary-foreground, white);
+}

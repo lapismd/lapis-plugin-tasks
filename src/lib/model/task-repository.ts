@@ -14,9 +14,15 @@ import {
   serializeTaskDocument,
   type ParsedTaskFile,
   type TaskDocument,
+  type TaskListDocument,
   type TaskPlan,
   type TaskStart,
 } from "./task-document";
+import {
+  replaceTaskListItemsSection as replaceItemsSectionSource,
+  scanTaskListItemsSections,
+  type TaskListItemsSection,
+} from "./task-list-items";
 import {
   cancelTaskDocument,
   completeTaskDocument,
@@ -121,6 +127,49 @@ export class TaskRepository {
       throw new Error(`Not a task document: ${path}`);
     }
     return document;
+  }
+
+  async getTaskListDocument(idOrPath: string): Promise<TaskListDocument> {
+    const path = await this.resolvePath(idOrPath);
+    if (!path) throw new Error(`Missing task-list document: ${idOrPath}`);
+    const document = await this.loadDocument(path);
+    if (document.kind !== "task-list") {
+      throw new Error(`Not a task-list document: ${path}`);
+    }
+    return document;
+  }
+
+  async resolveTaskListItem(
+    sourcePath: string,
+    target: string,
+  ): Promise<TaskSummary | null> {
+    return this.getByPath(resolveTaskHref(sourcePath, target));
+  }
+
+  async replaceTaskListItemsSection(
+    idOrPath: string,
+    expected: Pick<TaskListItemsSection, "ordinal" | "source">,
+    entries: ReadonlyArray<{ label: string; target: string }>,
+  ): Promise<TaskListDocument> {
+    if (!this.files) {
+      throw new Error("TaskRepository mutations require a file store.");
+    }
+    const path = await this.resolvePath(idOrPath);
+    if (!path) throw new Error(`Missing task-list document: ${idOrPath}`);
+    const raw = await this.files.read(path);
+    const nextRaw = replaceItemsSectionSource(raw, expected, entries, path);
+    const reparsed = parseTaskDocument(nextRaw, path);
+    if (!reparsed || reparsed.kind !== "task-list") {
+      throw new Error(`Items mutation produced an invalid task list: ${path}`);
+    }
+    await this.files.write(path, nextRaw);
+    await indexTaskDocument(this.database, { ...reparsed, raw: nextRaw });
+    return { ...reparsed, raw: nextRaw };
+  }
+
+  async getTaskListItemsSections(idOrPath: string): Promise<TaskListItemsSection[]> {
+    const document = await this.getTaskListDocument(idOrPath);
+    return scanTaskListItemsSections(document.raw, document.path);
   }
 
   async setChecklistItemChecked(

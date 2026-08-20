@@ -164,6 +164,42 @@ describe("TaskRepository", () => {
     });
   });
 
+  it("guards and reprojects one exact Items section", async () => {
+    const { repository, files } = await openRepository();
+    const before = await files.read("lists/home.md");
+    const [section] = await repository.getTaskListItemsSections("list_home");
+    expect(section?.entries.map((entry) => entry.label)).toEqual(["Buy filter"]);
+
+    const next = await repository.replaceTaskListItemsSection(
+      "list_home",
+      section!,
+      [{ label: "Replace cartridge", target: "../child.md" }],
+    );
+    expect(next.raw).toBe(
+      before.replace(
+        "- [Buy filter](../buy.md)",
+        "- [Replace cartridge](../child.md)",
+      ),
+    );
+    await expect(repository.items("list_home")).resolves.toMatchObject([
+      { id: "t_child" },
+    ]);
+  });
+
+  it("rejects a stale Items section without rewriting prose", async () => {
+    const { repository, files } = await openRepository();
+    const [section] = await repository.getTaskListItemsSections("list_home");
+    const changed = (await files.read("lists/home.md")).replace(
+      "# Home",
+      "# Home\n\nAuthored note.",
+    );
+    await files.write("lists/home.md", changed.replace("Buy filter", "Changed"));
+    await expect(
+      repository.replaceTaskListItemsSection("list_home", section!, []),
+    ).rejects.toMatchObject({ code: "stale-section" });
+    await expect(files.read("lists/home.md")).resolves.toContain("Authored note.");
+  });
+
   it("writes a file mutation and upserts the same parse", async () => {
     const { repository, files } = await openRepository();
     const next = await repository.complete("buy.md", "2026-08-20T09:00:00Z");

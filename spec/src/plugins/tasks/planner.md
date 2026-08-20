@@ -16,6 +16,14 @@ hosts the lanes. The first column is buckets plus the Lists tree from
 [Lists](./lists.md). The middle column is
 `ApplicationTaskPlannerMode`. The third column is task detail.
 
+When navigation selects a task list, the middle column keeps its list title as
+workspace chrome but replaces the bucket planner body with the complete
+Markdown file surface. Its Tasks surface context preserves task selection,
+detail opening, checklist interaction, completion, exact-section quick-create,
+and drag ordering without allowing row controls to activate document editing.
+Ordinary Markdown surfaces deliberately omit planner-only selection, creation,
+and drag behavior. See LN-TASK-035 and LN-TASK-037.
+
 `tasks-workspace.svelte` wires a live `App` and `TaskRepository`: refresh
 from `buildTaskPlannerSnapshotFromRepository`, persist through
 `applyCatalogTaskToRepository`, and open list notes with `app.openFile`.

@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@lapis-notes/api", () => ({
   Notice: class Notice {},
+  MarkdownRenderChild: class MarkdownRenderChild {},
   Plugin: class Plugin {},
   PluginSettingTab: class PluginSettingTab {},
   Setting: class Setting {},

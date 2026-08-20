@@ -1,5 +1,8 @@
 export { TasksPlugin, TASKS_PLUGIN_ID, default } from "./tasks-plugin";
 export { TASKS_VIEW_TYPE, TasksView, type TasksSettingsSource } from "./tasks-view";
+export { createTaskListMarkdownContribution } from "./task-list-markdown-extension";
+export { default as TaskListItemsBlock } from "./task-list-items-block/TaskListItemsBlock.svelte";
+export type { TasksListSurfaceController } from "./task-list-surface";
 export {
   DEFAULT_TASKS_PLUGIN_SETTINGS,
   TASKS_PLUGIN_DATA_VERSION,
