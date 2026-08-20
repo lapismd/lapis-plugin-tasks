@@ -125,11 +125,11 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
 .task-column-canvas-story__canvas
   [data-column-id="tasks"]
   > [data-ui-part="resize-handle"] {
-  border-start-end-radius: var(
+  border-start-start-radius: var(
     --ui-column-canvas-radius,
     var(--radius-lg, var(--radius))
   );
-  border-end-end-radius: var(
+  border-end-start-radius: var(
     --ui-column-canvas-radius,
     var(--radius-lg, var(--radius))
   );

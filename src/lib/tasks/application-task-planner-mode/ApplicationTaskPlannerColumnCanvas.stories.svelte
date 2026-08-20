@@ -41,6 +41,14 @@
   play={async (context) => {
     const canvas = within(context.canvasElement);
     expect(canvas.getByText("All lists")).toBeVisible();
+    const tasksResizeHandle = canvas.getByRole("separator", {
+      name: "Resize Tasks column",
+    });
+    const tasksResizeStyle = getComputedStyle(tasksResizeHandle);
+    expect(tasksResizeStyle.borderTopLeftRadius).not.toBe("0px");
+    expect(tasksResizeStyle.borderBottomLeftRadius).not.toBe("0px");
+    expect(tasksResizeStyle.borderTopRightRadius).toBe("0px");
+    expect(tasksResizeStyle.borderBottomRightRadius).toBe("0px");
     expect(
       canvas.getByRole("button", { name: "Collapse All lists section" }),
     ).toBeVisible();

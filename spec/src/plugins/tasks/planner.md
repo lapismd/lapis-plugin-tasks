@@ -15,6 +15,9 @@ columns may open from the selected task in catalog stories.
 hosts the lanes. The first column is buckets plus the Lists tree from
 [Lists](./lists.md). The middle column is
 `ApplicationTaskPlannerMode`. The third column is task detail.
+The first-column resize handle sits flush against the planner column and rounds
+its logical start edge. Its hover surface therefore curves toward the adjacent
+planner rather than back into the Tasks navigation.
 
 When navigation selects a task list, the middle column keeps its list title as
 workspace chrome but replaces the bucket planner body with the complete
