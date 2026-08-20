@@ -35,6 +35,7 @@ task:
   plan:
     date: 2026-08-19
     at: anytime
+    duration: 45m
   deadline: 2026-08-21
 ---
 # Tailor platform CV variant
@@ -57,15 +58,50 @@ is the relative `.md` path.
 - `status`: `open`, `completed`, or `canceled`
 - `start`: `anytime`, `someday`, or a `YYYY-MM-DD` date
 - `inbox`: optional boolean
-- `plan`: optional `{ date, at }` where `at` is `anytime`, `morning`,
-  `afternoon`, `evening`, or `HH:mm`. `anytime` means that day with no
-  preferred window. Morning, afternoon, and evening are loose day-parts.
-  `HH:mm` is an explicit time block. `all-day` is not a task token; it is
-  reserved for a future calendar or event resource.
-- `deadline`, `repeat`, and `comments`: optional
+- `plan`: optional `{ date, at, duration }` where `at` is `anytime`, `morning`, `afternoon`, `evening`, or `HH:mm`. `anytime` means that day with no preferred window. Morning, afternoon, and evening are loose day-parts. `HH:mm` is an explicit time block. `duration` is a positive estimate such as `45m` or `1h30m`. `all-day` is not a task token; it is reserved for a future calendar or event resource.
+- `deadline`: optional `YYYY-MM-DD` date independent of `start` and `plan`
+- `repeat`: optional rolling recurrence rule described below
+- `comments`: optional comment records described below
 
 A someday task must not also have an active plan. `plan.date` must not precede
 a dated start.
+
+## Recurrence
+
+Recurring tasks keep one Markdown file and advance its plan date after completion or skip. The current parser accepts this shape:
+
+```yaml
+repeat:
+  strategy: rolling
+  frequency: weekly
+  interval: 1
+  on:
+    - friday
+  anchor: schedule
+  resetChecklist: true
+  lastCompletedAt: 2026-08-14T09:30:00+01:00
+  completionCount: 4
+```
+
+`frequency` is `daily`, `weekly`, `monthly`, or `yearly`. `anchor: schedule` advances from the existing plan date. `anchor: completion` advances from the completion date. Completing a rolling task keeps it open, advances `plan.date`, records completion metadata, and may reset only `## Checklist`.
+
+The implementation does not yet interpret `repeat.on`. Monthly and yearly advancement use fixed 30-day and 365-day intervals rather than calendar-aware rules. Missed-occurrence history is not a separate resource.
+
+## Comments
+
+Comments remain structured task metadata rather than Markdown body prose:
+
+```yaml
+comments:
+  - id: comment-final-examples
+    at: 2026-08-20T10:00:00+01:00
+    text: Verify the final examples.
+    occurrence: 2026-08-21
+    editedAt: 2026-08-20T10:15:00+01:00
+    resolved: false
+```
+
+The parser requires `id`, `at`, and `text`. `occurrence`, `editedAt`, and `resolved` are optional. Projection rows expose only `commentCount`; comment authoring, editing, resolution, and presentation workflows are not specified.
 
 ## List
 
@@ -123,3 +159,29 @@ documents then remap every link to `navigation-item`.
 
 Other body prose is ordinary Markdown. Membership of a task in a list is the
 parent’s `## Items` link, not a field on the child. See LN-TASK-021.
+
+## Design influences and current differences
+
+The original design notes combined selected concepts from Things, Superlist, and Tiimo with rules introduced by the Markdown-first architecture. The product names record provenance only. They do not imply file-format compatibility, feature parity, or a dependency on those products.
+
+| Source | Retained concepts |
+| --- | --- |
+| Things | Actionability separate from daily planning, an independent deadline, explicit Someday state, derived smart views, lightweight checklists, and schedule- or completion-anchored recurrence |
+| Superlist | Rich task bodies, linked full subtasks, lists that contain tasks or lists, navigation separate from ownership, and Inbox independent from structure |
+| Tiimo | Daily intention, loose day-parts, estimated duration, deliberate review of overdue plans, rolling recurrence, and resettable routine checklists |
+| Markdown-first design | YAML state, Markdown content, structural links in reserved sections, Markdown-owned order, stable resource IDs, and a disposable database projection |
+
+The current repository does not implement every possibility in those source notes:
+
+| Concept from the notes | Current repository position |
+| --- | --- |
+| Dedicated Deadlines smart view | Not defined. Deadlines participate in Today and Upcoming queries. |
+| Promote a checklist item to a full task | Not defined as a mutation or interface workflow. You can create a task file and add its link under `## Subtasks`. |
+| Duration drives workload budgets, automatic scheduling, calendar placement, or artificial intelligence planning | Not implemented. `plan.duration` parses, round-trips, projects to minutes, and reaches catalog tasks. |
+| Full recurrence grammar | Partial. The parser retains `repeat.on`, but recurrence advancement does not interpret it. Monthly and yearly advancement currently use fixed day counts. |
+| Comments form a complete collaboration surface | Partial. Comments parse, serialize, and contribute a projection count, but interaction workflows are not specified. |
+| Stable IDs make arbitrary filesystem moves transparent | Partial. IDs survive content-preserving changes, but structural Markdown links remain path-based. Generic backlink repair after an external rename or move is not specified. |
+| Every task or list has one structural parent across all relationship kinds | Partial. The list tree rejects cycles and multiple incoming `list-item` parents for task lists. The contract does not enforce one parent across both `subtask` and `list-item` relationships for every task. |
+| Every Markdown construct has dedicated Tasks editing controls | Not promised. Task bodies remain ordinary Markdown, and rendering or editing depends on host Markdown surfaces. |
+
+Use this section to understand why the model has its current boundaries. The [Tasks plugin requirements](./index.md) remain normative. [Runtime](./runtime.md) defines query and mutation behavior, [Lists](./lists.md) defines structural ownership, and [Planner](./planner.md) defines view classification.
