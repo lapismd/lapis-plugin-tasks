@@ -88,6 +88,37 @@ describe("planner Markdown fixtures", () => {
     ]);
   });
 
+  it("keeps canceled Markdown tasks in the repository-backed Logbook", async () => {
+    const now = new Date(`${PLANNER_FIXTURE_TODAY}T12:00:00`);
+    const database = new MemoryAppDatabase("planner-canceled-logbook");
+    await database.open();
+    const files = Object.fromEntries(
+      plannerMarkdownFixtures.map((fixture) => [fixture.path, fixture.raw]),
+    );
+    const repository = new TaskRepository(
+      database,
+      createMemoryTaskFileStore(files),
+    );
+    for (const document of parsePlannerFixtures()) {
+      await indexTaskDocument(database, document);
+    }
+
+    await repository.cancel(
+      "upcoming/critique.md",
+      "2026-08-20T10:00:00Z",
+    );
+    const snapshot = await buildTaskPlannerSnapshotFromRepository(
+      repository,
+      now,
+    );
+
+    expect(
+      snapshot.logbook.flatMap((group) =>
+        group.tasks.map((task) => task.title),
+      ),
+    ).toContain("Draft design critique");
+  });
+
   it("builds a sectioned list tree from the navigation document", async () => {
     const now = new Date(`${PLANNER_FIXTURE_TODAY}T12:00:00`);
     const database = new MemoryAppDatabase("planner-list-tree");

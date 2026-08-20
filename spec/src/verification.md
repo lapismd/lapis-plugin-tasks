@@ -30,7 +30,7 @@
 | LN-TASK-015 | Implemented | `parseTaskDocument` accepts `type: task-list` with `list.status` active or archived. |
 | LN-TASK-016 | Implemented | Task front matter maps nested `task:` status, start, inbox, plan, deadline, and repeat; `plan.at` accepts anytime, morning, afternoon, evening, or HH:mm and not all-day; view flags are not stored. |
 | LN-TASK-017 | Implemented | Reserved-section parser indexes Checklist checkboxes and Subtasks/Items links without checkbox wrappers. |
-| LN-TASK-018 | Implemented | `task-queries` derives Inbox, Today, Anytime, Upcoming, Someday, Completed, and Review without rewriting plan dates. Planner fixtures assert deadline-only tasks appear on Upcoming day rows. |
+| LN-TASK-018 | Implemented | `task-queries` derives Inbox, Today, Anytime, Upcoming, Someday, Completed, Logbook, and Review without rewriting plan dates. Repository and planner fixtures assert canceled tasks stay in Logbook and deadline-only tasks appear on Upcoming day rows. |
 | LN-TASK-019 | Implemented | Mutations rewrite one document then project; rolling complete resets only `## Checklist`. |
 | LN-TASK-020 | Implemented | `TaskRepository` queries AppDatabase projections; planner fixtures assert the same view ids as catalog summaries. |
 | LN-TASK-021 | Implemented | Planner Markdown fixtures round-trip through `parseTaskDocument`; list membership comes from task-list `## Items`. |

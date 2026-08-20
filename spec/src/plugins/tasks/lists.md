@@ -80,4 +80,5 @@ attaches that task to the existing list and must not mint a new id such as
 `src/lib/model/list-navigation.ts` and `apply-catalog-task.ts` own that
 identity rule. Catalog writes through `apply-catalog-task.ts` map `planAt`
 `morning`, `afternoon`, `evening`, or `HH:mm` onto the task file; `all-day`
-is not a stored task token.
+is not a stored task token. Catalog `status` `canceled` persists through
+`TaskRepository.cancel` as YAML `task.status: canceled`.

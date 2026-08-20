@@ -1,24 +1,39 @@
 import { describe, expect, it } from "vitest";
-import { resolveTaskPlanAt, resolveTaskPlannerPlacement } from "./planner";
+import { createTask } from "./fixtures";
+import {
+  classifyTask,
+  resolveTaskPlanAt,
+  resolveTaskPlannerPlacement,
+} from "./planner";
+import { formatTaskScheduleLabel } from "./task-dates";
 
 describe("resolveTaskPlannerPlacement", () => {
   const now = new Date("2026-08-20T12:00:00");
 
-  it("writes anytime for Today and day-parts for morning and afternoon", () => {
+  it("writes Today and Tomorrow dates and keeps an existing day-part", () => {
     expect(resolveTaskPlannerPlacement("today", now)).toMatchObject({
       planDate: "2026-08-20",
       planAt: "anytime",
       when: null,
     });
-    expect(resolveTaskPlannerPlacement("this-morning", now)).toMatchObject({
+    expect(resolveTaskPlannerPlacement("tomorrow", now)).toMatchObject({
+      planDate: "2026-08-21",
+      planAt: "anytime",
+      when: null,
+    });
+    expect(
+      resolveTaskPlannerPlacement("today", now, { planAt: "morning" }),
+    ).toMatchObject({
       planDate: "2026-08-20",
       planAt: "morning",
       when: null,
     });
-    expect(resolveTaskPlannerPlacement("this-afternoon", now)).toMatchObject({
-      planDate: "2026-08-20",
-      planAt: "afternoon",
-      when: null,
+    expect(
+      resolveTaskPlannerPlacement("tomorrow", now, { planAt: "evening" }),
+    ).toMatchObject({
+      planDate: "2026-08-21",
+      planAt: "evening",
+      when: "this-evening",
     });
     expect(resolveTaskPlannerPlacement("this-evening", now)).toMatchObject({
       planDate: "2026-08-20",

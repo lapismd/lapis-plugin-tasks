@@ -3,7 +3,9 @@ import type {
   AppDatabaseTaskRecord,
 } from "@lapis-notes/api/app-database";
 import {
+  and,
   eq,
+  or,
   PUBLIC_TASKS_PROJECTION_ID,
   taskQueryToIndexQuery,
 } from "@lapis-notes/api/app-database";
@@ -15,6 +17,7 @@ import {
   type TaskStart,
 } from "./task-document";
 import {
+  cancelTaskDocument,
   completeTaskDocument,
   planTaskDocument,
   reopenTaskDocument,
@@ -134,6 +137,19 @@ export class TaskRepository {
 
   async completed(): Promise<TaskSummary[]> {
     return this.query("completed");
+  }
+
+  async logbook(): Promise<TaskSummary[]> {
+    const result = await this.database.queryProjection<AppDatabaseTaskRecord>(
+      PUBLIC_TASKS_PROJECTION_ID,
+      {
+        where: and(
+          eq("kind", "task"),
+          or(eq("status", "completed"), eq("status", "canceled")),
+        ),
+      },
+    );
+    return result.rows.map(taskRowToSummary);
   }
 
   async lists(): Promise<TaskSummary[]> {
@@ -290,6 +306,10 @@ export class TaskRepository {
 
   async complete(path: string, at: string): Promise<TaskSummary> {
     return this.mutate(path, (document) => completeTaskDocument(document, at));
+  }
+
+  async cancel(path: string, at: string): Promise<TaskSummary> {
+    return this.mutate(path, (document) => cancelTaskDocument(document, at));
   }
 
   async reopen(path: string, at: string): Promise<TaskSummary> {
@@ -868,7 +888,10 @@ export class TaskRepository {
     return byPath?.documentId ?? null;
   }
 
-  private async query(view: TaskView, today?: string): Promise<TaskSummary[]> {
+  private async query(
+    view: Exclude<TaskView, "logbook">,
+    today?: string,
+  ): Promise<TaskSummary[]> {
     const result = await this.database.queryProjection<AppDatabaseTaskRecord>(
       PUBLIC_TASKS_PROJECTION_ID,
       taskQueryToIndexQuery({ view, today }),

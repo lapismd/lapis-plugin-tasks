@@ -5,11 +5,25 @@ import type { TaskPlan, TaskStart } from "./task-document";
 import { catalogTaskFromSummary } from "./catalog-adapter";
 import type { TaskRepository } from "./task-repository";
 
-function isDone(task: Task): boolean {
+function isCanceled(task: Task): boolean {
+  return task.status === "canceled";
+}
+
+function isCompleted(task: Task): boolean {
   return (
-    task.status === "done" ||
-    task.status === "completed" ||
-    Boolean(task.completedAt)
+    !isCanceled(task) &&
+    (task.status === "done" ||
+      task.status === "completed" ||
+      Boolean(task.completedAt))
+  );
+}
+
+function isOpen(task: Task): boolean {
+  return (
+    task.status === "open" ||
+    task.status === "todo" ||
+    task.status === "waiting" ||
+    (!isCompleted(task) && !isCanceled(task))
   );
 }
 
@@ -115,9 +129,13 @@ export async function applyCatalogTaskToRepository(
   if (!path) throw new Error("Task is missing a vault path");
   const at = next.updatedAt || new Date().toISOString();
 
-  const completed = isDone(next) && (!previous || !isDone(previous));
-  const reopened = !isDone(next) && Boolean(previous && isDone(previous));
-  if (completed) {
+  const canceled = isCanceled(next) && (!previous || !isCanceled(previous));
+  const completed = isCompleted(next) && (!previous || !isCompleted(previous));
+  const reopened =
+    isOpen(next) && Boolean(previous && (isCompleted(previous) || isCanceled(previous)));
+  if (canceled) {
+    await repository.cancel(path, at);
+  } else if (completed) {
     await repository.complete(path, next.completedAt ?? at);
   } else if (reopened) {
     await repository.reopen(path, at);

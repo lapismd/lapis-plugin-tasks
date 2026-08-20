@@ -45,13 +45,24 @@
   );
 
   function selectPlacement(placement: TaskPlannerQuickPlacement) {
-    const patch = resolveTaskPlannerPlacement(placement);
+    const patch = resolveTaskPlannerPlacement(placement, new Date(), scheduleValue);
     void update({
       scheduledAt: patch.scheduledAt ?? undefined,
       when: patch.when ?? undefined,
       start: patch.start ?? undefined,
       planDate: patch.planDate ?? undefined,
       planAt: patch.planAt ?? undefined,
+    });
+  }
+
+  function selectDate(date: string) {
+    const kept = resolveTaskPlannerPlacement("today", new Date(), scheduleValue);
+    void update({
+      scheduledAt: date,
+      when: kept.when ?? undefined,
+      start: "anytime",
+      planDate: date,
+      planAt: kept.planAt ?? undefined,
     });
   }
 </script>
@@ -73,14 +84,7 @@
     scheduledAt={scheduleValue.scheduledAt}
     when={scheduleValue.when}
     planAt={scheduleValue.planAt}
-    onSelectDate={(date) =>
-      void update({
-        scheduledAt: date,
-        when: undefined,
-        start: "anytime",
-        planDate: date,
-        planAt: "anytime",
-      })}
+    onSelectDate={selectDate}
     onSelectPlacement={selectPlacement}
     onClear={() =>
       void update({

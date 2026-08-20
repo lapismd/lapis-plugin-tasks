@@ -1,7 +1,13 @@
 import type { ParsedTaskFile } from "./task-document";
 import type { TaskSummary } from "./task-queries";
 import { createTask } from "./fixtures";
-import type { Task, TaskWhen } from "./types";
+import type { Task, TaskStatus, TaskWhen } from "./types";
+
+function catalogStatus(status: string | undefined): TaskStatus {
+  if (status === "completed" || status === "done") return "completed";
+  if (status === "canceled") return "canceled";
+  return "open";
+}
 
 function catalogWhen(input: {
   startKind?: string;
@@ -19,7 +25,7 @@ export function catalogTaskFromSummary(summary: TaskSummary): Task {
   return createTask({
     id: summary.id,
     title: summary.title,
-    status: summary.status === "completed" ? "done" : summary.status === "canceled" ? "done" : "todo",
+    status: catalogStatus(summary.status),
     inbox: summary.inbox,
     start: summary.startKind === "date" ? summary.startDate : summary.startKind,
     planDate: summary.planDate,
@@ -46,7 +52,7 @@ export function catalogTaskFromDocument(document: ParsedTaskFile): Task {
     return createTask({
       id: document.id,
       title: document.title,
-      status: "todo",
+      status: "open",
       listId: document.kind === "task-list" ? document.id : undefined,
       sourcePath: document.path,
     });
@@ -54,7 +60,7 @@ export function catalogTaskFromDocument(document: ParsedTaskFile): Task {
   return createTask({
     id: document.id,
     title: document.title,
-    status: document.task.status === "open" ? "todo" : "done",
+    status: catalogStatus(document.task.status),
     inbox: document.task.inbox,
     start:
       document.task.start.kind === "date"

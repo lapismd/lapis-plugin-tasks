@@ -37,7 +37,7 @@ See LN-TASK-018.
 
 | Bucket | `classifyTask` rule |
 | --- | --- |
-| Logbook | Task is completed |
+| Logbook | Task is completed or canceled |
 | Inbox | `inbox` is true |
 | Someday | `start` or `when` is `someday` |
 | Review | Plan date is before today |
@@ -55,11 +55,19 @@ has no preferred window. `morning`, `afternoon`, and `evening` are loose
 windows. `HH:mm` is time-blocked. Evening still fills the This evening Today
 subgroup. Morning and afternoon stay in the main Today list. See LN-TASK-016.
 
-Expanded planner rows and task detail include an `At` dropdown next to When.
-It writes `plan.at` as `morning`, `afternoon`, `evening`, or `anytime` using
-the same icon-and-label picker chrome as When. Evening still sets catalog
-`when: this-evening`. A clock value stays visible until the user picks a
-day-part. The dropdown does not add Morning or Afternoon Today sections.
+When is the date or undated-bucket picker: Today, Tomorrow, a calendar date,
+Anytime, or Someday. It does not offer morning, afternoon, or evening. Those
+day-parts live on the `At` dropdown. Changing the date keeps the current
+`plan.at`. Anytime and Someday clear the date and day-part.
+
+`At` writes `plan.at` as `morning`, `afternoon`, `evening`, or `anytime`.
+Evening still sets catalog `when: this-evening` and fills the This evening
+Today subgroup. A clock value stays visible until the user picks a day-part.
+The dropdown does not add Morning or Afternoon Today sections.
+
+Planner status pickers use YAML `task.status`: Open, Completed, and Canceled.
+The row checkbox still toggles open and completed. Canceled leaves Today and
+appears in Logbook. Todo, Waiting, and Done are not planner status values.
 
 ## Drag hosts
 

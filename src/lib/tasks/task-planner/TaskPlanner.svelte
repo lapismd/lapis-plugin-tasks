@@ -171,7 +171,12 @@
   }
 
   function isTaskDone(task: Task) {
-    return task.status === "done" || Boolean(task.completedAt);
+    return (
+      task.status === "done" ||
+      task.status === "completed" ||
+      task.status === "canceled" ||
+      Boolean(task.completedAt)
+    );
   }
 
   function taskDateLabel(task: Task) {

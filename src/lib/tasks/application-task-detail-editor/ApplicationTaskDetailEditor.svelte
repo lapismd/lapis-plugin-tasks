@@ -2,7 +2,7 @@
   import "./ApplicationTaskDetailEditor.css";
   import CheckCircle2Icon from "@lucide/svelte/icons/check-circle-2";
   import CircleIcon from "@lucide/svelte/icons/circle";
-  import HourglassIcon from "@lucide/svelte/icons/hourglass";
+  import CircleXIcon from "@lucide/svelte/icons/circle-x";
   import SignalHighIcon from "@lucide/svelte/icons/signal-high";
   import SignalLowIcon from "@lucide/svelte/icons/signal-low";
   import SignalMediumIcon from "@lucide/svelte/icons/signal-medium";
@@ -40,22 +40,22 @@
 
   const statusOptions: InlineOptionPickerOption[] = [
     {
-      value: "todo",
-      label: "Todo",
+      value: "open",
+      label: "Open",
       icon: CircleIcon,
       accent: "var(--kanban-foreground, var(--foreground))",
     },
     {
-      value: "waiting",
-      label: "Waiting",
-      icon: HourglassIcon,
-      accent: "#c99700",
-    },
-    {
-      value: "done",
-      label: "Done",
+      value: "completed",
+      label: "Completed",
       icon: CheckCircle2Icon,
       accent: "#3d9a5f",
+    },
+    {
+      value: "canceled",
+      label: "Canceled",
+      icon: CircleXIcon,
+      accent: "#e5484d",
     },
   ];
 
@@ -86,14 +86,19 @@
       customField<ApplicationTask, undefined, string>({
         id: "task-detail-status",
         label: "Status",
-        get: (value) => value.status ?? (value.done ? "done" : "todo"),
+        get: (value) =>
+          value.status === "canceled"
+            ? "canceled"
+            : value.status === "completed" || value.status === "done" || value.done
+              ? "completed"
+              : "open",
         set: (value, status) => {
-          const done = status === "done";
+          const completed = status === "completed";
           return {
             ...value,
             status: status as ApplicationTask["status"],
-            done,
-            completedAt: done
+            done: completed,
+            completedAt: completed
               ? (value.completedAt ?? new Date().toISOString())
               : undefined,
           };

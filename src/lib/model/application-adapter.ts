@@ -5,7 +5,11 @@ export function taskToApplicationTask(task: Task): ApplicationTaskAdapter {
   return {
     id: task.id,
     body: task.title,
-    done: task.status === "done" || Boolean(task.completedAt),
+    done:
+      task.status === "done" ||
+      task.status === "completed" ||
+      task.status === "canceled" ||
+      Boolean(task.completedAt),
     dueAt: task.dueAt,
     scheduledAt: task.scheduledAt,
     when: task.when,
@@ -37,7 +41,7 @@ export function applicationTaskToTask(
   const input: CreateTaskInput = {
     id: task.id,
     title: task.body,
-    status: task.done ? "done" : (task.status ?? "todo"),
+    status: task.status ?? (task.done ? "completed" : "open"),
     priority: task.priority,
     applicationId,
     linkedTo: task.linkedTo,

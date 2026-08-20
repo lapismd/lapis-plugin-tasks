@@ -4,6 +4,7 @@
   import ApplicationTaskWhenPicker from "./ApplicationTaskWhenPicker.svelte";
   import {
     formatShortTaskDate,
+    formatTaskScheduleLabel,
     resolveTaskPlannerPlacement,
     type TaskPlannerQuickPlacement,
     type TaskWhen,
@@ -37,16 +38,9 @@
   let duePillAt = $state<string | null>("2026-07-02");
   let dueFooterAt = $state<string | null>("2026-07-02");
 
-  const selectedLabel = $derived.by(() => {
-    if (planAt === "morning") return "This Morning";
-    if (planAt === "afternoon") return "This Afternoon";
-    if (when === "this-evening" || planAt === "evening") return "This Evening";
-    if (when === "someday") return "Someday";
-    if (when === "anytime") return "Anytime";
-    if (when === "today") return "Today";
-    if (scheduledAt) return formatShortTaskDate(scheduledAt);
-    return "None";
-  });
+  const selectedLabel = $derived(
+    formatTaskScheduleLabel({ when, planAt, scheduledAt }) ?? "None",
+  );
 
   const duePillLabel = $derived(
     duePillAt ? formatShortTaskDate(duePillAt) : "None",
@@ -56,16 +50,23 @@
   );
 
   function selectPlacement(placement: QuickPlacement) {
-    const patch = resolveTaskPlannerPlacement(placement);
+    const patch = resolveTaskPlannerPlacement(placement, new Date(), {
+      when,
+      planAt,
+    });
     when = patch.when ?? null;
     scheduledAt = patch.scheduledAt ?? null;
     planAt = patch.planAt ?? null;
   }
 
   function selectDate(date: string) {
-    when = null;
+    const kept = resolveTaskPlannerPlacement("today", new Date(), {
+      when,
+      planAt,
+    });
+    when = kept.when ?? null;
     scheduledAt = date;
-    planAt = "anytime";
+    planAt = kept.planAt ?? null;
   }
 
   function clearSchedule() {

@@ -99,6 +99,18 @@ describe("applyCatalogTaskToRepository", () => {
     );
     expect(await files.read("buy.md")).toContain("status: completed");
 
+    await applyCatalogTaskToRepository(
+      repository,
+      {
+        ...catalogTaskFromSummary((await repository.get("t_buy"))!),
+        status: "canceled",
+        completedAt: undefined,
+        updatedAt: "2026-08-20T13:30:00Z",
+      },
+      catalogTaskFromSummary((await repository.get("t_buy"))!),
+    );
+    expect(await files.read("buy.md")).toContain("status: canceled");
+
     const created = await createCatalogTaskInRepository(
       repository,
       {

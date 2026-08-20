@@ -54,8 +54,7 @@ export type TaskPlannerRowContext = {
 
 export type TaskPlannerPlacement =
   | "today"
-  | "this-morning"
-  | "this-afternoon"
+  | "tomorrow"
   | "this-evening"
   | "anytime"
   | "someday"
@@ -63,12 +62,7 @@ export type TaskPlannerPlacement =
 
 export type TaskPlannerQuickPlacement = Extract<
   TaskPlannerPlacement,
-  | "today"
-  | "this-morning"
-  | "this-afternoon"
-  | "this-evening"
-  | "anytime"
-  | "someday"
+  "today" | "tomorrow" | "this-evening" | "anytime" | "someday"
 >;
 
 export type TaskPlanAtDayPart = "anytime" | "morning" | "afternoon" | "evening";
@@ -274,6 +268,7 @@ function isCompleted(task: Task) {
   return (
     task.status === "done" ||
     task.status === "completed" ||
+    task.status === "canceled" ||
     Boolean(task.completedAt)
   );
 }
@@ -300,7 +295,7 @@ function taskScheduledOrDueDate(task: Task) {
 function activeTaskPatch(task: Task): TaskPlannerMovePatch {
   return isCompleted(task)
     ? {
-        status: "todo",
+        status: "open",
         completedAt: null,
       }
     : {};
@@ -359,39 +354,49 @@ export function getTaskPlannerPlacementSource(
   return "none";
 }
 
+export function keptPlanAtForDate(current?: {
+  planAt?: string | null;
+  when?: string | null;
+}): { planAt: TaskCatalogPlanAt; when: TaskWhen | null } {
+  if (current?.when === "this-evening" || current?.planAt === "evening") {
+    return { planAt: "evening", when: "this-evening" };
+  }
+  if (
+    current?.planAt &&
+    (isTaskPlanAtDayPart(current.planAt) || /^\d{2}:\d{2}$/.test(current.planAt))
+  ) {
+    return { planAt: current.planAt, when: null };
+  }
+  return { planAt: "anytime", when: null };
+}
+
 export function resolveTaskPlannerPlacement(
   placement: TaskPlannerPlacement,
   now = new Date(),
+  current?: { planAt?: string | null; when?: string | null },
 ): Pick<
   TaskPlannerMovePatch,
   "scheduledAt" | "when" | "start" | "planDate" | "planAt"
 > {
   const today = formatDateOnly(now);
+  const kept = keptPlanAtForDate(current);
   if (placement === "today") {
     return {
       scheduledAt: today,
-      when: null,
+      when: kept.when,
       start: "anytime",
       planDate: today,
-      planAt: "anytime",
+      planAt: kept.planAt,
     };
   }
-  if (placement === "this-morning") {
+  if (placement === "tomorrow") {
+    const tomorrow = formatDateOnly(addDays(now, 1));
     return {
-      scheduledAt: today,
-      when: null,
+      scheduledAt: tomorrow,
+      when: kept.when,
       start: "anytime",
-      planDate: today,
-      planAt: "morning",
-    };
-  }
-  if (placement === "this-afternoon") {
-    return {
-      scheduledAt: today,
-      when: null,
-      start: "anytime",
-      planDate: today,
-      planAt: "afternoon",
+      planDate: tomorrow,
+      planAt: kept.planAt,
     };
   }
   if (placement === "this-evening") {
@@ -522,7 +527,7 @@ export function buildTaskPlannerMovePatch(
 
   if (target.bucket === "logbook") {
     return compactMovePatch({
-      status: "done",
+      status: "completed",
       completedAt: task.completedAt ?? updatedAt,
       updatedAt,
     });
@@ -531,19 +536,20 @@ export function buildTaskPlannerMovePatch(
   if (target.bucket === "upcoming" && target.date) {
     const date = taskDateOnly(target.date) ?? target.date;
     const source = getTaskPlannerPlacementSource(task);
+    const kept = keptPlanAtForDate(task);
     const datePatch =
       source === "dueAt"
-        ? { dueAt: date, deadline: date }
+        ? { dueAt: date, deadline: date, when: null }
         : {
             scheduledAt: date,
             planDate: date,
-            planAt: "anytime" as const,
+            planAt: kept.planAt,
             start: "anytime" as const,
+            when: kept.when,
           };
     return compactMovePatch({
       ...activePatch,
       ...datePatch,
-      when: null,
       updatedAt,
     });
   }
@@ -651,7 +657,7 @@ export async function buildTaskPlannerSnapshotFromRepository(
     upcoming,
     someday,
     review,
-    completed,
+    logbook,
     lists,
   ] = await Promise.all([
     repository.inbox(today),
@@ -660,7 +666,7 @@ export async function buildTaskPlannerSnapshotFromRepository(
     repository.upcoming(today),
     repository.someday(),
     repository.review(today),
-    repository.completed(),
+    repository.logbook(),
     repository.lists(),
   ]);
   const seen = new Set<string>();
@@ -672,7 +678,7 @@ export async function buildTaskPlannerSnapshotFromRepository(
     ...upcoming,
     ...someday,
     ...review,
-    ...completed,
+    ...logbook,
   ]) {
     if (seen.has(summary.id)) continue;
     seen.add(summary.id);
@@ -877,4 +883,3 @@ export function getPlannerSelectionPosition(
   if (previousSelected) return "last";
   return "single";
 }
-

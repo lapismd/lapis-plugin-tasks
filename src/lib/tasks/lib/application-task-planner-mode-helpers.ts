@@ -55,6 +55,15 @@ const plannerPlacementKeys = [
 	'order'
 ] as const satisfies ReadonlyArray<keyof Task>;
 
+function isClosedPlannerTask(task: Task) {
+	return (
+		task.status === 'done' ||
+		task.status === 'completed' ||
+		task.status === 'canceled' ||
+		Boolean(task.completedAt)
+	);
+}
+
 export function plannerTaskKey(task: Pick<Task, 'id' | 'applicationId'>) {
 	return `${task.applicationId ?? 'task'}:${task.id}`;
 }
@@ -86,8 +95,9 @@ export function plannerMovePatchToApplicationPatch(
 	if ('completedAt' in patch) nextPatch.completedAt = patch.completedAt ?? undefined;
 	if ('order' in patch) nextPatch.order = patch.order;
 	if ('updatedAt' in patch) nextPatch.updatedAt = patch.updatedAt;
-	if (patch.status === 'done') nextPatch.done = true;
-	if (patch.status && patch.status !== 'done') nextPatch.done = false;
+	if (patch.status === 'done' || patch.status === 'completed') nextPatch.done = true;
+	if (patch.status === 'canceled') nextPatch.done = true;
+	if (patch.status === 'open' || patch.status === 'todo') nextPatch.done = false;
 	return nextPatch;
 }
 
@@ -101,7 +111,7 @@ export function visiblePlannerTasks(
 	if (taskArea) {
 		const area = taskArea.toLowerCase();
 		return tasks
-			.filter((task) => task.status !== 'done' && !task.completedAt)
+			.filter((task) => !isClosedPlannerTask(task))
 			.filter((task) =>
 				task.areas.some(
 					(taskAreaName) =>
@@ -143,7 +153,7 @@ export function plannerTasksForListId(
 	if (listId.startsWith('area:')) {
 		const area = listId.slice('area:'.length).toLowerCase();
 		return tasks
-			.filter((task) => task.status !== 'done' && !task.completedAt)
+			.filter((task) => !isClosedPlannerTask(task))
 			.filter((task) =>
 				task.areas.some(
 					(taskAreaName) =>
@@ -165,7 +175,7 @@ export function buildPlannerDragLayout(
 		const area = taskArea.toLowerCase();
 		return {
 			[`area:${taskArea}`]: tasks
-				.filter((task) => task.status !== 'done' && !task.completedAt)
+				.filter((task) => !isClosedPlannerTask(task))
 				.filter((task) =>
 					task.areas.some(
 						(taskAreaName) =>
@@ -442,14 +452,21 @@ export function buildPlannerPlacementPatch(
 	task: Task,
 	placement: TaskPlannerQuickPlacement
 ) {
-	if (
-		placement === 'this-evening' ||
-		placement === 'this-morning' ||
-		placement === 'this-afternoon'
-	) {
+	if (placement === 'this-evening') {
 		return {
 			...buildTaskPlannerMovePatch(task, { bucket: 'today' }),
 			...resolveTaskPlannerPlacement(placement)
+		};
+	}
+	if (
+		placement === 'today' ||
+		placement === 'tomorrow' ||
+		placement === 'anytime' ||
+		placement === 'someday'
+	) {
+		return {
+			...resolveTaskPlannerPlacement(placement, new Date(), task),
+			updatedAt: new Date().toISOString()
 		};
 	}
 	return buildTaskPlannerMovePatch(task, { bucket: placement });

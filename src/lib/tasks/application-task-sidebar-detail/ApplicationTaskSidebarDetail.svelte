@@ -92,7 +92,10 @@
   );
   const createdRelative = $derived(formatCreatedRelative(task.createdAt));
   const statusTone = $derived(
-    task.status === "done" || task.completedAt
+    task.status === "done" ||
+      task.status === "completed" ||
+      task.status === "canceled" ||
+      Boolean(task.completedAt)
       ? "done"
       : task.status === "waiting"
         ? "waiting"
@@ -279,8 +282,17 @@
       <ApplicationTaskCheckbox
         class="task-sidebar-detail__checkbox"
         size="md"
-        checked={task.status === "done"}
-        label={task.status === "done"
+        checked={
+          task.status === "done" ||
+          task.status === "completed" ||
+          task.status === "canceled" ||
+          Boolean(task.completedAt)
+        }
+        label={
+          task.status === "done" ||
+          task.status === "completed" ||
+          task.status === "canceled" ||
+          Boolean(task.completedAt)
           ? "Mark task incomplete"
           : "Mark task done"}
         onchange={() => onToggleDone(task)}

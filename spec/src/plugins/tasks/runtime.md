@@ -44,6 +44,7 @@ for named views. Only `kind: task` rows match. See LN-TASK-018.
 | Upcoming | start date, plan date, or deadline is after today |
 | Someday | `start` is `someday` |
 | Completed | `status` is `completed` |
+| Logbook | `status` is `completed` or `canceled` |
 | Review | `plan.date` is before today |
 
 Start is actionable when it is `anytime`, or a date on or before today.
@@ -71,7 +72,7 @@ repository, and mounts `TasksView` with that repository.
 
 `task-mutations.ts` and repository methods rewrite one Markdown file, or the
 parent reserved-section links, then upsert the projection from that parse.
-See LN-TASK-019.
+See LN-TASK-019. `TaskRepository.cancel` writes `task.status: canceled`.
 
 - Completing a linked child updates the child file, not a checkbox on the
   parent.

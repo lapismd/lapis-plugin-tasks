@@ -3,9 +3,7 @@
   import ArchiveIcon from "@lucide/svelte/icons/archive";
   import CalendarDaysIcon from "@lucide/svelte/icons/calendar-days";
   import CheckIcon from "@lucide/svelte/icons/check";
-  import MoonIcon from "@lucide/svelte/icons/moon";
   import StarIcon from "@lucide/svelte/icons/star";
-  import SunIcon from "@lucide/svelte/icons/sun";
   import SunriseIcon from "@lucide/svelte/icons/sunrise";
   import * as Command from "@lapismd/design-core/shadcn/command";
   import { parseDate } from "chrono-node";
@@ -20,6 +18,7 @@
     normalizeTaskDateOnly,
     taskDateFromCalendarDate,
     todayDateOnly,
+    tomorrowDateOnly,
     type TaskDateSuggestion,
   } from "../../model";
 
@@ -70,21 +69,9 @@
   const suggestionsId = $derived(
     isDueMode ? "task-due-picker-suggestions" : "task-when-picker-suggestions",
   );
-  const isClockPlan = $derived(Boolean(planAt && /^\d{2}:\d{2}$/.test(planAt)));
-  const isMorningSelected = $derived(planAt === "morning");
-  const isAfternoonSelected = $derived(planAt === "afternoon");
-  const isEveningSelected = $derived(
-    when === "this-evening" || planAt === "evening",
-  );
-  const isTodaySelected = $derived(
-    isDueMode
-      ? normalizedScheduledAt === today
-      : normalizedScheduledAt === today &&
-        !isMorningSelected &&
-        !isAfternoonSelected &&
-        !isEveningSelected &&
-        !isClockPlan,
-  );
+  const tomorrow = $derived(tomorrowDateOnly());
+  const isTodaySelected = $derived(normalizedScheduledAt === today);
+  const isTomorrowSelected = $derived(normalizedScheduledAt === tomorrow);
 
   function updateNaturalDate(nextValue: string) {
     inputValue = nextValue;
@@ -98,18 +85,11 @@
 
   async function applyPlacement(placement: TaskPlannerQuickPlacement) {
     if (isDueMode) {
-      if (placement === "today") await onSelectDate?.(todayDateOnly());
+      if (placement === "today") await onSelectDate?.(today);
+      if (placement === "tomorrow") await onSelectDate?.(tomorrow);
       return;
     }
     await onSelectPlacement?.(placement);
-  }
-
-  async function applyToday() {
-    if (isDueMode) {
-      await onSelectDate?.(todayDateOnly());
-      return;
-    }
-    await onSelectPlacement?.("today");
   }
 
   async function clearSchedule() {
@@ -117,7 +97,7 @@
   }
 </script>
 
-<div class="task-when-picker-content" data-mode={mode}>
+<div class="task-when-picker-content" data-mode={mode} data-plan-at={planAt}>
   <Command.Root
     class="task-when-picker-content__command"
     label={commandLabel}
@@ -160,98 +140,42 @@
   </Command.Root>
 
   {#if !naturalQuery}
-    {#if isDueMode}
-      <div class="task-when-picker-content__quick task-when-picker-content__quick--single">
-        <button
-          type="button"
-          class="task-when-picker-content__quick-row"
-          onclick={() => void applyToday()}
+    <div class="task-when-picker-content__quick">
+      <button
+        type="button"
+        class="task-when-picker-content__quick-row"
+        onclick={() => void applyPlacement("today")}
+      >
+        <span
+          class="task-when-picker-content__quick-icon task-when-picker-content__quick-icon--star"
         >
-          <span
-            class="task-when-picker-content__quick-icon task-when-picker-content__quick-icon--star"
-          >
-            <StarIcon />
+          <StarIcon />
+        </span>
+        <span>Today</span>
+        {#if isTodaySelected}
+          <span class="task-when-picker-content__quick-check">
+            <CheckIcon />
           </span>
-          <span>Today</span>
-          {#if isTodaySelected}
-            <span class="task-when-picker-content__quick-check">
-              <CheckIcon />
-            </span>
-          {/if}
-        </button>
-      </div>
-    {:else}
-      <div class="task-when-picker-content__quick">
-        <button
-          type="button"
-          class="task-when-picker-content__quick-row"
-          onclick={() => void applyPlacement("this-morning")}
+        {/if}
+      </button>
+      <button
+        type="button"
+        class="task-when-picker-content__quick-row"
+        onclick={() => void applyPlacement("tomorrow")}
+      >
+        <span
+          class="task-when-picker-content__quick-icon task-when-picker-content__quick-icon--sunrise"
         >
-          <span
-            class="task-when-picker-content__quick-icon task-when-picker-content__quick-icon--sunrise"
-          >
-            <SunriseIcon />
+          <SunriseIcon />
+        </span>
+        <span>Tomorrow</span>
+        {#if isTomorrowSelected}
+          <span class="task-when-picker-content__quick-check">
+            <CheckIcon />
           </span>
-          <span>This Morning</span>
-          {#if isMorningSelected}
-            <span class="task-when-picker-content__quick-check">
-              <CheckIcon />
-            </span>
-          {/if}
-        </button>
-        <button
-          type="button"
-          class="task-when-picker-content__quick-row"
-          onclick={() => void applyPlacement("this-afternoon")}
-        >
-          <span
-            class="task-when-picker-content__quick-icon task-when-picker-content__quick-icon--sun"
-          >
-            <SunIcon />
-          </span>
-          <span>This Afternoon</span>
-          {#if isAfternoonSelected}
-            <span class="task-when-picker-content__quick-check">
-              <CheckIcon />
-            </span>
-          {/if}
-        </button>
-        <button
-          type="button"
-          class="task-when-picker-content__quick-row"
-          onclick={() => void applyPlacement("this-evening")}
-        >
-          <span
-            class="task-when-picker-content__quick-icon task-when-picker-content__quick-icon--moon"
-          >
-            <MoonIcon />
-          </span>
-          <span>This Evening</span>
-          {#if isEveningSelected}
-            <span class="task-when-picker-content__quick-check">
-              <CheckIcon />
-            </span>
-          {/if}
-        </button>
-        <button
-          type="button"
-          class="task-when-picker-content__quick-row"
-          onclick={() => void applyPlacement("today")}
-        >
-          <span
-            class="task-when-picker-content__quick-icon task-when-picker-content__quick-icon--star"
-          >
-            <StarIcon />
-          </span>
-          <span>Today</span>
-          {#if isTodaySelected}
-            <span class="task-when-picker-content__quick-check">
-              <CheckIcon />
-            </span>
-          {/if}
-        </button>
-      </div>
-    {/if}
+        {/if}
+      </button>
+    </div>
 
     <TaskDueCalendar
       bind:value={selectedDate}

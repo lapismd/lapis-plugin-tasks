@@ -85,12 +85,23 @@
 
   async function selectScheduleDate(date: string) {
     whenOpen = false;
-    await onScheduleChange({ scheduledAt: date });
+    const kept = resolveTaskPlannerPlacement("today", new Date(), {
+      when,
+      planAt,
+    });
+    await onScheduleChange({
+      scheduledAt: date,
+      when: kept.when ?? undefined,
+      planAt: kept.planAt ?? undefined,
+    });
   }
 
   async function selectPlacement(placement: TaskPlannerQuickPlacement) {
     whenOpen = false;
-    const patch = resolveTaskPlannerPlacement(placement);
+    const patch = resolveTaskPlannerPlacement(placement, new Date(), {
+      when,
+      planAt,
+    });
     await onScheduleChange({
       scheduledAt: patch.scheduledAt ?? undefined,
       when: patch.when ?? undefined,

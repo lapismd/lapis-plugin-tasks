@@ -2,6 +2,7 @@
   import {
     buildPlannerApplicationSummaries,
     createTask,
+    PLANNER_FIXTURE_TODAY,
     sampleApplicationBoard,
     type JobApplication,
     type Task,
@@ -40,7 +41,7 @@
       createTask({
         id: `story-task-created-${tasks.length + 1}`,
         title: input.title,
-        status: "todo",
+        status: "open",
         dueAt: input.dueAt,
         priority: input.priority,
         scheduledAt: input.scheduledAt,
@@ -67,6 +68,7 @@
 
 <ApplicationTaskPlannerMode
   {tasks}
+  now={new Date(`${PLANNER_FIXTURE_TODAY}T12:00:00`)}
   {applications}
   view="today"
   applicationSummaries={summaries}

@@ -75,6 +75,15 @@ task:
 ---
 # Submitted
 `,
+  "canceled.md": `---
+type: task
+id: t_canceled
+task:
+  status: canceled
+  start: anytime
+---
+# Canceled
+`,
 };
 
 async function openRepository() {
@@ -109,6 +118,12 @@ describe("TaskRepository", () => {
     ]);
     await expect(repository.someday()).resolves.toMatchObject([{ id: "t_later" }]);
     await expect(repository.completed()).resolves.toMatchObject([{ id: "t_done" }]);
+    await expect(repository.logbook()).resolves.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "t_done" }),
+        expect.objectContaining({ id: "t_canceled" }),
+      ]),
+    );
   });
 
   it("walks children and the structural parent", async () => {

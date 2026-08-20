@@ -39,8 +39,12 @@ export function formatDateOnly(value: Date) {
   return `${year}-${month}-${day}`;
 }
 
-export function todayDateOnly() {
-  return formatDateOnly(new Date());
+export function todayDateOnly(now = new Date()) {
+  return formatDateOnly(now);
+}
+
+export function tomorrowDateOnly(now = new Date()) {
+  return formatDateOnly(shiftDate(now, 1, "day"));
 }
 
 function parseDateOnlyUtc(value: string) {
@@ -87,18 +91,18 @@ export function formatTaskScheduleLabel(input: {
   when?: string | null;
   planAt?: string | null;
   scheduledAt?: string | null;
+  now?: Date;
 }): string | null {
-  if (input.when === "this-evening" || input.planAt === "evening") {
-    return "This Evening";
-  }
-  if (input.planAt === "morning") return "This Morning";
-  if (input.planAt === "afternoon") return "This Afternoon";
   if (input.when === "someday") return "Someday";
   if (input.when === "anytime") return "Anytime";
-  if (input.planAt && CLOCK_RE.test(input.planAt)) return input.planAt;
   const scheduled = normalizeTaskDateOnly(input.scheduledAt);
-  if (!scheduled) return input.when === "today" ? "Today" : null;
-  if (scheduled === todayDateOnly()) return "Today";
+  const now = input.now ?? new Date();
+  if (!scheduled) {
+    if (input.when === "today" || input.when === "this-evening") return "Today";
+    return null;
+  }
+  if (scheduled === todayDateOnly(now)) return "Today";
+  if (scheduled === tomorrowDateOnly(now)) return "Tomorrow";
   return formatShortTaskDate(scheduled);
 }
 

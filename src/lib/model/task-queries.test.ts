@@ -56,11 +56,33 @@ task:
 ---
 # Later
 `);
+    const completed = summaryFrom(`---
+type: task
+id: t5
+task:
+  status: completed
+  start: anytime
+---
+# Completed
+`);
+    const canceled = summaryFrom(`---
+type: task
+id: t6
+task:
+  status: canceled
+  start: anytime
+---
+# Canceled
+`);
     expect(matchesTaskView(inbox, "inbox", TODAY)).toBe(true);
     expect(matchesTaskView(today, "today", TODAY)).toBe(true);
     expect(matchesTaskView(today, "review", TODAY)).toBe(true);
     expect(matchesTaskView(anytime, "anytime", TODAY)).toBe(true);
     expect(matchesTaskView(someday, "someday", TODAY)).toBe(true);
     expect(matchesTaskView(today, "anytime", TODAY)).toBe(false);
+    expect(matchesTaskView(completed, "completed", TODAY)).toBe(true);
+    expect(matchesTaskView(canceled, "completed", TODAY)).toBe(false);
+    expect(matchesTaskView(completed, "logbook", TODAY)).toBe(true);
+    expect(matchesTaskView(canceled, "logbook", TODAY)).toBe(true);
   });
 });

@@ -7,6 +7,7 @@ export type TaskView =
   | "upcoming"
   | "someday"
   | "completed"
+  | "logbook"
   | "review";
 
 export type TaskSummary = {
@@ -128,6 +129,8 @@ export function matchesTaskView(
       return isOpenTask(summary) && summary.startKind === "someday";
     case "completed":
       return summary.status === "completed";
+    case "logbook":
+      return summary.status === "completed" || summary.status === "canceled";
     case "review":
       return (
         isOpenTask(summary) &&

@@ -355,11 +355,8 @@
 				...task,
 				title: patch.body ?? task.title,
 				status:
-					patch.done === undefined
-						? (patch.status ?? task.status)
-						: patch.done
-							? 'done'
-							: 'todo',
+					patch.status ??
+					(patch.done === undefined ? task.status : patch.done ? 'completed' : 'open'),
 				priority: Object.prototype.hasOwnProperty.call(patch, 'priority')
 					? patch.priority
 					: task.priority,
@@ -438,7 +435,7 @@
 		clearLogbookReopenConfirm();
 		void saveTaskPatch(pending.task, {
 			done: false,
-			status: 'todo',
+			status: 'open',
 			completedAt: undefined
 		});
 	}
@@ -455,7 +452,7 @@
 		const done = !currentTask.done;
 		void saveTaskPatch(task, {
 			done,
-			status: done ? 'done' : 'todo',
+			status: done ? 'completed' : 'open',
 			completedAt: done ? (currentTask.completedAt ?? new Date().toISOString()) : undefined
 		});
 	}
@@ -526,7 +523,11 @@
 			scheduledAt: task.scheduledAt,
 			when: task.when,
 			status: task.status,
-			done: task.status === 'done' || Boolean(task.completedAt),
+			done:
+				task.status === 'done' ||
+				task.status === 'completed' ||
+				task.status === 'canceled' ||
+				Boolean(task.completedAt),
 			completedAt: task.completedAt,
 			order: task.order,
 			updatedAt: task.updatedAt

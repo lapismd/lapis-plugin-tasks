@@ -7,7 +7,7 @@
   import CircleIcon from "@lucide/svelte/icons/circle";
   import EllipsisVerticalIcon from "@lucide/svelte/icons/ellipsis-vertical";
   import GripVerticalIcon from "@lucide/svelte/icons/grip-vertical";
-  import HourglassIcon from "@lucide/svelte/icons/hourglass";
+  import CircleXIcon from "@lucide/svelte/icons/circle-x";
   import SignalHighIcon from "@lucide/svelte/icons/signal-high";
   import SignalLowIcon from "@lucide/svelte/icons/signal-low";
   import SignalMediumIcon from "@lucide/svelte/icons/signal-medium";
@@ -126,22 +126,22 @@
 
   const statusOptions: InlineOptionPickerOption[] = [
     {
-      value: "todo",
-      label: "Todo",
+      value: "open",
+      label: "Open",
       icon: CircleIcon,
       accent: "var(--kanban-foreground, var(--foreground))",
     },
     {
-      value: "waiting",
-      label: "Waiting",
-      icon: HourglassIcon,
-      accent: "#c99700",
-    },
-    {
-      value: "done",
-      label: "Done",
+      value: "completed",
+      label: "Completed",
       icon: CheckCircle2Icon,
       accent: "#3d9a5f",
+    },
+    {
+      value: "canceled",
+      label: "Canceled",
+      icon: CircleXIcon,
+      accent: "#e5484d",
     },
   ];
 
@@ -167,7 +167,11 @@
   ];
 
   const effectiveStatus = $derived(
-    task.status ?? (task.done ? "done" : "todo"),
+    task.status === "canceled"
+      ? "canceled"
+      : task.status === "completed" || task.status === "done" || task.done
+        ? "completed"
+        : "open",
   );
 
   const footerFormConfig = createFormConfig<ApplicationTask>({
@@ -176,14 +180,19 @@
       customField<ApplicationTask, undefined, string>({
         id: "task-preview-status",
         label: "Status",
-        get: (value) => value.status ?? (value.done ? "done" : "todo"),
+        get: (value) =>
+          value.status === "canceled"
+            ? "canceled"
+            : value.status === "completed" || value.status === "done" || value.done
+              ? "completed"
+              : "open",
         set: (value, status) => {
-          const done = status === "done";
+          const completed = status === "completed";
           return {
             ...value,
             status: status as ApplicationTask["status"],
-            done,
-            completedAt: done
+            done: completed,
+            completedAt: completed
               ? (value.completedAt ?? new Date().toISOString())
               : undefined,
           };
@@ -509,9 +518,9 @@
   }
 
   function statusLabel(status: ApplicationTask["status"]) {
-    if (status === "waiting") return "Waiting";
-    if (status === "done") return "Done";
-    return "Todo";
+    if (status === "canceled") return "Canceled";
+    if (status === "completed" || status === "done") return "Completed";
+    return "Open";
   }
 
   function priorityLabel(priority: ApplicationTaskPriority | undefined) {

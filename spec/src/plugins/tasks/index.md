@@ -8,7 +8,10 @@ Host movable panels remain unspecified.
 Reusable leaf controls come from public Design Core APIs.
 `ApplicationTaskAreaPicker` is the catalog list picker and composes Design
 Core Command View. `ApplicationTaskAtPicker` is the planner `plan.at`
-day-part dropdown. A vault MAY include one `task-list-navigation` Markdown
+day-part dropdown. Catalog adaptation keeps YAML `open`, `completed`, and
+`canceled` on `Task.status` instead of collapsing canceled into done.
+When labels are the date or undated bucket; At labels are the day-part.
+A vault MAY include one `task-list-navigation` Markdown
 file whose headings are sidebar sections and whose links pin root lists.
 Nested lists stay in each list’s `## Items`. The
 `Plugins/Tasks/Panels` catalog story composes planner navigation, planner
@@ -47,7 +50,7 @@ following chapters describe the implemented model:
 | LN-TASK-015 | A canonical list MUST be a Markdown file whose front matter includes `type: task-list` and a stable `id`. `list.status` MUST be `active` or `archived`. Lists MUST NOT be completable outcomes. |
 | LN-TASK-016 | Task planning metadata MUST nest under `task:` with `status` `open`, `completed`, or `canceled`, and `start` `anytime`, `someday`, or a date. Inbox, plan, deadline, repeat, and comments MAY be omitted. When present, `plan.at` MUST be `anytime`, `morning`, `afternoon`, `evening`, or `HH:mm`. YAML MUST NOT store `today` or `upcoming` flags or task `plan.at: all-day`. |
 | LN-TASK-017 | `## Checklist` MUST hold lightweight checkboxes only. `## Subtasks` MUST hold Markdown links to task files without wrapping checkboxes. `## Items` MUST hold links to task or task-list files. Other links MUST be ordinary references. |
-| LN-TASK-018 | Inbox, Today, Anytime, Upcoming, Someday, Completed, and daily Review MUST be derived query-AST wrappers over the public `tasks/task` projection. Overdue `plan.date` values MUST stay visible until the user reschedules, completes, skips, or cancels. Upcoming day rows MUST place open tasks by plan date or, when plan is omitted, deadline. Catalog adaptation MUST NOT treat a deadline-only task as undated anytime. |
+| LN-TASK-018 | Inbox, Today, Anytime, Upcoming, Someday, Completed, Logbook, and daily Review MUST be derived query-AST wrappers over the public `tasks/task` projection. Completed MUST match only completed tasks; Logbook MUST match completed and canceled tasks. Overdue `plan.date` values MUST stay visible until the user reschedules, completes, skips, or cancels. Upcoming day rows MUST place open tasks by plan date or, when plan is omitted, deadline. Catalog adaptation MUST NOT treat a deadline-only task as undated anytime. |
 | LN-TASK-019 | Mutations MUST edit one Markdown file or parent reserved-section links, then upsert the projection from that parse. Completing a linked child MUST update the child file. Rolling complete MAY reset only `## Checklist`. |
 | LN-TASK-020 | Planner lists and cards MUST consume `TaskSummary` rows from the AppDatabase tasks projection. Detail and editor surfaces MAY load the Markdown `TaskDocument`. UI MUST NOT treat the database as authoritative. |
 | LN-TASK-021 | Canonical catalog types MUST use the Markdown-first schema. Catalog planner fixtures MUST round-trip through task documents. Area membership MUST mean a task-list `## Items` parent. |
