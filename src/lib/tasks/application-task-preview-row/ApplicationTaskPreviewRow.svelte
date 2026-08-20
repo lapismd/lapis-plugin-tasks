@@ -4,7 +4,6 @@
   import ArrowRightIcon from "@lucide/svelte/icons/arrow-right";
   import ArrowUpIcon from "@lucide/svelte/icons/arrow-up";
   import CheckCircle2Icon from "@lucide/svelte/icons/check-circle-2";
-  import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import CircleIcon from "@lucide/svelte/icons/circle";
   import EllipsisVerticalIcon from "@lucide/svelte/icons/ellipsis-vertical";
   import GripVerticalIcon from "@lucide/svelte/icons/grip-vertical";
@@ -43,6 +42,7 @@
   import ApplicationMarkdownPreview from "../../model/ReferenceMarkdownPreview.svelte";
   import { asSnippet } from "../../as-snippet";
   import ApplicationTaskLine from "../application-task-line/ApplicationTaskLine.svelte";
+  import ApplicationTaskChecklistProgress from "../application-task-checklist-progress/ApplicationTaskChecklistProgress.svelte";
 
   let {
     task,
@@ -80,6 +80,7 @@
     onLoadChecklist,
     onToggleChecklistItem,
     checklistRefreshVersion = 0,
+    showChecklistProgress = true,
   }: {
     task: ApplicationTask;
     taskIndex?: number;
@@ -112,6 +113,7 @@
       checked: boolean,
     ) => Promise<ChecklistItem[]>;
     checklistRefreshVersion?: number;
+    showChecklistProgress?: boolean;
   } = $props();
 
   const isOpenSurface = $derived(isExpanded || isClosing);
@@ -128,93 +130,6 @@
     showCollapsedChrome && ((showSwipeTrigger && !readonly) || showHoverOpen),
   );
   let swipeOpen = $state<SwipeItemOpen>(null);
-  let checklistExpanded = $state(false);
-  let checklistItems = $state<ChecklistItem[] | null>(null);
-  let checklistLoading = $state(false);
-  let checklistError = $state<string | null>(null);
-  let checklistLoadedRevision = $state<string | null>(null);
-  let pendingChecklistPositions = $state<Set<number>>(new Set());
-  const checklistTotal = $derived(task.checklistTotal ?? 0);
-  const checklistCompleted = $derived(
-    checklistItems
-      ? checklistItems.filter((item) => item.checked).length
-      : (task.checklistCompleted ?? 0),
-  );
-  const checklistProgress = $derived(
-    checklistTotal > 0
-      ? Math.round((checklistCompleted / checklistTotal) * 100)
-      : 0,
-  );
-  const checklistRevision = $derived(
-    `${checklistRefreshVersion}:${task.updatedAt ?? ""}:${task.checklistCompleted ?? 0}:${task.checklistTotal ?? 0}`,
-  );
-
-  async function loadChecklist(options: { keepError?: boolean } = {}) {
-    if (!onLoadChecklist) {
-      checklistError = "Checklist details are unavailable.";
-      return;
-    }
-    checklistLoading = true;
-    if (!options.keepError) checklistError = null;
-    try {
-      checklistItems = await onLoadChecklist();
-      checklistLoadedRevision = checklistRevision;
-    } catch (error) {
-      checklistError = error instanceof Error ? error.message : String(error);
-    } finally {
-      checklistLoading = false;
-    }
-  }
-
-  async function toggleChecklistDisclosure(event: MouseEvent) {
-    event.preventDefault();
-    event.stopPropagation();
-    checklistExpanded = !checklistExpanded;
-    if (checklistExpanded && checklistItems === null) await loadChecklist();
-  }
-
-  async function toggleChecklistItem(item: ChecklistItem, checked: boolean) {
-    if (!checklistItems || !onToggleChecklistItem) return;
-    const previous = checklistItems;
-    checklistError = null;
-    checklistItems = checklistItems.map((entry) =>
-      entry.position === item.position ? { ...entry, checked } : entry,
-    );
-    pendingChecklistPositions = new Set([
-      ...pendingChecklistPositions,
-      item.position,
-    ]);
-    try {
-      checklistItems = await onToggleChecklistItem(item, checked);
-      checklistLoadedRevision = checklistRevision;
-    } catch (error) {
-      checklistItems = previous;
-      await loadChecklist({ keepError: true });
-      checklistError =
-        error instanceof Error
-          ? error.message
-          : "The checklist could not be updated.";
-    } finally {
-      const next = new Set(pendingChecklistPositions);
-      next.delete(item.position);
-      pendingChecklistPositions = next;
-    }
-  }
-
-  $effect(() => {
-    const revision = checklistRevision;
-    if (
-      checklistExpanded &&
-      checklistItems !== null &&
-      checklistLoadedRevision !== null &&
-      checklistLoadedRevision !== revision &&
-      !checklistLoading &&
-      pendingChecklistPositions.size === 0
-    ) {
-      void loadChecklist();
-    }
-  });
-
   function removeTask() {
     onRemoveTask(task.id);
   }
@@ -841,68 +756,13 @@
           expandedPanel={asSnippet(previewExpandedPanel)}
         />
       {/if}
-      {#if checklistTotal > 0}
-        <div
-          class="task-preview-row__checklist"
-          data-task-checklist-progress
-        >
-          <button
-            type="button"
-            class="task-preview-row__checklist-summary"
-            aria-expanded={checklistExpanded}
-            aria-controls={`task-checklist-${task.id}`}
-            aria-label={`${checklistExpanded ? "Hide" : "Show"} checklist for ${titleExcerpt}`}
-            onclick={toggleChecklistDisclosure}
-          >
-            <span
-              class="task-preview-row__checklist-track"
-              role="progressbar"
-              aria-label={`Checklist progress: ${checklistCompleted} of ${checklistTotal}`}
-              aria-valuemin="0"
-              aria-valuemax={checklistTotal}
-              aria-valuenow={checklistCompleted}
-            >
-              <span style={`width: ${checklistProgress}%`}></span>
-            </span>
-            <span class="task-preview-row__checklist-count">
-              {checklistCompleted} / {checklistTotal}
-            </span>
-            <ChevronDownIcon aria-hidden="true" />
-          </button>
-          {#if checklistExpanded}
-            <div
-              id={`task-checklist-${task.id}`}
-              class="task-preview-row__checklist-items"
-              role="group"
-              aria-label={`Checklist for ${titleExcerpt}`}
-              aria-busy={checklistLoading}
-            >
-              {#if checklistLoading && checklistItems === null}
-                <span class="task-preview-row__checklist-state">Loading checklist…</span>
-              {:else if checklistItems}
-                {#each checklistItems as item (item.position)}
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={item.checked}
-                      disabled={pendingChecklistPositions.has(item.position)}
-                      onchange={(event) =>
-                        void toggleChecklistItem(item, event.currentTarget.checked)}
-                    />
-                    <span class:task-preview-row__checklist-item--done={item.checked}>
-                      {item.text}
-                    </span>
-                  </label>
-                {/each}
-              {/if}
-              {#if checklistError}
-                <span class="task-preview-row__checklist-error" role="alert">
-                  {checklistError}
-                </span>
-              {/if}
-            </div>
-          {/if}
-        </div>
+      {#if showChecklistProgress}
+        <ApplicationTaskChecklistProgress
+          {task}
+          {onLoadChecklist}
+          {onToggleChecklistItem}
+          {checklistRefreshVersion}
+        />
       {/if}
     </article>
   </div>

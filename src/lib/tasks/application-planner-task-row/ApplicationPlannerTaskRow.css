@@ -16,14 +16,19 @@
       border-radius 140ms ease;
   }
 
-  .application-planner-task-row:not(.application-planner-task-row--expanded):not(.application-planner-task-row--selected):hover:not(:has([data-task-drag-handle]:hover)),
+  .application-planner-task-row:not(.application-planner-task-row--expanded):not(.application-planner-task-row--selected):has(> .application-planner-task-row__columns:hover):not(:has([data-task-drag-handle]:hover)),
   .application-planner-task-row:not(.application-planner-task-row--expanded):not(.application-planner-task-row--selected):focus-visible {
     --task-row-surface: color-mix(
       in srgb,
       var(--task-application-color, var(--primary)) 8%,
       var(--kanban-card)
     );
-    background: var(--task-row-surface);
+  }
+
+  .application-planner-task-row:not(.application-planner-task-row--expanded):not(.application-planner-task-row--selected):has(> .application-planner-task-row__columns:hover)
+    > .application-planner-task-row__columns,
+  .application-planner-task-row:not(.application-planner-task-row--expanded):not(.application-planner-task-row--selected):focus-visible
+    > .application-planner-task-row__columns {
     box-shadow: inset 0 0 0 1px
       color-mix(
         in srgb,
@@ -38,6 +43,13 @@
     align-items: start;
     gap: 0.45rem;
     min-width: 0;
+    margin: -0.3rem -0.5rem -0.5rem;
+    border-radius: 0.45rem;
+    background: var(--task-row-surface);
+    padding: 0.3rem 0.5rem 0.5rem;
+    transition:
+      background-color 140ms ease,
+      box-shadow 140ms ease;
   }
 
   .application-planner-task-row__primary {
@@ -168,7 +180,9 @@
     display: none;
   }
 
-  .application-planner-task-row:is(:hover, :focus-within)
+  .application-planner-task-row:has(
+      > .application-planner-task-row__columns:is(:hover, :focus-within)
+    )
     .application-planner-task-row__open,
   .application-planner-task-row__open:focus-visible {
     background: var(--kanban-muted);
@@ -178,7 +192,9 @@
       color-mix(in srgb, var(--kanban-foreground) 18%, transparent);
   }
 
-  .application-planner-task-row:is(:hover, :focus-within)
+  .application-planner-task-row:has(
+      > .application-planner-task-row__columns:is(:hover, :focus-within)
+    )
     .application-planner-task-row__open:hover,
   .application-planner-task-row__open:focus-visible:hover {
     background: color-mix(
@@ -188,14 +204,18 @@
     );
   }
 
-  .application-planner-task-row:is(:hover, :focus-within)
+  .application-planner-task-row:has(
+      > .application-planner-task-row__columns:is(:hover, :focus-within)
+    )
     .application-planner-task-row__open-icon--notes,
   .application-planner-task-row__open:focus-visible
     .application-planner-task-row__open-icon--notes {
     display: none;
   }
 
-  .application-planner-task-row:is(:hover, :focus-within)
+  .application-planner-task-row:has(
+      > .application-planner-task-row__columns:is(:hover, :focus-within)
+    )
     .application-planner-task-row__open-icon--arrow,
   .application-planner-task-row__open:focus-visible
     .application-planner-task-row__open-icon--arrow {

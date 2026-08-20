@@ -54,6 +54,53 @@
     );
     return canvas;
   }
+
+  async function showDailyAgendaChecklistSummary(
+    canvasElement: HTMLElement,
+    canvas: ReturnType<typeof within>,
+  ) {
+    const tasksTab = canvas.queryByRole("button", {
+      name: "Tasks",
+      exact: true,
+    });
+    if (tasksTab && tasksTab.getAttribute("aria-pressed") !== "true") {
+      await userEvent.click(tasksTab);
+    }
+    let todayButton: HTMLElement | undefined;
+    await waitFor(() => {
+      todayButton = canvas
+        .getAllByRole("button", { name: "Today", exact: true })
+        .find(
+          (button) =>
+            getComputedStyle(button).pointerEvents !== "none" &&
+            button.getClientRects().length > 0,
+        );
+      expect(todayButton).toBeDefined();
+    });
+    await userEvent.click(todayButton!);
+    const daySections = Array.from(
+      canvasElement.querySelectorAll<HTMLElement>("[data-day-section]"),
+    );
+    expect(daySections.map((section) => section.dataset.daySection)).toEqual([
+      "anytime",
+      "morning",
+      "afternoon",
+      "evening",
+      "done",
+    ]);
+    const disclosure = await canvas.findByRole("button", {
+      name: "Show checklist for Review interview notes",
+    });
+    expect(disclosure).toHaveAttribute("aria-expanded", "false");
+    expect(
+      canvas.queryByRole("group", {
+        name: "Checklist for Review interview notes",
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      canvas.getByRole("progressbar", { name: "Checklist progress: 1 of 3" }),
+    ).toBeVisible();
+  }
 </script>
 
 <Story
@@ -208,6 +255,11 @@
     await waitFor(() => {
       expect(app.workspace.getActiveFile()?.path).toBe("lists/applications.md");
     });
+
+    // Leave this visual story on the feature-rich daily agenda instead of the
+    // final mutation assertion, so the app-backed shell documents the current
+    // Tasks surface when opened directly in Storybook.
+    await showDailyAgendaChecklistSummary(canvasElement, canvas);
   }}
 />
 
@@ -239,5 +291,6 @@
     ).toBeVisible();
     expect(canvas.getByLabelText("Mobile left sidebar")).toBeInTheDocument();
     expect(canvas.getByLabelText("Mobile right sidebar")).toBeInTheDocument();
+    await showDailyAgendaChecklistSummary(canvasElement, canvas);
   }}
 />

@@ -15,6 +15,7 @@
 
   import type { ApplicationTask } from '../../model';
   import ApplicationTaskAreaPicker from "../application-task-area-picker/ApplicationTaskAreaPicker.svelte";
+  import ApplicationTaskChecklistProgress from "../application-task-checklist-progress/ApplicationTaskChecklistProgress.svelte";
   import ApplicationTaskPreviewRow from "../application-task-preview-row/ApplicationTaskPreviewRow.svelte";
 
   type ApplicationSummary = {
@@ -287,6 +288,15 @@
       </div>
     {/if}
   </div>
+  <ApplicationTaskChecklistProgress
+    task={applicationTask}
+    layout="planner"
+    onLoadChecklist={onLoadChecklist ? () => onLoadChecklist(task) : undefined}
+    onToggleChecklistItem={onToggleChecklistItem
+      ? (item, checked) => onToggleChecklistItem(task, item, checked)
+      : undefined}
+    {checklistRefreshVersion}
+  />
 </div>
 
 {#snippet primaryColumn()}
@@ -310,13 +320,7 @@
       onToggleDone={(_, event) => onToggleDone(task, event)}
       onUpdateTask={(_, patch) => onUpdateTask(task, patch)}
       onRemoveTask={() => onRemoveTask(task)}
-      onLoadChecklist={onLoadChecklist
-        ? () => onLoadChecklist(task)
-        : undefined}
-      onToggleChecklistItem={onToggleChecklistItem
-        ? (item, checked) => onToggleChecklistItem(task, item, checked)
-        : undefined}
-      {checklistRefreshVersion}
+      showChecklistProgress={false}
       onMoveTask={(_, direction) => onMoveTask(task, direction)}
     />
   </div>

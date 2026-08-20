@@ -107,6 +107,43 @@
     expect(
       canvas.getByRole("progressbar", { name: "Checklist progress: 1 of 3" }),
     ).toBeVisible();
+    const checklistFooter = checklistDisclosure.closest(
+      "[data-task-checklist-progress]",
+    );
+    const checklistRow = checklistFooter?.closest("[data-planner-task-id]");
+    const checklistMeta = checklistRow?.querySelector(
+      ".application-planner-task-row__meta",
+    );
+    expect(checklistRow?.lastElementChild).toBe(checklistFooter);
+    expect(checklistMeta).toBeInTheDocument();
+    expect(
+      checklistMeta!.compareDocumentPosition(checklistFooter!) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      Math.abs(
+        checklistRow!.getBoundingClientRect().width -
+          checklistFooter!.getBoundingClientRect().width,
+      ),
+    ).toBeLessThan(1);
+    const checklistBody = checklistRow!.querySelector<HTMLElement>(
+      ".application-planner-task-row__columns",
+    )!;
+    const bodySurface = getComputedStyle(checklistBody).backgroundColor;
+    const footerSurface = getComputedStyle(checklistFooter!).backgroundColor;
+    expect(footerSurface).not.toBe(bodySurface);
+    await userEvent.hover(checklistBody);
+    expect(getComputedStyle(checklistFooter!).backgroundColor).toBe(
+      footerSurface,
+    );
+    await userEvent.unhover(checklistBody);
+    checklistDisclosure.focus();
+    await waitFor(() =>
+      expect(getComputedStyle(checklistFooter!).backgroundColor).not.toBe(
+        footerSurface,
+      ),
+    );
+    expect(getComputedStyle(checklistBody).backgroundColor).toBe(bodySurface);
     await userEvent.click(checklistDisclosure);
     const interviewChecklist = await canvas.findByRole("group", {
       name: "Checklist for Review interview notes",
@@ -114,6 +151,7 @@
     const cadenceItem = within(interviewChecklist).getByRole("checkbox", {
       name: "Note the Kubernetes upgrade cadence",
     });
+    expect(cadenceItem.closest("[data-task-checkbox]")).toBeInTheDocument();
     await userEvent.click(cadenceItem);
     expect(cadenceItem).toBeChecked();
     expect(

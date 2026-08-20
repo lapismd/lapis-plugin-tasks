@@ -5,12 +5,14 @@
     checked = false,
     label,
     size = "sm",
+    disabled = false,
     class: className = "",
     onchange = () => {},
   }: {
     checked?: boolean;
     label: string;
     size?: "sm" | "md";
+    disabled?: boolean;
     class?: string;
     onchange?: (event: Event) => void;
   } = $props();
@@ -25,6 +27,7 @@
   <input
     type="checkbox"
     {checked}
+    {disabled}
     aria-label={label}
     onchange={onchange}
     onclick={(event) => event.stopPropagation()}

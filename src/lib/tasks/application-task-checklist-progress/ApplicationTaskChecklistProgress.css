@@ -1,0 +1,139 @@
+.task-checklist-progress {
+  --task-checklist-footer-surface: color-mix(
+    in srgb,
+    var(--kanban-foreground) 4%,
+    var(--kanban-card)
+  );
+
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.48rem 0.6rem 0.55rem 1.5rem;
+  border-top: 1px solid
+    color-mix(in srgb, var(--kanban-border) 82%, transparent);
+  border-radius: 0 0 0.4rem 0.4rem;
+  background: var(--task-checklist-footer-surface);
+  transition: background-color 140ms ease;
+}
+
+.task-checklist-progress:hover,
+.task-checklist-progress:focus-within {
+  --task-checklist-footer-surface: color-mix(
+    in srgb,
+    var(--kanban-foreground) 7%,
+    var(--kanban-card)
+  );
+}
+
+.task-checklist-progress[data-layout="planner"] {
+  box-sizing: border-box;
+  margin: 0.45rem -0.5rem -0.5rem;
+  padding-left: 2.95rem;
+  border-bottom-right-radius: 0.45rem;
+  border-bottom-left-radius: 0.45rem;
+}
+
+.task-checklist-progress__summary {
+  display: grid;
+  width: 100%;
+  min-height: 1.35rem;
+  grid-template-columns: minmax(2.8rem, 4rem) auto 0.85rem;
+  align-items: center;
+  justify-content: start;
+  gap: 0.55rem;
+  border: 0;
+  background: transparent;
+  color: var(--kanban-muted);
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+}
+
+.task-checklist-progress__summary:focus-visible {
+  border-radius: 0.25rem;
+  outline: 2px solid
+    color-mix(in srgb, var(--ui-tasks-accent) 35%, transparent);
+  outline-offset: 2px;
+}
+
+.task-checklist-progress__track {
+  display: block;
+  width: 100%;
+  height: 0.38rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(
+    in srgb,
+    var(--ui-tasks-accent) 14%,
+    var(--kanban-border)
+  );
+}
+
+.task-checklist-progress__track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--ui-tasks-accent);
+  transition: width 150ms ease;
+}
+
+.task-checklist-progress__count {
+  min-width: 2.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.task-checklist-progress__summary svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  transition: rotate 150ms ease;
+}
+
+.task-checklist-progress__summary[aria-expanded="true"] svg {
+  rotate: 180deg;
+}
+
+.task-checklist-progress__items {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.1rem 0.25rem 0.1rem 0;
+}
+
+.task-checklist-progress__items label {
+  display: grid;
+  grid-template-columns: 1rem minmax(0, 1fr);
+  align-items: start;
+  gap: 0.5rem;
+  color: var(--kanban-foreground);
+  cursor: pointer;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.task-checklist-progress__control {
+  margin-top: 0.08rem;
+}
+
+.task-checklist-progress__item--done {
+  color: var(--kanban-muted);
+  text-decoration: line-through;
+}
+
+.task-checklist-progress__state,
+.task-checklist-progress__error {
+  color: var(--kanban-muted);
+  font-size: 0.72rem;
+}
+
+.task-checklist-progress__error {
+  color: var(--ui-tasks-destructive, var(--destructive));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .task-checklist-progress,
+  .task-checklist-progress__track > span,
+  .task-checklist-progress__summary svg {
+    transition: none;
+  }
+}

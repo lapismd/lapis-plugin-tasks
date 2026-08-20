@@ -127,9 +127,17 @@ See LN-TASK-032.
 
 Catalog task rows use projected checklist aggregates for their collapsed
 footer. Rows with no checklist do not render that footer. A nonzero total shows
-a progress bar, completed/total count, and disclosure control without putting
-item text into the planner snapshot. Opening the disclosure lazily reads the
-current `TaskDocument` through `TaskRepository`.
+a progress bar, completed/total count, and collapsed disclosure control without
+putting item text into the planner snapshot. The checklist is the final child of
+the whole task card after application and list chips. It spans beneath the
+content and trailing controls, keeps both bottom corner radii, and therefore
+reads as the card footer rather than another chip-column item. A top divider and
+slightly darker semantic surface distinguish it without introducing a separate
+card. The body and footer own separate interaction surfaces: body hover does not
+recolor the footer, while hover or focus within the footer applies its own
+subtle surface change. Opening the disclosure lazily reads the current
+`TaskDocument` through `TaskRepository`. Expanded items reuse the public Tasks
+`ApplicationTaskCheckbox` rather than a separate native-checkbox presentation.
 
 Expanded checkboxes optimistically update progress while the guarded Markdown
 mutation runs. Success replaces the local items with the reparsed document and

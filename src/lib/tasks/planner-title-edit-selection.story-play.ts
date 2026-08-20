@@ -15,33 +15,41 @@ export async function playTitleClickStartsInlineEdit({
 
   const firstRow = rows[0]!;
   const secondRow = rows[1]!;
+  const secondTaskId = secondRow.dataset.plannerTaskId;
+  expect(secondTaskId).toBeTruthy();
 
-  async function clickPoint(
-    host: HTMLElement,
-    xRatio: number,
-    yRatio: number,
-  ) {
-    const rect = host.getBoundingClientRect();
-    const x = rect.left + rect.width * xRatio;
-    const y = rect.top + rect.height * yRatio;
-    const target =
-      (host.ownerDocument.elementFromPoint(x, y) as HTMLElement | null) ?? host;
-    await userEvent.click(target);
+  function currentSecondRow() {
+    const current = [
+      ...canvasElement.querySelectorAll<HTMLElement>(
+        ".application-planner-task-row",
+      ),
+    ].find((row) => row.dataset.plannerTaskId === secondTaskId);
+    expect(current).not.toBeUndefined();
+    return current!;
   }
 
-  // Select via non-title chrome near the bottom of the row surface.
-  await clickPoint(firstRow, 0.55, 0.92);
+  // Select the row itself through its keyboard contract. This avoids coupling
+  // the selection setup to body/footer geometry or to whichever child happens
+  // to occupy a percentage-based pointer coordinate.
+  firstRow.focus();
+  await userEvent.keyboard(" ");
   await waitFor(() =>
     expect(firstRow).toHaveAttribute("data-planner-selected", "true"),
   );
 
-  const title = secondRow.querySelector<HTMLElement>(".task-line__title");
+  // Selection updates can replace keyed row elements. Reacquire the next row
+  // by task identity before starting title edit.
+  const editableRow = currentSecondRow();
+  expect(editableRow).not.toHaveAttribute("data-planner-select-on-surface");
+  expect(editableRow).not.toHaveClass("application-planner-task-row--expanded");
+  const title = editableRow.querySelector<HTMLElement>(".task-line__title");
   expect(title).not.toBeNull();
   expect(title).toHaveAttribute("type", "button");
   await userEvent.click(title!);
 
   await waitFor(() => {
-    const editor = secondRow.querySelector<HTMLElement>(
+    const currentRow = currentSecondRow();
+    const editor = currentRow.querySelector<HTMLElement>(
       ".task-line__title-editor",
     );
     expect(editor).not.toBeNull();
@@ -49,10 +57,10 @@ export async function playTitleClickStartsInlineEdit({
     expect(editor).toHaveAttribute("role", "textbox");
     expect(document.activeElement).toBe(editor);
     expect(firstRow).not.toHaveAttribute("data-planner-selected", "true");
-    expect(secondRow).not.toHaveAttribute("data-planner-selected", "true");
+    expect(currentRow).not.toHaveAttribute("data-planner-selected", "true");
   });
 
-  const editor = secondRow.querySelector<HTMLElement>(
+  const editor = currentSecondRow().querySelector<HTMLElement>(
     ".task-line__title-editor",
   )!;
   const before = editor.textContent ?? "";
