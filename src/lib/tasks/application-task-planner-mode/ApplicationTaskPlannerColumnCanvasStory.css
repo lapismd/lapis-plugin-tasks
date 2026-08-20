@@ -126,6 +126,8 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
   [data-column-id="tasks"]
   > [data-ui-part="resize-handle"] {
   inset-inline-end: -1px;
+  inset-block: 1px;
+  height: auto;
   border-start-start-radius: var(
     --ui-column-canvas-radius,
     var(--radius-lg, var(--radius))

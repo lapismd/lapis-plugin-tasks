@@ -63,6 +63,14 @@
         tasksColumn.getBoundingClientRect().right,
     ).toBeCloseTo(plannerStartBorderWidth, 1);
     expect(
+      tasksResizeHandle.getBoundingClientRect().top -
+        tasksColumn.getBoundingClientRect().top,
+    ).toBeCloseTo(plannerStartBorderWidth, 1);
+    expect(
+      tasksColumn.getBoundingClientRect().bottom -
+        tasksResizeHandle.getBoundingClientRect().bottom,
+    ).toBeCloseTo(plannerStartBorderWidth, 1);
+    expect(
       canvas.getByRole("button", { name: "Collapse All lists section" }),
     ).toBeVisible();
     expect(canvas.getByRole("button", { name: "All lists section" })).toBeVisible();
