@@ -1,27 +1,45 @@
-export const TASKS_PLUGIN_DATA_VERSION = 1 as const;
+export const TASKS_PLUGIN_DATA_VERSION = 2 as const;
 
 export type TasksDayPartSettings = {
   afternoonStartsAt: string;
   eveningStartsAt: string;
 };
 
+export type TasksDailyAgendaSettings = {
+  hideOverdueTasks: boolean;
+};
+
 export type TasksPluginSettings = {
   dayParts: TasksDayPartSettings;
+  dailyAgenda: TasksDailyAgendaSettings;
 };
 
 export type TasksPluginSettingsPatch = {
   dayParts?: Partial<TasksDayPartSettings>;
+  dailyAgenda?: Partial<TasksDailyAgendaSettings>;
 };
 
 export type TasksPluginDataV1 = {
+  version: 1;
+  settings: {
+    dayParts: TasksDayPartSettings;
+  };
+};
+
+export type TasksPluginDataV2 = {
   version: typeof TASKS_PLUGIN_DATA_VERSION;
   settings: TasksPluginSettings;
 };
+
+export type TasksPluginData = TasksPluginDataV2;
 
 export const DEFAULT_TASKS_PLUGIN_SETTINGS: TasksPluginSettings = Object.freeze({
   dayParts: Object.freeze({
     afternoonStartsAt: "12:00",
     eveningStartsAt: "17:00",
+  }),
+  dailyAgenda: Object.freeze({
+    hideOverdueTasks: false,
   }),
 });
 
@@ -76,6 +94,7 @@ export function validateTasksDayPartSettings(
 export function mergeTasksPluginSettings(value: unknown): TasksPluginSettings {
   const stored = recordValue(value);
   const dayParts = recordValue(stored.dayParts);
+  const dailyAgenda = recordValue(stored.dailyAgenda);
   try {
     return {
       dayParts: validateTasksDayPartSettings({
@@ -88,19 +107,27 @@ export function mergeTasksPluginSettings(value: unknown): TasksPluginSettings {
             ? dayParts.eveningStartsAt
             : DEFAULT_TASKS_PLUGIN_SETTINGS.dayParts.eveningStartsAt,
       }),
+      dailyAgenda: {
+        hideOverdueTasks:
+          typeof dailyAgenda.hideOverdueTasks === "boolean"
+            ? dailyAgenda.hideOverdueTasks
+            : DEFAULT_TASKS_PLUGIN_SETTINGS.dailyAgenda.hideOverdueTasks,
+      },
     };
   } catch {
     return cloneTasksPluginSettings(DEFAULT_TASKS_PLUGIN_SETTINGS);
   }
 }
 
-export function migrateTasksPluginData(value: unknown): TasksPluginDataV1 {
+export function migrateTasksPluginData(value: unknown): TasksPluginData {
   const stored = recordValue(value);
+  const settings =
+    stored.version === TASKS_PLUGIN_DATA_VERSION || stored.version === 1
+      ? stored.settings
+      : null;
   return {
     version: TASKS_PLUGIN_DATA_VERSION,
-    settings: mergeTasksPluginSettings(
-      stored.version === TASKS_PLUGIN_DATA_VERSION ? stored.settings : null,
-    ),
+    settings: mergeTasksPluginSettings(settings),
   };
 }
 
@@ -113,12 +140,18 @@ export function patchTasksPluginSettings(
       ...current.dayParts,
       ...patch.dayParts,
     }),
+    dailyAgenda: {
+      ...current.dailyAgenda,
+      ...patch.dailyAgenda,
+    },
   };
 }
 
 export function cloneTasksPluginSettings(
   settings: TasksPluginSettings,
 ): TasksPluginSettings {
-  return { dayParts: { ...settings.dayParts } };
+  return {
+    dayParts: { ...settings.dayParts },
+    dailyAgenda: { ...settings.dailyAgenda },
+  };
 }
-

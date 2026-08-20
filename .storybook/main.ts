@@ -119,8 +119,10 @@ const config: StorybookConfig = {
           "@lucide/svelte/icons/chevron-right",
           "@lucide/svelte/icons/clock-3",
           "@lucide/svelte/icons/moon",
+          "@lucide/svelte/icons/list-restart",
           "@lucide/svelte/icons/sun",
           "@lucide/svelte/icons/sunrise",
+          "@lucide/svelte/icons/timer-off",
         ],
       },
       server: {

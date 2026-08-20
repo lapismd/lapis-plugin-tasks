@@ -355,12 +355,17 @@ function taskEligibleForDay(
   task: Task,
   selectedDate: string,
   actualToday: string,
+  hideOverdueTasks: boolean,
 ) {
   const planDate = taskDateOnly(task.planDate) ?? taskDateOnly(task.scheduledAt);
   const deadline = taskDateOnly(task.deadline) ?? taskDateOnly(task.dueAt);
+  const datedMatches = [planDate, deadline].filter(
+    (date): date is string => Boolean(date),
+  );
   if (
-    (planDate && planDate <= selectedDate) ||
-    (deadline && deadline <= selectedDate)
+    datedMatches.some((date) =>
+      hideOverdueTasks ? date === selectedDate : date <= selectedDate,
+    )
   ) {
     return true;
   }
@@ -400,7 +405,15 @@ export function buildTaskPlannerDaySnapshot(
       if (taskDateOnly(task.completedAt) === selectedDate) snapshot.done.push(task);
       continue;
     }
-    if (isCanceled(task) || !taskEligibleForDay(task, selectedDate, actualToday)) {
+    if (
+      isCanceled(task) ||
+      !taskEligibleForDay(
+        task,
+        selectedDate,
+        actualToday,
+        settings.dailyAgenda.hideOverdueTasks,
+      )
+    ) {
       continue;
     }
     snapshot[resolveTaskDaySection(task, settings)].push(task);

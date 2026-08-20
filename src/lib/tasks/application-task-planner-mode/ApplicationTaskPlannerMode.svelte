@@ -73,6 +73,7 @@
 		now,
 		clock = () => now ?? new Date(),
 		settings = DEFAULT_TASKS_PLUGIN_SETTINGS,
+		hideCompletedTasks = false,
 		selectedDate = $bindable(todayDateOnly(now ?? clock())),
 		applications = [],
 		view = 'today',
@@ -97,6 +98,7 @@
 		now?: Date;
 		clock?: () => Date;
 		settings?: TasksPluginSettings;
+		hideCompletedTasks?: boolean;
 		selectedDate?: string;
 		applications?: JobApplication[];
 		view?: TaskBucket;
@@ -816,6 +818,7 @@
 	{now}
 	{clock}
 	{settings}
+	{hideCompletedTasks}
 	bind:selectedDate
 	{actualToday}
 	{view}

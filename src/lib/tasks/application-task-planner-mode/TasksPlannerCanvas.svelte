@@ -12,6 +12,7 @@
   import type { App } from "@lapis-notes/api";
   import {
     findListNavNode,
+    buildTaskPlannerDaySnapshot,
     listTreeFromAreas,
     type JobApplication,
     type ListTreeDropTarget,
@@ -29,11 +30,13 @@
   import {
     DEFAULT_TASKS_PLUGIN_SETTINGS,
     type TasksPluginSettings,
+    type TasksPluginSettingsPatch,
   } from "../../tasks-settings";
   import ApplicationTaskSidebarDetail from "../application-task-sidebar-detail/ApplicationTaskSidebarDetail.svelte";
   import ApplicationTaskPlannerMode from "./ApplicationTaskPlannerMode.svelte";
   import TaskListNavTree from "./TaskListNavTree.svelte";
   import TaskMarkdownSurface from "../../task-list-markdown-surface/TaskListMarkdownSurface.svelte";
+  import TaskTodayActionsMenu from "../task-planner/TaskTodayActionsMenu.svelte";
   import type { TasksMarkdownSurfaceController } from "../../task-list-surface";
   import "./ApplicationTaskPlannerColumnCanvasStory.css";
 
@@ -70,6 +73,7 @@
     onUnpinList,
     onArchiveList,
     onDeleteList,
+    onUpdateSettings = () => {},
     app,
     repository,
     onRefreshWorkspace,
@@ -84,7 +88,7 @@
     applicationSummaries?: Record<string, ApplicationSummary>;
     showRelated?: boolean;
     variant?: "story" | "workspace";
-    onSaveTask: (task: Task) => void;
+    onSaveTask: (task: Task) => void | Promise<void>;
     onCreateTask: (input: TaskQuickCreateInput) => void;
     onDeleteTask: (task: Task) => void;
     onLoadChecklist?: (task: Task) => Promise<ChecklistItem[]>;
@@ -105,6 +109,7 @@
     onUnpinList?: (path: string) => void;
     onArchiveList?: (path: string) => void;
     onDeleteList?: (path: string) => void;
+    onUpdateSettings?: (patch: TasksPluginSettingsPatch) => void | Promise<void>;
     app?: App;
     repository?: TaskRepository;
     onRefreshWorkspace?: () => void | Promise<void>;
@@ -203,6 +208,8 @@
     enter: () => void;
     exit: () => Promise<boolean>;
   } | null>(null);
+  let hideCompletedTasks = $state(false);
+  let markAllIncompletePending = $state(false);
   let previousTaskArea: string | null | undefined;
 
   const activePlannerLabel = $derived(
@@ -237,6 +244,17 @@
   });
   const showTodayShortcut = $derived(
     taskView === "today" && selectedDate !== actualToday,
+  );
+  const selectedDaySnapshot = $derived(
+    buildTaskPlannerDaySnapshot(
+      tasks,
+      selectedDate || actualToday,
+      settings,
+      actualToday,
+    ),
+  );
+  const actualTodaySnapshot = $derived(
+    buildTaskPlannerDaySnapshot(tasks, actualToday, settings, actualToday),
   );
   const activeTask = $derived(
     activeTaskId
@@ -381,6 +399,29 @@
       completedAt: done ? (task.completedAt ?? (now ?? clock()).toISOString()) : undefined,
       updatedAt: (now ?? clock()).toISOString(),
     });
+  }
+
+  async function markAllTodayTasksIncomplete() {
+    if (markAllIncompletePending) return;
+    const completedTasks = [...selectedDaySnapshot.done];
+    if (!completedTasks.length) return;
+    markAllIncompletePending = true;
+    try {
+      for (const task of completedTasks) {
+        await onSaveTask({
+          ...task,
+          status: "open",
+          completedAt: undefined,
+          updatedAt: (now ?? clock()).toISOString(),
+        });
+      }
+    } finally {
+      markAllIncompletePending = false;
+    }
+  }
+
+  async function setHideOverdueTasks(hideOverdueTasks: boolean) {
+    await onUpdateSettings({ dailyAgenda: { hideOverdueTasks } });
   }
 
   function removeActiveTask(task: Task) {
@@ -578,7 +619,12 @@
   function bucketCount(bucket: TaskBucket) {
     if (bucket === "inbox") return snapshot.inbox.length;
     if (bucket === "today") {
-      return snapshot.today.length + snapshot.thisEvening.length;
+      return (
+        actualTodaySnapshot.anytime.length +
+        actualTodaySnapshot.morning.length +
+        actualTodaySnapshot.afternoon.length +
+        actualTodaySnapshot.evening.length
+      );
     }
     if (bucket === "review") return snapshot.review.length;
     if (bucket === "upcoming") {
@@ -680,40 +726,50 @@
             <ColumnCanvas.Title>{activePlannerLabel}</ColumnCanvas.Title>
           </div>
           <ColumnCanvas.HeaderActions>
-            <ColumnCanvas.Toggle />
-            {#if showTodayShortcut || (taskArea && selectedListNode && app && repository)}
-              {#if showTodayShortcut}
-                <button
-                  type="button"
-                  class="task-column-canvas-story__today-shortcut"
-                  aria-label="Return to today"
-                  onclick={() => (selectedDate = actualToday)}
-                >
-                  <CalendarDaysIcon aria-hidden="true" />
-                  <span>Today</span>
-                </button>
-              {/if}
-              {#if taskArea && selectedListNode && app && repository}
-                <button
-                  type="button"
-                  class="task-column-canvas-story__markdown-mode"
-                  aria-label={taskListEditing
-                    ? `Read ${activePlannerLabel}`
-                    : `Edit ${activePlannerLabel}`}
-                  title={taskListEditing ? "Reading view" : "Edit"}
-                  onclick={() =>
-                    taskListEditing
-                      ? void readTaskListDocument()
-                      : editTaskListDocument()}
-                >
-                  {#if taskListEditing}
-                    <BookOpenIcon aria-hidden="true" />
-                  {:else}
-                    <PencilIcon aria-hidden="true" />
-                  {/if}
-                </button>
-              {/if}
+            {#if showTodayShortcut}
+              <button
+                type="button"
+                class="task-column-canvas-story__today-shortcut"
+                aria-label="Return to today"
+                onclick={() => (selectedDate = actualToday)}
+              >
+                <CalendarDaysIcon aria-hidden="true" />
+                <span>Today</span>
+              </button>
             {/if}
+            {#if taskView === "today" && !taskArea}
+              <TaskTodayActionsMenu
+                {hideCompletedTasks}
+                hideOverdueTasks={settings.dailyAgenda.hideOverdueTasks}
+                completedTaskCount={selectedDaySnapshot.done.length}
+                {markAllIncompletePending}
+                onHideCompletedTasksChange={(hidden) =>
+                  (hideCompletedTasks = hidden)}
+                onHideOverdueTasksChange={setHideOverdueTasks}
+                onMarkAllIncomplete={markAllTodayTasksIncomplete}
+              />
+            {/if}
+            {#if taskArea && selectedListNode && app && repository}
+              <button
+                type="button"
+                class="task-column-canvas-story__markdown-mode"
+                aria-label={taskListEditing
+                  ? `Read ${activePlannerLabel}`
+                  : `Edit ${activePlannerLabel}`}
+                title={taskListEditing ? "Reading view" : "Edit"}
+                onclick={() =>
+                  taskListEditing
+                    ? void readTaskListDocument()
+                    : editTaskListDocument()}
+              >
+                {#if taskListEditing}
+                  <BookOpenIcon aria-hidden="true" />
+                {:else}
+                  <PencilIcon aria-hidden="true" />
+                {/if}
+              </button>
+            {/if}
+            <ColumnCanvas.Toggle />
           </ColumnCanvas.HeaderActions>
         </ColumnCanvas.Header>
         <div class="task-column-canvas-story__pane">
@@ -732,6 +788,7 @@
             {now}
             {clock}
             {settings}
+            {hideCompletedTasks}
             bind:selectedDate
             {applications}
             view={taskView}

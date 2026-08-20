@@ -163,6 +163,69 @@
     ).toBeVisible();
   }
 
+  async function assertPlannerViewTotals(
+    canvasElement: HTMLElement,
+    canvas: ReturnType<typeof within>,
+  ) {
+    const plannerColumn = canvasElement.querySelector<HTMLElement>(
+      '[data-column-id="planner"][data-ui-part="column"]',
+    )!;
+    const expectedViews = [
+      { name: "Inbox", total: 1 },
+      { name: "Review", total: 1 },
+      { name: "Upcoming", total: 2 },
+      { name: "Anytime", total: 2 },
+      { name: "Someday", total: 1 },
+      { name: "Logbook", total: 3 },
+    ] as const;
+
+    for (const expectedView of expectedViews) {
+      const navigationItem = canvas
+        .getAllByRole("button", { name: expectedView.name, exact: true })
+        .find(
+          (button) =>
+            getComputedStyle(button).pointerEvents !== "none" &&
+            button.getClientRects().length > 0,
+        );
+      expect(navigationItem).toBeDefined();
+      expect(navigationItem!.querySelector("small")).toHaveTextContent(
+        String(expectedView.total),
+      );
+      await userEvent.click(navigationItem!);
+      await waitFor(() => {
+        expect(plannerColumn.querySelector("h1")).toHaveTextContent(
+          expectedView.name,
+        );
+        expect(
+          plannerColumn.querySelectorAll("[data-planner-sortable-row]"),
+        ).toHaveLength(expectedView.total);
+      });
+      if (expectedView.name === "Review") {
+        expect(plannerColumn).toHaveTextContent("Finish yesterday's review");
+        expect(plannerColumn).not.toHaveTextContent("Publish the daily status");
+      }
+    }
+
+    const todayNavigation = canvas
+      .getAllByRole("button", { name: "Today", exact: true })
+      .find(
+        (button) =>
+          getComputedStyle(button).pointerEvents !== "none" &&
+          button.getClientRects().length > 0,
+      );
+    expect(todayNavigation).toBeDefined();
+    expect(todayNavigation!.querySelector("small")).toHaveTextContent("7");
+    await userEvent.click(todayNavigation!);
+    await waitFor(() => {
+      expect(
+        plannerColumn.querySelectorAll("[data-planner-sortable-row]"),
+      ).toHaveLength(7);
+      expect(
+        plannerColumn.querySelectorAll("[data-day-section]"),
+      ).toHaveLength(5);
+    });
+  }
+
   async function collapseLapisLeftSidebar(
     canvas: ReturnType<typeof within>,
   ) {
@@ -1139,6 +1202,7 @@
         ),
       ).toBeVisible();
     });
+    await assertPlannerViewTotals(canvasElement, canvas);
     expect(canvas.getByRole("button", { name: "Applications" })).toBeVisible();
     expect(canvas.getByRole("button", { name: "Docs" })).toBeVisible();
     expect(canvas.getByRole("button", { name: "CV" })).toBeVisible();

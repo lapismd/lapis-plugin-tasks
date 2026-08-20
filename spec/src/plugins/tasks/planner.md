@@ -36,6 +36,8 @@ state:
 | Selected bucket, List, Task, or date | Planner controller | In memory |
 | Section disclosure and open detail columns | Planner presentation | In memory |
 | Day-part boundaries | Versioned Tasks plugin settings | Persisted as plugin-owned settings |
+| Hide completed tasks | Today presentation | In memory |
+| Hide overdue tasks | Versioned Tasks plugin settings | Persisted as plugin-owned settings |
 
 Today, Review, Upcoming, Anytime, and Logbook are query results, not document
 fields. Daily section placement is derived from `plan.date`, `plan.at`, status,

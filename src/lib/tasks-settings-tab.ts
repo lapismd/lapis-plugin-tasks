@@ -34,6 +34,19 @@ export class TasksSettingsTab extends PluginSettingTab {
             void this.update({ dayParts: { eveningStartsAt } }),
           ),
       );
+
+    new Setting(this.containerEl)
+      .setName("Hide overdue tasks")
+      .setDesc(
+        "Hide unfinished tasks planned or due before the selected daily agenda date.",
+      )
+      .addToggle((toggle) =>
+        toggle
+          .setValue(settings.dailyAgenda.hideOverdueTasks)
+          .onChange((hideOverdueTasks) =>
+            void this.update({ dailyAgenda: { hideOverdueTasks } }),
+          ),
+      );
   }
 
   private async update(patch: TasksPluginSettingsPatch): Promise<void> {

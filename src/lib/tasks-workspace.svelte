@@ -22,6 +22,7 @@
   import {
     DEFAULT_TASKS_PLUGIN_SETTINGS,
     type TasksPluginSettings,
+    type TasksPluginSettingsPatch,
   } from "./tasks-settings";
   import type { TasksSettingsSource } from "./tasks-view";
   import TasksPlannerCanvas from "./tasks/application-task-planner-mode/TasksPlannerCanvas.svelte";
@@ -244,6 +245,10 @@
     await queueRefresh();
   }
 
+  async function updateSettings(patch: TasksPluginSettingsPatch) {
+    await settingsSource?.update(patch);
+  }
+
   onMount(() => {
     settings = settingsSource?.get() ?? DEFAULT_TASKS_PLUGIN_SETTINGS;
     void queueRefresh();
@@ -281,7 +286,7 @@
     applications={[]}
     applicationSummaries={{}}
     showRelated={false}
-    onSaveTask={(task) => void saveTask(task)}
+    onSaveTask={saveTask}
     onCreateTask={(input) => void createTask(input)}
     onDeleteTask={(task) => void deleteTask(task)}
     onLoadChecklist={loadChecklist}
@@ -296,6 +301,7 @@
     onUnpinList={(path) => void unpinList(path)}
     onArchiveList={(path) => void archiveList(path)}
     onDeleteList={(path) => void deleteList(path)}
+    onUpdateSettings={updateSettings}
     onRefreshWorkspace={queueRefresh}
     onCreateTaskListItem={createTaskListItem}
   />

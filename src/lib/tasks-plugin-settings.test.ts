@@ -14,15 +14,15 @@ vi.mock("@lapis-notes/api", () => ({
 import { TasksPlugin } from "./tasks-plugin";
 import {
   migrateTasksPluginData,
-  type TasksPluginDataV1,
+  type TasksPluginData,
   type TasksPluginSettings,
 } from "./tasks-settings";
 
 type TasksPluginSettingsHarness = {
-  data: TasksPluginDataV1;
+  data: TasksPluginData;
   saveQueue: Promise<void>;
   settingsListeners: Set<(settings: TasksPluginSettings) => void>;
-  saveData(data: TasksPluginDataV1): Promise<void>;
+  saveData(data: TasksPluginData): Promise<void>;
   getSettings: TasksPlugin["getSettings"];
   updateSettings: TasksPlugin["updateSettings"];
   subscribeSettings: TasksPlugin["subscribeSettings"];
@@ -43,8 +43,8 @@ describe("TasksPlugin settings persistence", () => {
     const firstSave = new Promise<void>((resolve) => {
       releaseFirstSave = resolve;
     });
-    const saved: TasksPluginDataV1[] = [];
-    const saveData = vi.fn(async (data: TasksPluginDataV1) => {
+    const saved: TasksPluginData[] = [];
+    const saveData = vi.fn(async (data: TasksPluginData) => {
       saved.push(data);
       if (saved.length === 1) await firstSave;
     });
@@ -57,6 +57,7 @@ describe("TasksPlugin settings persistence", () => {
     });
     const second = plugin.updateSettings({
       dayParts: { eveningStartsAt: "18:30" },
+      dailyAgenda: { hideOverdueTasks: true },
     });
     await Promise.resolve();
     await Promise.resolve();
@@ -73,11 +74,19 @@ describe("TasksPlugin settings persistence", () => {
       { afternoonStartsAt: "11:30", eveningStartsAt: "17:00" },
       { afternoonStartsAt: "11:30", eveningStartsAt: "18:30" },
     ]);
+    expect(saved.map((data) => data.settings.dailyAgenda)).toEqual([
+      { hideOverdueTasks: false },
+      { hideOverdueTasks: true },
+    ]);
+    expect(notifications.map((settings) => settings.dailyAgenda)).toEqual([
+      { hideOverdueTasks: false },
+      { hideOverdueTasks: true },
+    ]);
   });
 
   it("continues the persistence queue after a failed save", async () => {
     const saveData = vi
-      .fn<(data: TasksPluginDataV1) => Promise<void>>()
+      .fn<(data: TasksPluginData) => Promise<void>>()
       .mockRejectedValueOnce(new Error("disk full"))
       .mockResolvedValue(undefined);
     const plugin = settingsHarness(saveData);

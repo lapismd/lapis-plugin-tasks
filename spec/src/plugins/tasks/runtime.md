@@ -94,8 +94,11 @@ interaction rules. See LN-TASK-035.
 
 Settings saves are serialized. The two local `HH:mm` day-part boundaries must
 be valid and ordered. Absent, older, or malformed data uses `12:00` and `17:00`.
-After a successful save, every open view receives the persisted snapshot and
-reclassifies clock-valued tasks without a file mutation. See LN-TASK-029.
+The persisted `dailyAgenda.hideOverdueTasks` preference defaults to false and
+migrates version-1 data without losing valid boundaries. After a successful
+save, every open view receives the persisted snapshot. Boundary changes
+reclassify clock-valued tasks; the overdue preference changes selected-agenda
+inclusion. Neither change mutates a Task file. See LN-TASK-029.
 
 ## Mutations
 

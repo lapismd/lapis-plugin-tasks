@@ -12,6 +12,12 @@
     type TaskQuickCreateInput,
   } from "../../model";
   import { samplePlannerTasks } from "../story-fixture";
+  import {
+    cloneTasksPluginSettings,
+    DEFAULT_TASKS_PLUGIN_SETTINGS,
+    patchTasksPluginSettings,
+    type TasksPluginSettingsPatch,
+  } from "../../tasks-settings";
   import TasksPlannerCanvas from "./TasksPlannerCanvas.svelte";
 
   const applicationSummaries =
@@ -33,6 +39,9 @@
       ...application,
       tasks: application.tasks?.map((task) => ({ ...task })),
     })),
+  );
+  let settings = $state(
+    cloneTasksPluginSettings(DEFAULT_TASKS_PLUGIN_SETTINGS),
   );
 
   const now = new Date(`${PLANNER_FIXTURE_TODAY}T12:00:00`);
@@ -115,11 +124,16 @@
       entry.id === application.id ? application : entry,
     );
   }
+
+  function updateSettings(patch: TasksPluginSettingsPatch) {
+    settings = patchTasksPluginSettings(settings, patch);
+  }
 </script>
 
 <TasksPlannerCanvas
   {tasks}
   {now}
+  {settings}
   {snapshot}
   {applications}
   {applicationSummaries}
@@ -137,4 +151,5 @@
   onUnpinList={() => {}}
   onArchiveList={() => {}}
   onDeleteList={() => {}}
+  onUpdateSettings={updateSettings}
 />

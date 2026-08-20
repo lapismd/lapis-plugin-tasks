@@ -14,7 +14,7 @@ import {
   cloneTasksPluginSettings,
   migrateTasksPluginData,
   patchTasksPluginSettings,
-  type TasksPluginDataV1,
+  type TasksPluginData,
   type TasksPluginSettings,
   type TasksPluginSettingsPatch,
 } from "./tasks-settings";
@@ -36,7 +36,7 @@ const MANIFEST: PluginManifest = {
 export class TasksPlugin extends Plugin {
   readonly repository: TaskRepository;
   clock: () => Date = () => new Date();
-  private data: TasksPluginDataV1 = migrateTasksPluginData(null);
+  private data: TasksPluginData = migrateTasksPluginData(null);
   private saveQueue: Promise<void> = Promise.resolve();
   private readonly settingsListeners = new Set<(settings: TasksPluginSettings) => void>();
 
@@ -61,6 +61,7 @@ export class TasksPlugin extends Plugin {
       (leaf: WorkspaceLeaf) =>
         new TasksView(leaf, this.repository, () => this.clock(), {
           get: () => this.getSettings(),
+          update: (patch) => this.updateSettings(patch),
           subscribe: (listener) => this.subscribeSettings(listener),
         }),
     );
@@ -82,7 +83,7 @@ export class TasksPlugin extends Plugin {
       ...this.data,
       settings: patchTasksPluginSettings(this.data.settings, patch),
     };
-    const snapshot: TasksPluginDataV1 = {
+    const snapshot: TasksPluginData = {
       version: this.data.version,
       settings: this.getSettings(),
     };

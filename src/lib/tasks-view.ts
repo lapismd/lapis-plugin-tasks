@@ -1,13 +1,17 @@
 import { View, type WorkspaceLeaf } from "@lapis-notes/api";
 import { mount, unmount } from "svelte";
 import type { TaskRepository } from "./model";
-import type { TasksPluginSettings } from "./tasks-settings";
+import type {
+  TasksPluginSettings,
+  TasksPluginSettingsPatch,
+} from "./tasks-settings";
 import TasksWorkspace from "./tasks-workspace.svelte";
 
 export const TASKS_VIEW_TYPE = "tasks";
 
 export type TasksSettingsSource = {
   get(): TasksPluginSettings;
+  update(patch: TasksPluginSettingsPatch): Promise<void>;
   subscribe(listener: (settings: TasksPluginSettings) => void): () => void;
 };
 

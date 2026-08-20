@@ -14,8 +14,11 @@ export {
   migrateTasksPluginData,
   patchTasksPluginSettings,
   validateTasksDayPartSettings,
+  type TasksDailyAgendaSettings,
   type TasksDayPartSettings,
+  type TasksPluginData,
   type TasksPluginDataV1,
+  type TasksPluginDataV2,
   type TasksPluginSettings,
   type TasksPluginSettingsPatch,
 } from "./tasks-settings";

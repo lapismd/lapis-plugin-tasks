@@ -113,6 +113,9 @@ describe("daily agenda", () => {
       afternoonStartsAt: "12:00",
       eveningStartsAt: "17:00",
     },
+    dailyAgenda: {
+      hideOverdueTasks: false,
+    },
   };
 
   it("routes clock values at the configured boundaries", () => {
@@ -177,6 +180,35 @@ describe("daily agenda", () => {
     expect(snapshot.afternoon.map((task) => task.id)).toEqual(["due"]);
     expect(snapshot.done.map((task) => task.id)).toEqual(["done"]);
     expect(Object.values(snapshot).flat()).not.toContain("canceled");
+  });
+
+  it("hides carried-over tasks without hiding exact-date or completed tasks", () => {
+    const selectedDate = "2026-08-20";
+    const snapshot = buildTaskPlannerDaySnapshot(
+      [
+        agendaTask({ id: "overdue", planDate: "2026-08-19" }),
+        agendaTask({ id: "planned", planDate: selectedDate }),
+        agendaTask({
+          id: "due",
+          planDate: "2026-08-19",
+          deadline: selectedDate,
+        }),
+        agendaTask({
+          id: "done",
+          status: "completed",
+          completedAt: "2026-08-20T09:00:00.000Z",
+        }),
+      ],
+      selectedDate,
+      {
+        ...settings,
+        dailyAgenda: { hideOverdueTasks: true },
+      },
+      selectedDate,
+    );
+
+    expect(snapshot.anytime.map((task) => task.id)).toEqual(["due", "planned"]);
+    expect(snapshot.done.map((task) => task.id)).toEqual(["done"]);
   });
 
   it("writes section placement, completes at the injected clock, and reopens from Done", () => {

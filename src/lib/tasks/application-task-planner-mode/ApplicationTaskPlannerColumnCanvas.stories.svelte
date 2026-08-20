@@ -131,7 +131,57 @@
       expect(style.borderTopColor).toBe("rgba(0, 0, 0, 0)");
       expect(style.outlineStyle).toBe("none");
     }
-    const alignedTitle = canvas.getByRole("button", {
+
+    const expectedViewTotals = [
+      { name: "Inbox", total: 1 },
+      { name: "Review", total: 1 },
+      { name: "Upcoming", total: 2 },
+      { name: "Anytime", total: 2 },
+      { name: "Someday", total: 1 },
+      { name: "Logbook", total: 3 },
+    ] as const;
+    for (const expectedView of expectedViewTotals) {
+      const navigationItem = canvas.getByRole("button", {
+        name: expectedView.name,
+      });
+      expect(navigationItem.querySelector("small")).toHaveTextContent(
+        String(expectedView.total),
+      );
+      await userEvent.click(navigationItem);
+      expect(
+        await canvas.findByRole("heading", {
+          name: expectedView.name,
+          level: 1,
+        }),
+      ).toBeVisible();
+      await waitFor(() =>
+        expect(
+          plannerColumn.querySelectorAll("[data-planner-sortable-row]"),
+        ).toHaveLength(expectedView.total),
+      );
+    }
+    await userEvent.click(canvas.getByRole("button", { name: "Review" }));
+    const reviewRow = await waitFor(() => {
+      const row = plannerColumn.querySelector<HTMLElement>(
+        '[data-planner-sortable-group="review"]',
+      );
+      expect(row).toHaveTextContent("Finish yesterday's review");
+      return row!;
+    });
+    expect(reviewRow).toBeVisible();
+    expect(
+      canvas.queryByRole("heading", { name: "Logbook", level: 1 }),
+    ).not.toBeInTheDocument();
+    const todayNavigation = canvas.getByRole("button", { name: "Today" });
+    expect(todayNavigation.querySelector("small")).toHaveTextContent("7");
+    await userEvent.click(todayNavigation);
+    await waitFor(() =>
+      expect(
+        plannerColumn.querySelectorAll("[data-planner-sortable-row]"),
+      ).toHaveLength(7),
+    );
+
+    const alignedTitle = await canvas.findByRole("button", {
       name: "Finish yesterday's review",
       exact: true,
     });
@@ -150,6 +200,10 @@
       ),
     ).toBeLessThan(1);
     await playTitleClickStartsInlineEdit(context);
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(canvas.queryByRole("textbox", { name: "Task title" })).toBeNull(),
+    );
     const daySections = Array.from(
       context.canvasElement.querySelectorAll<HTMLElement>("[data-day-section]"),
     );
@@ -191,6 +245,111 @@
       ),
     ).toBeInTheDocument();
 
+    const documentCanvas = within(context.canvasElement.ownerDocument.body);
+    const todayActions = canvas.getByRole("button", { name: "Today actions" });
+    async function waitForTodayActionsReady() {
+      await waitFor(() => {
+        expect(todayActions).toHaveAttribute("data-state", "closed");
+        expect(getComputedStyle(todayActions).pointerEvents).not.toBe("none");
+      });
+    }
+    await userEvent.click(todayActions);
+    expect(
+      await documentCanvas.findByRole("menuitemcheckbox", {
+        name: "Hide completed tasks",
+      }),
+    ).not.toBeChecked();
+    expect(
+      documentCanvas.getByRole("menuitem", { name: "Mark all incomplete" }),
+    ).toBeEnabled();
+    await userEvent.click(
+      documentCanvas.getByRole("menuitemcheckbox", {
+        name: "Hide overdue tasks",
+      }),
+    );
+    await userEvent.keyboard("{Escape}");
+    await waitForTodayActionsReady();
+    await waitFor(() =>
+      expect(
+        canvas.queryByRole("button", {
+          name: "Finish yesterday's review",
+          exact: true,
+        }),
+      ).not.toBeInTheDocument(),
+    );
+    expect(
+      canvas.getByRole("button", {
+        name: "Review interview notes",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await userEvent.click(todayActions);
+    const hideOverdue = await documentCanvas.findByRole("menuitemcheckbox", {
+      name: "Hide overdue tasks",
+    });
+    expect(hideOverdue).toBeChecked();
+    await userEvent.click(hideOverdue);
+    await userEvent.keyboard("{Escape}");
+    await waitForTodayActionsReady();
+    expect(
+      await canvas.findByRole("button", {
+        name: "Finish yesterday's review",
+        exact: true,
+      }),
+    ).toBeVisible();
+
+    await userEvent.click(
+      daySections[4]!.querySelector<HTMLButtonElement>(
+        ":scope > header button",
+      )!,
+    );
+    expect(canvas.getByText("Publish the daily status")).toBeVisible();
+    await userEvent.click(todayActions);
+    await userEvent.click(
+      await documentCanvas.findByRole("menuitemcheckbox", {
+        name: "Hide completed tasks",
+      }),
+    );
+    await userEvent.keyboard("{Escape}");
+    await waitForTodayActionsReady();
+    await waitFor(() =>
+      expect(canvas.queryByText("Publish the daily status")).not.toBeInTheDocument(),
+    );
+    await userEvent.click(todayActions);
+    const hideCompleted = await documentCanvas.findByRole("menuitemcheckbox", {
+      name: "Hide completed tasks",
+    });
+    expect(hideCompleted).toBeChecked();
+    await userEvent.click(hideCompleted);
+    await userEvent.keyboard("{Escape}");
+    await waitForTodayActionsReady();
+    expect(await canvas.findByText("Publish the daily status")).toBeVisible();
+    await userEvent.click(
+      daySections[4]!.querySelector<HTMLButtonElement>(
+        ":scope > header button",
+      )!,
+    );
+
+    await userEvent.click(todayActions);
+    await userEvent.click(
+      await documentCanvas.findByRole("menuitem", {
+        name: "Mark all incomplete",
+      }),
+    );
+    await waitForTodayActionsReady();
+    const reopenedTask = await canvas.findByRole("checkbox", {
+      name: "Mark Publish the daily status complete",
+    });
+    expect(reopenedTask).toBeVisible();
+    await userEvent.click(reopenedTask);
+    await waitFor(() =>
+      expect(
+        canvas.queryByRole("checkbox", {
+          name: "Mark Publish the daily status complete",
+        }),
+      ).not.toBeInTheDocument(),
+    );
+
     const morningDisclosure = daySections[1]!.querySelector<HTMLButtonElement>(
       ":scope > header button",
     )!;
@@ -202,22 +361,40 @@
       canvas.getByRole("button", { name: /Thu 2026-08-20/ }),
     );
     expect(
-      within(agendaCalendar).getByRole("heading", {
+      await canvas.findByRole("heading", { name: "Thursday", level: 1 }),
+    ).toBeVisible();
+    const selectedAgendaCalendar = context.canvasElement.querySelector<HTMLElement>(
+      ".tasks-planner__agenda-calendar",
+    )!;
+    expect(
+      await within(selectedAgendaCalendar).findByRole("heading", {
         name: "Thursday",
         level: 1,
       }),
     ).toBeVisible();
-    expect(within(agendaCalendar).getByText("August 2026")).toBeVisible();
+    expect(within(selectedAgendaCalendar).getByText("August 2026")).toBeVisible();
     const returnToToday = await canvas.findByRole("button", {
       name: "Return to today",
     });
     expect(returnToToday).toBeVisible();
+    const collapsePlanner = canvas.getByRole("button", {
+      name: "Collapse planner column",
+    });
+    expect(returnToToday.getBoundingClientRect().left).toBeLessThan(
+      todayActions.getBoundingClientRect().left,
+    );
+    expect(todayActions.getBoundingClientRect().left).toBeLessThan(
+      collapsePlanner.getBoundingClientRect().left,
+    );
     await userEvent.click(returnToToday);
     expect(
       canvas.getByRole("button", { name: "Wed 2026-08-19, today" }),
     ).toHaveAttribute("aria-pressed", "true");
+    const resetAgendaCalendar = context.canvasElement.querySelector<HTMLElement>(
+      ".tasks-planner__agenda-calendar",
+    )!;
     expect(
-      within(agendaCalendar).getByRole("heading", {
+      within(resetAgendaCalendar).getByRole("heading", {
         name: "Wednesday",
         level: 1,
       }),

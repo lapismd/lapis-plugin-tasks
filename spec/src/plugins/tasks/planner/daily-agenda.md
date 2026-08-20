@@ -29,7 +29,9 @@ until it is rescheduled, completed, skipped, or canceled.
 
 Named query views may overlap: Review is an overdue subset of Today, for
 example. The navigation bucket classifier applies its fixed priority only when
-one catalog destination is required.
+one catalog destination is required. Each planner destination renders its own
+query result, heading, count, icon, and empty state; Inbox and Review never
+fall through to the Logbook presentation.
 
 ## Selected date and week
 
@@ -38,14 +40,24 @@ seven-day strip supports previous and next week, distinguishes actual today
 from the selected date, and updates presentation only. When the dates differ,
 the Column Canvas header action returns to today.
 
+The Today column header keeps its actions in navigation order: the conditional
+Today shortcut, the Today actions menu, and the column collapse control at the
+far right. The menu can hide completed rows for the current session, reopen all
+tasks completed on the selected date, and hide overdue agenda rows. Reopening
+all completed tasks clears their terminal completion state and preserves their
+existing plan, so they return to the corresponding open day section.
+
 The selected weekday and uppercase month/year appear above the week strip. The
 complete calendar header stays sticky inside the planner scroll viewport. Week
 controls are ghost buttons at rest; hover adds a semantic grey border without
 an outline ring, while keyboard focus keeps its visible ring.
 
-The selected agenda includes every open task whose plan date or deadline is on
-or before the selected date. An overdue task can consequently appear in both
-the selected agenda and Review without duplicating source state.
+By default, the selected agenda includes every open task whose plan date or
+deadline is on or before the selected date. The persisted `dailyAgenda.hideOverdueTasks`
+setting limits that match to the selected date while leaving Review's overdue
+query intact. A task remains visible when either its plan date or deadline
+matches the selected date. Changing this setting only reclassifies the view and
+never rewrites Task Markdown.
 
 ## Day sections
 

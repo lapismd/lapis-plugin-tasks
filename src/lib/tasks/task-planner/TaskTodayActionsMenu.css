@@ -1,0 +1,63 @@
+.tasks-today-actions__trigger[data-ui-component="button"] {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: none;
+  place-items: center;
+  border-radius: 0.35rem;
+  color: var(--ui-tasks-muted-foreground);
+  padding: 0;
+}
+
+.tasks-today-actions__trigger[data-ui-component="button"]:hover,
+.tasks-today-actions__trigger[data-ui-component="button"]:focus-visible,
+.tasks-today-actions__trigger[data-ui-component="button"][data-state="open"] {
+  background: var(--ui-tasks-muted-surface);
+  color: var(--ui-tasks-foreground);
+}
+
+.tasks-today-actions__trigger svg,
+.tasks-today-actions__item svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex: none;
+}
+
+.tasks-today-actions__content[data-ui-component="dropdown-menu"] {
+  --ui-dropdown-menu-background: var(
+    --kanban-muted-surface,
+    var(--popover)
+  );
+
+  min-width: 13.5rem;
+  border-color: var(--ui-tasks-border);
+  border-radius: 0.85rem;
+  box-shadow: 0 0.6rem 1.6rem
+    color-mix(in srgb, var(--ui-tasks-foreground) 12%, transparent);
+  color: var(--ui-tasks-foreground);
+  padding: 0.35rem;
+}
+
+.tasks-today-actions__item[data-ui-component="dropdown-menu"] {
+  min-height: 2rem;
+  gap: 0.55rem;
+  border-radius: 0.55rem;
+  color: var(--ui-tasks-foreground);
+  font-size: 0.8rem;
+  font-weight: 550;
+  padding-block: 0.45rem;
+  padding-inline-start: 0.55rem;
+}
+
+.tasks-today-actions__item[data-ui-component="dropdown-menu"]:focus,
+.tasks-today-actions__item[data-ui-component="dropdown-menu"][data-highlighted] {
+  background: color-mix(
+    in srgb,
+    var(--ui-tasks-card) 80%,
+    var(--ui-tasks-border)
+  );
+}
+
+.tasks-today-actions__item[data-disabled] {
+  opacity: 0.5;
+}

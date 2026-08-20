@@ -10,9 +10,11 @@
   import BriefcaseBusinessIcon from "@lucide/svelte/icons/briefcase-business";
   import CalendarClockIcon from "@lucide/svelte/icons/calendar-clock";
   import CalendarDaysIcon from "@lucide/svelte/icons/calendar-days";
+  import CircleAlertIcon from "@lucide/svelte/icons/circle-alert";
   import CircleEllipsisIcon from "@lucide/svelte/icons/circle-ellipsis";
   import FlagIcon from "@lucide/svelte/icons/flag";
   import FolderKanbanIcon from "@lucide/svelte/icons/folder-kanban";
+  import InboxIcon from "@lucide/svelte/icons/inbox";
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
@@ -82,6 +84,7 @@
     now,
     clock = () => now ?? new Date(),
     settings = DEFAULT_TASKS_PLUGIN_SETTINGS,
+    hideCompletedTasks = false,
     selectedDate = $bindable(todayDateOnly(now ?? clock())),
     actualToday = todayDateOnly(now ?? clock()),
     view = "today",
@@ -98,6 +101,7 @@
     now?: Date;
     clock?: () => Date;
     settings?: TasksPluginSettings;
+    hideCompletedTasks?: boolean;
     selectedDate?: string;
     actualToday?: string;
     view?: PlannerView;
@@ -141,10 +145,14 @@
     }),
     KeyboardSensor,
   ];
-  const snapshot = $derived(buildTaskPlannerSnapshot(tasks, now));
+  const snapshot = $derived(buildTaskPlannerSnapshot(tasks, now ?? clock()));
   const daySnapshot = $derived(
     buildTaskPlannerDaySnapshot(tasks, selectedDate, settings, actualToday),
   );
+  const visibleDaySnapshot = $derived({
+    ...daySnapshot,
+    done: hideCompletedTasks ? [] : daySnapshot.done,
+  });
   const selectedWeek = $derived(buildTaskPlannerWeek(selectedDate, actualToday));
   const selectedDateHeading = $derived.by(() => {
     const date = new Date(`${selectedDate}T00:00:00`);
@@ -181,13 +189,17 @@
       ? selectedArea.title
       : view === "today"
         ? "Today"
-        : view === "upcoming"
-          ? "Upcoming"
-          : view === "anytime"
-            ? "Anytime"
-            : view === "someday"
-              ? "Someday"
-              : "Logbook",
+        : view === "inbox"
+          ? "Inbox"
+          : view === "review"
+            ? "Review"
+            : view === "upcoming"
+              ? "Upcoming"
+              : view === "anytime"
+                ? "Anytime"
+                : view === "someday"
+                  ? "Someday"
+                  : "Logbook",
   );
   const headingCount = $derived.by(() => {
     if (selectedArea) return areaTasks.length;
@@ -198,6 +210,8 @@
         daySnapshot.afternoon.length +
         daySnapshot.evening.length
       );
+    if (view === "inbox") return snapshot.inbox.length;
+    if (view === "review") return snapshot.review.length;
     if (view === "upcoming")
       return snapshot.upcoming.reduce(
         (total, group) => total + group.tasks.length,
@@ -215,7 +229,9 @@
       ? "No open tasks in this area"
       : view === "logbook"
         ? "No completed tasks"
-        : `No ${heading.toLowerCase()} tasks`,
+        : view === "review"
+          ? "No tasks to review"
+          : `No ${heading.toLowerCase()} tasks`,
   );
   const quickCreateEnabled = $derived(Boolean(onCreateTask) && view !== "logbook");
 
@@ -827,6 +843,10 @@
             <span class="tasks-planner__title-icon" aria-hidden="true">
               {#if selectedArea}
                 <FolderKanbanIcon />
+              {:else if view === "inbox"}
+                <InboxIcon />
+              {:else if view === "review"}
+                <CircleAlertIcon />
               {:else if view === "upcoming"}
                 <CalendarDaysIcon />
               {:else if view === "anytime"}
@@ -853,10 +873,14 @@
             section.id,
             section.label,
             section.icon,
-            daySnapshot[section.id],
+            visibleDaySnapshot[section.id],
           )}
         {/each}
       </div>
+    {:else if view === "inbox"}
+      {@render taskList(snapshot.inbox, "Inbox tasks", "inbox")}
+    {:else if view === "review"}
+      {@render taskList(snapshot.review, "Review tasks", "review")}
     {:else if view === "upcoming"}
       {#if snapshot.upcomingRows.length}
         {@render upcomingRows(snapshot.upcomingRows)}
