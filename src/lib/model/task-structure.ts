@@ -55,6 +55,7 @@ export type StructuralEntryCandidate = {
 export type ScannedChecklistItem = {
   text: string;
   checked: boolean;
+  heading: HeadingContext;
   position: number;
   sourceStart: number;
   sourceEnd: number;
@@ -234,6 +235,17 @@ function walkLists(
         if (parsed) {
           checklist.push({
             ...parsed,
+            heading: {
+              ...heading,
+              sourceStart:
+                heading.sourceStart == null
+                  ? null
+                  : heading.sourceStart + bodyOffset,
+              sourceEnd:
+                heading.sourceEnd == null
+                  ? null
+                  : heading.sourceEnd + bodyOffset,
+            },
             position: checklist.length,
             sourceStart: item.from + bodyOffset,
             sourceEnd: item.to + bodyOffset,

@@ -2,9 +2,26 @@ import { parseTaskDocument } from "./task-document";
 import {
   scanTaskHeadings,
   scanTaskStructure,
+  type IndexedMarkdownHeading,
   type StructuralEntryKind,
   type TaskStructureTarget,
 } from "./task-structure";
+
+export const TASK_MARKDOWN_GROUP_TONES = [
+  "anytime",
+  "morning",
+  "afternoon",
+  "evening",
+  "done",
+] as const;
+
+export type TaskMarkdownGroupTone =
+  (typeof TASK_MARKDOWN_GROUP_TONES)[number];
+
+export type TaskMarkdownGroupHeading = IndexedMarkdownHeading & {
+  ordinal: number;
+  tone: TaskMarkdownGroupTone;
+};
 
 export type StructuralTaskRunEntry = {
   label: string;
@@ -113,6 +130,47 @@ export function scanMarkdownTaskRuns(
     resolveTarget,
     (target) => target.kind === "task-list",
   );
+}
+
+/**
+ * Finds semantic Markdown headings that own rich Tasks presentation. The
+ * returned tone is disposable UI state derived solely from source order.
+ */
+export function scanMarkdownTaskGroupHeadings(
+  source: string,
+  sourcePath: string,
+  resolveTarget: StructuralTaskTargetResolver,
+): TaskMarkdownGroupHeading[] {
+  const parsed = parseTaskDocument(source, sourcePath);
+  if (!parsed) return [];
+
+  const ownedHeadingStarts = new Set<number>();
+  for (const run of scanMarkdownTaskRuns(source, sourcePath, resolveTarget)) {
+    if (run.headingFrom != null) ownedHeadingStarts.add(run.headingFrom);
+  }
+  if (parsed.kind === "task") {
+    const scanned = scanTaskStructure(source, {
+      documentId: parsed.id,
+      documentPath: parsed.path,
+      documentKind: "task",
+    });
+    for (const item of scanned.checklist) {
+      if (item.heading.sourceStart != null) {
+        ownedHeadingStarts.add(item.heading.sourceStart);
+      }
+    }
+  }
+
+  return scanTaskHeadings(source)
+    .filter((heading) => ownedHeadingStarts.has(heading.sourceStart))
+    .map((heading, ordinal) => ({
+      ...heading,
+      ordinal,
+      tone:
+        TASK_MARKDOWN_GROUP_TONES[
+          ordinal % TASK_MARKDOWN_GROUP_TONES.length
+        ]!,
+    }));
 }
 
 function scanResolvedTaskRuns(

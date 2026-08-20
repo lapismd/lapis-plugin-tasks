@@ -149,6 +149,54 @@ Context.
     });
     expect(scanned.checklist).toEqual([]);
   });
+
+  it("retains derived heading context for lightweight Task checklists", () => {
+    const raw = `${frontmatter}
+
+# Release
+
+- [ ] Root item
+
+## Preparation
+
+- [x] Confirm scope
+
+### Review
+
+- [ ] Share notes
+`;
+    const scanned = scanTaskStructure(raw, {
+      documentId: "t_release",
+      documentPath: "release.md",
+      documentKind: "task",
+    });
+
+    expect(
+      scanned.checklist.map((item) => ({
+        text: item.text,
+        path: item.heading.path,
+        level: item.heading.level,
+        headingSource:
+          item.heading.sourceStart == null || item.heading.sourceEnd == null
+            ? null
+            : raw.slice(item.heading.sourceStart, item.heading.sourceEnd),
+      })),
+    ).toEqual([
+      { text: "Root item", path: [], level: null, headingSource: null },
+      {
+        text: "Confirm scope",
+        path: ["Preparation"],
+        level: 2,
+        headingSource: "## Preparation",
+      },
+      {
+        text: "Share notes",
+        path: ["Preparation", "Review"],
+        level: 3,
+        headingSource: "### Review",
+      },
+    ]);
+  });
 });
 
 describe("resolveTaskDocumentStructure", () => {

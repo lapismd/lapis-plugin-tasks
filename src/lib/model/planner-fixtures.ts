@@ -97,6 +97,8 @@ list:
 
 ## Portfolio
 - [Update portfolio case study](../anytime/portfolio.md)
+
+## Speaking
 - [Explore conference talks](../someday/talks.md)
 `,
   },

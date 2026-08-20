@@ -54,6 +54,10 @@ describe("task-list Markdown contribution", () => {
     expect(source).toContain("sourceRunOrdinal");
     expect(source).toContain("ctx.addChild(child)");
     expect(source).toContain("scanMarkdownTaskRuns");
+    expect(source).toContain("scanMarkdownTaskGroupHeadings");
+    expect(source).toContain("Decoration.line");
+    expect(source).toContain('"data-task-group-heading": "true"');
+    expect(source).toContain("markRenderedTaskGroupHeadings");
     expect(source).toContain('ctx.frontmatter?.type !== "task-list-navigation"');
   });
 
@@ -71,6 +75,15 @@ describe("task-list Markdown contribution", () => {
       ".task-list-items-block [data-task-checkbox].task-checkbox input:checked::after",
     );
     expect(styles).toContain("mask: none;");
+
+    const globalStyles = readFileSync("src/lib/styles.css", "utf8");
+    expect(globalStyles).toContain('[data-task-group-heading="true"]');
+    expect(globalStyles).toContain(
+      "var(--ui-tasks-day-morning)",
+    );
+    expect(globalStyles).toContain(
+      '.cm-editor .cm-line[data-task-group-heading="true"]',
+    );
   });
 
   it.each([

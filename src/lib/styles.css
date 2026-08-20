@@ -1,5 +1,78 @@
 @import "./tasks/tasks.tokens.css";
 
+[data-task-group-heading="true"] {
+  --tasks-markdown-group-color: var(--ui-tasks-day-anytime);
+
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 2.35rem;
+  border: 1px solid
+    color-mix(in srgb, var(--tasks-markdown-group-color) 20%, transparent);
+  border-radius: 999px;
+  padding: 0.45rem 0.75rem;
+  background: color-mix(
+    in srgb,
+    var(--tasks-markdown-group-color) 10%,
+    var(--ui-tasks-card)
+  );
+  color: color-mix(
+    in srgb,
+    var(--tasks-markdown-group-color) 78%,
+    var(--ui-tasks-foreground)
+  );
+  font-family: var(--font-sans, inherit);
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+[data-task-group-tone="morning"] {
+  --tasks-markdown-group-color: var(--ui-tasks-day-morning);
+}
+
+[data-task-group-tone="afternoon"] {
+  --tasks-markdown-group-color: var(--ui-tasks-day-afternoon);
+}
+
+[data-task-group-tone="evening"] {
+  --tasks-markdown-group-color: var(--ui-tasks-day-evening);
+}
+
+[data-task-group-tone="done"] {
+  --tasks-markdown-group-color: var(--ui-tasks-day-done);
+}
+
+:is(h2, h3, h4, h5, h6).task-markdown-group-heading[data-task-group-heading="true"] {
+  display: flex;
+  align-items: center;
+  margin-block: 1rem 0.5rem;
+  font-family: var(--font-sans, inherit) !important;
+  font-size: 0.78rem !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.05em !important;
+  line-height: 1.2 !important;
+  text-transform: uppercase !important;
+}
+
+.cm-editor .cm-line[data-task-group-heading="true"] {
+  display: block;
+  margin-block: 0.5rem;
+  font-family: var(--font-sans, inherit) !important;
+  font-size: 0.78rem !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.05em !important;
+  line-height: 1.2 !important;
+  text-transform: uppercase !important;
+}
+
+.cm-editor .cm-line[data-task-group-heading="true"] .cm-heading {
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
 .catalog-boundary {
   max-width: 42rem;
   border: 1px solid var(--ui-tasks-border);

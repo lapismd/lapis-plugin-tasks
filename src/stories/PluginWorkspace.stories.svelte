@@ -105,11 +105,33 @@
     ).toBeVisible();
   }
 
+  async function collapseLapisLeftSidebar(
+    canvas: ReturnType<typeof within>,
+  ) {
+    const close = canvas
+      .queryAllByRole("button", { name: "Close left sidebar", exact: true })
+      .find(
+        (button) =>
+          getComputedStyle(button).pointerEvents !== "none" &&
+          button.getClientRects().length > 0,
+      );
+    if (!close) return;
+    await userEvent.click(close);
+    await waitFor(() => {
+      expect(
+        canvas
+          .queryAllByRole("button", { name: "Close left sidebar", exact: true })
+          .some((button) => button.getClientRects().length > 0),
+      ).toBe(false);
+    });
+  }
+
   async function openMarkdownFixture(
     canvasElement: HTMLElement,
     app: App,
     path: string,
     mode: "preview" | "live-preview",
+    readySelector = "[data-structural-task-run]",
   ) {
     const file = app.vault.getFileByPath(path);
     expect(file).toBeTruthy();
@@ -144,7 +166,7 @@
         expect(
           Array.from(
             canvasElement.querySelectorAll<HTMLElement>(
-              "[data-structural-task-run]",
+              readySelector,
             ),
           ).some((run) => run.getClientRects().length > 0),
         ).toBe(true);
@@ -153,14 +175,38 @@
     );
   }
 
-  function visibleTaskRun(canvasElement: HTMLElement) {
+  function visibleTaskRun(canvasElement: HTMLElement, title?: string) {
     const run = Array.from(
       canvasElement.querySelectorAll<HTMLElement>(
         "[data-structural-task-run]",
       ),
-    ).find((candidate) => candidate.getClientRects().length > 0);
+    ).find(
+      (candidate) =>
+        candidate.getClientRects().length > 0 &&
+        (!title ||
+          within(candidate).queryByRole("button", { name: title, exact: true })),
+    );
     expect(run).toBeDefined();
     return run!;
+  }
+
+  async function expectTaskGroupHeadingTones(
+    canvasElement: HTMLElement,
+    tones: string[],
+  ) {
+    let headings: HTMLElement[] = [];
+    await waitFor(() => {
+      headings = Array.from(
+        canvasElement.querySelectorAll<HTMLElement>(
+          '[data-task-group-heading="true"]',
+        ),
+      ).filter((heading) => heading.getClientRects().length > 0);
+      expect(headings.map((heading) => heading.dataset.taskGroupTone)).toEqual(
+        tones,
+      );
+    });
+    expect(new Set(headings.map((heading) => getComputedStyle(heading).backgroundColor)).size)
+      .toBe(tones.length);
   }
 
   async function expectContainedMarkdownRun(run: HTMLElement) {
@@ -971,6 +1017,7 @@
     // final mutation assertion, so the app-backed shell documents the current
     // Tasks surface when opened directly in Storybook.
     await showDailyAgendaChecklistSummary(canvasElement, canvas);
+    await collapseLapisLeftSidebar(canvas);
   }}
 />
 
@@ -1004,6 +1051,7 @@
     expect(canvas.getByLabelText("Mobile right sidebar")).toBeInTheDocument();
     await exerciseMarkdownNativeList(canvasElement, canvas);
     await showDailyAgendaChecklistSummary(canvasElement, canvas);
+    await collapseLapisLeftSidebar(canvas);
   }}
 />
 
@@ -1028,6 +1076,7 @@
       canvas,
       storyApp(canvasElement),
     );
+    await collapseLapisLeftSidebar(canvas);
   }}
 />
 
@@ -1076,6 +1125,7 @@
       },
       { timeout: 5_000 },
     );
+    await collapseLapisLeftSidebar(canvas);
   }}
 />
 
@@ -1100,6 +1150,7 @@
       canvas,
       storyApp(canvasElement),
     );
+    await collapseLapisLeftSidebar(canvas);
   }}
 />
 
@@ -1146,6 +1197,7 @@
         ),
       ).toBeVisible();
     });
+    await collapseLapisLeftSidebar(canvas);
   }}
 />
 
@@ -1168,7 +1220,8 @@
     const app = storyApp(canvasElement);
 
     await openMarkdownFixture(canvasElement, app, "lists/cv.md", "preview");
-    let run = visibleTaskRun(canvasElement);
+    await expectTaskGroupHeadingTones(canvasElement, ["anytime", "morning"]);
+    let run = visibleTaskRun(canvasElement, "Explore conference talks");
     await expectContainedMarkdownRun(run);
     expect(run.querySelector("[data-task-drag-handle]")).not.toBeInTheDocument();
     await expectDedicatedMarkdownCheckbox(run, "Explore conference talks");
@@ -1179,12 +1232,40 @@
       "lists/cv.md",
       "live-preview",
     );
-    run = visibleTaskRun(canvasElement);
+    await expectTaskGroupHeadingTones(canvasElement, ["anytime", "morning"]);
+    run = visibleTaskRun(canvasElement, "Explore conference talks");
     await expectContainedMarkdownRun(run);
     expect(run.querySelector("[data-task-drag-handle]")).not.toBeInTheDocument();
     await expectDedicatedMarkdownCheckbox(run, "Explore conference talks");
 
+    await openMarkdownFixture(
+      canvasElement,
+      app,
+      "inbox/today-2.md",
+      "preview",
+      '[data-task-group-heading="true"]',
+    );
+    await expectTaskGroupHeadingTones(canvasElement, ["anytime"]);
+    const visibleChecklistHeading = Array.from(
+      canvasElement.querySelectorAll<HTMLElement>(
+        '[data-task-group-heading="true"]',
+      ),
+    ).find((heading) => heading.getClientRects().length > 0);
+    expect(visibleChecklistHeading).toHaveTextContent("Checklist");
+    expect(
+      Array.from(canvasElement.querySelectorAll<HTMLElement>("h2,h3,h4,h5,h6")).find(
+        (heading) =>
+          heading.getClientRects().length > 0 &&
+          heading.textContent?.trim() === "Atlas AI loop",
+      ),
+    ).not.toHaveAttribute("data-task-group-heading");
+
     await openMarkdownFixture(canvasElement, app, "lists.md", "preview");
+    await expectTaskGroupHeadingTones(canvasElement, [
+      "anytime",
+      "morning",
+      "afternoon",
+    ]);
     await waitFor(() => {
       expect(
         canvasElement.querySelectorAll<HTMLElement>("[data-task-list-row]"),
@@ -1209,5 +1290,6 @@
     for (const navigationRun of navigationRuns) {
       await expectContainedMarkdownRun(navigationRun);
     }
+    await collapseLapisLeftSidebar(within(canvasElement));
   }}
 />

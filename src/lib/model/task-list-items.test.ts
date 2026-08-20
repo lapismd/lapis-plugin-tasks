@@ -4,6 +4,7 @@ import {
   createTaskHeading,
   moveStructuralTaskEntryEditorChanges,
   replaceStructuralTaskRun,
+  scanMarkdownTaskGroupHeadings,
   scanMarkdownTaskRuns,
   renameTaskHeading,
   scanStructuralTaskRuns,
@@ -107,6 +108,86 @@ id: lists-nav
           },
         ],
       },
+    ]);
+  });
+});
+
+describe("scanMarkdownTaskGroupHeadings", () => {
+  it("deduplicates multiple runs under one heading and rotates tones in source order", () => {
+    const raw = `${frontMatter}
+
+# Docs
+
+- [Root](root.md)
+
+## Alpha
+
+- [One](one.md)
+
+Context splits the runs.
+
+- [Two](two.md)
+
+## Ordinary
+
+Prose only.
+
+## Beta
+- [Three](three.md)
+
+## Gamma
+- [Four](four.md)
+
+## Delta
+- [Five](five.md)
+
+## Epsilon
+- [Six](six.md)
+
+## Zeta
+- [Seven](seven.md)
+`;
+
+    expect(
+      scanMarkdownTaskGroupHeadings(raw, "lists/docs.md", resolve).map(
+        ({ text, ordinal, tone }) => ({ text, ordinal, tone }),
+      ),
+    ).toEqual([
+      { text: "Alpha", ordinal: 0, tone: "anytime" },
+      { text: "Beta", ordinal: 1, tone: "morning" },
+      { text: "Gamma", ordinal: 2, tone: "afternoon" },
+      { text: "Delta", ordinal: 3, tone: "evening" },
+      { text: "Epsilon", ordinal: 4, tone: "done" },
+      { text: "Zeta", ordinal: 5, tone: "anytime" },
+    ]);
+  });
+
+  it("includes checklist-only headings in Task documents but not root or ordinary headings", () => {
+    const raw = `---
+type: task
+id: t_release
+---
+# Release
+
+- [ ] Root checklist
+
+## Checklist
+- [x] Verify ranges
+
+## Notes
+Ordinary prose.
+
+## Follow-up
+- [Child](child.md)
+`;
+
+    expect(
+      scanMarkdownTaskGroupHeadings(raw, "release.md", resolve).map(
+        ({ text, tone }) => ({ text, tone }),
+      ),
+    ).toEqual([
+      { text: "Checklist", tone: "anytime" },
+      { text: "Follow-up", tone: "morning" },
     ]);
   });
 });

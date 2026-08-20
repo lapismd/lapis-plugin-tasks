@@ -38,6 +38,11 @@ task rows retain their normal compact layout and card surfaces without consuming
 the next heading's boundary decoration. In ordinary Markdown surfaces, rich rows
 remain inside the render width so neither end radius is clipped, and the
 Tasks-owned checkbox tick is isolated from host Markdown checkbox selectors.
+An H2-H6 that owns a rich run, or a lightweight checklist in a Task document,
+keeps its Markdown semantics but adopts the Today category pill treatment in
+reading mode and live preview. Qualifying headings rotate through neutral,
+warning, info, accent, and success colours in source order. The decoration does
+not apply in source mode and does not make the heading itself a planner control.
 TaskRuns and the daily planner both render
 `TaskQuickCreateRow` and `TaskQuickCreateActions`, rather than maintaining
 separate add forms. Rich TaskRun rows reuse the planner's selection resolver and task-patch
@@ -87,7 +92,9 @@ LN-TASK-015.
 `Plugins/Tasks/Shell` boots a public `App`, loads File Explorer, Search,
 Markdown, and `TasksPlugin`, seeds planner Markdown, and restores a `tasks`
 leaf. The live planner uses the same pinned clock as the repository
-snapshot.
+snapshot. The desktop and phone-width demos restore Today for their final
+visual state and then collapse the Lapis left sidebar so the planner is the
+resting focus.
 
 The Today planner is a controlled selected-date surface. Its default date and
 all completion timestamps come from the injected local clock. A Monday-first

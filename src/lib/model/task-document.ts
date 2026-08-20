@@ -529,7 +529,7 @@ export function parseTaskDocument(
     updated: asString(frontMatter.updated),
     task: parseTaskFrontMatter(frontMatter.task, diagnostics),
     body,
-    checklist: structure.checklist,
+    checklist: structure.checklist.map(({ heading: _heading, ...item }) => item),
     structuralLinks: structure.candidates.map((entry, ordinal) => ({
       title: entry.authoredLabel,
       href: entry.authoredHref,

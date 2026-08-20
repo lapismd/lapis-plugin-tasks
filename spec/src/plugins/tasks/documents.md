@@ -155,6 +155,16 @@ Heading paths are disposable parse output. They are never copied to front
 matter, so renaming or moving a heading changes one Markdown range and the next
 index rebuild derives the new grouping.
 
+In reading mode and live preview, an H2-H6 that actually owns a resolved rich
+TaskRun is presented with the same pill-shaped category chrome as a Today
+section. A heading in a Task document also qualifies when its content includes
+lightweight checklist items, even if it has no structural TaskRun. Qualifying
+headings are ordered by their source ranges and rotate through the Tasks
+neutral, warning, info, accent, and success roles; separate runs under the same
+heading retain one colour. This is derived presentation only: H1, implicit-root
+entries, headings with ordinary Markdown alone, and source-mode headings remain
+normal Markdown, and no colour or grouping field is written to front matter.
+
 ## Contiguous `TaskRun` groups
 
 A heading can contain several independent structural runs because ordinary

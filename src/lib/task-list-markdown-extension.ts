@@ -21,9 +21,11 @@ import {
 import { mount, unmount } from "svelte";
 import type { TaskRepository } from "./model/task-repository";
 import {
+  scanMarkdownTaskGroupHeadings,
   scanMarkdownTaskRuns,
   structuralTaskRunDecorationRange,
   structuralTaskRunEditorChange,
+  type TaskMarkdownGroupHeading,
   type StructuralTaskRun,
   type StructuralTaskRunEntryInput,
   type StructuralTaskTargetResolver,
@@ -160,6 +162,21 @@ export function structuralTaskRunDecorations(
         ),
       }).range(range.from, range.to);
     });
+  for (const heading of scanMarkdownTaskGroupHeadings(
+    source,
+    sourcePath,
+    resolveTarget,
+  )) {
+    ranges.push(
+      Decoration.line({
+        attributes: {
+          class: "task-markdown-group-heading",
+          "data-task-group-heading": "true",
+          "data-task-group-tone": heading.tone,
+        },
+      }).range(state.doc.lineAt(heading.sourceStart).from),
+    );
+  }
   return Decoration.set(ranges, true);
 }
 
@@ -268,6 +285,49 @@ function createCachedTargetResolver(app: App): StructuralTaskTargetResolver {
   };
 }
 
+function sourceLineAt(source: string, offset: number): number {
+  let line = 0;
+  for (let index = 0; index < offset; index += 1) {
+    if (source.charCodeAt(index) === 10) line += 1;
+  }
+  return line;
+}
+
+function normalizedHeadingText(value: string | null | undefined): string {
+  return value?.normalize("NFKC").trim().replace(/\s+/g, " ") ?? "";
+}
+
+function renderedHeadings(el: HTMLElement): HTMLElement[] {
+  return [
+    ...(el.matches("h2,h3,h4,h5,h6") ? [el] : []),
+    ...Array.from(el.querySelectorAll<HTMLElement>("h2,h3,h4,h5,h6")),
+  ];
+}
+
+function markRenderedTaskGroupHeadings(
+  el: HTMLElement,
+  ctx: MarkdownPostProcessorContext,
+  source: string,
+  headings: ReadonlyArray<TaskMarkdownGroupHeading>,
+): void {
+  for (const rendered of renderedHeadings(el)) {
+    const level = Number(rendered.tagName.slice(1));
+    const section = ctx.getSectionInfo(rendered);
+    const match = headings.find(
+      (heading) =>
+        heading.level === level &&
+        (section?.lineStart === sourceLineAt(source, heading.sourceStart) ||
+          (!section &&
+            normalizedHeadingText(rendered.textContent) ===
+              normalizedHeadingText(heading.text))),
+    );
+    if (!match) continue;
+    rendered.classList.add("task-markdown-group-heading");
+    rendered.setAttribute("data-task-group-heading", "true");
+    rendered.setAttribute("data-task-group-tone", match.tone);
+  }
+}
+
 function createPostProcessor(app: App, repository: TaskRepository) {
   return async (el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
     if (
@@ -288,11 +348,16 @@ function createPostProcessor(app: App, repository: TaskRepository) {
     }
     const file = app.vault.getFileByPath(ctx.sourcePath);
     const source = file ? await app.vault.cachedRead(file) : "";
+    const resolveTarget = createCachedTargetResolver(app);
+    const sourceHeadings = source
+      ? scanMarkdownTaskGroupHeadings(source, ctx.sourcePath, resolveTarget)
+      : [];
+    markRenderedTaskGroupHeadings(el, ctx, source, sourceHeadings);
     const sourceSections = source
       ? scanMarkdownTaskRuns(
           source,
           ctx.sourcePath,
-          createCachedTargetResolver(app),
+          resolveTarget,
         )
       : [];
     const lists = [
