@@ -1,6 +1,6 @@
 <script module lang="ts">
   import { defineMeta } from "@storybook/addon-svelte-csf";
-  import { expect, userEvent, waitFor, within } from "storybook/test";
+  import { expect, fireEvent, userEvent, waitFor, within } from "storybook/test";
   import { ApplicationTaskPlannerColumnCanvasExample } from "../../catalog.example-sources";
   import ApplicationTaskPlannerColumnCanvasStory from "./ApplicationTaskPlannerColumnCanvasStory.svelte";
   import { playTitleClickStartsInlineEdit } from "../planner-title-edit-selection.story-play";
@@ -173,14 +173,31 @@
     const checklistBody = checklistRow!.querySelector<HTMLElement>(
       ".application-planner-task-row__columns",
     )!;
+    const checklistSwipeContent = checklistRow!.querySelector<HTMLElement>(
+      ".application-planner-task-row__swipe-content",
+    )!;
+    const checklistPreview = checklistRow!.querySelector<HTMLElement>(
+      ".task-preview-row",
+    )!;
+    expect(getComputedStyle(checklistBody).borderBottomLeftRadius).toBe("0px");
+    expect(getComputedStyle(checklistBody).borderBottomRightRadius).toBe("0px");
+    expect(getComputedStyle(checklistSwipeContent).transition).toContain(
+      "background-color 0.14s",
+    );
+    expect(getComputedStyle(checklistPreview).transition).toBe("padding 0.16s");
     const bodySurface = getComputedStyle(checklistBody).backgroundColor;
     const footerSurface = getComputedStyle(checklistFooter!).backgroundColor;
     expect(footerSurface).not.toBe(bodySurface);
-    await userEvent.hover(checklistBody);
+    expect(getComputedStyle(checklistRow!).boxShadow).toBe("none");
+    (checklistRow as HTMLElement).focus();
+    await waitFor(() =>
+      expect(getComputedStyle(checklistRow!).boxShadow).not.toBe("none"),
+    );
+    expect(getComputedStyle(checklistBody).boxShadow).toBe("none");
     expect(getComputedStyle(checklistFooter!).backgroundColor).toBe(
       footerSurface,
     );
-    await userEvent.unhover(checklistBody);
+    (checklistRow as HTMLElement).blur();
     checklistDisclosure.focus();
     await waitFor(() =>
       expect(getComputedStyle(checklistFooter!).backgroundColor).not.toBe(
@@ -216,6 +233,60 @@
       expect(getComputedStyle(selectedChecklistFooter).backgroundColor).toBe(
         getComputedStyle(selectedChecklistBody).backgroundColor,
       ),
+    );
+    const followingTaskId = Array.from(
+      context.canvasElement.querySelectorAll<HTMLElement>(
+        "[data-planner-task-id]",
+      ),
+    ).find((row) => row.textContent?.includes("Write flashcards for system design"))
+      ?.dataset.plannerTaskId;
+    expect(followingTaskId).toBeTruthy();
+    const followingTaskRow = Array.from(
+      context.canvasElement.querySelectorAll<HTMLElement>(
+        "[data-planner-task-id]",
+      ),
+    ).find((row) => row.dataset.plannerTaskId === followingTaskId)!;
+    fireEvent.click(followingTaskRow, { shiftKey: true });
+    let rangeChecklistRow: HTMLElement | undefined;
+    let rangeFollowingRow: HTMLElement | undefined;
+    await waitFor(() => {
+      const rows = Array.from(
+        context.canvasElement.querySelectorAll<HTMLElement>(
+          "[data-planner-task-id]",
+        ),
+      );
+      rangeChecklistRow = rows.find(
+        (row) => row.dataset.plannerTaskId === checklistTaskId,
+      );
+      rangeFollowingRow = rows.find(
+        (row) => row.dataset.plannerTaskId === followingTaskId,
+      );
+      expect(rangeChecklistRow).toHaveClass(
+        "application-planner-task-row--selected-first",
+      );
+      expect(rangeFollowingRow).toHaveClass(
+        "application-planner-task-row--selected-last",
+      );
+    });
+    const rangeChecklistBody =
+      rangeChecklistRow!.querySelector<HTMLElement>(
+        ".application-planner-task-row__columns",
+      )!;
+    const rangeChecklistFooter = rangeChecklistRow!.querySelector<HTMLElement>(
+      "[data-task-checklist-progress]",
+    )!;
+    const rangeFollowingBody =
+      rangeFollowingRow!.querySelector<HTMLElement>(
+        ".application-planner-task-row__columns",
+      )!;
+    expect(getComputedStyle(rangeChecklistBody).borderBottomLeftRadius).toBe(
+      "0px",
+    );
+    expect(getComputedStyle(rangeChecklistFooter).borderBottomLeftRadius).toBe(
+      "0px",
+    );
+    expect(getComputedStyle(rangeFollowingBody).borderTopRightRadius).toBe(
+      "0px",
     );
     await userEvent.click(
       canvas.getByRole("button", {

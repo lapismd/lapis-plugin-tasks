@@ -139,13 +139,19 @@ content and trailing controls, keeps both bottom corner radii, and therefore
 reads as the card footer rather than another chip-column item. A top divider and
 slightly darker semantic surface distinguish it without introducing a separate
 card. The body and footer own separate interaction surfaces: body hover does not
-recolor the footer, while hover or focus within the footer applies its own
-subtle surface change. The trailing details control is vertically centered with
+recolor the footer, but its border frames the whole task card including that
+footer; hover or focus within the footer applies its own subtle surface change.
+The trailing details control is vertically centered with
 the title line. A selected row carries its selection surface through the footer,
-so a checklist does not visually interrupt the selected card. Opening the
-disclosure lazily reads the current `TaskDocument` through `TaskRepository`.
-Expanded items reuse the public Tasks `ApplicationTaskCheckbox` rather than a
-separate native-checkbox presentation.
+so a checklist does not visually interrupt the selected card. The checklist
+footer owns the lower rounded corners; its body and opaque swipe surface keep
+square lower corners, including on hover. Adjacent selected rows square the
+corners at their shared edge, preventing selected color from leaking beside the
+selection outline. Those row, body, and swipe surfaces share one hover duration,
+while the nested preview only animates layout. Opening the disclosure lazily
+reads the current `TaskDocument` through `TaskRepository`. Expanded items reuse
+the public Tasks `ApplicationTaskCheckbox` rather than a separate native-checkbox
+presentation.
 
 Expanded checkboxes optimistically update progress while the guarded Markdown
 mutation runs. Success replaces the local items with the reparsed document and
