@@ -49,6 +49,11 @@
   overflow: hidden;
 }
 
+.task-list-markdown-surface:not(.task-list-markdown-surface--editing)
+  [data-task-markdown-redundant-title="true"] {
+  display: none;
+}
+
 .task-list-markdown-surface__fallback {
   display: flex;
   align-items: center;

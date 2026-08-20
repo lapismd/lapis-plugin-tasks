@@ -126,6 +126,22 @@
       "[data-task-markdown-surface]",
     );
     expect(surface).toHaveAttribute("data-editing", "false");
+    const redundantTitle = surface!.querySelector<HTMLElement>(
+      'h1[data-task-markdown-redundant-title="true"]',
+    );
+    expect(redundantTitle).not.toBeNull();
+    expect(redundantTitle).not.toBeVisible();
+    const readingBlock = surface!.querySelector<HTMLElement>(
+      "[data-structural-task-run]",
+    )!;
+    const readingSourceButton = within(readingBlock).getByRole("button", {
+      name: "Edit task run source",
+      exact: true,
+    });
+    expect(
+      readingBlock.getBoundingClientRect().right -
+        readingSourceButton.getBoundingClientRect().right,
+    ).toBeLessThan(16);
     const documentBackground = getComputedStyle(surface!).backgroundColor;
     expect(documentBackground).not.toBe("rgba(0, 0, 0, 0)");
     expect(
@@ -187,17 +203,22 @@
         exact: true,
       }),
     );
-    expect(canvasElement.querySelector("[data-task-sidebar-detail]"))
-      .toBeVisible();
+    await waitFor(() => {
+      expect(canvasElement.querySelector("[data-task-sidebar-detail]"))
+        .toBeVisible();
+    });
     const taskDetail = canvasElement.querySelector<HTMLElement>(
       "[data-task-sidebar-detail]",
     )!;
     expect(taskDetail.querySelector("[data-task-markdown-surface]")).toBeVisible();
+    const redundantTaskTitle = taskDetail.querySelector<HTMLElement>(
+      'h1[data-task-markdown-redundant-title="true"]',
+    );
+    expect(redundantTaskTitle).not.toBeNull();
+    expect(redundantTaskTitle).not.toBeVisible();
     expect(
-      within(taskDetail).getByRole("heading", {
-        name: "Review interview notes",
-      }),
-    ).toBeVisible();
+      within(taskDetail).getByRole("textbox", { name: "Task title" }),
+    ).toHaveTextContent("Review interview notes");
     await userEvent.click(
       within(taskDetail).getByRole("button", {
         name: "Edit Review interview notes",
@@ -228,6 +249,14 @@
       ".task-list-items-widget [data-structural-task-run]",
     );
     expect(liveBlock).toBeVisible();
+    const liveSourceButton = within(liveBlock!).getByRole("button", {
+      name: "Edit task run source",
+      exact: true,
+    });
+    expect(
+      liveBlock!.getBoundingClientRect().right -
+        liveSourceButton.getBoundingClientRect().right,
+    ).toBeLessThan(16);
     expect(
       getComputedStyle(surface!.querySelector<HTMLElement>(".cm-editor")!)
         .backgroundColor,
@@ -569,8 +598,14 @@
       .closest<HTMLElement>("[data-task-list-row]")!;
     expect(writingRow.querySelector("[data-task-list-row-icon]")).toBeVisible();
     expect(writingRow.querySelector("[data-task-checkbox]")).not.toBeInTheDocument();
+    const writingDragHandle = within(writingRow).getByRole("button", {
+      name: "Reorder list Writing",
+      exact: true,
+    });
+    expect(writingDragHandle).toBeInTheDocument();
     await userEvent.click(writingRow);
     expect(writingRow).toHaveAttribute("aria-pressed", "true");
+    expect(writingDragHandle).toBeVisible();
 
     await userEvent.click(
       within(writingRow).getByRole("button", {
@@ -587,6 +622,16 @@
       ).toHaveLength(2);
       expect(docsSurface).toHaveAttribute("data-editing", "true");
     });
+    const linkedListColumn = canvasElement.querySelector<HTMLElement>(
+      ".task-column-canvas-story__linked-list-column",
+    )!;
+    const linkedListColumnStyle = getComputedStyle(linkedListColumn);
+    expect(Number.parseFloat(linkedListColumnStyle.borderTopWidth)).toBeGreaterThan(
+      0,
+    );
+    expect(Number.parseFloat(linkedListColumnStyle.borderTopLeftRadius)).toBeGreaterThan(
+      0,
+    );
 
     const draftRow = within(docsBlock())
       .getByRole("button", { name: "Draft design critique", exact: true })
@@ -672,6 +717,25 @@
       await canvas.findByText("Tailor platform CV variant"),
     ).toBeVisible();
     expect(canvas.getByTestId("tasks-planner")).toBeVisible();
+    const collapsePlanner = canvas.getByRole("button", {
+      name: "Collapse planner column",
+      exact: true,
+    });
+    expect(collapsePlanner).toBeVisible();
+    await userEvent.click(collapsePlanner);
+    const expandPlanner = await canvas.findByRole("button", {
+      name: "Expand planner column",
+      exact: true,
+    });
+    expect(expandPlanner).toBeVisible();
+    await userEvent.click(expandPlanner);
+    await waitFor(() => {
+      expect(
+        canvasElement.querySelector(
+          '[data-column-id="planner"][data-ui-part="column"]',
+        ),
+      ).toBeVisible();
+    });
     expect(canvas.getByRole("button", { name: "Applications" })).toBeVisible();
     expect(canvas.getByRole("button", { name: "Docs" })).toBeVisible();
     expect(canvas.getByRole("button", { name: "CV" })).toBeVisible();
@@ -930,5 +994,51 @@
       canvas,
       storyApp(canvasElement),
     );
+  }}
+/>
+
+<Story
+  name="Nested List Rows"
+  args={{ displayMode: "desktop" }}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          "Leave a nested List row and its adjacent Markdown column visible for hover and column-chrome review.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    canvasElement.style.height = "100%";
+    canvasElement.style.maxHeight = "100%";
+    canvasElement.style.overflow = "hidden";
+    const canvas = await waitForReady(canvasElement);
+    await userEvent.click(await canvas.findByRole("button", { name: "Docs" }));
+    const writingRow = (await canvas.findByRole("button", {
+      name: "Writing",
+      exact: true,
+    })).closest<HTMLElement>("[data-task-list-row]")!;
+    expect(
+      within(writingRow).getByRole("button", {
+        name: "Reorder list Writing",
+        exact: true,
+      }),
+    ).toBeInTheDocument();
+    await userEvent.click(
+      within(writingRow).getByRole("button", {
+        name: "Open list Writing to the right",
+        exact: true,
+      }),
+    );
+    await waitFor(() => {
+      expect(
+        canvas.getByRole("button", { name: "Edit Writing", exact: true }),
+      ).toBeVisible();
+      expect(
+        canvasElement.querySelector(
+          ".task-column-canvas-story__linked-list-column",
+        ),
+      ).toBeVisible();
+    });
   }}
 />

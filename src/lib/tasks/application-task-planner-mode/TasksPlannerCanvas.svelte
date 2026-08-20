@@ -155,6 +155,7 @@
         minWidth: 360,
         maxWidth: 720,
         pathLevel: 1,
+        collapsible: true,
         resizable: true,
       },
       detail: {
@@ -423,6 +424,10 @@
     get activeListPath() {
       return activeListPath;
     },
+    get pageTitle() {
+      return activePlannerLabel;
+    },
+    hideMatchingDocumentTitle: true,
     onActiveTaskChange: handleActiveTaskChange,
     onActiveListChange: handleActiveListChange,
     onOpenList: handleOpenList,
@@ -464,6 +469,10 @@
     get activeListPath() {
       return activeListPath;
     },
+    get pageTitle() {
+      return activeLinkedList?.title ?? null;
+    },
+    hideMatchingDocumentTitle: true,
     onActiveTaskChange: handleActiveTaskChange,
     onActiveListChange: handleActiveListChange,
     onOpenList: handleOpenList,
@@ -505,6 +514,10 @@
     get activeListPath() {
       return activeListPath;
     },
+    get pageTitle() {
+      return activeTask?.title ?? null;
+    },
+    hideMatchingDocumentTitle: true,
     onActiveTaskChange: handleActiveTaskChange,
     onActiveListChange: handleActiveListChange,
     onOpenList: handleOpenList,
@@ -666,8 +679,9 @@
           >
             <ColumnCanvas.Title>{activePlannerLabel}</ColumnCanvas.Title>
           </div>
-          {#if showTodayShortcut || (taskArea && selectedListNode && app && repository)}
-            <ColumnCanvas.HeaderActions>
+          <ColumnCanvas.HeaderActions>
+            <ColumnCanvas.Toggle />
+            {#if showTodayShortcut || (taskArea && selectedListNode && app && repository)}
               {#if showTodayShortcut}
                 <button
                   type="button"
@@ -699,8 +713,8 @@
                   {/if}
                 </button>
               {/if}
-            </ColumnCanvas.HeaderActions>
-          {/if}
+            {/if}
+          </ColumnCanvas.HeaderActions>
         </ColumnCanvas.Header>
         <div class="task-column-canvas-story__pane">
           {#if taskArea && selectedListNode && app && repository}
@@ -741,7 +755,12 @@
         </div>
       </ColumnCanvas.Column>
 
-      <ColumnCanvas.Column id="detail">
+      <ColumnCanvas.Column
+        id="detail"
+        class={activeLinkedList
+          ? "task-column-canvas-story__linked-list-column"
+          : undefined}
+      >
         {#if activeLinkedList && app && repository}
           <ColumnCanvas.Header>
             <div

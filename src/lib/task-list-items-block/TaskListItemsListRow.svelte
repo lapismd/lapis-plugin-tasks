@@ -3,6 +3,7 @@
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import FolderKanbanIcon from "@lucide/svelte/icons/folder-kanban";
+  import GripVerticalIcon from "@lucide/svelte/icons/grip-vertical";
   import Trash2Icon from "@lucide/svelte/icons/trash-2";
 
   let {
@@ -11,6 +12,7 @@
     selected = false,
     expanded = false,
     canExpand = true,
+    canDrag = false,
     canDelete = false,
     onSelect,
     onOpen,
@@ -22,6 +24,7 @@
     selected?: boolean;
     expanded?: boolean;
     canExpand?: boolean;
+    canDrag?: boolean;
     canDelete?: boolean;
     onSelect: () => void;
     onOpen: () => void | Promise<void>;
@@ -84,6 +87,17 @@
     </span>
   </div>
   <div class="task-list-items-list-row__actions">
+    {#if canDrag}
+      <button
+        type="button"
+        class="task-list-items-list-row__drag"
+        data-task-drag-handle
+        aria-label={`Reorder list ${title}`}
+        title={`Reorder ${title}`}
+      >
+        <GripVerticalIcon aria-hidden="true" />
+      </button>
+    {/if}
     {#if canDelete && onDelete}
       <button
         type="button"

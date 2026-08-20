@@ -38,6 +38,8 @@ export type TasksMarkdownSurfaceController = {
   activeTaskId?: string | null;
   activeListPath?: string | null;
   sourceRunOrdinal?: number | null;
+  pageTitle?: string | null;
+  hideMatchingDocumentTitle?: boolean;
   tasks?: Task[];
 };
 

@@ -56,6 +56,7 @@
   background: transparent;
   color: var(--ui-muted-foreground, currentColor);
   cursor: pointer;
+  margin-inline-start: auto;
 }
 
 .task-list-items-block__source svg {
@@ -255,11 +256,19 @@
   color: var(--ui-destructive, #b42318);
 }
 
+.task-list-items-list-row__drag {
+  cursor: grab;
+}
+
 @media (hover: hover) {
+  .task-list-items-list-row__drag,
   .task-list-items-list-row__delete {
     opacity: 0;
   }
 
+  .task-list-items-list-row:hover .task-list-items-list-row__drag,
+  .task-list-items-list-row:focus-within .task-list-items-list-row__drag,
+  .task-list-items-list-row--selected .task-list-items-list-row__drag,
   .task-list-items-list-row:hover .task-list-items-list-row__delete,
   .task-list-items-list-row:focus-within .task-list-items-list-row__delete,
   .task-list-items-list-row--selected .task-list-items-list-row__delete {

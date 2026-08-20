@@ -273,6 +273,15 @@ function createPostProcessor(app: App, repository: TaskRepository) {
     if (ctx.frontmatter?.type !== "task-list" && ctx.frontmatter?.type !== "task") {
       return;
     }
+    const controller = asTasksMarkdownSurfaceController(ctx.surface?.context);
+    if (
+      el.tagName === "H1" &&
+      controller?.hideMatchingDocumentTitle &&
+      sameDisplayTitle(el.textContent, controller.pageTitle)
+    ) {
+      el.setAttribute("data-task-markdown-redundant-title", "true");
+      return;
+    }
     const file = app.vault.getFileByPath(ctx.sourcePath);
     const source = file ? await app.vault.cachedRead(file) : "";
     const sourceSections = source
@@ -325,6 +334,16 @@ function createPostProcessor(app: App, repository: TaskRepository) {
       ctx.addChild(child);
     });
   };
+}
+
+function sameDisplayTitle(
+  rendered: string | null | undefined,
+  pageTitle: string | null | undefined,
+): boolean {
+  const normalize = (value: string | null | undefined) =>
+    value?.normalize("NFKC").trim().replace(/\s+/g, " ").toLocaleLowerCase();
+  const renderedTitle = normalize(rendered);
+  return Boolean(renderedTitle && renderedTitle === normalize(pageTitle));
 }
 
 export function createTaskStructureMarkdownContribution(

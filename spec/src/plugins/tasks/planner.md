@@ -27,7 +27,8 @@ and drag behavior. See LN-TASK-035 and LN-TASK-037.
 The middle-column toolbar uses the Markdown pencil and book-open affordances to
 enter and leave full-document live preview, so the same control remains
 available at phone width without claiming document-body double-click. The
-TaskRun block's code icon is the only pointer control that reveals its literal
+planner column also exposes the controller-owned collapse toggle. The TaskRun
+block's trailing code icon is the only pointer control that reveals its literal
 source. The preview, CodeMirror editor, scroller, and gutters share the
 active Lapis Markdown theme background and retain the Lapis document margins.
 The rich widget resets CodeMirror whitespace and typography inheritance so its
@@ -39,9 +40,11 @@ helper: a row click selects, modifiers toggle or extend selection, the title
 edits, a title/body double-click expands inline, and only the trailing details
 control opens the detail column.
 Linked task-list entries use the same row rhythm and selection surface, replacing
-the task checkbox with a list icon. They support recursive disclosure, within-run
-ordering, explicit cross-run movement, delete, and a trailing open control. Open mounts the linked
-list's complete Markdown surface in the closeable column to the right without
+the task checkbox with a list icon. Tasks-owned surfaces expose their drag handle
+on row hover or focus. They support recursive disclosure, within-run ordering,
+explicit cross-run movement, delete, and a trailing open control. Open mounts the
+linked list's complete Markdown surface in a bordered, rounded, closeable column
+to the right without
 replacing the parent list or forcing its active editor back to preview.
 Child-task refreshes update those rows in place. The Markdown file surface is
 keyed by its container and list path, so a task title, schedule, status, or
@@ -63,6 +66,10 @@ actions, and close control, but its body mounts the complete Task `TFile` rather
 than a notes-only projection. The same pencil/book-open affordance toggles live
 preview. A Task document may therefore render its own heading-aware TaskRuns and
 lightweight checklists in source order.
+
+In preview mode, the file surface hides its H1 only when the normalized heading
+matches the surrounding Column Canvas title. Live edit keeps the H1 in the
+source so the document remains complete and directly editable.
 
 When a task row shows its list chip, it prefers the projected task-list page
 title over the internal `listId`. A legacy row with only that id shows its

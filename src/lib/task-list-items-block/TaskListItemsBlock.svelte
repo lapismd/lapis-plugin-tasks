@@ -526,6 +526,7 @@
             target={row.entry.target}
             selected={selectedListPath === row.path}
             expanded={Boolean(row.path && expandedListPaths.includes(row.path))}
+            canDrag={Boolean(controller)}
             canDelete={Boolean(controller?.onDeleteList)}
             onSelect={() => selectList(row)}
             onOpen={() => openList(row)}

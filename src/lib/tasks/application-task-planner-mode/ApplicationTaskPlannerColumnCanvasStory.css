@@ -104,6 +104,13 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
 }
 
 .task-column-canvas-story__canvas
+  [data-column-id="detail"].task-column-canvas-story__linked-list-column[data-ui-part="column"] {
+  border: 1px solid var(--ui-column-canvas-border-color, var(--border));
+  border-radius: var(--ui-column-canvas-radius, var(--radius));
+  background: var(--ui-column-canvas-column-background, var(--card));
+}
+
+.task-column-canvas-story__canvas
   [data-column-id="planner"]
   ~ [data-ui-part="column"],
 .task-column-canvas-story__canvas
