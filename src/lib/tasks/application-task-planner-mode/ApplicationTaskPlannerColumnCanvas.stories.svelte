@@ -62,6 +62,29 @@
       "evening",
       "done",
     ]);
+    for (const section of daySections) {
+      const header = section.querySelector<HTMLButtonElement>(
+        ":scope > header button",
+      )!;
+      const label = header.querySelector<HTMLElement>(
+        ".tasks-planner__day-section-label",
+      )!;
+      const trailing = header.querySelector<HTMLElement>(
+        ".tasks-planner__day-section-trailing",
+      )!;
+      const count = trailing.querySelector<HTMLElement>(
+        ".tasks-planner__day-section-count",
+      )!;
+      expect(trailing.firstElementChild).toBe(count);
+      expect(trailing.lastElementChild?.tagName).toBe("svg");
+      expect(count.getBoundingClientRect().left).toBeGreaterThan(
+        label.getBoundingClientRect().right,
+      );
+      expect(
+        header.getBoundingClientRect().right -
+          count.getBoundingClientRect().right,
+      ).toBeLessThan(60);
+    }
     expect(daySections[0]).toHaveAttribute("data-day-section-expanded", "true");
     expect(daySections[4]).toHaveAttribute("data-day-section-expanded", "false");
     expect(

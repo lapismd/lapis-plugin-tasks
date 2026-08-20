@@ -762,9 +762,11 @@
         <span class="tasks-planner__day-section-label">
           <SectionIcon aria-hidden="true" />
           <span>{title}</span>
-          <small>{items.length}</small>
         </span>
-        <ChevronDownIcon aria-hidden="true" />
+        <span class="tasks-planner__day-section-trailing">
+          <small class="tasks-planner__day-section-count">{items.length}</small>
+          <ChevronDownIcon aria-hidden="true" />
+        </span>
       </button>
     </header>
     <div id={`tasks-day-section-${section}`}>

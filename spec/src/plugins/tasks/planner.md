@@ -83,6 +83,9 @@ readable and route to Anytime. Canceled tasks do not enter Done. Section colors
 use Tasks tokens derived from semantic roles rather than product-specific
 hard-coded colors. Disclosure state is session-only, survives selected-date
 changes, and leaves even collapsed or empty sections as sortable drop targets.
+Every header keeps its icon and title at the leading edge and groups the item
+count with the disclosure chevron at the trailing edge, so counts align across
+sections regardless of title length.
 See LN-TASK-029 and LN-TASK-031.
 
 When is the date or undated-bucket picker: Today, Tomorrow, a calendar date,

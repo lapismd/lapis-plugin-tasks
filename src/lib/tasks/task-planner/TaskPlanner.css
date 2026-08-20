@@ -604,13 +604,21 @@
   }
 
   .tasks-planner__day-section-label svg,
-  .tasks-planner__day-section-header button > svg {
+  .tasks-planner__day-section-trailing svg {
     width: 0.95rem;
     height: 0.95rem;
     flex: none;
   }
 
-  .tasks-planner__day-section-label small {
+  .tasks-planner__day-section-trailing {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 0.48rem;
+    margin-left: auto;
+  }
+
+  .tasks-planner__day-section-count {
     min-width: 1.35rem;
     border-radius: 999px;
     background: color-mix(in srgb, var(--tasks-day-section-color) 13%, transparent);
@@ -619,12 +627,12 @@
     text-align: center;
   }
 
-  .tasks-planner__day-section-header button > svg {
+  .tasks-planner__day-section-trailing svg {
     transition: rotate 150ms ease;
   }
 
   .tasks-planner__day-section[data-day-section-expanded="true"]
-    .tasks-planner__day-section-header button > svg {
+    .tasks-planner__day-section-trailing svg {
     rotate: 180deg;
   }
 
