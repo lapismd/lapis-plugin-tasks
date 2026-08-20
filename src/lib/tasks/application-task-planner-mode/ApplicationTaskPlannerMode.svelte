@@ -682,6 +682,20 @@
 			}
 			return;
 		}
+		if (target.type === 'planner-sidebar-list') {
+			const listId = typeof target.listId === 'string' ? target.listId : '';
+			const title =
+				typeof target.title === 'string' && target.title.trim()
+					? target.title.trim()
+					: listId;
+			if (!listId) return;
+			for (const task of movingTasks) {
+				void saveTaskPatch(task, {
+					listId,
+					areas: title ? [title] : []
+				});
+			}
+		}
 
 	}
 

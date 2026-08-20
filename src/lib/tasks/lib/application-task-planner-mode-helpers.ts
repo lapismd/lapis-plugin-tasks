@@ -474,7 +474,13 @@ export function getPlannerExternalDropTargetAt(
 	if (!(dropElement instanceof HTMLElement)) return null;
 
 	const parsed = plannerDropDataFromElement(dropElement);
-	if (!parsed || parsed.data.type !== 'planner-sidebar-bucket') return null;
+	if (
+		!parsed ||
+		(parsed.data.type !== 'planner-sidebar-bucket' &&
+			parsed.data.type !== 'planner-sidebar-list')
+	) {
+		return null;
+	}
 
 	return {
 		id: parsed.id,

@@ -57,9 +57,12 @@ the App Shell sidebar: `data-planner-drop-id`, `data-planner-drop-data`, and
 `data-planner-drop-mode`. Dragging a task over a bucket or list morphs the
 drag preview and highlights the drop target. See LN-TASK-028.
 
-Dropping onto a bucket updates plan, inbox, or start through
-`saveTaskPatch`. Dropping onto a list sets `listId` and `areas` so the task
-gains a `list-item` on that list.
+`plannerDropTargetFromPoint` in
+`src/lib/tasks/lib/application-task-planner-mode-helpers.ts` accepts both
+`planner-sidebar-bucket` and `planner-sidebar-list` payloads.
+`ApplicationTaskPlannerMode` then calls `saveTaskPatch`: a bucket drop
+updates plan, inbox, or start; a list drop sets `listId` and `areas` so the
+task gains a `list-item` on that list.
 
 ## Branding versus catalog
 
