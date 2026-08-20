@@ -375,6 +375,17 @@ function taskEligibleForDay(
   );
 }
 
+export function isTaskOverdueForDay(task: Task, selectedDate: string) {
+  const datedMatches = [
+    taskDateOnly(task.planDate) ?? taskDateOnly(task.scheduledAt),
+    taskDateOnly(task.deadline) ?? taskDateOnly(task.dueAt),
+  ].filter((date): date is string => Boolean(date));
+  return (
+    datedMatches.some((date) => date <= selectedDate) &&
+    !datedMatches.some((date) => date === selectedDate)
+  );
+}
+
 function compareDaySectionTasks(left: Task, right: Task) {
   const leftOrder = left.order ?? left.todayOrder;
   const rightOrder = right.order ?? right.todayOrder;

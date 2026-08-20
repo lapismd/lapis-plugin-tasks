@@ -55,6 +55,7 @@ export {
   comparePlannerTasks,
   getPlannerSelectionPosition,
   getTaskPlannerPlacementSource,
+  isTaskOverdueForDay,
   isTaskPlanAtDayPart,
   keptPlanAtForDate,
   resolveTaskPlanAt,

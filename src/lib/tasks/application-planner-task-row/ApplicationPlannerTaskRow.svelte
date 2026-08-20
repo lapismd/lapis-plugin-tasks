@@ -1,5 +1,6 @@
 <script lang="ts">
 	import './ApplicationPlannerTaskRow.css';
+  import CircleAlertIcon from "@lucide/svelte/icons/circle-alert";
   import ArrowRightIcon from "@lucide/svelte/icons/arrow-right";
   import BriefcaseBusinessIcon from "@lucide/svelte/icons/briefcase-business";
   import TextIcon from "@lucide/svelte/icons/text";
@@ -32,6 +33,7 @@
     sortableGroup = "planner",
     dragging = false,
     selected = false,
+    overdue = false,
     selectionPosition = null,
     expanded = false,
     closing = false,
@@ -63,6 +65,7 @@
     sortableGroup?: string;
     dragging?: boolean;
     selected?: boolean;
+    overdue?: boolean;
     selectionPosition?: PlannerSelectionPosition | null;
     expanded?: boolean;
     closing?: boolean;
@@ -263,6 +266,17 @@
       </SwipeItem.Root>
 
       <div class="application-planner-task-row__aside">
+        {#if overdue && !applicationTask.done}
+          <span
+            class="application-planner-task-row__overdue"
+            data-task-overdue-indicator
+            role="img"
+            aria-label="Overdue task"
+            title="Overdue task"
+          >
+            <CircleAlertIcon aria-hidden="true" />
+          </span>
+        {/if}
         <button
           type="button"
           class="application-planner-task-row__open"

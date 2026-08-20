@@ -70,7 +70,7 @@
         void onHideOverdueTasksChange(checked === true)}
     >
       <TimerOffIcon aria-hidden="true" />
-      <span>Hide overdue tasks</span>
+      <span>{hideOverdueTasks ? "Show overdue tasks" : "Hide overdue tasks"}</span>
     </DropdownMenu.CheckboxItem>
   </DropdownMenu.Content>
 </DropdownMenu.Root>

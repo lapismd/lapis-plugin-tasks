@@ -5,6 +5,7 @@
 	import * as AlertDialog from '@lapismd/design-core/shadcn/alert-dialog';
 	import {
 		applicationTaskToTask,
+		isTaskOverdueForDay,
 		resolveTaskPlannerPlacement,
 		taskToApplicationTask,
 		todayDateOnly,
@@ -776,6 +777,7 @@
 		sortableGroup={context.group}
 		dragging={Boolean(context.dragged)}
 		selected={Boolean(context.selected)}
+		overdue={view === 'today' && !area && isTaskOverdueForDay(task, selectedDate)}
 		selectionPosition={context.selectionPosition ?? null}
 		expanded={expandedTaskId === taskKey}
 		closing={closingTaskId === taskKey}

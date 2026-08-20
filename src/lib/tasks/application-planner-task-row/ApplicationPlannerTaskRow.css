@@ -153,7 +153,29 @@
     flex: none;
     align-items: flex-start;
     justify-content: flex-end;
+    gap: 0.25rem;
     padding-top: 0.31rem;
+  }
+
+  .application-planner-task-row__overdue {
+    display: grid;
+    width: 1.2rem;
+    height: 1.2rem;
+    flex: none;
+    place-items: center;
+    border-radius: 999px;
+    background: color-mix(
+      in srgb,
+      var(--ui-tasks-destructive-text) 14%,
+      transparent
+    );
+    color: var(--ui-tasks-destructive-text);
+  }
+
+  .application-planner-task-row__overdue svg {
+    width: 0.8rem;
+    height: 0.8rem;
+    stroke-width: 2.5;
   }
 
   .application-planner-task-row__open {

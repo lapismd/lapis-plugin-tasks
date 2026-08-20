@@ -44,6 +44,15 @@ fields. Daily section placement is derived from `plan.date`, `plan.at`, status,
 completion time, and the configured clock boundaries. See [Daily
 agenda](./planner/daily-agenda.md).
 
+Today presents its selected weekday and week strip in one sticky calendar
+surface. That surface paints through the same inline overflow as the task rows
+beneath it, while retaining the surrounding planner padding and scrollbar
+gutter. Carried-over rows expose an overdue marker beside their detail control,
+and the Today actions menu names its persisted overdue toggle for the action it
+will perform: **Hide overdue tasks** or **Show overdue tasks**. Day-part
+boundaries and the overdue default are available through both the host's public
+Tasks settings section and the legacy plugin settings tab.
+
 ## Component map
 
 ```mermaid

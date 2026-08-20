@@ -38,6 +38,7 @@ describe("TasksPlugin", () => {
     expect(source).toContain("await this.loadData()");
     expect(source).toContain("this.saveData(snapshot)");
     expect(source).toContain("addSettingTab");
+    expect(source).toContain("registerTasksWorkspaceSettings(this)");
     expect(view).toContain('export const TASKS_VIEW_TYPE = "tasks"');
     expect(index).toContain("TasksPlugin");
     expect(index).toContain("TasksView");

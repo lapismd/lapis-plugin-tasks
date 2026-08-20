@@ -46,11 +46,17 @@ far right. The menu can hide completed rows for the current session, reopen all
 tasks completed on the selected date, and hide overdue agenda rows. Reopening
 all completed tasks clears their terminal completion state and preserves their
 existing plan, so they return to the corresponding open day section.
+The overdue action reads **Hide overdue tasks** while overdue rows are visible
+and **Show overdue tasks** while they are hidden, so its label always describes
+the action that selecting it will perform.
 
-The selected weekday and uppercase month/year appear above the week strip. The
-complete calendar header stays sticky inside the planner scroll viewport. Week
-controls are ghost buttons at rest; hover adds a semantic grey border without
-an outline ring, while keyboard focus keeps its visible ring.
+The compact selected weekday and uppercase month/year appear above the week
+strip. The complete calendar header paints through the same inline overflow as
+the task-row surfaces beneath it while preserving the planner's surrounding
+content padding and scrollbar gutter. It stays sticky inside the planner scroll
+viewport, so rows cannot show around its edges while scrolling.
+Week controls are ghost buttons at rest; hover adds a semantic grey border
+without an outline ring, while keyboard focus keeps its visible ring.
 
 By default, the selected agenda includes every open task whose plan date or
 deadline is on or before the selected date. The persisted `dailyAgenda.hideOverdueTasks`
@@ -58,6 +64,11 @@ setting limits that match to the selected date while leaving Review's overdue
 query intact. A task remains visible when either its plan date or deadline
 matches the selected date. Changing this setting only reclassifies the view and
 never rewrites Task Markdown.
+
+Tasks retains the Obsidian-compatible `PluginSettingTab` and also registers a
+Tasks page with the public Lapis workspace settings controller. Both surfaces
+edit the same versioned plugin data; the workspace shell is not expected to
+render the legacy tab directly.
 
 ## Day sections
 

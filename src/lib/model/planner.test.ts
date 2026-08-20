@@ -5,6 +5,7 @@ import {
   buildTaskPlannerDaySnapshot,
   buildTaskPlannerWeek,
   classifyTask,
+  isTaskOverdueForDay,
   resolveTaskDaySection,
   resolveTaskPlanAt,
   resolveTaskPlannerPlacement,
@@ -209,6 +210,18 @@ describe("daily agenda", () => {
 
     expect(snapshot.anytime.map((task) => task.id)).toEqual(["due", "planned"]);
     expect(snapshot.done.map((task) => task.id)).toEqual(["done"]);
+    expect(
+      isTaskOverdueForDay(
+        agendaTask({ planDate: "2026-08-19" }),
+        selectedDate,
+      ),
+    ).toBe(true);
+    expect(
+      isTaskOverdueForDay(
+        agendaTask({ planDate: "2026-08-19", deadline: selectedDate }),
+        selectedDate,
+      ),
+    ).toBe(false);
   });
 
   it("writes section placement, completes at the injected clock, and reopens from Done", () => {

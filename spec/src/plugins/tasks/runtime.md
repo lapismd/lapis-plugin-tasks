@@ -85,6 +85,11 @@ mounts `TasksView` with the repository, injected clock, and live settings
 source. Plugin data owns only presentation settings; task and list state stays
 in Markdown.
 
+The plugin also registers a Tasks section through the public workspace settings
+controller. This is the settings surface used by the Lapis workspace shell;
+the `PluginSettingTab` remains available to Obsidian-compatible hosts. Both
+surfaces persist through the same plugin-owned update queue.
+
 The same onload registers the plugin-scoped `task-structure-runs` Markdown
 contribution through the public API. The contribution supplies a CodeMirror
 extension and rendered-Markdown postprocessor but imports neither Lapis

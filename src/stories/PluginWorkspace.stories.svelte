@@ -4,6 +4,7 @@
   import { expect, fireEvent, userEvent, waitFor, within } from "storybook/test";
 
   import PluginWorkspaceDemo from "./PluginWorkspaceDemo.svelte";
+  import { TasksPlugin } from "../lib";
   import { PluginWorkspaceExample } from "./PluginWorkspace.example-sources";
   import {
     computedContrastRatio,
@@ -118,13 +119,36 @@
     );
     expect(agendaCalendar).toBeVisible();
     expect(getComputedStyle(agendaCalendar!).position).toBe("sticky");
-    expect(
-      within(agendaCalendar!).getByRole("heading", {
-        name: "Wednesday",
-        level: 1,
-      }),
-    ).toBeVisible();
+    const weekdayHeading = within(agendaCalendar!).getByRole("heading", {
+      name: "Wednesday",
+      level: 1,
+    });
+    expect(weekdayHeading).toBeVisible();
+    expect(Number.parseFloat(getComputedStyle(weekdayHeading).fontSize)).toBeLessThanOrEqual(
+      32,
+    );
     expect(within(agendaCalendar!).getByText("August 2026")).toBeVisible();
+    const plannerContent = agendaCalendar!.closest<HTMLElement>(
+      ".tasks-planner__content",
+    )!;
+    const agendaTaskRow = plannerContent.querySelector(
+      ".tasks-planner__day-sections .application-planner-task-row",
+    );
+    expect(agendaTaskRow).not.toBeNull();
+    const calendarBox = agendaCalendar!.getBoundingClientRect();
+    const agendaTaskRowBox = agendaTaskRow!.getBoundingClientRect();
+    const plannerScrollbar = plannerContent
+      .closest<HTMLElement>('[data-ui-component="scroll-area"]')!
+      .querySelector<HTMLElement>(
+        '[data-ui-part="scroll-area-scrollbar"][data-orientation="vertical"]',
+      );
+    expect(Math.abs(calendarBox.left - agendaTaskRowBox.left)).toBeLessThan(1);
+    expect(Math.abs(calendarBox.right - agendaTaskRowBox.right)).toBeLessThan(1);
+    if (plannerScrollbar) {
+      expect(calendarBox.right).toBeLessThan(
+        plannerScrollbar.getBoundingClientRect().left,
+      );
+    }
     for (const name of ["Previous week", "Next week"]) {
       const control = within(agendaCalendar!).getByRole("button", { name });
       const style = getComputedStyle(control);
@@ -244,6 +268,73 @@
           .queryAllByRole("button", { name: "Close left sidebar", exact: true })
           .some((button) => button.getClientRects().length > 0),
       ).toBe(false);
+    });
+  }
+
+  async function exerciseTasksWorkspaceSettings(
+    canvasElement: HTMLElement,
+    canvas: ReturnType<typeof within>,
+    app: App,
+  ) {
+    if (!canvas.queryByRole("button", { name: "Open settings", exact: true })) {
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Open left sidebar", exact: true }),
+      );
+    }
+    const openSettings = await canvas.findByRole("button", {
+      name: "Open settings",
+      exact: true,
+    });
+    await userEvent.click(openSettings);
+    const dialog = await canvas.findByRole("dialog", {
+      name: "Settings",
+      exact: true,
+    });
+    const settingsCanvas = within(dialog);
+    await userEvent.click(
+      settingsCanvas.getByRole("button", { name: "Tasks", exact: true }),
+    );
+    expect(
+      settingsCanvas.getByRole("heading", { name: "Tasks", level: 1 }),
+    ).toBeVisible();
+    expect(
+      settingsCanvas.getByLabelText<HTMLInputElement>("Afternoon starts at"),
+    ).toHaveValue("12:00");
+    expect(
+      settingsCanvas.getByLabelText<HTMLInputElement>("Evening starts at"),
+    ).toHaveValue("17:00");
+
+    const tasksPlugin = app.plugins.plugins.get("tasks");
+    expect(tasksPlugin).toBeInstanceOf(TasksPlugin);
+    const hideOverdue = settingsCanvas.getByRole("switch", {
+      name: "Hide overdue tasks",
+      exact: true,
+    });
+    expect(hideOverdue).not.toBeChecked();
+    await userEvent.click(hideOverdue);
+    await waitFor(() => {
+      expect((tasksPlugin as TasksPlugin).getSettings().dailyAgenda).toEqual({
+        hideOverdueTasks: true,
+      });
+    });
+    await userEvent.click(hideOverdue);
+    await waitFor(() => {
+      expect((tasksPlugin as TasksPlugin).getSettings().dailyAgenda).toEqual({
+        hideOverdueTasks: false,
+      });
+    });
+    await userEvent.click(
+      settingsCanvas.getByRole("button", {
+        name: "Close settings",
+        exact: true,
+      }),
+    );
+    await waitFor(() => {
+      expect(
+        canvasElement.querySelector(
+          '[data-ui-component="app-shell-settings-dialog"]',
+        ),
+      ).not.toBeInTheDocument();
     });
   }
 
@@ -1327,6 +1418,8 @@
     await waitFor(() => {
       expect(app.workspace.getActiveFile()?.path).toBe("lists/applications.md");
     });
+
+    await exerciseTasksWorkspaceSettings(canvasElement, canvas, app);
 
     // Leave this visual story on the feature-rich daily agenda instead of the
     // final mutation assertion, so the app-backed shell documents the current

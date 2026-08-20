@@ -113,6 +113,7 @@ const config: StorybookConfig = {
           "@lucide/svelte/icons/calendar-days",
           "@lucide/svelte/icons/check",
           "@lucide/svelte/icons/arrow-left",
+          "@lucide/svelte/icons/circle-alert",
           "@lucide/svelte/icons/check-check",
           "@lucide/svelte/icons/chevron-down",
           "@lucide/svelte/icons/chevron-left",

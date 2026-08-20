@@ -9,6 +9,12 @@ See LN-TASK-033, LN-TASK-035, and LN-TASK-041.
 
 ## Task row interaction
 
+On the Today agenda, a carried-over row whose plan or deadline made it eligible
+before the selected date shows a prominent overdue icon immediately before the
+task-details control. The indicator and details control share the title-line
+vertical center. A task with an exact selected-date plan or deadline is not
+marked overdue, even when another date field is older.
+
 A row click selects the Task. Modifier clicks toggle or extend selection. The
 title enters inline title editing, and a title or body double-click opens the
 expanded inline editor. Only the trailing detail control opens Task detail.

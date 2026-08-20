@@ -19,6 +19,7 @@ import {
   type TasksPluginSettingsPatch,
 } from "./tasks-settings";
 import { TasksSettingsTab } from "./tasks-settings-tab";
+import { registerTasksWorkspaceSettings } from "./register-tasks-settings";
 import { TASKS_VIEW_TYPE, TasksView } from "./tasks-view";
 import { createTaskStructureMarkdownContribution } from "./task-list-markdown-extension";
 
@@ -72,6 +73,7 @@ export class TasksPlugin extends Plugin {
     });
     this.addRibbonIcon("list-todo", "Open Tasks", () => void this.openTasks());
     this.addSettingTab(new TasksSettingsTab(this.app, this));
+    registerTasksWorkspaceSettings(this);
   }
 
   getSettings(): TasksPluginSettings {

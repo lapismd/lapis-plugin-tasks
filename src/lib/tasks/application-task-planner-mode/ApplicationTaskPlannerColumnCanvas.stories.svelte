@@ -199,6 +199,23 @@
           (detailsRect.top + detailsRect.height / 2),
       ),
     ).toBeLessThan(1);
+    const overdueIndicator = within(alignedRow).getByRole("img", {
+      name: "Overdue task",
+      exact: true,
+    });
+    expect(overdueIndicator).toBeVisible();
+    expect(overdueIndicator.nextElementSibling).toBe(alignedDetails);
+    expect(
+      getComputedStyle(overdueIndicator).backgroundColor,
+    ).not.toBe("rgba(0, 0, 0, 0)");
+    const overdueRect = overdueIndicator.getBoundingClientRect();
+    expect(overdueRect.right).toBeLessThan(detailsRect.left);
+    expect(
+      Math.abs(
+        overdueRect.top + overdueRect.height / 2 -
+          (detailsRect.top + detailsRect.height / 2),
+      ),
+    ).toBeLessThan(1);
     await playTitleClickStartsInlineEdit(context);
     await userEvent.keyboard("{Escape}");
     await waitFor(() =>
@@ -284,11 +301,16 @@
       }),
     ).toBeVisible();
     await userEvent.click(todayActions);
-    const hideOverdue = await documentCanvas.findByRole("menuitemcheckbox", {
-      name: "Hide overdue tasks",
+    expect(
+      documentCanvas.queryByRole("menuitemcheckbox", {
+        name: "Hide overdue tasks",
+      }),
+    ).not.toBeInTheDocument();
+    const showOverdue = await documentCanvas.findByRole("menuitemcheckbox", {
+      name: "Show overdue tasks",
     });
-    expect(hideOverdue).toBeChecked();
-    await userEvent.click(hideOverdue);
+    expect(showOverdue).toBeChecked();
+    await userEvent.click(showOverdue);
     await userEvent.keyboard("{Escape}");
     await waitForTodayActionsReady();
     expect(
