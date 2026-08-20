@@ -125,16 +125,53 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
 .task-column-canvas-story__canvas
   [data-column-id="tasks"]
   > [data-ui-part="resize-handle"] {
-  inset-inline-end: -1px;
+  inset-inline-end: -0.25rem;
   inset-block: 1px;
+  width: 0.5rem;
   height: auto;
-  border-start-start-radius: var(
-    --ui-column-canvas-radius,
-    var(--radius-lg, var(--radius))
-  );
-  border-end-start-radius: var(
-    --ui-column-canvas-radius,
-    var(--radius-lg, var(--radius))
+  background: transparent;
+}
+
+.task-column-canvas-story__canvas
+  [data-column-id="tasks"][data-ui-part="column"] {
+  z-index: 1;
+  overflow: visible;
+}
+
+.task-column-canvas-story__canvas
+  [data-column-id="tasks"]
+  > [data-ui-part="resize-handle"]:hover,
+.task-column-canvas-story__canvas
+  [data-column-id="tasks"]
+  > [data-ui-part="resize-handle"][data-resizing="true"] {
+  background: transparent;
+}
+
+.task-column-canvas-story__canvas
+  [data-column-id="planner"][data-ui-part="column"]::before {
+  box-sizing: border-box;
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  content: "";
+  border-inline-start: 0.25rem solid transparent;
+  pointer-events: none;
+  transition: border-color 120ms ease;
+}
+
+.task-column-canvas-story__canvas
+  [data-column-id="tasks"]:has(
+    > [data-ui-part="resize-handle"]:hover
+  )
+  + [data-column-id="planner"][data-ui-part="column"]::before,
+.task-column-canvas-story__canvas
+  [data-column-id="tasks"]:has(
+    > [data-ui-part="resize-handle"][data-resizing="true"]
+  )
+  + [data-column-id="planner"][data-ui-part="column"]::before {
+  border-inline-start-color: var(
+    --ui-column-canvas-resize-handle-hover,
+    color-mix(in oklab, var(--primary) 40%, transparent)
   );
 }
 

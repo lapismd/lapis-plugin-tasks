@@ -44,11 +44,6 @@
     const tasksResizeHandle = canvas.getByRole("separator", {
       name: "Resize Tasks column",
     });
-    const tasksResizeStyle = getComputedStyle(tasksResizeHandle);
-    expect(tasksResizeStyle.borderTopLeftRadius).not.toBe("0px");
-    expect(tasksResizeStyle.borderBottomLeftRadius).not.toBe("0px");
-    expect(tasksResizeStyle.borderTopRightRadius).toBe("0px");
-    expect(tasksResizeStyle.borderBottomRightRadius).toBe("0px");
     const tasksColumn = context.canvasElement.querySelector<HTMLElement>(
       '[data-column-id="tasks"][data-ui-part="column"]',
     )!;
@@ -60,8 +55,8 @@
     );
     expect(
       tasksResizeHandle.getBoundingClientRect().right -
-        tasksColumn.getBoundingClientRect().right,
-    ).toBeCloseTo(plannerStartBorderWidth, 1);
+        plannerColumn.getBoundingClientRect().left,
+    ).toBeCloseTo(tasksResizeHandle.getBoundingClientRect().width / 2, 1);
     expect(
       tasksResizeHandle.getBoundingClientRect().top -
         tasksColumn.getBoundingClientRect().top,
@@ -70,6 +65,43 @@
       tasksColumn.getBoundingClientRect().bottom -
         tasksResizeHandle.getBoundingClientRect().bottom,
     ).toBeCloseTo(plannerStartBorderWidth, 1);
+    expect(getComputedStyle(tasksResizeHandle).backgroundColor).toBe(
+      "rgba(0, 0, 0, 0)",
+    );
+    const resizeStart = tasksResizeHandle.getBoundingClientRect();
+    expect(
+      context.canvasElement.ownerDocument.elementFromPoint(
+        plannerColumn.getBoundingClientRect().left +
+          plannerStartBorderWidth +
+          resizeStart.width / 4,
+        resizeStart.top + resizeStart.height / 2,
+      ),
+    ).toBe(tasksResizeHandle);
+    await userEvent.pointer([
+      {
+        keys: "[MouseLeft>]",
+        target: tasksResizeHandle,
+        coords: {
+          clientX: resizeStart.left + resizeStart.width / 2,
+          clientY: resizeStart.top + resizeStart.height / 2,
+        },
+      },
+    ]);
+    await waitFor(() =>
+      expect(tasksResizeHandle).toHaveAttribute("data-resizing", "true"),
+    );
+    await waitFor(() =>
+      expect(
+        getComputedStyle(plannerColumn, "::before").borderLeftColor,
+      ).not.toBe("rgba(0, 0, 0, 0)"),
+    );
+    expect(getComputedStyle(tasksResizeHandle).backgroundColor).toBe(
+      "rgba(0, 0, 0, 0)",
+    );
+    await fireEvent.pointerUp(window);
+    await waitFor(() =>
+      expect(tasksResizeHandle).not.toHaveAttribute("data-resizing"),
+    );
     expect(
       canvas.getByRole("button", { name: "Collapse All lists section" }),
     ).toBeVisible();

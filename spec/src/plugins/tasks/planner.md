@@ -15,13 +15,14 @@ columns may open from the selected task in catalog stories.
 hosts the lanes. The first column is buckets plus the Lists tree from
 [Lists](./lists.md). The middle column is
 `ApplicationTaskPlannerMode`. The third column is task detail.
-The first-column resize handle sits flush against the planner column and rounds
-its logical start edge. Its hover surface therefore curves toward the adjacent
-planner rather than back into the Tasks navigation. It advances across the
-planner's one-pixel start border to meet that border's inner edge, matching the
-right-side resize treatment instead of leaving the hover fill behind the frame.
-Its block start and end are inset by that same border width so the curved ends
-remain nested within the planner body rather than extending outside its frame.
+The first-column resize handle uses a transparent hit target centered across the
+planner's one-pixel start border, with equal pointer-accessible area on the Tasks
+and planner sides. The borderless Tasks column permits only that target to
+overflow; its block start and end remain inset by the border width. Hover and
+active-resize feedback is painted separately by the adjacent planner column,
+whose own overflow clips the accent strip to the start corners. This mirrors the
+right-side handle without approximating the curve or separating the visible edge
+from its pointer target.
 
 When navigation selects a task list, the middle column keeps its list title as
 workspace chrome but replaces the bucket planner body with the complete
