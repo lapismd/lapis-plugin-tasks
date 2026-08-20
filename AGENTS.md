@@ -41,5 +41,8 @@ This repository owns the first-party external Lapis plugin whose runtime ID is
 ## Version control
 
 - Use Jujutsu for status, diffs, commits, bookmarks, and history work.
-- After each verified slice, commit with a PR-quality message. This is a
-  standing request; do not wait for the user to ask.
+- Preserve unrelated work and keep each change independently verifiable.
+- After each verified change, run `jj commit` with a PR-quality message that
+  explains what changed, why it changed, and the validation that passed. Keep
+  the message descriptive enough for review context rather than using a terse
+  label. This is a standing request; do not wait for the user to ask.

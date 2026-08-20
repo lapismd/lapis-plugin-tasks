@@ -12,6 +12,7 @@
 | LPT-SPEC-008 | Implemented | The repository taxonomy audit covers every story title under `Plugins/Tasks`. |
 | LPT-SPEC-009 | Implemented | Exact Storybook mirror validation covers every SUMMARY chapter. |
 | LPT-SPEC-010 | Implemented | Canonical plugin chapters and stories use the `Plugins/Tasks` hierarchy. |
+| LPT-SPEC-011 | Implemented | `AGENTS.md` requires unrelated-work preservation, independently verified Jujutsu commits, and review-context messages that record the change, rationale, and passing validation. |
 | LN-TASK-001 | Implemented | Package identity, manifest, build, and pack inspection. |
 | LN-TASK-002 | Implemented | Plugin onload registers the tasks projection, `tasks` view, `tasks:open`, and ribbon. |
 | LN-TASK-003 | Implemented | Application-ownership audit excludes `globalThis.app`. |
