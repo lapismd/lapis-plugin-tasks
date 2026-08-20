@@ -53,15 +53,19 @@ remain inside the render width so neither end radius is clipped, and the
 Tasks-owned checkbox tick is isolated from host Markdown checkbox selectors.
 An H2-H6 that owns a rich run, or a lightweight checklist in a Task document,
 keeps its Markdown semantics but adopts the Today category pill treatment in
-reading mode and live preview. Qualifying headings rotate through neutral,
+reading mode and live preview. Its type uses the stable workspace sans token and
+the same size, weight, tracking, casing, and line height as the Today section
+label, even when the surrounding Markdown editor supplies a different content
+font. Qualifying headings rotate through neutral,
 warning, info, accent, and success colours in source order. The decoration does
 not apply in source mode and does not make the heading itself a planner control.
 TaskRuns and the daily planner both render
 `TaskQuickCreateRow` and `TaskQuickCreateActions`, rather than maintaining
-separate add forms. Rich TaskRun rows reuse the planner's selection resolver and task-patch
-helper: a row click selects, modifiers toggle or extend selection, the title
-edits, a title/body double-click expands inline, and only the trailing details
-control opens the detail column.
+separate add forms. The collapsed `New task` label, including a retained draft,
+uses normal non-bold weight in both surfaces. Rich TaskRun rows reuse the
+planner's selection resolver and task-patch helper: a row click selects,
+modifiers toggle or extend selection, the title edits, a title/body double-click
+expands inline, and only the trailing details control opens the detail column.
 Linked task-list entries use the same row rhythm and selection surface, replacing
 the task checkbox with a list icon. Tasks-owned surfaces expose their drag handle
 on row hover or focus. They support recursive disclosure, within-run ordering,
@@ -210,13 +214,15 @@ updates plan, inbox, or start; a list drop sets `listId` and `areas` so the
 task gains a `task-entry` from that List.
 
 Within the daily agenda, quick-create writes the selected date and the open
-section's day part. Sortable layouts include all five sections even when they
-are empty or collapsed. Cross-section drops persist both ordering and
-placement. Done completes with the injected clock. Moving a completed row back
-to an open section clears completion, writes the selected date, and assigns that
-section's `plan.at`. Because Done groups by actual completion date, completing
-while viewing another date can remove the row. Rolling recurring completion
-continues to advance the task rather than adding an artificial history row.
+section's day part. The collapsed quick-create row keeps a small block-end gap
+after its divider so the first task card remains visually distinct. Sortable
+layouts include all five sections even when they are empty or collapsed.
+Cross-section drops persist both ordering and placement. Done completes with
+the injected clock. Moving a completed row back to an open section clears
+completion, writes the selected date, and assigns that section's `plan.at`.
+Because Done groups by actual completion date, completing while viewing another
+date can remove the row. Rolling recurring completion continues to advance the
+task rather than adding an artificial history row.
 See LN-TASK-032.
 
 ## Checklist progress

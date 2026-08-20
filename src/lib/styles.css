@@ -21,11 +21,11 @@
     var(--ui-tasks-card)
   );
   color: var(--tasks-markdown-group-foreground);
-  font-family: var(--font-sans, inherit);
+  font-family: var(--ui-workspace-font-sans, var(--font-sans, inherit));
   font-size: 0.78rem;
   font-weight: 850;
   letter-spacing: 0.05em;
-  line-height: 1.2;
+  line-height: 1.5;
   text-transform: uppercase;
 }
 
@@ -51,11 +51,14 @@
   align-items: center;
   margin-block: 1rem 0.5rem;
   color: var(--tasks-markdown-group-foreground) !important;
-  font-family: var(--font-sans, inherit) !important;
+  font-family: var(
+    --ui-workspace-font-sans,
+    var(--font-sans, inherit)
+  ) !important;
   font-size: 0.78rem !important;
   font-weight: 850 !important;
   letter-spacing: 0.05em !important;
-  line-height: 1.2 !important;
+  line-height: 1.5 !important;
   text-transform: uppercase !important;
 }
 
@@ -66,11 +69,14 @@
   margin-block: 0.5rem;
   padding: 0.45rem 0.75rem !important;
   color: var(--tasks-markdown-group-foreground) !important;
-  font-family: var(--font-sans, inherit) !important;
+  font-family: var(
+    --ui-workspace-font-sans,
+    var(--font-sans, inherit)
+  ) !important;
   font-size: 0.78rem !important;
   font-weight: 850 !important;
   letter-spacing: 0.05em !important;
-  line-height: 1.2 !important;
+  line-height: 1.5 !important;
   text-transform: uppercase !important;
 }
 

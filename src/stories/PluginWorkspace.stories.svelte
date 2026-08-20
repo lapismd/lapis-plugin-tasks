@@ -43,6 +43,15 @@
     },
   } as const;
 
+  type TaskGroupHeadingTypography = {
+    fontFamily: string;
+    fontSize: string;
+    fontWeight: string;
+    letterSpacing: string;
+    lineHeight: string;
+    textTransform: string;
+  };
+
   function storyApp(canvasElement: HTMLElement): App {
     const root = canvasElement.querySelector<
       HTMLElement & { __lapisApp?: App }
@@ -107,6 +116,22 @@
     expect(
       canvasElement.querySelector(".tasks-planner__agenda-heading"),
     ).not.toBeInTheDocument();
+    const quickCreateLabel = visibleElements(
+      canvasElement,
+      ".task-quick-create-row__label",
+    )[0];
+    expect(quickCreateLabel).toBeDefined();
+    expect(getComputedStyle(quickCreateLabel!).fontWeight).toBe("400");
+    const quickCreateRow = quickCreateLabel!.closest<HTMLElement>(
+      ".task-quick-create-row",
+    );
+    const firstTaskRow = quickCreateRow?.nextElementSibling as HTMLElement | null;
+    expect(quickCreateRow).not.toBeNull();
+    expect(firstTaskRow).not.toBeNull();
+    expect(
+      firstTaskRow!.getBoundingClientRect().top -
+        quickCreateRow!.getBoundingClientRect().bottom,
+    ).toBeGreaterThanOrEqual(3);
     const disclosure = await canvas.findByRole("button", {
       name: "Show checklist for Review interview notes",
     });
@@ -209,6 +234,7 @@
   async function expectTaskGroupHeadingTones(
     canvasElement: HTMLElement,
     tones: string[],
+    typography?: TaskGroupHeadingTypography,
   ) {
     let headings: HTMLElement[] = [];
     await waitFor(() => {
@@ -221,8 +247,30 @@
         tones,
       );
     });
-    expect(new Set(headings.map((heading) => getComputedStyle(heading).backgroundColor)).size)
-      .toBe(tones.length);
+    expect(
+      new Set(
+        headings.map((heading) => getComputedStyle(heading).backgroundColor),
+      ).size,
+    ).toBe(tones.length);
+    if (typography) {
+      headings.forEach((heading) => {
+        expect(taskGroupHeadingTypography(heading)).toEqual(typography);
+      });
+    }
+  }
+
+  function taskGroupHeadingTypography(
+    element: HTMLElement,
+  ): TaskGroupHeadingTypography {
+    const style = getComputedStyle(element);
+    return {
+      fontFamily: style.fontFamily,
+      fontSize: style.fontSize,
+      fontWeight: style.fontWeight,
+      letterSpacing: style.letterSpacing,
+      lineHeight: style.lineHeight,
+      textTransform: style.textTransform,
+    };
   }
 
   function visibleElements(canvasElement: HTMLElement, selector: string) {
@@ -447,6 +495,11 @@
     const readingBlock = surface!.querySelector<HTMLElement>(
       "[data-structural-task-run]",
     )!;
+    const readingQuickCreateLabel = readingBlock.querySelector<HTMLElement>(
+      ".task-quick-create-row__label",
+    );
+    expect(readingQuickCreateLabel).not.toBeNull();
+    expect(getComputedStyle(readingQuickCreateLabel!).fontWeight).toBe("400");
     expect(
       within(readingBlock).queryByRole("button", {
         name: "Edit task run source",
@@ -592,6 +645,11 @@
       ).backgroundColor,
     ).not.toBe("rgba(0, 0, 0, 0)");
     const liveCanvas = within(liveBlock!);
+    const liveQuickCreateLabel = liveBlock!.querySelector<HTMLElement>(
+      ".task-quick-create-row__label",
+    );
+    expect(liveQuickCreateLabel).not.toBeNull();
+    expect(getComputedStyle(liveQuickCreateLabel!).fontWeight).toBe("400");
     await userEvent.click(
       liveCanvas.getByRole("button", { name: "New task", exact: true }),
     );
@@ -1405,11 +1463,22 @@
     canvasElement.style.height = "100%";
     canvasElement.style.maxHeight = "100%";
     canvasElement.style.overflow = "hidden";
-    await waitForReady(canvasElement);
+    const canvas = await waitForReady(canvasElement);
     const app = storyApp(canvasElement);
+    await showDailyAgendaChecklistSummary(canvasElement, canvas);
+    const todayHeadingTypography = taskGroupHeadingTypography(
+      visibleElements(
+        canvasElement,
+        ".tasks-planner__day-section-label",
+      )[0]!,
+    );
 
     await openMarkdownFixture(canvasElement, app, "lists/cv.md", "preview");
-    await expectTaskGroupHeadingTones(canvasElement, ["anytime", "morning"]);
+    await expectTaskGroupHeadingTones(
+      canvasElement,
+      ["anytime", "morning"],
+      todayHeadingTypography,
+    );
     let run = visibleTaskRun(canvasElement, "Explore conference talks");
     await expectContainedMarkdownRun(run, "hidden");
     expect(run.querySelector("[data-task-drag-handle]")).not.toBeInTheDocument();
@@ -1421,7 +1490,11 @@
       "lists/cv.md",
       "live-preview",
     );
-    await expectTaskGroupHeadingTones(canvasElement, ["anytime", "morning"]);
+    await expectTaskGroupHeadingTones(
+      canvasElement,
+      ["anytime", "morning"],
+      todayHeadingTypography,
+    );
     run = visibleTaskRun(canvasElement, "Explore conference talks");
     await expectContainedMarkdownRun(run, "visible");
     expect(run.querySelector("[data-task-drag-handle]")).not.toBeInTheDocument();
