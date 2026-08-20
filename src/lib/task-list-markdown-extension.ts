@@ -21,7 +21,7 @@ import {
 import { mount, unmount } from "svelte";
 import type { TaskRepository } from "./model/task-repository";
 import {
-  scanStructuralTaskRuns,
+  scanMarkdownTaskRuns,
   structuralTaskRunDecorationRange,
   structuralTaskRunEditorChange,
   type StructuralTaskRun,
@@ -141,7 +141,7 @@ export function structuralTaskRunDecorations(
   const source = state.doc.toString();
   const controller = asTasksMarkdownSurfaceController(surface.context);
   const resolveTarget = createCachedTargetResolver(app);
-  const ranges = scanStructuralTaskRuns(source, sourcePath, resolveTarget)
+  const ranges = scanMarkdownTaskRuns(source, sourcePath, resolveTarget)
     .filter(
       (section) =>
         section.ordinal !== controller?.sourceRunOrdinal &&
@@ -270,7 +270,11 @@ function createCachedTargetResolver(app: App): StructuralTaskTargetResolver {
 
 function createPostProcessor(app: App, repository: TaskRepository) {
   return async (el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
-    if (ctx.frontmatter?.type !== "task-list" && ctx.frontmatter?.type !== "task") {
+    if (
+      ctx.frontmatter?.type !== "task-list" &&
+      ctx.frontmatter?.type !== "task" &&
+      ctx.frontmatter?.type !== "task-list-navigation"
+    ) {
       return;
     }
     const controller = asTasksMarkdownSurfaceController(ctx.surface?.context);
@@ -285,7 +289,7 @@ function createPostProcessor(app: App, repository: TaskRepository) {
     const file = app.vault.getFileByPath(ctx.sourcePath);
     const source = file ? await app.vault.cachedRead(file) : "";
     const sourceSections = source
-      ? scanStructuralTaskRuns(
+      ? scanMarkdownTaskRuns(
           source,
           ctx.sourcePath,
           createCachedTargetResolver(app),

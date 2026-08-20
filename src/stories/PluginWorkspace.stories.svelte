@@ -105,6 +105,112 @@
     ).toBeVisible();
   }
 
+  async function openMarkdownFixture(
+    canvasElement: HTMLElement,
+    app: App,
+    path: string,
+    mode: "preview" | "live-preview",
+  ) {
+    const file = app.vault.getFileByPath(path);
+    expect(file).toBeTruthy();
+    let fileButton = canvasElement.querySelector<HTMLButtonElement>(
+      `button[data-path=${JSON.stringify(path)}]`,
+    );
+    if (!fileButton && path.includes("/")) {
+      const folderPath = path.slice(0, path.lastIndexOf("/"));
+      const folderButton = canvasElement.querySelector<HTMLButtonElement>(
+        `button[data-path=${JSON.stringify(folderPath)}]`,
+      );
+      expect(folderButton).toBeTruthy();
+      if (folderButton!.getAttribute("aria-expanded") !== "true") {
+        await userEvent.click(folderButton!);
+      }
+      await waitFor(() => {
+        fileButton = canvasElement.querySelector<HTMLButtonElement>(
+          `button[data-path=${JSON.stringify(path)}]`,
+        );
+        expect(fileButton).toBeTruthy();
+      });
+    }
+    expect(fileButton).toBeTruthy();
+    await userEvent.click(fileButton!);
+    await waitFor(() => {
+      expect(app.workspace.getActiveFile()?.path).toBe(path);
+    });
+    await app.openFile(file!, { state: { file: path, mode } });
+    await waitFor(
+      () => {
+        expect(app.workspace.getActiveFile()?.path).toBe(path);
+        expect(
+          Array.from(
+            canvasElement.querySelectorAll<HTMLElement>(
+              "[data-structural-task-run]",
+            ),
+          ).some((run) => run.getClientRects().length > 0),
+        ).toBe(true);
+      },
+      { timeout: 10_000 },
+    );
+  }
+
+  function visibleTaskRun(canvasElement: HTMLElement) {
+    const run = Array.from(
+      canvasElement.querySelectorAll<HTMLElement>(
+        "[data-structural-task-run]",
+      ),
+    ).find((candidate) => candidate.getClientRects().length > 0);
+    expect(run).toBeDefined();
+    return run!;
+  }
+
+  async function expectContainedMarkdownRun(run: HTMLElement) {
+    expect(run).toHaveAttribute("data-task-list-surface", "markdown");
+    expect(getComputedStyle(run).position).toBe("relative");
+    const sourceHeader = run.querySelector<HTMLElement>(
+      ".task-list-items-block__header",
+    )!;
+    const rows = run.querySelector<HTMLElement>(
+      ".task-list-items-block__rows",
+    )!;
+    let row: HTMLElement | null = null;
+    await waitFor(() => {
+      row = rows.querySelector<HTMLElement>(
+        ".application-planner-task-row, [data-task-list-row]",
+      );
+      expect(row).toBeTruthy();
+    });
+    expect(getComputedStyle(sourceHeader).position).toBe("absolute");
+    expect(
+      Math.abs(
+        rows.getBoundingClientRect().top - run.getBoundingClientRect().top,
+      ),
+    ).toBeLessThan(1);
+    expect(row!.getBoundingClientRect().right).toBeLessThanOrEqual(
+      run.getBoundingClientRect().right + 1,
+    );
+  }
+
+  async function expectDedicatedMarkdownCheckbox(
+    run: HTMLElement,
+    title: string,
+  ) {
+    const runCanvas = within(run);
+    const checkbox = runCanvas.getByRole<HTMLInputElement>("checkbox", {
+      name: `Mark ${title} complete`,
+      exact: true,
+    });
+    checkbox.checked = true;
+    const checkboxStyle = getComputedStyle(checkbox);
+    const tickStyle = getComputedStyle(checkbox, "::after");
+    expect(checkboxStyle.backgroundColor).toBe("rgba(0, 0, 0, 0)");
+    expect(tickStyle.maskImage).toBe("none");
+    expect(tickStyle.position).toBe("static");
+    expect(Number.parseFloat(tickStyle.width)).toBeLessThan(
+      checkbox.getBoundingClientRect().width,
+    );
+    checkbox.checked = false;
+  }
+
   async function exerciseMarkdownNativeList(
     canvasElement: HTMLElement,
     canvas: ReturnType<typeof within>,
@@ -1040,5 +1146,68 @@
         ),
       ).toBeVisible();
     });
+  }}
+/>
+
+<Story
+  name="Markdown Task Runs"
+  args={{ displayMode: "desktop" }}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          "Exercise rich Task/List runs in ordinary Markdown reading and live-preview surfaces, including contained radii, dedicated checkbox styling, overlay source controls, and presentation-only navigation rows.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    canvasElement.style.height = "100%";
+    canvasElement.style.maxHeight = "100%";
+    canvasElement.style.overflow = "hidden";
+    await waitForReady(canvasElement);
+    const app = storyApp(canvasElement);
+
+    await openMarkdownFixture(canvasElement, app, "lists/cv.md", "preview");
+    let run = visibleTaskRun(canvasElement);
+    await expectContainedMarkdownRun(run);
+    expect(run.querySelector("[data-task-drag-handle]")).not.toBeInTheDocument();
+    await expectDedicatedMarkdownCheckbox(run, "Explore conference talks");
+
+    await openMarkdownFixture(
+      canvasElement,
+      app,
+      "lists/cv.md",
+      "live-preview",
+    );
+    run = visibleTaskRun(canvasElement);
+    await expectContainedMarkdownRun(run);
+    expect(run.querySelector("[data-task-drag-handle]")).not.toBeInTheDocument();
+    await expectDedicatedMarkdownCheckbox(run, "Explore conference talks");
+
+    await openMarkdownFixture(canvasElement, app, "lists.md", "preview");
+    await waitFor(() => {
+      expect(
+        canvasElement.querySelectorAll<HTMLElement>("[data-task-list-row]"),
+      ).toHaveLength(3);
+    });
+    expect(
+      Array.from(
+        canvasElement.querySelectorAll<HTMLElement>("[data-task-list-row]"),
+      ).map((row) => row.getAttribute("aria-label")),
+    ).toEqual(["Applications", "Docs", "CV"]);
+    const navigationRuns = Array.from(
+      canvasElement.querySelectorAll<HTMLElement>(
+        "[data-structural-task-run]",
+      ),
+    ).filter((candidate) => candidate.getClientRects().length > 0);
+    expect(navigationRuns).toHaveLength(3);
+    expect(
+      navigationRuns.some((candidate) =>
+        candidate.querySelector("[data-task-drag-handle]"),
+      ),
+    ).toBe(false);
+    for (const navigationRun of navigationRuns) {
+      await expectContainedMarkdownRun(navigationRun);
+    }
   }}
 />

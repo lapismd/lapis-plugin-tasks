@@ -87,7 +87,10 @@ then a humanized stable id.
 
 `type: task-list-navigation` is a separate presentation document. Its headings
 name sidebar sections and its links pin root Lists. Those links derive
-`navigation-item`, never structural ownership. See [Lists](./lists.md).
+`navigation-item`, never structural ownership. Reading and live preview may
+replace resolved Task List links with the shared rich List row, but that visual
+composition does not turn them into `list-entry` or expose planner mutations.
+See [Lists](./lists.md).
 
 ## Structural candidate rules
 

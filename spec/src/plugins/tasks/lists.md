@@ -22,6 +22,10 @@ root Lists. Extra navigation documents are diagnosed and ignored.
 Navigation links derive `navigation-item`. They never establish ownership,
 never satisfy a parent query, and may point at a List that is also referenced
 elsewhere. A nested List pin is ignored in favor of its structural parent.
+When `lists.md` is opened as ordinary Markdown, its reading and live-preview
+surfaces render each resolved pin with the shared rich List-row presentation.
+Those rows remain presentation-only: they omit planner drag, delete, and
+quick-create controls and do not alter the navigation relationship.
 
 ## Structural parents
 

@@ -498,6 +498,7 @@
               taskIndex,
             )}
             expanded={expandedTaskId === row.task.id}
+            reorderable={Boolean(controller)}
             selectOnSurfaceClick={controller?.activeTaskId != null}
             areaOptions={[]}
             onSelectTask={selectTask}

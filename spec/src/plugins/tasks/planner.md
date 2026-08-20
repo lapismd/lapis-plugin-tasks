@@ -28,12 +28,17 @@ The middle-column toolbar uses the Markdown pencil and book-open affordances to
 enter and leave full-document live preview, so the same control remains
 available at phone width without claiming document-body double-click. The
 planner column also exposes the controller-owned collapse toggle. The TaskRun
-block's trailing code icon is the only pointer control that reveals its literal
-source. The preview, CodeMirror editor, scroller, and gutters share the
+block's code icon is the only pointer control that reveals its literal source.
+It overlays the run's inline end beside the authored grouping heading instead
+of consuming a standalone row. The preview, CodeMirror editor, scroller, and
+gutters share the
 active Lapis Markdown theme background and retain the Lapis document margins.
 The rich widget resets CodeMirror whitespace and typography inheritance so its
 task rows retain their normal compact layout and card surfaces without consuming
-the next heading's boundary decoration. TaskRuns and the daily planner both render
+the next heading's boundary decoration. In ordinary Markdown surfaces, rich rows
+remain inside the render width so neither end radius is clipped, and the
+Tasks-owned checkbox tick is isolated from host Markdown checkbox selectors.
+TaskRuns and the daily planner both render
 `TaskQuickCreateRow` and `TaskQuickCreateActions`, rather than maintaining
 separate add forms. Rich TaskRun rows reuse the planner's selection resolver and task-patch
 helper: a row click selects, modifiers toggle or extend selection, the title
@@ -53,6 +58,9 @@ create, reorder, and delete operations transact through that active editor.
 The real-App shell fixture keeps authored prose before and after an arbitrarily
 named grouping heading and structural run, so desktop and phone acceptance
 exercise source-order authority rather than a list-only special case.
+The same shell fixture opens `lists.md` as ordinary Markdown and verifies that
+its presentation-only pins reuse the List row without gaining structural or
+planner behavior.
 
 `tasks-workspace.svelte` wires a live `App` and `TaskRepository`: refresh
 from `buildTaskPlannerSnapshotFromRepository`, persist through

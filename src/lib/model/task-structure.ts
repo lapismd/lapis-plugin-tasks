@@ -256,7 +256,7 @@ export function scanTaskStructure(
   options: {
     documentId: string;
     documentPath: string;
-    documentKind: "task" | "task-list";
+    documentKind: "task" | "task-list" | "task-list-navigation";
   },
 ): ScannedTaskStructure {
   const { body, offset } = sourceBody(raw);

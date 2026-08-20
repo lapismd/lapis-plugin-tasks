@@ -36,6 +36,7 @@
     expanded = false,
     closing = false,
     dragPreview = false,
+    reorderable = true,
     /**
      * When true, plain clicks on the preview surface/title select the row
      * instead of starting title edit (used while a host detail panel is open).
@@ -66,6 +67,7 @@
     expanded?: boolean;
     closing?: boolean;
     dragPreview?: boolean;
+    reorderable?: boolean;
     selectOnSurfaceClick?: boolean;
     areaOptions?: string[];
     onRequestOpen?: (
@@ -308,6 +310,7 @@
       {taskTotal}
       {sortableGroup}
       {dragging}
+      {reorderable}
       isExpanded={expanded}
       isClosing={closing}
       {areaOptions}

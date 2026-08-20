@@ -81,14 +81,56 @@ export function scanStructuralTaskRuns(
   if (!parsed || (parsed.kind !== "task" && parsed.kind !== "task-list")) {
     return [];
   }
+  return scanResolvedTaskRuns(
+    source,
+    parsed.id,
+    parsed.path,
+    parsed.kind,
+    resolveTarget,
+    () => true,
+  );
+}
+
+/**
+ * Finds rich Markdown presentation runs. Navigation runs stay presentation-only
+ * and include only links whose targets are Task Lists.
+ */
+export function scanMarkdownTaskRuns(
+  source: string,
+  sourcePath: string,
+  resolveTarget: StructuralTaskTargetResolver,
+): StructuralTaskRun[] {
+  const parsed = parseTaskDocument(source, sourcePath);
+  if (!parsed) return [];
+  if (parsed.kind === "task" || parsed.kind === "task-list") {
+    return scanStructuralTaskRuns(source, sourcePath, resolveTarget);
+  }
+  return scanResolvedTaskRuns(
+    source,
+    parsed.id,
+    parsed.path,
+    parsed.kind,
+    resolveTarget,
+    (target) => target.kind === "task-list",
+  );
+}
+
+function scanResolvedTaskRuns(
+  source: string,
+  documentId: string,
+  documentPath: string,
+  documentKind: "task" | "task-list" | "task-list-navigation",
+  resolveTarget: StructuralTaskTargetResolver,
+  includeTarget: (target: TaskStructureTarget) => boolean,
+): StructuralTaskRun[] {
   const scanned = scanTaskStructure(source, {
-    documentId: parsed.id,
-    documentPath: parsed.path,
-    documentKind: parsed.kind,
+    documentId,
+    documentPath,
+    documentKind,
   });
   const resolved = scanned.candidates.map((candidate) => {
-    const target = resolveTarget(sourcePath, candidate.authoredHref);
-    return target && target.kind !== "unsupported"
+    const target = resolveTarget(documentPath, candidate.authoredHref);
+    return target && target.kind !== "unsupported" && includeTarget(target)
       ? {
           candidate,
           target,
@@ -113,14 +155,14 @@ export function scanStructuralTaskRuns(
       current.listDepth === item.candidate.listDepth &&
       current.headingPath.join("\u0000") ===
         item.candidate.heading.path.join("\u0000") &&
-      current.id.startsWith(`${parsed.id}:${item.candidate.listStart}:`) &&
+      current.id.startsWith(`${documentId}:${item.candidate.listStart}:`) &&
       item.candidate.positionInList === previous.candidate.positionInList + 1;
     if (!contiguous) {
       runs.push({
-        id: `${parsed.id}:${item.candidate.listStart}:${item.candidate.positionInList}`,
+        id: `${documentId}:${item.candidate.listStart}:${item.candidate.positionInList}`,
         ordinal: runs.length,
-        documentId: parsed.id,
-        documentPath: parsed.path,
+        documentId,
+        documentPath,
         headingPath: item.candidate.heading.path,
         headingLevel: item.candidate.heading.level,
         headingText: item.candidate.heading.text,

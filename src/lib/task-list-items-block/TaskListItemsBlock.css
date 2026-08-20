@@ -1,4 +1,5 @@
 .task-list-items-block {
+  position: relative;
   display: grid;
   gap: 0.5rem;
   margin-block: 0.75rem;
@@ -28,10 +29,12 @@
 }
 
 .task-list-items-block__header {
+  position: absolute;
+  inset-block-start: -2.15rem;
+  inset-inline-end: 0;
+  z-index: 2;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
 }
 
 .task-list-items-block__header h2 {
@@ -56,7 +59,6 @@
   background: transparent;
   color: var(--ui-muted-foreground, currentColor);
   cursor: pointer;
-  margin-inline-start: auto;
 }
 
 .task-list-items-block__source svg {
@@ -72,6 +74,34 @@
 .task-list-items-block__rows {
   display: grid;
   gap: 0.25rem;
+}
+
+.task-list-items-block[data-task-list-surface="markdown"]
+  .application-planner-task-row,
+.task-list-items-block[data-task-list-surface="markdown"]
+  .task-list-items-list-row {
+  margin-inline: 0;
+}
+
+.task-list-items-block [data-task-checkbox].task-checkbox input:checked {
+  border-color: var(--card-color, var(--ui-tasks-accent));
+  background: transparent;
+}
+
+.task-list-items-block [data-task-checkbox].task-checkbox input:checked::after {
+  position: static;
+  inset: auto;
+  display: block;
+  width: var(--task-checkbox-tick-width);
+  height: var(--task-checkbox-tick-height);
+  border: var(--task-checkbox-tick-border) solid
+    var(--kanban-card, var(--background));
+  border-top-width: 0;
+  border-left-width: 0;
+  background: transparent;
+  opacity: 1;
+  mask: none;
+  -webkit-mask: none;
 }
 
 .task-list-items-block .task-line,

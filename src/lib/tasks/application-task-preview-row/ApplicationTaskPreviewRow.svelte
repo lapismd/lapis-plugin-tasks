@@ -54,6 +54,7 @@
     isClosing = false,
     readonly = false,
     embedded = false,
+    reorderable = true,
     showFooterActions = true,
     /** When false, the parent owns SwipeItem.Root around this row. */
     ownSwipe = true,
@@ -91,6 +92,7 @@
     isClosing?: boolean;
     readonly?: boolean;
     embedded?: boolean;
+    reorderable?: boolean;
     showFooterActions?: boolean;
     ownSwipe?: boolean;
     showHoverOpen?: boolean;
@@ -650,45 +652,49 @@
     class:task-preview-row-shell--dragging={dragging}
     class:task-preview-row-shell--expanded={isOpenSurface}
     class:task-preview-row-shell--embedded={embedded}
-    data-sortable-item={embedded ? undefined : true}
-    data-sortable-index={embedded ? undefined : taskIndex}
-    data-sortable-group={embedded ? undefined : sortableGroup}
+    data-sortable-item={embedded || !reorderable ? undefined : true}
+    data-sortable-index={embedded || !reorderable ? undefined : taskIndex}
+    data-sortable-group={embedded || !reorderable ? undefined : sortableGroup}
   >
     {#if showCollapsedChrome}
-      <button
-        type="button"
-        class="task-preview-row__drag-handle"
-        data-task-drag-handle
-        data-swipe-item-gesture-ignore
-        aria-label={`Reorder ${titleExcerpt}`}
-        onpointerdown={(event) => onDragStart(event)}
-      >
-        <GripVerticalIcon />
-      </button>
+      {#if reorderable}
+        <button
+          type="button"
+          class="task-preview-row__drag-handle"
+          data-task-drag-handle
+          data-swipe-item-gesture-ignore
+          aria-label={`Reorder ${titleExcerpt}`}
+          onpointerdown={(event) => onDragStart(event)}
+        >
+          <GripVerticalIcon />
+        </button>
+      {/if}
 
       <div
         class="task-preview-row__hover-actions"
         data-task-preview-hover-actions
         data-swipe-item-gesture-ignore
       >
-        <div class="task-preview-row__hover-move">
-          <button
-            type="button"
-            aria-label="Move task up"
-            disabled={!canMoveUp}
-            onclick={() => onMoveTask(task.id, -1)}
-          >
-            <ArrowUpIcon />
-          </button>
-          <button
-            type="button"
-            aria-label="Move task down"
-            disabled={!canMoveDown}
-            onclick={() => onMoveTask(task.id, 1)}
-          >
-            <ArrowDownIcon />
-          </button>
-        </div>
+        {#if reorderable}
+          <div class="task-preview-row__hover-move">
+            <button
+              type="button"
+              aria-label="Move task up"
+              disabled={!canMoveUp}
+              onclick={() => onMoveTask(task.id, -1)}
+            >
+              <ArrowUpIcon />
+            </button>
+            <button
+              type="button"
+              aria-label="Move task down"
+              disabled={!canMoveDown}
+              onclick={() => onMoveTask(task.id, 1)}
+            >
+              <ArrowDownIcon />
+            </button>
+          </div>
+        {/if}
         {#if showHoverEnd}
           <div class="task-preview-row__hover-end">
             {#if showSwipeTrigger && !readonly}
@@ -830,22 +836,24 @@
 
       {#if showFooterActions}
         <div class="task-preview-row__footer-actions">
-          <button
-            type="button"
-            aria-label="Move task up"
-            disabled={!canMoveUp}
-            onclick={() => onMoveTask(task.id, -1)}
-          >
-            <ArrowUpIcon />
-          </button>
-          <button
-            type="button"
-            aria-label="Move task down"
-            disabled={!canMoveDown}
-            onclick={() => onMoveTask(task.id, 1)}
-          >
-            <ArrowDownIcon />
-          </button>
+          {#if reorderable}
+            <button
+              type="button"
+              aria-label="Move task up"
+              disabled={!canMoveUp}
+              onclick={() => onMoveTask(task.id, -1)}
+            >
+              <ArrowUpIcon />
+            </button>
+            <button
+              type="button"
+              aria-label="Move task down"
+              disabled={!canMoveDown}
+              onclick={() => onMoveTask(task.id, 1)}
+            >
+              <ArrowDownIcon />
+            </button>
+          {/if}
           <button
             type="button"
             aria-label={`Remove task ${titleExcerpt}`}

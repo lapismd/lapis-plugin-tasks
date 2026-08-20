@@ -4,6 +4,7 @@ import {
   createTaskHeading,
   moveStructuralTaskEntryEditorChanges,
   replaceStructuralTaskRun,
+  scanMarkdownTaskRuns,
   renameTaskHeading,
   scanStructuralTaskRuns,
   structuralTaskRunEditorChange,
@@ -55,6 +56,58 @@ describe("scanStructuralTaskRuns", () => {
         run.entries.map((entry) => entry.label),
       ),
     ).toEqual([["One"], ["Two"]]);
+  });
+
+  it("keeps navigation links presentation-only while exposing linked Lists to Markdown", () => {
+    const raw = `---
+type: task-list-navigation
+id: lists-nav
+---
+# Lists
+
+## Work
+- [Applications](./lists/applications.md)
+- [Follow up](./tasks/follow-up.md)
+`;
+    const resolveNavigation: StructuralTaskTargetResolver = (_source, href) =>
+      href.includes("applications")
+        ? {
+            id: "list-applications",
+            path: "lists/applications.md",
+            kind: "task-list",
+            title: "Applications",
+          }
+        : {
+            id: "task-follow-up",
+            path: "tasks/follow-up.md",
+            kind: "task",
+            title: "Follow up",
+          };
+
+    expect(scanStructuralTaskRuns(raw, "lists.md", resolveNavigation)).toEqual(
+      [],
+    );
+    expect(
+      scanMarkdownTaskRuns(raw, "lists.md", resolveNavigation).map((run) => ({
+        heading: run.headingPath,
+        entries: run.entries.map((entry) => ({
+          label: entry.label,
+          kind: entry.kind,
+          targetPath: entry.targetPath,
+        })),
+      })),
+    ).toEqual([
+      {
+        heading: ["Work"],
+        entries: [
+          {
+            label: "Applications",
+            kind: "list-entry",
+            targetPath: "lists/applications.md",
+          },
+        ],
+      },
+    ]);
   });
 });
 

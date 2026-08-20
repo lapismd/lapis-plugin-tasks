@@ -53,6 +53,24 @@ describe("task-list Markdown contribution", () => {
     expect(source).toContain("return true");
     expect(source).toContain("sourceRunOrdinal");
     expect(source).toContain("ctx.addChild(child)");
+    expect(source).toContain("scanMarkdownTaskRuns");
+    expect(source).toContain('ctx.frontmatter?.type !== "task-list-navigation"');
+  });
+
+  it("keeps rich Markdown rows inside the host and protects the Tasks checkbox", () => {
+    const styles = readFileSync(
+      "src/lib/task-list-items-block/TaskListItemsBlock.css",
+      "utf8",
+    );
+    expect(styles).toContain(".task-list-items-block__header {\n  position: absolute;");
+    expect(styles).toContain(
+      '.task-list-items-block[data-task-list-surface="markdown"]',
+    );
+    expect(styles).toContain("margin-inline: 0;");
+    expect(styles).toContain(
+      ".task-list-items-block [data-task-checkbox].task-checkbox input:checked::after",
+    );
+    expect(styles).toContain("mask: none;");
   });
 
   it.each([
