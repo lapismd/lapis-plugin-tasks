@@ -335,6 +335,41 @@
   min-width: 0;
 }
 
+.task-repeat-picker__setting-row .cv-form-inline-option-picker,
+.task-repeat-picker__setting-row [data-ui-component="segmented-control"] {
+  width: 100%;
+  min-width: 0;
+}
+
+.task-repeat-picker__setting-row .cv-form-inline-option-trigger,
+.task-repeat-picker__setting-row .cv-form-inline-option-list,
+.task-repeat-picker__setting-row .cv-form-segmented {
+  width: 100%;
+}
+
+.task-repeat-picker__setting-row .cv-form-segmented button {
+  flex: 1 1 0;
+  justify-content: center;
+}
+
+.task-repeat-picker__setting-row--segmented[data-ui-component="field"] {
+  grid-template-columns: minmax(7rem, 1fr) minmax(18rem, 1.65fr);
+}
+
+.task-repeat-picker__settings-card--behavior .cv-form-segmented {
+  background: var(--ui-form-background, var(--background));
+}
+
+.task-repeat-picker__settings-card--behavior .cv-form-segmented button {
+  min-width: 8rem;
+  background: var(--ui-form-background, var(--background));
+  white-space: nowrap;
+}
+
+.task-repeat-picker__settings-card--behavior .cv-form-segmented button.active {
+  background: var(--ui-form-selection);
+}
+
 .task-repeat-picker__control-grid {
   display: grid;
   min-width: 0;
@@ -344,6 +379,11 @@
 
 .task-repeat-picker__control-grid > * {
   min-width: 0;
+}
+
+.task-repeat-picker__control-grid [data-ui-component="input"] {
+  width: 100%;
+  background: var(--ui-form-background, var(--background));
 }
 
 .task-repeat-picker__weekday-grid[data-ui-component="toggle-group"] {
@@ -365,6 +405,7 @@
   gap: 0.08rem;
   border-color: transparent;
   border-radius: calc(var(--ui-form-radius, var(--radius)) * 1.05);
+  background: var(--ui-form-background, var(--background)) !important;
   color: var(--ui-form-muted, var(--muted-foreground));
   padding: 0.45rem 0.1rem 0.55rem;
 }
@@ -409,6 +450,12 @@
 
 .task-repeat-picker__sheet [data-ui-part="select-trigger"]:hover,
 .task-repeat-picker__sheet [data-ui-part="select-trigger"][data-state="open"],
+.task-repeat-picker__sheet .cv-form-inline-option-trigger:hover,
+.task-repeat-picker__sheet .cv-form-inline-option-trigger:focus-visible,
+.task-repeat-picker__sheet .cv-form-inline-option-list button:hover,
+.task-repeat-picker__sheet .cv-form-inline-option-list button:focus-visible,
+.task-repeat-picker__sheet .cv-form-segmented button:hover,
+.task-repeat-picker__sheet .cv-form-segmented button:focus-visible,
 .task-repeat-picker__sheet
   [data-ui-component="cycle-picker"]
   [data-ui-component="button"]:hover,
@@ -420,6 +467,12 @@
 .task-repeat-picker__sheet
   [data-ui-component="button"][data-variant="secondary"] {
   background: var(--task-repeat-picker-control-hover) !important;
+  color: var(--ui-form-foreground, var(--foreground));
+}
+
+.task-repeat-picker__sheet .cv-form-inline-option-list button.active,
+.task-repeat-picker__sheet .cv-form-segmented button.active {
+  background: var(--task-repeat-picker-control-selected) !important;
   color: var(--ui-form-foreground, var(--foreground));
 }
 

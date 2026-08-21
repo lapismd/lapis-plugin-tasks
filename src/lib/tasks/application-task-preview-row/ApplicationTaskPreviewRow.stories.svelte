@@ -252,32 +252,85 @@
     const interval = within(recurrenceDialog).getByRole("spinbutton", {
       name: "Recurrence interval",
     });
+    const scheduleCard = interval.closest(".task-repeat-picker__settings-card");
+    if (!(scheduleCard instanceof HTMLElement)) {
+      throw new Error("Expected recurrence interval to render inside a settings card");
+    }
+    expect(getComputedStyle(interval).backgroundColor).not.toBe(
+      getComputedStyle(scheduleCard).backgroundColor,
+    );
     await userEvent.clear(interval);
     await userEvent.type(interval, "2");
-    const frequencySelect = within(recurrenceDialog).getByRole("combobox", {
+    const frequencySelect = within(recurrenceDialog).getByRole("button", {
       name: "Recurrence frequency",
     });
     expect(frequencySelect.tagName).toBe("BUTTON");
     await userEvent.click(frequencySelect);
     await userEvent.click(
       within(
-        page.getByRole("listbox", {
-          name: "Recurrence frequency options",
+        within(recurrenceDialog).getByRole("listbox", {
+          name: "Recurrence frequency",
         }),
       ).getByRole("option", { name: "Months" }),
     );
-    const anchorSelect = within(recurrenceDialog).getByRole("combobox", {
-      name: "Recurrence anchor",
+    expect(
+      within(recurrenceDialog).queryByRole("combobox", {
+        name: "Recurrence anchor",
+      }),
+    ).not.toBeInTheDocument();
+    const completionDateButton = within(recurrenceDialog).getByRole("button", {
+      name: "Completion date",
     });
-    expect(anchorSelect.tagName).toBe("BUTTON");
-    await userEvent.click(anchorSelect);
-    await userEvent.click(
-      within(
-        page.getByRole("listbox", {
-          name: "Recurrence anchor options",
-        }),
-      ).getByRole("option", { name: "Completion date" }),
+    const completionRow = completionDateButton.closest(
+      ".task-repeat-picker__setting-row--segmented",
     );
+    const behaviorCard = completionDateButton.closest(
+      ".task-repeat-picker__settings-card--behavior",
+    );
+    const completionLabel = completionRow?.querySelector(
+      '[data-ui-part="field-label"]',
+    );
+    if (
+      !(completionRow instanceof HTMLElement) ||
+      !(behaviorCard instanceof HTMLElement) ||
+      !(completionLabel instanceof HTMLElement)
+    ) {
+      throw new Error("Expected behavior recurrence controls to render in segmented rows");
+    }
+    const completionButtonRect = completionDateButton.getBoundingClientRect();
+    const completionLabelRect = completionLabel.getBoundingClientRect();
+    expect(completionButtonRect.left).toBeGreaterThan(completionLabelRect.right);
+    expect(completionDateButton.scrollWidth).toBeLessThanOrEqual(
+      completionDateButton.clientWidth + 1,
+    );
+    expect(getComputedStyle(completionDateButton).backgroundColor).not.toBe(
+      getComputedStyle(behaviorCard).backgroundColor,
+    );
+    await userEvent.click(completionDateButton);
+    expect(
+      within(recurrenceDialog).getByRole("button", {
+        name: "Carry overdue",
+      }),
+    ).toBeDisabled();
+    expect(
+      within(recurrenceDialog).getByRole("button", {
+        name: "Skip missed dates",
+      }),
+    ).toBeDisabled();
+    expect(
+      within(recurrenceDialog).getByRole("button", {
+        name: "Skip missed dates",
+      }).scrollWidth,
+    ).toBeLessThanOrEqual(
+      within(recurrenceDialog).getByRole("button", {
+        name: "Skip missed dates",
+      }).clientWidth + 1,
+    );
+    expect(
+      within(recurrenceDialog).getByRole("button", {
+        name: "Calendar day",
+      }),
+    ).toHaveAttribute("aria-pressed", "true");
     await userEvent.click(
       within(recurrenceDialog).getByRole("switch", {
         name: "Reset checklist on completion",
@@ -456,7 +509,7 @@
       within(customForm).getByRole("switch", { name: "Edit raw RRULE" }),
     ).not.toBeChecked();
     expect(
-      within(customForm).getByRole("combobox", {
+      within(customForm).getByRole("button", {
         name: "Recurrence frequency",
       }),
     ).toHaveTextContent("Weeks");
@@ -473,19 +526,34 @@
     const tuesday = within(customForm).getByRole("button", { name: "Tuesday" });
     expect(tuesday).toHaveTextContent(/Tue\s*18/);
     expect(tuesday).toHaveAttribute("aria-pressed", "false");
+    const customInterval = within(customForm).getByRole("spinbutton", {
+      name: "Recurrence interval",
+    });
+    const customScheduleCard = customInterval.closest(
+      ".task-repeat-picker__settings-card",
+    );
+    if (!(customScheduleCard instanceof HTMLElement)) {
+      throw new Error("Expected custom recurrence interval to render inside a settings card");
+    }
+    expect(getComputedStyle(customInterval).backgroundColor).toBe(
+      getComputedStyle(tuesday).backgroundColor,
+    );
+    expect(getComputedStyle(tuesday).backgroundColor).not.toBe(
+      getComputedStyle(customScheduleCard).backgroundColor,
+    );
     await userEvent.click(tuesday);
     expect(tuesday).toHaveAttribute("aria-pressed", "true");
     await userEvent.click(tuesday);
     expect(tuesday).toHaveAttribute("aria-pressed", "false");
     await userEvent.click(
-      within(customForm).getByRole("combobox", {
+      within(customForm).getByRole("button", {
         name: "Recurrence end condition",
       }),
     );
     await userEvent.click(
       within(
-        page.getByRole("listbox", {
-          name: "Recurrence end condition options",
+        within(customForm).getByRole("listbox", {
+          name: "Recurrence end condition",
         }),
       ).getByRole("option", { name: "On date" }),
     );
@@ -495,14 +563,14 @@
     expect(dialog).toBeVisible();
     expect(state().repeat).toMatchObject({ rrule: "FREQ=DAILY;INTERVAL=2" });
     await userEvent.click(
-      within(customForm).getByRole("combobox", {
+      within(customForm).getByRole("button", {
         name: "Recurrence end condition",
       }),
     );
     await userEvent.click(
       within(
-        page.getByRole("listbox", {
-          name: "Recurrence end condition options",
+        within(customForm).getByRole("listbox", {
+          name: "Recurrence end condition",
         }),
       ).getByRole("option", { name: "After count" }),
     );
@@ -511,13 +579,8 @@
     });
     await userEvent.clear(count);
     await userEvent.type(count, "12");
-    const anchorSelect = within(customForm).getByRole("combobox", {
-      name: "Recurrence anchor",
-    });
-    await userEvent.click(anchorSelect);
     await userEvent.click(
-      within(page.getByRole("listbox", { name: "Recurrence anchor options" }))
-        .getByRole("option", { name: "Scheduled date" }),
+      within(customForm).getByRole("button", { name: "Scheduled date" }),
     );
     const additionalDates = within(customForm).getByRole("combobox", {
       name: "Additional recurrence dates",

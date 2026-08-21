@@ -118,8 +118,14 @@ Task-detail close control's bordered circular geometry, centered icon scale,
 and shadow, with a grey resting surface and stronger hover contrast against the
 white or themed sheet surface.
 The sheet follows the Tasks settings composition: calendar-like weekday toggles,
-Switch controls for boolean policy, Cycle Picker for tracking type, and
-Chip Autocomplete for RDATE/EXDATE. Date chips share the plan-date selector's
+Inline Option Picker pop-out controls for three-or-more option choices,
+Segmented Control for two-option choices, Switch controls for boolean policy,
+Cycle Picker for tracking type, and Chip Autocomplete for RDATE/EXDATE. The
+inline-option and segmented rows keep their labels and values on one row at
+desktop widths so the sheet stays compact. Behavior segmented controls keep
+their option labels unwrapped and use the normal form surface for unselected
+segments over the grey settings-card panel. Repeat-interval inputs and weekday
+cells also use that form surface over grey panels. Date chips share the plan-date selector's
 natural-language parser and normalize against the injected clock before the
 canonical local dates are persisted. Their suggestion popovers remain inside
 the sheet so accepting a suggestion is not treated as an outside interaction.

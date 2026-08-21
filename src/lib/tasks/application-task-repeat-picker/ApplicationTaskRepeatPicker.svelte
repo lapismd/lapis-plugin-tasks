@@ -5,7 +5,13 @@
   import CheckIcon from "@lucide/svelte/icons/check";
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import Repeat2Icon from "@lucide/svelte/icons/repeat-2";
-  import { ChipAutocomplete, CyclePicker } from "@lapismd/design-core/forms";
+  import {
+    ChipAutocomplete,
+    CyclePicker,
+    InlineOptionPicker,
+    SegmentedControl,
+    type InlineOptionPickerOption,
+  } from "@lapismd/design-core/forms";
   import FormSheet from "@lapismd/design-core/forms/FormSheet.svelte";
   import { Button } from "@lapismd/design-core/shadcn/button";
   import * as Collapsible from "@lapismd/design-core/shadcn/collapsible";
@@ -106,12 +112,23 @@
   const frequencyLabels: Record<EditableFrequency, string> = {
     DAILY: "Days", WEEKLY: "Weeks", MONTHLY: "Months", YEARLY: "Years",
   };
+  const frequencyOptions: InlineOptionPickerOption[] = [
+    { value: "DAILY", label: frequencyLabels.DAILY, icon: Repeat2Icon },
+    { value: "WEEKLY", label: frequencyLabels.WEEKLY, icon: Repeat2Icon },
+    { value: "MONTHLY", label: frequencyLabels.MONTHLY, icon: Repeat2Icon },
+    { value: "YEARLY", label: frequencyLabels.YEARLY, icon: Repeat2Icon },
+  ];
   const monthlyModeLabels: Record<MonthlyMode, string> = {
     "month-day": "Calendar day", position: "Positional weekday",
   };
   const endModeLabels: Record<EndMode, string> = {
     never: "Never", count: "After count", until: "On date",
   };
+  const endModeOptions: InlineOptionPickerOption[] = [
+    { value: "never", label: endModeLabels.never, icon: CalendarDaysIcon },
+    { value: "count", label: endModeLabels.count, icon: Repeat2Icon },
+    { value: "until", label: endModeLabels.until, icon: CalendarDaysIcon },
+  ];
   const trackingTypeLabels: Record<TrackingType, string> = {
     none: "None", boolean: "Boolean", count: "Count", duration: "Duration", number: "Number",
   };
@@ -259,6 +276,26 @@
 
   function isTrackingType(value: string): value is TrackingType {
     return value in trackingTypeLabels;
+  }
+
+  function setFrequency(value: string) {
+    if (isEditableFrequency(value)) frequency = value;
+  }
+
+  function setMonthlyMode(value: string) {
+    if (value === "month-day" || value === "position") monthlyMode = value;
+  }
+
+  function setEndMode(value: string) {
+    if (value === "never" || value === "count" || value === "until") endMode = value;
+  }
+
+  function setAnchor(value: string) {
+    if (value === "schedule" || value === "completion") anchor = value;
+  }
+
+  function setMissed(value: string) {
+    if (value === "carry" || value === "skip") missed = value;
   }
 
   async function applyRepeatEvery(nextFrequency = frequency) {
@@ -676,7 +713,7 @@
                 />
               </Field.Field>
             {:else}
-              <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--stacked">
+              <Field.Field class="task-repeat-picker__setting-row">
                 <Field.Label>Repeat interval</Field.Label>
                 <div class="task-repeat-picker__control-grid">
                   <Input
@@ -686,27 +723,12 @@
                     bind:value={interval}
                     aria-label="Recurrence interval"
                   />
-                  <Select.Root type="single" bind:value={frequency}>
-                    <Select.Trigger
-                      role="combobox"
-                      aria-label="Recurrence frequency"
-                      aria-controls={`${uid}-recurrence-frequency-options`}
-                    >
-                      {frequencyLabels[frequency]}
-                    </Select.Trigger>
-                    <Select.Content
-                      id={`${uid}-recurrence-frequency-options`}
-                      aria-label="Recurrence frequency options"
-                      portalProps={{ disabled: true }}
-                    >
-                      <Select.Group>
-                        <Select.Item value="DAILY" label="Days">Days</Select.Item>
-                        <Select.Item value="WEEKLY" label="Weeks">Weeks</Select.Item>
-                        <Select.Item value="MONTHLY" label="Months">Months</Select.Item>
-                        <Select.Item value="YEARLY" label="Years">Years</Select.Item>
-                      </Select.Group>
-                    </Select.Content>
-                  </Select.Root>
+                  <InlineOptionPicker
+                    value={frequency}
+                    options={frequencyOptions}
+                    ariaLabel="Recurrence frequency"
+                    onChange={setFrequency}
+                  />
                 </div>
               </Field.Field>
 
@@ -740,30 +762,18 @@
               {/if}
 
               {#if frequency === "MONTHLY"}
-                <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--stacked">
+                <Field.Field class="task-repeat-picker__setting-row">
                   <Field.Label>Monthly rule</Field.Label>
-                  <Select.Root type="single" bind:value={monthlyMode}>
-                    <Select.Trigger
-                      role="combobox"
-                      aria-label="Monthly recurrence mode"
-                      aria-controls={`${uid}-recurrence-monthly-mode-options`}
-                    >
-                      {monthlyModeLabels[monthlyMode]}
-                    </Select.Trigger>
-                    <Select.Content
-                      id={`${uid}-recurrence-monthly-mode-options`}
-                      aria-label="Monthly recurrence mode options"
-                      portalProps={{ disabled: true }}
-                    >
-                      <Select.Group>
-                        <Select.Item value="month-day" label="Calendar day">Calendar day</Select.Item>
-                        <Select.Item value="position" label="Positional weekday">Positional weekday</Select.Item>
-                      </Select.Group>
-                    </Select.Content>
-                  </Select.Root>
+                  <SegmentedControl
+                    value={monthlyMode}
+                    options={["month-day", "position"]}
+                    labels={monthlyModeLabels}
+                    ariaLabel="Monthly recurrence mode"
+                    onChange={setMonthlyMode}
+                  />
                 </Field.Field>
                 {#if monthlyMode === "position"}
-                  <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--stacked">
+                  <Field.Field class="task-repeat-picker__setting-row">
                     <Field.Label>Position and weekday</Field.Label>
                     <div class="task-repeat-picker__control-grid">
                       <Input
@@ -773,26 +783,20 @@
                         bind:value={position}
                         aria-label="Monthly position"
                       />
-                      <Select.Root type="single" bind:value={positionalWeekday}>
-                        <Select.Trigger
-                          role="combobox"
-                          aria-label="Monthly weekday"
-                          aria-controls={`${uid}-recurrence-monthly-weekday-options`}
-                        >
-                          {weekdayOptions.find(([day]) => day === positionalWeekday)?.[1] ?? "Mon"}
-                        </Select.Trigger>
-                        <Select.Content
-                          id={`${uid}-recurrence-monthly-weekday-options`}
-                          aria-label="Monthly weekday options"
-                          portalProps={{ disabled: true }}
-                        >
-                          <Select.Group>
-                            {#each weekdayOptions as [day, dayLabel]}
-                              <Select.Item value={day} label={dayLabel}>{dayLabel}</Select.Item>
-                            {/each}
-                          </Select.Group>
-                        </Select.Content>
-                      </Select.Root>
+                      <InlineOptionPicker
+                        value={positionalWeekday}
+                        options={weekdayOptions.map(([day, dayLabel]) => ({
+                          value: day,
+                          label: dayLabel,
+                          icon: CalendarDaysIcon,
+                        }))}
+                        ariaLabel="Monthly weekday"
+                        onChange={(value) => {
+                          if (weekdayOptions.some(([day]) => day === value)) {
+                            positionalWeekday = value;
+                          }
+                        }}
+                      />
                     </div>
                   </Field.Field>
                 {:else}
@@ -832,28 +836,14 @@
                 </Field.Field>
               {/if}
 
-              <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--stacked">
+              <Field.Field class="task-repeat-picker__setting-row">
                 <Field.Label>Ends</Field.Label>
-                <Select.Root type="single" bind:value={endMode}>
-                  <Select.Trigger
-                    role="combobox"
-                    aria-label="Recurrence end condition"
-                    aria-controls={`${uid}-recurrence-end-options`}
-                  >
-                    {endModeLabels[endMode]}
-                  </Select.Trigger>
-                  <Select.Content
-                    id={`${uid}-recurrence-end-options`}
-                    aria-label="Recurrence end condition options"
-                    portalProps={{ disabled: true }}
-                  >
-                    <Select.Group>
-                      <Select.Item value="never" label="Never">Never</Select.Item>
-                      <Select.Item value="count" label="After count">After count</Select.Item>
-                      <Select.Item value="until" label="On date">On date</Select.Item>
-                    </Select.Group>
-                  </Select.Content>
-                </Select.Root>
+                <InlineOptionPicker
+                  value={endMode}
+                  options={endModeOptions}
+                  ariaLabel="Recurrence end condition"
+                  onChange={setEndMode}
+                />
               </Field.Field>
               {#if endMode === "count"}
                 <Field.Field class="task-repeat-picker__setting-row">
@@ -887,54 +877,27 @@
           <Field.Description>
             Control advancement, exceptions, checklist resets, and pauses.
           </Field.Description>
-          <div class="task-repeat-picker__settings-card">
-            <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--stacked">
+          <div class="task-repeat-picker__settings-card task-repeat-picker__settings-card--behavior">
+            <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--segmented">
               <Field.Label>Advance from</Field.Label>
-              <Select.Root type="single" bind:value={anchor}>
-                <Select.Trigger
-                  role="combobox"
-                  aria-label="Recurrence anchor"
-                  aria-controls={`${uid}-recurrence-anchor-options`}
-                >
-                  {anchorLabels[anchor]}
-                </Select.Trigger>
-                <Select.Content
-                  id={`${uid}-recurrence-anchor-options`}
-                  aria-label="Recurrence anchor options"
-                  portalProps={{ disabled: true }}
-                >
-                  <Select.Group>
-                    <Select.Item value="schedule" label="Scheduled date">Scheduled date</Select.Item>
-                    <Select.Item value="completion" label="Completion date">Completion date</Select.Item>
-                  </Select.Group>
-                </Select.Content>
-              </Select.Root>
+              <SegmentedControl
+                value={anchor}
+                options={["schedule", "completion"]}
+                labels={anchorLabels}
+                ariaLabel="Recurrence anchor"
+                onChange={setAnchor}
+              />
             </Field.Field>
-            <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--stacked">
+            <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--segmented">
               <Field.Label>Missed dates</Field.Label>
-              <Select.Root
-                type="single"
-                bind:value={missed}
+              <SegmentedControl
+                value={anchor === "completion" ? "carry" : missed}
+                options={["carry", "skip"]}
+                labels={missedLabels}
+                ariaLabel="Missed occurrence policy"
                 disabled={anchor === "completion"}
-              >
-                <Select.Trigger
-                  role="combobox"
-                  aria-label="Missed occurrence policy"
-                  aria-controls={`${uid}-recurrence-missed-options`}
-                >
-                  {missedLabels[anchor === "completion" ? "carry" : missed]}
-                </Select.Trigger>
-                <Select.Content
-                  id={`${uid}-recurrence-missed-options`}
-                  aria-label="Missed occurrence policy options"
-                  portalProps={{ disabled: true }}
-                >
-                  <Select.Group>
-                    <Select.Item value="carry" label="Carry overdue">Carry overdue</Select.Item>
-                    <Select.Item value="skip" label="Skip missed dates">Skip missed dates</Select.Item>
-                  </Select.Group>
-                </Select.Content>
-              </Select.Root>
+                onChange={setMissed}
+              />
             </Field.Field>
             <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--stacked">
               <Field.Label>Additional dates</Field.Label>
