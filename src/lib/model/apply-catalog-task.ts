@@ -1,7 +1,12 @@
 import { listsMatch } from "./list-navigation";
 import { taskDateOnly } from "./planner";
 import type { Task, TaskQuickCreateInput } from "./types";
-import type { TaskPlan, TaskRepeat, TaskStart } from "./task-document";
+import type {
+  TaskPlan,
+  TaskRepeat,
+  TaskStart,
+  TaskTracking,
+} from "./task-document";
 import { catalogTaskFromSummary } from "./catalog-adapter";
 import type { TaskRepository } from "./task-repository";
 
@@ -83,6 +88,13 @@ function plansEqual(
 function repeatsEqual(
   left: TaskRepeat | undefined,
   right: TaskRepeat | undefined,
+): boolean {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
+
+function trackingEqual(
+  left: TaskTracking | undefined,
+  right: TaskTracking | undefined,
 ): boolean {
   return JSON.stringify(left) === JSON.stringify(right);
 }
@@ -178,6 +190,9 @@ export async function applyCatalogTaskToRepository(
 
   if (!repeatsEqual(next.repeat, previous?.repeat)) {
     await repository.setRepeat(path, next.repeat, at);
+  }
+  if (!trackingEqual(next.tracking, previous?.tracking)) {
+    await repository.setTracking(path, next.tracking, at);
   }
 
   if (next.listId !== previous?.listId) {

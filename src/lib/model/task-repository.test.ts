@@ -94,7 +94,10 @@ task:
 `,
 };
 
-async function openRepository(fixtures = FILES) {
+async function openRepository(
+  fixtures = FILES,
+  clock: () => Date = () => new Date("2026-08-20T09:00:00"),
+) {
   const database = new MemoryAppDatabase("tasks-repo");
   await database.open();
   const files = createMemoryTaskFileStore(fixtures);
@@ -105,9 +108,13 @@ async function openRepository(fixtures = FILES) {
   });
   const resolve = createTaskStructureResolverFromDocuments(documents);
   for (const document of documents) {
-    await indexTaskDocument(database, document, resolve);
+    await indexTaskDocument(database, document, resolve, TODAY);
   }
-  return { database, files, repository: new TaskRepository(database, files) };
+  return {
+    database,
+    files,
+    repository: new TaskRepository(database, files, clock),
+  };
 }
 
 describe("TaskRepository", () => {
@@ -136,6 +143,58 @@ describe("TaskRepository", () => {
         expect.objectContaining({ id: "t_canceled" }),
       ]),
     );
+  });
+
+  it("serializes stale effective-occurrence refresh without writing Markdown", async () => {
+    const fixtures = {
+      "habit.md": `---
+type: task
+id: habit
+task:
+  status: open
+  start: anytime
+  plan:
+    date: 2026-08-20
+    at: morning
+  repeat:
+    start: 2026-08-20
+    rrule: FREQ=DAILY;INTERVAL=2
+    anchor: schedule
+    missed: skip
+---
+# Habit
+`,
+    };
+    const { database, files, repository } = await openRepository(
+      fixtures,
+      () => new Date("2026-08-25T08:00:00"),
+    );
+    const before = await files.read("habit.md");
+    const refreshed: string[] = [];
+    repository.subscribeEffectiveOccurrenceRefresh((date) =>
+      refreshed.push(date),
+    );
+
+    const [, upcoming, review] = await Promise.all([
+      repository.today("2026-08-25"),
+      repository.upcoming("2026-08-25"),
+      repository.review("2026-08-25"),
+    ]);
+
+    expect(upcoming).toMatchObject([
+      {
+        id: "habit",
+        effectiveOccurrenceDate: "2026-08-26",
+        effectiveOccurrenceState: "future",
+        effectiveForDate: "2026-08-25",
+      },
+    ]);
+    expect(review).toEqual([]);
+    expect(refreshed).toEqual(["2026-08-25"]);
+    await expect(files.read("habit.md")).resolves.toBe(before);
+    await expect(database.getTaskRow({ id: "habit" })).resolves.toMatchObject({
+      effectiveForDate: "2026-08-25",
+    });
   });
 
   it("walks children and the structural parent", async () => {

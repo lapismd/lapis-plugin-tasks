@@ -251,22 +251,30 @@
 
   onMount(() => {
     settings = settingsSource?.get() ?? DEFAULT_TASKS_PLUGIN_SETTINGS;
+    const unsubscribeEffective = repository.subscribeEffectiveOccurrenceRefresh(
+      () => void queueRefresh(),
+    );
     void queueRefresh();
     const unsubscribeSettings = settingsSource?.subscribe((nextSettings) => {
       settings = nextSettings;
     });
     const changed = app.metadataCache.on("changed", (file) => {
       if (isTaskSourcePath(file.path)) {
+        repository.invalidateEffectiveOccurrences();
         checklistRefreshVersion += 1;
         void queueRefresh();
       }
     });
     const deleted = app.metadataCache.on("deleted", (file) => {
-      if (isTaskSourcePath(file.path)) void queueRefresh();
+      if (isTaskSourcePath(file.path)) {
+        repository.invalidateEffectiveOccurrences();
+        void queueRefresh();
+      }
     });
     return () => {
       app.metadataCache.offref(changed);
       app.metadataCache.offref(deleted);
+      unsubscribeEffective();
       unsubscribeSettings?.();
     };
   });

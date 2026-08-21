@@ -197,8 +197,9 @@ unsupported structural candidates all bound or split a run.
 
 ## Derived index shapes
 
-The public projection stores enough information to reproduce source order and
-perform guarded edits:
+The public projection stores enough information to reproduce source order,
+perform guarded edits, and refresh recurrence-derived effective dates without
+changing the source document:
 
 ```ts
 interface StructuralEntry {

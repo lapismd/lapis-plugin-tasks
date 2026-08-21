@@ -303,3 +303,75 @@ describe("daily agenda", () => {
     ]);
   });
 });
+
+describe("effective recurrence placement", () => {
+  const repeat = {
+    start: "2026-08-18" as const,
+    rrule: "FREQ=DAILY",
+    anchor: "schedule" as const,
+    missed: "carry" as const,
+  };
+
+  it("classifies the single effective occurrence instead of the stored plan", () => {
+    expect(
+      classifyTask(
+        agendaTask({
+          repeat,
+          planDate: "2026-08-18",
+          effectiveOccurrenceDate: "2026-08-18",
+          effectiveOccurrenceState: "overdue",
+        }),
+        "2026-08-20",
+      ),
+    ).toBe("review");
+    expect(
+      classifyTask(
+        agendaTask({
+          repeat: { ...repeat, missed: "skip" },
+          planDate: "2026-08-18",
+          effectiveOccurrenceDate: "2026-08-21",
+          effectiveOccurrenceState: "future",
+        }),
+        "2026-08-20",
+      ),
+    ).toBe("upcoming");
+    expect(
+      classifyTask(
+        agendaTask({
+          repeat: { ...repeat, paused: true },
+          planDate: "2026-08-18",
+          effectiveOccurrenceDate: "2026-08-18",
+          effectiveOccurrenceState: "paused",
+        }),
+        "2026-08-20",
+      ),
+    ).toBe("anytime");
+  });
+
+  it("uses the effective date for agenda inclusion and overdue decoration", () => {
+    const carry = agendaTask({
+      id: "carry",
+      repeat,
+      planDate: "2026-08-18",
+      effectiveOccurrenceDate: "2026-08-18",
+      effectiveOccurrenceState: "overdue",
+    });
+    const skip = agendaTask({
+      id: "skip",
+      repeat: { ...repeat, missed: "skip" },
+      planDate: "2026-08-18",
+      effectiveOccurrenceDate: "2026-08-21",
+      effectiveOccurrenceState: "future",
+    });
+    const snapshot = buildTaskPlannerDaySnapshot(
+      [carry, skip],
+      "2026-08-20",
+      undefined,
+      "2026-08-20",
+    );
+
+    expect(snapshot.anytime.map((task) => task.id)).toEqual(["carry"]);
+    expect(isTaskOverdueForDay(carry, "2026-08-20")).toBe(true);
+    expect(isTaskOverdueForDay(skip, "2026-08-20")).toBe(false);
+  });
+});

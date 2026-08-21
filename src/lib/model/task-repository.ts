@@ -44,6 +44,7 @@ import {
   setTaskChecklistItemChecked,
   setTaskInbox,
   setTaskRepeat,
+  setTaskTracking,
   setTaskStart,
   skipOccurrence,
 } from "./task-mutations";
@@ -64,6 +65,7 @@ import {
 } from "./list-navigation";
 import { projectTask } from "./task-projection";
 import type { TaskSummary, TaskView } from "./task-queries";
+import { todayDateOnly } from "./task-dates";
 
 export type TaskFileStore = {
   read(path: string): Promise<string>;
@@ -132,10 +134,61 @@ export function taskRowToSummary(row: AppDatabaseTaskRecord): TaskSummary {
 }
 
 export class TaskRepository {
+  private effectiveRefreshQueue: Promise<void> = Promise.resolve();
+  private effectiveForDate: string | null = null;
+  private readonly effectiveRefreshListeners = new Set<
+    (today: string) => void
+  >();
+
   constructor(
     private readonly database: AppDatabase,
     private readonly files?: TaskFileStore,
+    private readonly clock: () => Date = () => new Date(),
   ) {}
+
+  invalidateEffectiveOccurrences(): void {
+    this.effectiveForDate = null;
+  }
+
+  subscribeEffectiveOccurrenceRefresh(
+    listener: (today: string) => void,
+  ): () => void {
+    this.effectiveRefreshListeners.add(listener);
+    return () => this.effectiveRefreshListeners.delete(listener);
+  }
+
+  async refreshEffectiveOccurrences(today = todayDateOnly(this.clock())): Promise<void> {
+    if (!this.files || this.effectiveForDate === today) return;
+    const refresh = this.effectiveRefreshQueue
+      .catch(() => undefined)
+      .then(async () => {
+        if (this.effectiveForDate === today) return;
+        const projected = await this.database.queryProjection<AppDatabaseTaskRecord>(
+          PUBLIC_TASKS_PROJECTION_ID,
+          taskQueryToIndexQuery({ kind: "task" }),
+        );
+        const staleRows = projected.rows.filter(
+          (row) => row.repeat && row.effectiveForDate !== today,
+        );
+        for (const row of staleRows) {
+          const raw = await this.files!.read(row.documentPath);
+          const document = parseTaskDocument(raw, row.documentPath);
+          if (!document || document.kind !== "task") continue;
+          await indexTaskDocument(
+            this.database,
+            { ...document, raw },
+            (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
+            today,
+          );
+        }
+        this.effectiveForDate = today;
+        if (staleRows.length) {
+          for (const listener of this.effectiveRefreshListeners) listener(today);
+        }
+      });
+    this.effectiveRefreshQueue = refresh;
+    await refresh;
+  }
 
   async get(id: string): Promise<TaskSummary | null> {
     const row =
@@ -635,7 +688,10 @@ export class TaskRepository {
   }
 
   async complete(path: string, at: string): Promise<TaskSummary> {
-    return this.mutate(path, (document) => completeTaskDocument(document, at));
+    const localDate = todayDateOnly(this.clock());
+    return this.mutate(path, (document) =>
+      completeTaskDocument(document, at, localDate),
+    );
   }
 
   async cancel(path: string, at: string): Promise<TaskSummary> {
@@ -803,7 +859,7 @@ export class TaskRepository {
       diagnostics: [],
     };
     await this.writeDocument(document);
-    return taskRowToSummary(projectTask(document));
+    return taskRowToSummary(projectTask(document, todayDateOnly(this.clock())));
   }
 
   async createList(input: {
@@ -839,7 +895,7 @@ export class TaskRepository {
     if (input.pin) {
       await this.pinList(input.path, input.pin.section, input.at);
     }
-    return taskRowToSummary(projectTask(document));
+    return taskRowToSummary(projectTask(document, todayDateOnly(this.clock())));
   }
 
   async remove(path: string): Promise<void> {
@@ -855,7 +911,10 @@ export class TaskRepository {
   }
 
   async skip(path: string, at: string): Promise<TaskSummary> {
-    return this.mutate(path, (document) => skipOccurrence(document, at));
+    const localDate = todayDateOnly(this.clock());
+    return this.mutate(path, (document) =>
+      skipOccurrence(document, at, localDate),
+    );
   }
 
   async planFor(
@@ -900,6 +959,16 @@ export class TaskRepository {
     return this.mutate(path, (document) => setTaskRepeat(document, repeat, at));
   }
 
+  async setTracking(
+    path: string,
+    tracking: TaskDocument["task"]["tracking"],
+    at: string,
+  ): Promise<TaskSummary> {
+    return this.mutate(path, (document) =>
+      setTaskTracking(document, tracking, at),
+    );
+  }
+
   async moveToList(
     childPath: string,
     listPath: string | null,
@@ -913,7 +982,7 @@ export class TaskRepository {
     if (listPath) {
       await this.replaceListItem(listPath, childPath, child, at);
     }
-    return taskRowToSummary(projectTask(child));
+    return taskRowToSummary(projectTask(child, todayDateOnly(this.clock())));
   }
 
   async pinList(
@@ -1234,7 +1303,7 @@ export class TaskRepository {
   ): Promise<TaskSummary> {
     const next = mutate(await this.loadDocument(path));
     await this.writeDocument(next);
-    return taskRowToSummary(projectTask(next));
+    return taskRowToSummary(projectTask(next, todayDateOnly(this.clock())));
   }
 
   private async loadDocument(path: string): Promise<ParsedTaskFile> {
@@ -1254,10 +1323,12 @@ export class TaskRepository {
     const serialized = serializeTaskDocument(document);
     const next = parseTaskDocument(serialized, document.path) ?? document;
     await this.files.write(document.path, serialized);
+    this.invalidateEffectiveOccurrences();
     await indexTaskDocument(
       this.database,
       { ...next, raw: serialized },
       (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
+      todayDateOnly(this.clock()),
     );
   }
 
@@ -1270,10 +1341,12 @@ export class TaskRepository {
       throw new Error(`Structural mutation produced an invalid task document: ${path}`);
     }
     await this.files.write(path, raw);
+    this.invalidateEffectiveOccurrences();
     await indexTaskDocument(
       this.database,
       { ...parsed, raw },
       (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
+      todayDateOnly(this.clock()),
     );
   }
 
@@ -1365,6 +1438,7 @@ export class TaskRepository {
     view: Exclude<TaskView, "logbook">,
     today?: string,
   ): Promise<TaskSummary[]> {
+    if (today) await this.refreshEffectiveOccurrences(today);
     const result = await this.database.queryProjection<AppDatabaseTaskRecord>(
       PUBLIC_TASKS_PROJECTION_ID,
       taskQueryToIndexQuery({ view, today }),

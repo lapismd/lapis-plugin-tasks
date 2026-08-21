@@ -22,6 +22,7 @@ import { TasksSettingsTab } from "./tasks-settings-tab";
 import { registerTasksWorkspaceSettings } from "./register-tasks-settings";
 import { TASKS_VIEW_TYPE, TasksView } from "./tasks-view";
 import { createTaskStructureMarkdownContribution } from "./task-list-markdown-extension";
+import { todayDateOnly } from "./model/task-dates";
 
 export const TASKS_PLUGIN_ID = "tasks";
 
@@ -40,12 +41,14 @@ export class TasksPlugin extends Plugin {
   private data: TasksPluginData = migrateTasksPluginData(null);
   private saveQueue: Promise<void> = Promise.resolve();
   private readonly settingsListeners = new Set<(settings: TasksPluginSettings) => void>();
+  private localDateTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(app: App, pluginManifest: PluginManifest = MANIFEST) {
     super(app, pluginManifest);
     this.repository = new TaskRepository(
       app.appDatabase,
       createVaultTaskFileStore(app),
+      () => this.clock(),
     );
   }
 
@@ -53,6 +56,9 @@ export class TasksPlugin extends Plugin {
     this.data = migrateTasksPluginData(await this.loadData());
     this.registerIndexProjection(
       createTasksProjectionRegistration(createAppTaskStructureResolver(this.app)),
+    );
+    await this.repository.refreshEffectiveOccurrences(
+      todayDateOnly(this.clock()),
     );
     this.registerMarkdownExtension(
       createTaskStructureMarkdownContribution(this.app, this.repository),
@@ -74,6 +80,50 @@ export class TasksPlugin extends Plugin {
     this.addRibbonIcon("list-todo", "Open Tasks", () => void this.openTasks());
     this.addSettingTab(new TasksSettingsTab(this.app, this));
     registerTasksWorkspaceSettings(this);
+
+    if (typeof document !== "undefined") {
+      this.registerDomEvent(document, "visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+          void this.refreshEffectiveOccurrences();
+        }
+      });
+    }
+    if (typeof window !== "undefined") {
+      this.registerDomEvent(window, "focus", () => {
+        void this.refreshEffectiveOccurrences();
+      });
+      this.registerDomEvent(window, "pageshow", () => {
+        void this.refreshEffectiveOccurrences();
+      });
+    }
+    this.scheduleLocalDateRefresh();
+    this.register(() => {
+      if (this.localDateTimer) clearTimeout(this.localDateTimer);
+      this.localDateTimer = null;
+    });
+  }
+
+  private async refreshEffectiveOccurrences(): Promise<void> {
+    await this.repository.refreshEffectiveOccurrences(
+      todayDateOnly(this.clock()),
+    );
+  }
+
+  private scheduleLocalDateRefresh(): void {
+    if (this.localDateTimer) clearTimeout(this.localDateTimer);
+    const now = this.clock();
+    const nextLocalDate = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + 1,
+    );
+    const delay = Math.max(1, nextLocalDate.getTime() - now.getTime() + 50);
+    this.localDateTimer = setTimeout(() => {
+      this.localDateTimer = null;
+      void this.refreshEffectiveOccurrences().finally(() =>
+        this.scheduleLocalDateRefresh(),
+      );
+    }, delay);
   }
 
   getSettings(): TasksPluginSettings {

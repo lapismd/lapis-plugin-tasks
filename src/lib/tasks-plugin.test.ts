@@ -39,6 +39,10 @@ describe("TasksPlugin", () => {
     expect(source).toContain("this.saveData(snapshot)");
     expect(source).toContain("addSettingTab");
     expect(source).toContain("registerTasksWorkspaceSettings(this)");
+    expect(source).toContain("refreshEffectiveOccurrences");
+    expect(source).toContain('"visibilitychange"');
+    expect(source).toContain('"pageshow"');
+    expect(source).toContain("scheduleLocalDateRefresh");
     expect(view).toContain('export const TASKS_VIEW_TYPE = "tasks"');
     expect(index).toContain("TasksPlugin");
     expect(index).toContain("TasksView");

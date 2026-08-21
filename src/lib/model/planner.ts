@@ -357,7 +357,9 @@ function taskEligibleForDay(
   actualToday: string,
   hideOverdueTasks: boolean,
 ) {
-  const planDate = taskDateOnly(task.planDate) ?? taskDateOnly(task.scheduledAt);
+  const planDate = task.repeat
+    ? taskDateOnly(task.effectiveOccurrenceDate)
+    : taskDateOnly(task.planDate) ?? taskDateOnly(task.scheduledAt);
   const deadline = taskDateOnly(task.deadline) ?? taskDateOnly(task.dueAt);
   const datedMatches = [planDate, deadline].filter(
     (date): date is string => Boolean(date),
@@ -376,6 +378,13 @@ function taskEligibleForDay(
 }
 
 export function isTaskOverdueForDay(task: Task, selectedDate: string) {
+  if (task.repeat) {
+    const effectiveDate = taskDateOnly(task.effectiveOccurrenceDate);
+    return (
+      task.effectiveOccurrenceState === "overdue" &&
+      Boolean(effectiveDate && effectiveDate < selectedDate)
+    );
+  }
   const datedMatches = [
     taskDateOnly(task.planDate) ?? taskDateOnly(task.scheduledAt),
     taskDateOnly(task.deadline) ?? taskDateOnly(task.dueAt),
@@ -439,6 +448,7 @@ export function buildTaskPlannerDaySnapshot(
 
 function taskPlannerDate(task: Task) {
   return (
+    taskDateOnly(task.effectiveOccurrenceDate) ??
     taskDateOnly(task.planDate) ??
     taskDateOnly(task.scheduledAt) ??
     taskDateOnly(task.deadline) ??
@@ -478,6 +488,21 @@ export function classifyTask(
   if (isCompleted(task)) return "logbook";
   if (task.inbox) return "inbox";
   if (task.start === "someday" || task.when === "someday") return "someday";
+  if (task.repeat && task.effectiveOccurrenceState) {
+    if (task.effectiveOccurrenceState === "overdue") return "review";
+    if (task.effectiveOccurrenceState === "current") return "today";
+    if (task.effectiveOccurrenceState === "future") return "upcoming";
+    if (task.effectiveOccurrenceState === "unsupported") {
+      const effectiveDate = taskDateOnly(task.effectiveOccurrenceDate);
+      if (effectiveDate) return effectiveDate > today ? "upcoming" : "today";
+    }
+    if (
+      task.effectiveOccurrenceState === "paused" ||
+      task.effectiveOccurrenceState === "exhausted"
+    ) {
+      return "anytime";
+    }
+  }
   const planDate = taskDateOnly(task.planDate) ?? taskDateOnly(task.scheduledAt);
   const deadline = taskDateOnly(task.deadline) ?? taskDateOnly(task.dueAt);
   const startDate = taskDateOnly(
@@ -511,7 +536,11 @@ export function getTaskPlannerPlacementSource(
 ): TaskPlannerPlacementSource {
   if (isCompleted(task)) return "completedAt";
   if (task.when) return "when";
-  if (taskDateOnly(task.planDate) || taskDateOnly(task.scheduledAt)) {
+  if (
+    taskDateOnly(task.effectiveOccurrenceDate) ||
+    taskDateOnly(task.planDate) ||
+    taskDateOnly(task.scheduledAt)
+  ) {
     return "scheduledAt";
   }
   if (taskDateOnly(task.deadline) || taskDateOnly(task.dueAt)) return "dueAt";

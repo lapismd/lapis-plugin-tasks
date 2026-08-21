@@ -201,6 +201,7 @@ function indexedLinks(
 export function taskDocumentToIndexedFile(
   document: ParsedTaskFile,
   structure: ResolvedTaskDocumentStructure | null = null,
+  today?: string,
 ): AppDatabaseIndexedFile {
   const links = indexedLinks(document, structure);
   return {
@@ -228,7 +229,7 @@ export function taskDocumentToIndexedFile(
     })),
     properties: [],
     task: {
-      ...projectTask(document),
+      ...projectTask(document, today),
       ...(structure ? { structure: taskStructureForProjection(structure) } : {}),
     },
   };
@@ -249,21 +250,25 @@ export async function indexTaskDocument(
         }
       : null;
   },
+  today?: string,
 ): Promise<void> {
-  await database.upsertIndexedFile(taskDocumentToIndexedFile(document));
+  await database.upsertIndexedFile(
+    taskDocumentToIndexedFile(document, null, today),
+  );
   const structure = await resolvedStructure(document, resolveTarget);
-  await indexResolvedTaskDocument(database, document, structure);
+  await indexResolvedTaskDocument(database, document, structure, today);
 }
 
 export async function indexResolvedTaskDocument(
   database: AppDatabase,
   document: ParsedTaskFile,
   structure: ResolvedTaskDocumentStructure | null,
+  today?: string,
 ): Promise<void> {
   await database.upsertIndexedFile(
-    taskDocumentToIndexedFile(document, structure),
+    taskDocumentToIndexedFile(document, structure, today),
   );
-  const projected = projectTask(document);
+  const projected = projectTask(document, today);
   await database.replaceProjectionSource({
     projectionId: PUBLIC_TASKS_PROJECTION_ID,
     sourcePath: document.path,

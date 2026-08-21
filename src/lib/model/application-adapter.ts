@@ -25,6 +25,10 @@ export function taskToApplicationTask(task: Task): ApplicationTaskAdapter {
     planDate: task.planDate,
     planAt: task.planAt,
     repeat: task.repeat,
+    tracking: task.tracking,
+    effectiveOccurrenceDate: task.effectiveOccurrenceDate,
+    effectiveOccurrenceState: task.effectiveOccurrenceState,
+    effectiveForDate: task.effectiveForDate,
     deadline: task.deadline ?? task.dueAt,
     inbox: task.inbox,
     checklistTotal: task.checklistTotal,
@@ -77,6 +81,12 @@ export function applicationTaskToTask(
     repeat: Object.prototype.hasOwnProperty.call(task, "repeat")
       ? task.repeat
       : existing?.repeat,
+    tracking: Object.prototype.hasOwnProperty.call(task, "tracking")
+      ? task.tracking
+      : existing?.tracking,
+    effectiveOccurrenceDate: task.effectiveOccurrenceDate,
+    effectiveOccurrenceState: task.effectiveOccurrenceState,
+    effectiveForDate: task.effectiveForDate,
     inbox: Object.prototype.hasOwnProperty.call(task, "inbox")
       ? task.inbox
       : existing?.inbox,

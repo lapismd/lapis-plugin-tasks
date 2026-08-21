@@ -42,6 +42,13 @@ do not include body prose or comments text.
 Catalog adapters preserve the optional checklist total and completed counts
 while continuing to exclude checklist item text. See LN-TASK-033.
 
+`TaskRepository.refreshEffectiveOccurrences` serializes recurrence projection
+refresh. It runs before the first stale date-sensitive query and is invoked by
+plugin startup, visible/focused/pageshow wake-up, and the next-local-date timer.
+Markdown and source hashes remain unchanged; only disposable projection rows
+are replaced. Open planner workspaces subscribe to completed refreshes and
+rebuild their snapshots from those rows.
+
 For a `task-list`, the parser projects the page display title: its top-level
 front matter `title`, then its first H1, then a human-readable stable-id
 fallback. Repository list renames keep an existing front matter title and H1

@@ -4,6 +4,8 @@
 and plugin runtime. A task is a Markdown file with YAML front
 matter. The filesystem is authoritative. AppDatabase owns the public
 `tasks/task` projection. The plugin registers a main-area planner view.
+The runtime refreshes disposable effective-occurrence fields at date-sensitive
+lifecycle boundaries without rewriting Markdown.
 Host movable panels remain unspecified.
 Reusable leaf controls come from public Design Core APIs.
 `ApplicationTaskAreaPicker` is the catalog List picker and uses the standard

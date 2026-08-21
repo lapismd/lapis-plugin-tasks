@@ -62,6 +62,11 @@ date. Daily section placement is derived from the effective date, `plan.at`,
 status, completion time, and the configured clock boundaries. See [Daily
 agenda](./planner/daily-agenda.md).
 
+Catalog adapters retain recurrence, tracking, effective state, effective date,
+and the resolver date. Classification, upcoming grouping, selected-day
+inclusion, and overdue decoration consume those effective fields. Paused and
+exhausted recurrence remains open in Anytime rather than surfacing a stale plan.
+
 Every named planner destination repeats its navigation icon before the title in
 the planner-column header. The label, icon, navigation count, rendered rows,
 and empty state all come from the same selected bucket rather than separate
