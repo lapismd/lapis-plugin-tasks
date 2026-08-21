@@ -264,6 +264,7 @@
               mode: "due",
               pickerId: `task-due-picker-${root.id}`,
               variant: "footer",
+              now,
             }),
           },
         },
@@ -296,6 +297,7 @@
             wrapper: "none",
             props: ({ root }) => ({
               pickerId: `task-when-picker-${root.id}`,
+              now,
             }),
           },
         },

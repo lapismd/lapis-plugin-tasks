@@ -153,6 +153,7 @@
               mode: "due",
               pickerId: `task-detail-due-picker-${root.id}`,
               variant: "footer",
+              now,
             }),
           },
         },
@@ -185,6 +186,7 @@
             wrapper: "none",
             props: ({ root }) => ({
               pickerId: `task-detail-when-picker-${root.id}`,
+              now,
             }),
           },
         },

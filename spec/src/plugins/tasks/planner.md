@@ -121,9 +121,18 @@ selector, the date is appended as muted anchor context such as `on the 18th`;
 undated tasks omit that context. The header then provides the same
 natural-language recurrence Command used by the custom sheet. Natural-language
 recurrence accepts omitted leading `every` by retrying with that prefix before
-reporting no match. Its no-apply `Repeat every…` disclosure uses an unlabeled
-transparent control row: a number input and Forms Inline Option Picker
-frequency control share one row. `Custom recurrence…` opens a separately
+reporting no match, and weekend phrases persist the canonical Saturday/Sunday
+RRULE. The compact recurrence preset list includes weekday and weekend
+shortcuts. Its natural-language command remains bounded to the fixed-width
+popover, wraps long suggestion text, gives the input only a neutral grey
+search-style focus ring without changing the border, and uses the same neutral
+grey suggestion hover and selected states as the preset menu items rather than
+the recurrence accent. Suggestions use a two-row label/shortcut layout so long
+RRULE values wrap without colliding with the label. Only the preset list scrolls;
+`Repeat every…` and `Custom recurrence…` stay pinned in the popover footer. Its
+no-apply `Repeat every…` disclosure uses an unlabeled transparent control row:
+a number input and Forms Inline Option Picker frequency control share one row.
+`Custom recurrence…` opens a separately
 scrollable, flat, full-height Design Core Form Sheet while closing the popover.
 Its compact header uses the stronger Task-detail title weight and reuses the
 Task-detail close control's bordered circular geometry, centered icon scale,

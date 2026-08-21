@@ -161,8 +161,9 @@ are not aggregate counters.
 
 ## Recurrence editor
 
-The recurrence Command View provides Daily, Weekly, Every 2 weeks, Monthly,
-and Yearly presets plus Advanced raw RRULE editing. Structured controls own
+The recurrence Command View provides Daily, Weekly, Every 2 weeks, Every
+weekday, Every weekend, Monthly, and Yearly presets plus Advanced raw RRULE
+editing. Structured controls own
 interval, selected weekdays, monthly positional rules, COUNT/UNTIL end
 conditions, anchor, missed policy, checklist reset, RDATE/EXDATE, pause, and
 tracking. Completion anchoring disables skip policy. Applying any schedule

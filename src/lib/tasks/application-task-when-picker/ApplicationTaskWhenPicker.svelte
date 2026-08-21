@@ -26,6 +26,7 @@
     scheduledAt = null,
     when = null,
     planAt = null,
+    now = undefined,
     onClear = null,
     onSelectDate = null,
     onSelectPlacement = null,
@@ -37,6 +38,7 @@
     scheduledAt?: string | null;
     when?: string | null;
     planAt?: string | null;
+    now?: Date;
     onClear?: (() => void | Promise<void>) | null;
     onSelectDate?: ((date: string) => void | Promise<void>) | null;
     onSelectPlacement?: ((placement: TaskPlannerQuickPlacement) => void | Promise<void>) | null;
@@ -55,7 +57,7 @@
   );
 
   const scheduleLabel = $derived(
-    formatTaskScheduleLabel({ when, planAt, scheduledAt }) ?? "Anytime",
+    formatTaskScheduleLabel({ when, planAt, scheduledAt, now }) ?? "Anytime",
   );
 
   const pillLabel = $derived.by(() => {
@@ -171,6 +173,7 @@
         {scheduledAt}
         {when}
         {planAt}
+        {now}
         onClear={clear}
         onSelectDate={selectDate}
         onSelectPlacement={selectPlacement}

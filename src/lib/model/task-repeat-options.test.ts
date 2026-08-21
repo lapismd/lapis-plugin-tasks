@@ -24,6 +24,8 @@ describe("task recurrence preset presentation", () => {
           label: "Every 2 weeks",
           context: "on Friday",
         },
+        { value: "weekday", label: "Every weekday" },
+        { value: "weekend", label: "Every weekend" },
         { value: "monthly", label: "Monthly", context: "on the 21st" },
         { value: "yearly", label: "Yearly", context: "on Aug 21" },
       ],
@@ -49,6 +51,22 @@ describe("task recurrence preset presentation", () => {
     expect(
       taskRepeatPresetFor({
         start: "2026-08-21",
+        rrule: "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR",
+        anchor: "schedule",
+        missed: "carry",
+      }),
+    ).toBe("weekday");
+    expect(
+      taskRepeatPresetFor({
+        start: "2026-08-21",
+        rrule: "FREQ=WEEKLY;BYDAY=SA,SU",
+        anchor: "schedule",
+        missed: "carry",
+      }),
+    ).toBe("weekend");
+    expect(
+      taskRepeatPresetFor({
+        start: "2026-08-21",
         rrule: "FREQ=WEEKLY",
         anchor: "completion",
         missed: "carry",
@@ -58,7 +76,7 @@ describe("task recurrence preset presentation", () => {
 
   it("preserves rolling completion metadata when changing a preset", () => {
     expect(
-      taskRepeatForPreset("monthly", {
+      taskRepeatForPreset("weekend", {
         start: "2026-08-21",
         rrule: "FREQ=DAILY;INTERVAL=3",
         anchor: "completion",
@@ -68,7 +86,7 @@ describe("task recurrence preset presentation", () => {
       }),
     ).toEqual({
       start: "2026-08-21",
-      rrule: "FREQ=MONTHLY",
+      rrule: "FREQ=WEEKLY;BYDAY=SA,SU",
       anchor: "schedule",
       missed: "carry",
       lastCompletedAt: "2026-08-18T09:15:00.000Z",
@@ -77,6 +95,9 @@ describe("task recurrence preset presentation", () => {
   });
 
   it("presents custom rules as friendly recurrence text", () => {
+    expect(formatTaskRepeatRule("FREQ=WEEKLY;BYDAY=SA,SU")).toBe(
+      "Every weekend",
+    );
     expect(
       formatTaskRepeatRule(
         "FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,WE,FR;COUNT=12",
@@ -136,6 +157,13 @@ describe("task recurrence preset presentation", () => {
         input: "weekday",
         label: "Every weekday",
         rrule: "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR",
+      },
+    ]);
+    expect(buildNaturalTaskRepeatSuggestions("weekend")).toEqual([
+      {
+        input: "weekend",
+        label: "Every weekend",
+        rrule: "FREQ=WEEKLY;BYDAY=SA,SU",
       },
     ]);
     expect(buildNaturalTaskRepeatSuggestions("nonsense turtle")).toEqual([]);

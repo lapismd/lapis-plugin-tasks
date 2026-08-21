@@ -14,6 +14,8 @@ export type TaskRepeatPreset =
   | "daily"
   | "weekly"
   | "biweekly"
+  | "weekday"
+  | "weekend"
   | "monthly"
   | "yearly"
   | "custom";
@@ -41,12 +43,16 @@ export type TaskNaturalRepeatSuggestion = {
   rrule: string;
 };
 
+const WEEKDAY_RRULE = "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR";
+const WEEKEND_RRULE = "FREQ=WEEKLY;BYDAY=SA,SU";
+
 function sentenceCase(value: string): string {
   return value.length ? `${value[0]!.toUpperCase()}${value.slice(1)}` : value;
 }
 
 /** Present a stored RRULE property value as reader-facing recurrence text. */
 export function formatTaskRepeatRule(rrule: string): string {
+  if (rrule === WEEKEND_RRULE) return "Every weekend";
   try {
     const text = RRule.fromString(rrule).toText();
     return text ? sentenceCase(text) : rrule;
@@ -69,12 +75,52 @@ function naturalRepeatInputs(input: string): string[] {
   return [`every ${input}`, input];
 }
 
+function naturalRepeatShortcut(
+  input: string,
+): TaskNaturalRepeatSuggestion | null {
+  const normalized = input
+    .toLocaleLowerCase("en-US")
+    .replace(/[.!?]+$/gu, "")
+    .replace(/\s+/gu, " ")
+    .trim();
+  const weekdayInputs = new Set([
+    "weekday",
+    "weekdays",
+    "every weekday",
+    "every weekdays",
+    "each weekday",
+    "each weekdays",
+  ]);
+  const weekendInputs = new Set([
+    "weekend",
+    "weekends",
+    "every weekend",
+    "every weekends",
+    "each weekend",
+    "each weekends",
+  ]);
+  const rrule = weekdayInputs.has(normalized)
+    ? WEEKDAY_RRULE
+    : weekendInputs.has(normalized)
+      ? WEEKEND_RRULE
+      : null;
+  return rrule
+    ? {
+        input,
+        label: formatTaskRepeatRule(rrule),
+        rrule,
+      }
+    : null;
+}
+
 /** Parse rrule.js natural-language input into a validated Tasks suggestion. */
 export function buildNaturalTaskRepeatSuggestions(
   input: string,
 ): TaskNaturalRepeatSuggestion[] {
   const normalizedInput = input.trim();
   if (!normalizedInput) return [];
+  const shortcut = naturalRepeatShortcut(normalizedInput);
+  if (shortcut) return [shortcut];
   for (const candidate of naturalRepeatInputs(normalizedInput)) {
     try {
       const parsed = RRule.fromText(candidate);
@@ -160,6 +206,8 @@ export function taskRepeatPresetFor(
       "FREQ=DAILY": "daily",
       "FREQ=WEEKLY": "weekly",
       "FREQ=WEEKLY;INTERVAL=2": "biweekly",
+      [WEEKDAY_RRULE]: "weekday",
+      [WEEKEND_RRULE]: "weekend",
       "FREQ=MONTHLY": "monthly",
       "FREQ=YEARLY": "yearly",
     } as const
@@ -179,6 +227,8 @@ export function taskRepeatForPreset(
     daily: "FREQ=DAILY",
     weekly: "FREQ=WEEKLY",
     biweekly: "FREQ=WEEKLY;INTERVAL=2",
+    weekday: WEEKDAY_RRULE,
+    weekend: WEEKEND_RRULE,
     monthly: "FREQ=MONTHLY",
     yearly: "FREQ=YEARLY",
   }[preset];
@@ -247,6 +297,8 @@ export function buildTaskRepeatPresentation(
         label: "Every 2 weeks",
         context: `on ${weekday}`,
       },
+      { value: "weekday", label: "Every weekday" },
+      { value: "weekend", label: "Every weekend" },
       {
         value: "monthly",
         label: "Monthly",

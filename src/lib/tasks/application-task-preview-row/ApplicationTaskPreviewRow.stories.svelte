@@ -134,6 +134,20 @@
     expect(within(recurrenceMenu).queryByText("Presets")).not.toBeInTheDocument();
     expect(within(recurrenceMenu).getByText("Every week")).toBeVisible();
     expect(
+      within(recurrenceMenu).getByRole("option", {
+        name: "Every weekday",
+      }),
+    ).toBeVisible();
+    expect(
+      within(recurrenceMenu).getByRole("option", {
+        name: "Every weekend",
+      }),
+    ).toBeVisible();
+    const presetsList = within(recurrenceMenu).getByRole("listbox", {
+      name: "Recurrence presets",
+    });
+    expect(presetsList.getBoundingClientRect().height).toBeLessThanOrEqual(205);
+    expect(
       recurrenceMenu.querySelector(".task-repeat-picker__summary-context"),
     ).toHaveTextContent("on the 22nd");
     expect(within(recurrenceMenu).queryByText("Sat, Aug 22")).not.toBeInTheDocument();
@@ -141,8 +155,11 @@
       name: "Describe recurrence",
     });
     await userEvent.type(compactNaturalRule, "weekday");
+    const naturalMatches = within(recurrenceMenu).getByRole("listbox", {
+      name: "Natural-language recurrence matches",
+    });
     await userEvent.click(
-      within(recurrenceMenu).getByRole("option", {
+      within(naturalMatches).getByRole("option", {
         name: /Every weekday/,
       }),
     );
@@ -204,9 +221,16 @@
     recurrenceMenu = page.getByRole("dialog", {
       name: "Choose task recurrence",
     });
+    const activePresetsList = within(recurrenceMenu).getByRole("listbox", {
+      name: "Recurrence presets",
+    });
     expect(
       within(recurrenceMenu).getByRole("button", { name: "Repeat every" }),
     ).toHaveAttribute("aria-expanded", "true");
+    expect(
+      within(recurrenceMenu).getByRole("button", { name: "Repeat every" })
+        .getBoundingClientRect().top,
+    ).toBeGreaterThanOrEqual(activePresetsList.getBoundingClientRect().bottom - 1);
     expect(
       within(recurrenceMenu).getByRole("spinbutton", {
         name: "Repeat every interval",
@@ -440,6 +464,16 @@
     ).toBeVisible();
     expect(
       within(recurrenceDialog).getByRole("option", {
+        name: "Every weekday",
+      }),
+    ).toBeVisible();
+    expect(
+      within(recurrenceDialog).getByRole("option", {
+        name: "Every weekend",
+      }),
+    ).toBeVisible();
+    expect(
+      within(recurrenceDialog).getByRole("option", {
         name: "Monthly on the 21st",
       }),
     ).toBeVisible();
@@ -466,7 +500,7 @@
     });
     await userEvent.click(
       within(recurrenceDialog).getByRole("option", {
-        name: "Weekly on Friday",
+        name: "Every weekend",
       }),
     );
     await waitFor(() => {
@@ -474,7 +508,7 @@
       expect(state().scheduledAt).toBe("2026-08-21");
       expect(state().planAt).toBe("anytime");
       expect(state().repeat).toMatchObject({
-        rrule: "FREQ=WEEKLY",
+        rrule: "FREQ=WEEKLY;BYDAY=SA,SU",
         anchor: "schedule",
         missed: "carry",
       });
@@ -487,13 +521,13 @@
     });
     expect(
       recurrenceDialog.querySelector(".task-repeat-picker__summary"),
-    ).toHaveTextContent("Every week");
+    ).toHaveTextContent("Every weekend");
     expect(
       recurrenceDialog.querySelector(".task-repeat-picker__summary-context"),
-    ).toHaveTextContent("on the 21st");
+    ).not.toBeInTheDocument();
     expect(
       within(recurrenceDialog).getByRole("option", {
-        name: "Weekly on Friday",
+        name: "Every weekend",
       }),
     ).toHaveAttribute("aria-current", "true");
   }}

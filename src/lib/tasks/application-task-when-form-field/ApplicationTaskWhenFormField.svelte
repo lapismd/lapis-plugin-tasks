@@ -26,6 +26,7 @@
     value = mode === "due" ? null : {},
     update,
     pickerId = undefined,
+    now = undefined,
   }: {
     mode?: PickerMode;
     variant?: PickerVariant;
@@ -34,6 +35,7 @@
     value?: any;
     update: (value: any) => void | Promise<void>;
     pickerId?: string;
+    now?: Date;
   } = $props();
 
   const isDueMode = $derived(mode === "due");
@@ -45,7 +47,7 @@
   );
 
   function selectPlacement(placement: TaskPlannerQuickPlacement) {
-    const patch = resolveTaskPlannerPlacement(placement, new Date(), scheduleValue);
+    const patch = resolveTaskPlannerPlacement(placement, now ?? new Date(), scheduleValue);
     void update({
       scheduledAt: patch.scheduledAt ?? undefined,
       when: patch.when ?? undefined,
@@ -56,7 +58,7 @@
   }
 
   function selectDate(date: string) {
-    const kept = resolveTaskPlannerPlacement("today", new Date(), scheduleValue);
+    const kept = resolveTaskPlannerPlacement("today", now ?? new Date(), scheduleValue);
     void update({
       scheduledAt: date,
       when: kept.when ?? undefined,
@@ -73,6 +75,7 @@
     {variant}
     {pickerId}
     scheduledAt={dueValue}
+    {now}
     onSelectDate={(date) => void update(date)}
     onClear={() => void update(null)}
   />
@@ -84,6 +87,7 @@
     scheduledAt={scheduleValue.scheduledAt}
     when={scheduleValue.when}
     planAt={scheduleValue.planAt}
+    {now}
     onSelectDate={selectDate}
     onSelectPlacement={selectPlacement}
     onClear={() =>

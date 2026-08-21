@@ -577,6 +577,9 @@
               {/if}
             </CommandView.Item>
           {/each}
+          </CommandView.Group>
+        </CommandView.List>
+        <CommandView.Footer>
           <Collapsible.Root
             bind:open={repeatEveryOpen}
             class="task-repeat-picker__repeat-every"
@@ -642,8 +645,7 @@
               />
             {/if}
           </CommandView.Item>
-        </CommandView.Group>
-        </CommandView.List>
+        </CommandView.Footer>
       </CommandView.Root>
     </Popover.Content>
   </Popover.Root>

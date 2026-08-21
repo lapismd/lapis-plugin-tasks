@@ -33,6 +33,7 @@
     scheduledAt = null,
     when = null,
     planAt = null,
+    now = undefined,
   }: {
     clearable?: boolean;
     mode?: PickerMode;
@@ -42,6 +43,7 @@
     scheduledAt?: string | null;
     when?: string | null;
     planAt?: string | null;
+    now?: Date;
   } = $props();
 
   let inputValue = $state("");
@@ -56,11 +58,12 @@
   });
 
   const naturalQuery = $derived(inputValue.trim());
+  const referenceNow = $derived(now ?? new Date());
   const naturalSuggestions = $derived.by(() =>
-    buildNaturalDateSuggestions(naturalQuery),
+    buildNaturalDateSuggestions(naturalQuery, referenceNow),
   );
   const normalizedScheduledAt = $derived(normalizeTaskDateOnly(scheduledAt));
-  const today = $derived(todayDateOnly());
+  const today = $derived(todayDateOnly(referenceNow));
   const isDueMode = $derived(mode === "due");
   const commandLabel = $derived(isDueMode ? "Due date" : "Schedule");
   const suggestionsLabel = $derived(
@@ -69,13 +72,13 @@
   const suggestionsId = $derived(
     isDueMode ? "task-due-picker-suggestions" : "task-when-picker-suggestions",
   );
-  const tomorrow = $derived(tomorrowDateOnly());
+  const tomorrow = $derived(tomorrowDateOnly(referenceNow));
   const isTodaySelected = $derived(normalizedScheduledAt === today);
   const isTomorrowSelected = $derived(normalizedScheduledAt === tomorrow);
 
   function updateNaturalDate(nextValue: string) {
     inputValue = nextValue;
-    const parsed = parseDate(nextValue);
+    const parsed = parseDate(nextValue, referenceNow);
     if (parsed) selectedDate = calendarDateFromDate(parsed);
   }
 
