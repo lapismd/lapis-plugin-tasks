@@ -20,10 +20,9 @@
     dueAt: "2026-07-02",
     repeat: untrack(() => recurringByDefault)
       ? {
-          strategy: "rolling",
-          frequency: "daily",
-          interval: 2,
+          rrule: "FREQ=DAILY;INTERVAL=2",
           anchor: "completion",
+          missed: "carry",
           lastCompletedAt: "2026-08-18T09:15:00.000Z",
           completionCount: 4,
         }

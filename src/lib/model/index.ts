@@ -36,6 +36,8 @@ export * from "./task-document";
 export * from "./task-index";
 export * from "./task-queries";
 export * from "./task-mutations";
+export * from "./recurrence-engine";
+export * from "./effective-occurrence";
 export * from "./task-projection";
 export * from "./task-repository";
 export * from "./task-repeat-options";

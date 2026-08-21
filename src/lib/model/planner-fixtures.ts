@@ -281,10 +281,10 @@ task:
     date: 2026-08-19
     at: morning
   repeat:
-    strategy: rolling
-    frequency: daily
-    interval: 1
+    start: 2026-08-19
+    rrule: FREQ=DAILY
     anchor: schedule
+    missed: carry
 ---
 # Daily stand-up reflection
 `,

@@ -1,8 +1,13 @@
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import { scanTaskStructure } from "./task-structure";
+import {
+  analyzeRecurrenceRule,
+  isLocalDateString,
+  type LocalDateString,
+} from "./recurrence-engine";
 
 export const TASK_DOCUMENT_SCHEMA = "tasks/v1";
-export const TASK_PROJECTION_VERSION = 1;
+export const TASK_PROJECTION_VERSION = 3;
 
 export type TaskDocumentKind = "task" | "task-list" | "task-list-navigation";
 export type CanonicalTaskStatus = "open" | "completed" | "canceled";
@@ -14,8 +19,8 @@ export type TaskPlanKind =
   | "afternoon"
   | "evening"
   | "time";
-export type TaskRepeatFrequency = "daily" | "weekly" | "monthly" | "yearly";
 export type TaskRepeatAnchor = "schedule" | "completion";
+export type TaskRepeatMissed = "carry" | "skip";
 export type StructuralLinkKind =
   | "task-entry"
   | "list-entry"
@@ -42,15 +47,28 @@ export type TaskPlan = {
 };
 
 export type TaskRepeat = {
-  strategy: "rolling";
-  frequency: TaskRepeatFrequency;
-  interval: number;
-  on?: string[];
+  start?: LocalDateString;
+  rrule: string;
   anchor: TaskRepeatAnchor;
+  missed: TaskRepeatMissed;
+  rdate?: LocalDateString[];
+  exdate?: LocalDateString[];
   resetChecklist?: boolean;
+  paused?: boolean;
+  pausedSince?: LocalDateString;
+  pauseRanges?: Array<{
+    start: LocalDateString;
+    end: LocalDateString;
+  }>;
   lastCompletedAt?: string;
   completionCount?: number;
 };
+
+export type TaskTracking =
+  | { type: "boolean" }
+  | { type: "count"; unit: string; target?: number }
+  | { type: "duration"; target?: string }
+  | { type: "number"; unit: string; target?: number };
 
 export type TaskComment = {
   id: string;
@@ -69,6 +87,11 @@ export type TaskFrontMatter = {
   plan?: TaskPlan;
   deadline?: string;
   repeat?: TaskRepeat;
+  /** Opaque invalid or legacy block retained during unrelated mutations. */
+  unparsedRepeat?: unknown;
+  tracking?: TaskTracking;
+  /** Opaque invalid tracking block retained during unrelated mutations. */
+  unparsedTracking?: unknown;
   comments: TaskComment[];
 };
 
@@ -312,38 +335,238 @@ function parsePlan(
   return { date, at, time, duration, durationMinutes };
 }
 
+type ParsedTaskField<T> = {
+  value?: T;
+  unparsed?: unknown;
+};
+
+function invalidTaskField<T>(
+  value: unknown,
+  diagnostics: TaskDiagnostic[],
+  code: string,
+  field: string,
+  message: string,
+): ParsedTaskField<T> {
+  diagnostics.push({ code, field, message });
+  return { unparsed: value };
+}
+
+function parseDateList(
+  value: unknown,
+): LocalDateString[] | undefined | null {
+  if (value == null) return undefined;
+  if (!Array.isArray(value) || !value.every(isLocalDateString)) return null;
+  return [...new Set(value)] as LocalDateString[];
+}
+
+function parsePauseRanges(
+  value: unknown,
+): TaskRepeat["pauseRanges"] | null {
+  if (value == null) return undefined;
+  if (!Array.isArray(value)) return null;
+  const ranges: NonNullable<TaskRepeat["pauseRanges"]> = [];
+  for (const entry of value) {
+    if (!entry || typeof entry !== "object" || Array.isArray(entry)) return null;
+    const range = entry as Record<string, unknown>;
+    if (
+      !isLocalDateString(range.start) ||
+      !isLocalDateString(range.end) ||
+      range.end < range.start
+    ) {
+      return null;
+    }
+    ranges.push({ start: range.start, end: range.end });
+  }
+  return ranges;
+}
+
 function parseRepeat(
   value: unknown,
   diagnostics: TaskDiagnostic[],
-): TaskRepeat | undefined {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
-  const record = value as Record<string, unknown>;
-  const frequency = asString(record.frequency);
-  const frequencies: TaskRepeatFrequency[] = ["daily", "weekly", "monthly", "yearly"];
-  if (!frequency || !frequencies.includes(frequency as TaskRepeatFrequency)) {
-    diagnostics.push({
-      code: "invalid-repeat",
-      field: "task.repeat.frequency",
-      message: "repeat.frequency must be daily, weekly, monthly, or yearly.",
-    });
-    return undefined;
+): ParsedTaskField<TaskRepeat> {
+  if (value == null) return {};
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return invalidTaskField(
+      value,
+      diagnostics,
+      "invalid-repeat",
+      "task.repeat",
+      "repeat must be an RRULE recurrence object.",
+    );
   }
-  const interval =
-    typeof record.interval === "number" && record.interval > 0
-      ? record.interval
-      : 1;
-  const anchor = record.anchor === "completion" ? "completion" : "schedule";
+  const record = value as Record<string, unknown>;
+  if (
+    Object.hasOwn(record, "frequency") ||
+    Object.hasOwn(record, "interval") ||
+    Object.hasOwn(record, "strategy") ||
+    Object.hasOwn(record, "on")
+  ) {
+    return invalidTaskField(
+      value,
+      diagnostics,
+      "legacy-repeat",
+      "task.repeat",
+      "Legacy frequency/interval recurrence is retained but is no longer executable; replace or remove it in the recurrence editor.",
+    );
+  }
+
+  const known = new Set([
+    "start",
+    "rrule",
+    "anchor",
+    "missed",
+    "rdate",
+    "exdate",
+    "resetChecklist",
+    "paused",
+    "pausedSince",
+    "pauseRanges",
+    "lastCompletedAt",
+    "completionCount",
+  ]);
+  const unknown = Object.keys(record).filter((key) => !known.has(key));
+  const rrule = asString(record.rrule);
+  const anchor = record.anchor ?? "schedule";
+  const missed = record.missed ?? "carry";
+  const start = record.start;
+  const rdate = parseDateList(record.rdate);
+  const exdate = parseDateList(record.exdate);
+  const pauseRanges = parsePauseRanges(record.pauseRanges);
+  const lastCompletedAt = asString(record.lastCompletedAt);
+  const completionCount = record.completionCount;
+  const invalid =
+    unknown.length > 0 ||
+    !rrule ||
+    (anchor !== "schedule" && anchor !== "completion") ||
+    (missed !== "carry" && missed !== "skip") ||
+    (anchor === "schedule" && !isLocalDateString(start)) ||
+    (start != null && !isLocalDateString(start)) ||
+    (anchor === "completion" && missed !== "carry") ||
+    rdate === null ||
+    exdate === null ||
+    pauseRanges === null ||
+    (record.resetChecklist != null &&
+      typeof record.resetChecklist !== "boolean") ||
+    (record.paused != null && typeof record.paused !== "boolean") ||
+    (record.paused === true && !isLocalDateString(record.pausedSince)) ||
+    (record.paused !== true && record.pausedSince != null) ||
+    (lastCompletedAt != null && !Number.isFinite(Date.parse(lastCompletedAt))) ||
+    (completionCount != null &&
+      (!Number.isInteger(completionCount) || (completionCount as number) < 0));
+  if (invalid) {
+    return invalidTaskField(
+      value,
+      diagnostics,
+      "invalid-repeat",
+      "task.repeat",
+      "repeat must use a valid RRULE, anchor/missed policy, date-only start and exceptions, pause ranges, and non-negative completionCount.",
+    );
+  }
+
+  const analysis = analyzeRecurrenceRule(rrule);
+  if (analysis.status === "invalid") {
+    return invalidTaskField(
+      value,
+      diagnostics,
+      "invalid-repeat-rule",
+      "task.repeat.rrule",
+      analysis.message,
+    );
+  }
+  if (analysis.status === "unsupported") {
+    diagnostics.push({
+      code: "unsupported-repeat-rule",
+      field: "task.repeat.rrule",
+      message: `The RRULE is preserved but automatic advancement is blocked because Tasks does not execute: ${analysis.parts.join(", ")}.`,
+    });
+  }
+
   return {
-    strategy: "rolling",
-    frequency: frequency as TaskRepeatFrequency,
-    interval,
-    on: asStringArray(record.on),
-    anchor,
-    resetChecklist: record.resetChecklist === true,
-    lastCompletedAt: asString(record.lastCompletedAt),
-    completionCount:
-      typeof record.completionCount === "number" ? record.completionCount : 0,
+    value: {
+      ...(isLocalDateString(start) ? { start } : {}),
+      rrule,
+      anchor: anchor as TaskRepeatAnchor,
+      missed: missed as TaskRepeatMissed,
+      ...(rdate?.length ? { rdate } : {}),
+      ...(exdate?.length ? { exdate } : {}),
+      resetChecklist: record.resetChecklist === true,
+      paused: record.paused === true,
+      ...(isLocalDateString(record.pausedSince)
+        ? { pausedSince: record.pausedSince }
+        : {}),
+      ...(pauseRanges?.length ? { pauseRanges } : {}),
+      ...(lastCompletedAt ? { lastCompletedAt } : {}),
+      ...(typeof completionCount === "number" ? { completionCount } : {}),
+    },
   };
+}
+
+function parseTracking(
+  value: unknown,
+  hasRepeat: boolean,
+  diagnostics: TaskDiagnostic[],
+): ParsedTaskField<TaskTracking> {
+  if (value == null) return {};
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return invalidTaskField(
+      value,
+      diagnostics,
+      "invalid-tracking",
+      "task.tracking",
+      "tracking must be a boolean, count, duration, or number object.",
+    );
+  }
+  if (!hasRepeat) {
+    return invalidTaskField(
+      value,
+      diagnostics,
+      "tracking-without-repeat",
+      "task.tracking",
+      "tracking requires an executable or preserved RRULE recurrence.",
+    );
+  }
+  const record = value as Record<string, unknown>;
+  const type = asString(record.type);
+  const unit = asString(record.unit);
+  const target = record.target;
+  const known = new Set(["type", "unit", "target"]);
+  const invalidTarget =
+    target != null &&
+    (typeof target !== "number" || !Number.isFinite(target) || target <= 0);
+  let tracking: TaskTracking | undefined;
+  if (type === "boolean" && record.unit == null && target == null) {
+    tracking = { type };
+  } else if (
+    (type === "count" || type === "number") &&
+    unit &&
+    !invalidTarget
+  ) {
+    tracking = {
+      type,
+      unit,
+      ...(typeof target === "number" ? { target } : {}),
+    };
+  } else if (
+    type === "duration" &&
+    record.unit == null &&
+    (target == null ||
+      (typeof target === "string" && parseDurationMinutes(target) != null))
+  ) {
+    tracking = {
+      type,
+      ...(typeof target === "string" ? { target } : {}),
+    };
+  }
+  if (!tracking || Object.keys(record).some((key) => !known.has(key))) {
+    return invalidTaskField(
+      value,
+      diagnostics,
+      "invalid-tracking",
+      "task.tracking",
+      "count and number tracking require a unit and optional positive target; duration accepts an optional positive duration target.",
+    );
+  }
+  return { value: tracking };
 }
 
 function parseComments(value: unknown): TaskComment[] {
@@ -404,6 +627,12 @@ function parseTaskFrontMatter(
       message: "plan.date must not be before a dated start.",
     });
   }
+  const repeat = parseRepeat(record.repeat, diagnostics);
+  const tracking = parseTracking(
+    record.tracking,
+    Boolean(repeat.value),
+    diagnostics,
+  );
   return {
     status,
     completedAt: asString(record.completedAt),
@@ -411,7 +640,10 @@ function parseTaskFrontMatter(
     start,
     plan,
     deadline: asString(record.deadline),
-    repeat: parseRepeat(record.repeat, diagnostics),
+    repeat: repeat.value,
+    unparsedRepeat: repeat.unparsed,
+    tracking: tracking.value,
+    unparsedTracking: tracking.unparsed,
     comments: parseComments(record.comments),
   };
 }
@@ -590,7 +822,16 @@ export function serializeTaskDocument(document: ParsedTaskFile): string {
         : {}),
       ...(plan ? { plan } : {}),
       ...(document.task.deadline ? { deadline: document.task.deadline } : {}),
-      ...(document.task.repeat ? { repeat: document.task.repeat } : {}),
+      ...(document.task.repeat
+        ? { repeat: document.task.repeat }
+        : document.task.unparsedRepeat !== undefined
+          ? { repeat: document.task.unparsedRepeat }
+          : {}),
+      ...(document.task.tracking
+        ? { tracking: document.task.tracking }
+        : document.task.unparsedTracking !== undefined
+          ? { tracking: document.task.unparsedTracking }
+          : {}),
       ...(document.task.comments.length
         ? { comments: document.task.comments }
         : {}),

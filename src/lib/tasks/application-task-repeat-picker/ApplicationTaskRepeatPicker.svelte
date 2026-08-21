@@ -11,7 +11,8 @@
   import type {
     TaskRepeat,
     TaskRepeatAnchor,
-    TaskRepeatFrequency,
+    TaskRepeatMissed,
+    LocalDateString,
   } from "../../model";
   import {
     buildTaskRepeatPresentation,
@@ -34,21 +35,27 @@
 
   let open = $state(false);
   let custom = $state(false);
-  let frequency = $state<TaskRepeatFrequency>("weekly");
+  type EditableFrequency = "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
+  let frequency = $state<EditableFrequency>("WEEKLY");
   let interval = $state(1);
   let anchor = $state<TaskRepeatAnchor>("schedule");
+  let missed = $state<TaskRepeatMissed>("carry");
   let resetChecklist = $state(false);
   const uid = $props.id();
 
-  const frequencyLabels: Record<TaskRepeatFrequency, string> = {
-    daily: "Days",
-    weekly: "Weeks",
-    monthly: "Months",
-    yearly: "Years",
+  const frequencyLabels: Record<EditableFrequency, string> = {
+    DAILY: "Days",
+    WEEKLY: "Weeks",
+    MONTHLY: "Months",
+    YEARLY: "Years",
   };
   const anchorLabels: Record<TaskRepeatAnchor, string> = {
     schedule: "Scheduled date",
     completion: "Completion date",
+  };
+  const missedLabels: Record<TaskRepeatMissed, string> = {
+    carry: "Carry overdue",
+    skip: "Skip missed dates",
   };
 
   const preset = $derived(taskRepeatPresetFor(repeat));
@@ -59,21 +66,26 @@
 
   const label = $derived.by(() => {
     if (!repeat) return "Does not repeat";
-    const unit = {
-      daily: "day",
-      weekly: "week",
-      monthly: "month",
-      yearly: "year",
-    }[repeat.frequency];
-    if (repeat.interval === 1) return repeat.frequency[0]!.toUpperCase() + repeat.frequency.slice(1);
-    return `Every ${repeat.interval} ${unit}s`;
+    const knownPreset = taskRepeatPresetFor(repeat);
+    if (knownPreset !== "custom") {
+      return presentation.options.find((option) => option.value === knownPreset)
+        ?.label ?? "Does not repeat";
+    }
+    return repeat.rrule;
   });
 
   $effect(() => {
     if (!open) return;
-    frequency = repeat?.frequency ?? "weekly";
-    interval = repeat?.interval ?? 1;
+    const frequencyMatch = /(?:^|;)FREQ=(DAILY|WEEKLY|MONTHLY|YEARLY)(?:;|$)/u.exec(
+      repeat?.rrule ?? "",
+    );
+    const intervalMatch = /(?:^|;)INTERVAL=(\d+)(?:;|$)/u.exec(
+      repeat?.rrule ?? "",
+    );
+    frequency = (frequencyMatch?.[1] as EditableFrequency | undefined) ?? "WEEKLY";
+    interval = Number(intervalMatch?.[1] ?? 1);
     anchor = repeat?.anchor ?? "schedule";
+    missed = repeat?.missed ?? "carry";
     resetChecklist = repeat?.resetChecklist ?? false;
     custom = preset === "custom";
   });
@@ -85,16 +97,22 @@
   async function selectPreset(
     value: Exclude<TaskRepeatPreset, "custom">,
   ) {
-    await onSelect?.(taskRepeatForPreset(value, repeat));
+    await onSelect?.(
+      taskRepeatForPreset(value, repeat, presentation.referenceDate),
+    );
     closePopover();
   }
 
   async function applyCustom() {
+    const normalizedInterval = Math.max(1, Math.trunc(interval || 1));
+    const rrule = `FREQ=${frequency}${
+      normalizedInterval === 1 ? "" : `;INTERVAL=${normalizedInterval}`
+    }`;
     await onSelect?.({
-      strategy: "rolling",
-      frequency,
-      interval: Math.max(1, Math.trunc(interval || 1)),
+      start: repeat?.start ?? (presentation.referenceDate as LocalDateString),
+      rrule,
       anchor,
+      missed: anchor === "completion" ? "carry" : missed,
       ...(resetChecklist ? { resetChecklist: true } : {}),
       ...(repeat?.lastCompletedAt ? { lastCompletedAt: repeat.lastCompletedAt } : {}),
       ...(repeat?.completionCount != null ? { completionCount: repeat.completionCount } : {}),
@@ -200,10 +218,32 @@
                 portalProps={{ disabled: true }}
               >
                 <Select.Group>
-                  <Select.Item value="daily" label="Days">Days</Select.Item>
-                  <Select.Item value="weekly" label="Weeks">Weeks</Select.Item>
-                  <Select.Item value="monthly" label="Months">Months</Select.Item>
-                  <Select.Item value="yearly" label="Years">Years</Select.Item>
+                  <Select.Item value="DAILY" label="Days">Days</Select.Item>
+                  <Select.Item value="WEEKLY" label="Weeks">Weeks</Select.Item>
+                  <Select.Item value="MONTHLY" label="Months">Months</Select.Item>
+                  <Select.Item value="YEARLY" label="Years">Years</Select.Item>
+                </Select.Group>
+              </Select.Content>
+            </Select.Root>
+          </div>
+          <div class="task-repeat-picker__custom-field">
+            <span>Missed dates</span>
+            <Select.Root type="single" bind:value={missed} disabled={anchor === "completion"}>
+              <Select.Trigger
+                role="combobox"
+                aria-label="Missed occurrence policy"
+                aria-controls={`${uid}-recurrence-missed-options`}
+              >
+                {missedLabels[anchor === "completion" ? "carry" : missed]}
+              </Select.Trigger>
+              <Select.Content
+                id={`${uid}-recurrence-missed-options`}
+                aria-label="Missed occurrence policy options"
+                portalProps={{ disabled: true }}
+              >
+                <Select.Group>
+                  <Select.Item value="carry" label="Carry overdue">Carry overdue</Select.Item>
+                  <Select.Item value="skip" label="Skip missed dates">Skip missed dates</Select.Item>
                 </Select.Group>
               </Select.Content>
             </Select.Root>

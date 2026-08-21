@@ -33,10 +33,11 @@ not an active edge.
 Planner lists and cards read `TaskSummary` rows through `TaskRepository`
 query wrappers. Detail and editor surfaces may reload the Markdown
 `TaskDocument`. `TaskSummary` carries indexed planning fields: status, inbox,
-start, plan, deadline, recurrence, checklist counts, and comment count. Plan kind is
-`anytime`, `morning`, `afternoon`, `evening`, or `time`, with `planTime` for
-clock values. Recurrence summaries retain strategy, frequency, interval, and
-anchor; complete recurrence metadata remains in the Task document. Summaries
+start, plan, deadline, recurrence, tracking, effective occurrence date/state,
+the local date for which those fields were resolved, checklist counts, and
+comment count. Plan kind is `anytime`, `morning`, `afternoon`, `evening`, or
+`time`, with `planTime` for clock values. Recurrence summaries retain the raw
+RRULE, anchor, missed policy, exceptions, pause state, and lifecycle metadata. Summaries
 do not include body prose or comments text.
 Catalog adapters preserve the optional checklist total and completed counts
 while continuing to exclude checklist item text. See LN-TASK-033.
@@ -55,19 +56,19 @@ for named views. Only `kind: task` rows match. See LN-TASK-018.
 | View | Open-task match |
 | --- | --- |
 | Inbox | `task.inbox` is true |
-| Today | `plan.date` or `deadline` is today or earlier |
+| Today | effective occurrence is current or overdue, or a non-recurring plan/deadline is today or earlier |
 | Anytime | start is actionable and there is no plan date |
-| Upcoming | start date, plan date, or deadline is after today |
+| Upcoming | effective occurrence is future, or a non-recurring start/plan/deadline is after today |
 | Someday | `start` is `someday` |
 | Completed | `status` is `completed` |
 | Logbook | `status` is `completed` or `canceled` |
-| Review | `plan.date` is before today |
+| Review | effective occurrence is overdue under carry, or a non-recurring plan is before today |
 
 Start is actionable when it is `anytime`, or a date on or before today.
 Someday starts are not Anytime. A deadline-only open task is Today or
 Upcoming from those dates; catalog adaptation must not treat it as undated
-Anytime. Overdue `plan.date` stays in Review until the user reschedules,
-completes, skips, or cancels.
+Anytime. Only carry retains an overdue occurrence in Review. Skip-policy
+recurrence resolves its next effective date without writing Task Markdown.
 
 The live planner also classifies catalog `Task` rows with `classifyTask` in
 `src/lib/model/planner.ts`. That path is the Column Canvas bucket order, not
@@ -123,9 +124,9 @@ See LN-TASK-019. `TaskRepository.cancel` writes `task.status: canceled`.
   requires its checklist ordinal and expected text, replaces only that marker,
   reparses the file, writes it, and reprojects the new counts. A stale ordinal
   or text raises `TaskChecklistMutationError` without writing.
-- Rolling completion and skip follow the normalized repeat schema, anchor, date
-  advancement, counter, and checklist rules in [Rolling
-  recurrence](./documents/recurrence.md). See LN-TASK-044.
+- Recurring completion and skip follow the RRULE engine, shared resolver,
+  observation ordering, lifecycle counter, and checklist rules in [RRULE
+  recurrence](./documents/recurrence.md). See LN-TASK-044 and LN-TASK-049–055.
 - Structured row and detail controls use the same repository boundary. Exact
   clock values update `task.plan.at`; List changes move the structural parent
   link; recurrence changes replace or clear the complete `task.repeat` value.

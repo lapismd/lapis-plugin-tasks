@@ -134,10 +134,10 @@ describe("applyCatalogTaskToRepository", () => {
       {
         ...beforeRepeat,
         repeat: {
-          strategy: "rolling",
-          frequency: "weekly",
-          interval: 2,
+          start: "2026-08-20",
+          rrule: "FREQ=WEEKLY;INTERVAL=2",
           anchor: "completion",
+          missed: "carry",
           resetChecklist: true,
         },
         updatedAt: "2026-08-20T12:45:00Z",
@@ -145,8 +145,7 @@ describe("applyCatalogTaskToRepository", () => {
       beforeRepeat,
     );
     const repeated = await files.read("buy.md");
-    expect(repeated).toContain("frequency: weekly");
-    expect(repeated).toContain("interval: 2");
+    expect(repeated).toContain("rrule: FREQ=WEEKLY;INTERVAL=2");
     expect(repeated).toContain("anchor: completion");
     expect(repeated).toContain("resetChecklist: true");
     const beforeClearRepeat = catalogTaskFromSummary(

@@ -45,8 +45,10 @@ Compatibility notes remain ordinary prose.
 - `inbox` controls capture state
 - `plan.date` selects a day and `plan.at` selects a day part or `HH:mm`
 - `deadline` is a hard due date and does not imply a plan
-- `repeat` describes the normalized [rolling recurrence
+- `repeat` describes the date-only [RRULE recurrence
   model](./documents/recurrence.md)
+- `tracking` describes boolean or quantitative habit observations and requires
+  recurrence in this release
 - `comments` stores task-owned comment metadata
 
 Today, Review, Upcoming, and Logbook are derived views, never stored flags.
@@ -264,7 +266,7 @@ not contribute progress.
 
 Checklist mutations identify an item by derived ordinal and expected text,
 verify its exact source range, and change only `[ ]`/`[x]`. A stale range or
-label fails closed. Rolling recurrence with `resetChecklist: true` resets all
+label fails closed. Recurring completion with `resetChecklist: true` resets all
 lightweight checkbox markers in that Task.
 
 ## Influences and retained concepts

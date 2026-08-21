@@ -10,7 +10,7 @@ const TODAY = "2026-08-20";
 function summaryFrom(raw: string, path = "task.md") {
   const document = parseTaskDocument(raw, path);
   if (!document) throw new Error("expected document");
-  return taskDocumentToSummary(document);
+  return taskDocumentToSummary(document, TODAY);
 }
 
 describe("task view queries", () => {
@@ -84,5 +84,69 @@ task:
     expect(matchesTaskView(canceled, "completed", TODAY)).toBe(false);
     expect(matchesTaskView(completed, "logbook", TODAY)).toBe(true);
     expect(matchesTaskView(canceled, "logbook", TODAY)).toBe(true);
+  });
+
+  it("uses one effective occurrence for carry, skip, and upcoming views", () => {
+    const carry = summaryFrom(`---
+type: task
+id: carry
+task:
+  status: open
+  start: anytime
+  plan:
+    date: 2026-08-18
+    at: anytime
+  repeat:
+    start: 2026-08-18
+    rrule: FREQ=DAILY
+    anchor: schedule
+    missed: carry
+---
+# Carry
+`);
+    const skip = summaryFrom(`---
+type: task
+id: skip
+task:
+  status: open
+  start: anytime
+  plan:
+    date: 2026-08-18
+    at: anytime
+  repeat:
+    start: 2026-08-18
+    rrule: FREQ=DAILY;INTERVAL=3
+    anchor: schedule
+    missed: skip
+---
+# Skip
+`);
+    const future = summaryFrom(`---
+type: task
+id: future
+task:
+  status: open
+  start: anytime
+  plan:
+    date: 2026-08-22
+    at: anytime
+  repeat:
+    start: 2026-08-22
+    rrule: FREQ=WEEKLY
+    anchor: schedule
+    missed: carry
+---
+# Future
+`);
+
+    expect(carry.effectiveOccurrenceState).toBe("overdue");
+    expect(matchesTaskView(carry, "today", TODAY)).toBe(true);
+    expect(matchesTaskView(carry, "review", TODAY)).toBe(true);
+    expect(skip.effectiveOccurrenceState).toBe("future");
+    expect(skip.effectiveOccurrenceDate).toBe("2026-08-21");
+    expect(matchesTaskView(skip, "review", TODAY)).toBe(false);
+    expect(matchesTaskView(skip, "upcoming", TODAY)).toBe(true);
+    expect(future.effectiveOccurrenceDate).toBe("2026-08-22");
+    expect(matchesTaskView(future, "upcoming", TODAY)).toBe(true);
   });
 });

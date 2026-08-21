@@ -109,9 +109,9 @@
     await userEvent.click(page.getByRole("option", { name: /^Weekly\b/ }));
     await waitFor(() =>
       expect(state().repeat).toMatchObject({
-        frequency: "weekly",
-        interval: 1,
+        rrule: "FREQ=WEEKLY",
         anchor: "schedule",
+        missed: "carry",
         lastCompletedAt: "2026-08-18T09:15:00.000Z",
         completionCount: 4,
       }),
@@ -163,9 +163,9 @@
     );
     await waitFor(() =>
       expect(state().repeat).toMatchObject({
-        frequency: "monthly",
-        interval: 2,
+        rrule: "FREQ=MONTHLY;INTERVAL=2",
         anchor: "completion",
+        missed: "carry",
         resetChecklist: true,
         lastCompletedAt: "2026-08-18T09:15:00.000Z",
         completionCount: 4,
@@ -256,9 +256,9 @@
       expect(state().scheduledAt).toBe("2026-08-21");
       expect(state().planAt).toBe("anytime");
       expect(state().repeat).toMatchObject({
-        frequency: "weekly",
-        interval: 1,
+        rrule: "FREQ=WEEKLY",
         anchor: "schedule",
+        missed: "carry",
       });
     });
 

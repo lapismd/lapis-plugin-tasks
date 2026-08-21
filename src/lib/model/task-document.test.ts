@@ -252,6 +252,146 @@ task:
     expect(raw).not.toContain("all-day");
   });
 
+  it("parses and round-trips the RRULE and tracking contracts", () => {
+    const document = parseTaskDocument(
+      `---
+type: task
+id: t_habit
+task:
+  status: open
+  start: anytime
+  plan:
+    date: 2026-08-21
+    at: morning
+  repeat:
+    start: 2026-08-21
+    rrule: FREQ=WEEKLY;BYDAY=MO,WE,FR;COUNT=12
+    anchor: schedule
+    missed: carry
+    rdate: [2026-08-22]
+    exdate: [2026-08-24]
+    resetChecklist: true
+    paused: false
+    pauseRanges:
+      - start: 2026-08-10
+        end: 2026-08-12
+    completionCount: 2
+  tracking:
+    type: count
+    unit: glasses
+    target: 8
+---
+# Drink water
+`,
+      "habit.md",
+    );
+    expect(document?.kind).toBe("task");
+    if (document?.kind !== "task") return;
+    expect(document.task.repeat).toMatchObject({
+      start: "2026-08-21",
+      rrule: "FREQ=WEEKLY;BYDAY=MO,WE,FR;COUNT=12",
+      anchor: "schedule",
+      missed: "carry",
+      rdate: ["2026-08-22"],
+      exdate: ["2026-08-24"],
+      pauseRanges: [{ start: "2026-08-10", end: "2026-08-12" }],
+      completionCount: 2,
+    });
+    expect(document.task.tracking).toEqual({
+      type: "count",
+      unit: "glasses",
+      target: 8,
+    });
+    const again = parseTaskDocument(
+      serializeTaskDocument(document),
+      "habit.md",
+    );
+    expect(again?.kind).toBe("task");
+    if (again?.kind !== "task") return;
+    expect(again.task.repeat).toEqual(document.task.repeat);
+    expect(again.task.tracking).toEqual(document.task.tracking);
+  });
+
+  it("preserves unsupported RRULE values while diagnosing and blocking execution", () => {
+    const raw = `---
+type: task
+id: t_hourly
+task:
+  status: open
+  start: anytime
+  repeat:
+    start: 2026-08-21
+    rrule: FREQ=HOURLY;BYMINUTE=15
+    anchor: schedule
+    missed: carry
+---
+# Unsupported
+`;
+    const document = parseTaskDocument(raw, "unsupported.md");
+    expect(document?.kind).toBe("task");
+    if (document?.kind !== "task") return;
+    expect(document.task.repeat?.rrule).toBe("FREQ=HOURLY;BYMINUTE=15");
+    expect(document.diagnostics).toContainEqual(
+      expect.objectContaining({ code: "unsupported-repeat-rule" }),
+    );
+    expect(serializeTaskDocument(document)).toContain(
+      "rrule: FREQ=HOURLY;BYMINUTE=15",
+    );
+  });
+
+  it("retains legacy and invalid recurrence blocks opaquely during round-trip", () => {
+    for (const [repeat, code] of [
+      ["frequency: daily\n    interval: 1", "legacy-repeat"],
+      ["rrule: FREQ=DAILY;COUNT=2;UNTIL=20260830\n    anchor: schedule", "invalid-repeat"],
+    ] as const) {
+      const raw = `---
+type: task
+id: t_legacy
+task:
+  status: open
+  start: anytime
+  repeat:
+    ${repeat}
+---
+# Legacy
+`;
+      const document = parseTaskDocument(raw, "legacy.md");
+      expect(document?.kind).toBe("task");
+      if (document?.kind !== "task") return;
+      expect(document.task.repeat).toBeUndefined();
+      expect(document.task.unparsedRepeat).toBeDefined();
+      expect(document.diagnostics.some((item) => item.code === code)).toBe(true);
+      const serialized = serializeTaskDocument(document);
+      expect(serialized).toContain(repeat.split("\n")[0]!);
+    }
+  });
+
+  it("requires recurrence for tracking and validates quantitative targets", () => {
+    const document = parseTaskDocument(
+      `---
+type: task
+id: t_tracking
+task:
+  status: open
+  start: anytime
+  tracking:
+    type: number
+    unit: km
+    target: 0
+---
+# Invalid tracking
+`,
+      "tracking.md",
+    );
+    expect(document?.kind).toBe("task");
+    if (document?.kind !== "task") return;
+    expect(document.task.tracking).toBeUndefined();
+    expect(document.task.unparsedTracking).toBeDefined();
+    expect(document.diagnostics).toContainEqual(
+      expect.objectContaining({ code: "tracking-without-repeat" }),
+    );
+  });
+
   it("parses a navigation document as presentation pins", () => {
     const document = parseTaskDocument(
       `---

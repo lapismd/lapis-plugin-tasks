@@ -3,8 +3,14 @@ import {
   TASK_PROJECTION_VERSION,
   type ParsedTaskFile,
 } from "./task-document";
+import { resolveEffectiveOccurrence } from "./effective-occurrence";
+import { todayDateOnly } from "./task-dates";
+import type { LocalDateString } from "./recurrence-engine";
 
-export function projectTask(document: ParsedTaskFile): AppDatabaseTaskRecord {
+export function projectTask(
+  document: ParsedTaskFile,
+  today = todayDateOnly(),
+): AppDatabaseTaskRecord {
   if (document.kind === "task-list-navigation") {
     return {
       documentPath: document.path,
@@ -35,6 +41,13 @@ export function projectTask(document: ParsedTaskFile): AppDatabaseTaskRecord {
       projectionVersion: TASK_PROJECTION_VERSION,
     };
   }
+  const effective = document.task.repeat
+    ? resolveEffectiveOccurrence(
+        document.task.repeat,
+        document.task.plan?.date as LocalDateString | undefined,
+        today as LocalDateString,
+      )
+    : null;
   return {
     documentPath: document.path,
     documentId: document.id,
@@ -51,10 +64,11 @@ export function projectTask(document: ParsedTaskFile): AppDatabaseTaskRecord {
     durationMinutes: document.task.plan?.durationMinutes ?? null,
     deadline: document.task.deadline ?? null,
     completedAt: document.task.completedAt ?? null,
-    repeatStrategy: document.task.repeat?.strategy ?? null,
-    repeatFrequency: document.task.repeat?.frequency ?? null,
-    repeatInterval: document.task.repeat?.interval ?? null,
-    repeatAnchor: document.task.repeat?.anchor ?? null,
+    repeat: document.task.repeat ?? null,
+    tracking: document.task.tracking ?? null,
+    effectiveOccurrenceDate: effective?.date ?? null,
+    effectiveOccurrenceState: effective?.state ?? null,
+    effectiveForDate: effective?.effectiveForDate ?? null,
     checklistTotal: document.checklist.length,
     checklistCompleted: document.checklist.filter((item) => item.checked).length,
     commentCount: document.task.comments.length,

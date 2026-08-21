@@ -29,10 +29,10 @@ describe("application task checklist aggregates", () => {
       id: "task-repeat",
       title: "Weekly review",
       repeat: {
-        strategy: "rolling",
-        frequency: "weekly",
-        interval: 2,
+        start: "2026-08-21",
+        rrule: "FREQ=WEEKLY;INTERVAL=2",
         anchor: "completion",
+        missed: "carry",
         resetChecklist: true,
       },
     });

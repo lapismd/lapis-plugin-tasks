@@ -37,18 +37,18 @@ describe("task recurrence preset presentation", () => {
   it("recognizes the date-aware two-week shortcut and keeps richer repeats custom", () => {
     expect(
       taskRepeatPresetFor({
-        strategy: "rolling",
-        frequency: "weekly",
-        interval: 2,
+        start: "2026-08-21",
+        rrule: "FREQ=WEEKLY;INTERVAL=2",
         anchor: "schedule",
+        missed: "carry",
       }),
     ).toBe("biweekly");
     expect(
       taskRepeatPresetFor({
-        strategy: "rolling",
-        frequency: "weekly",
-        interval: 1,
+        start: "2026-08-21",
+        rrule: "FREQ=WEEKLY",
         anchor: "completion",
+        missed: "carry",
       }),
     ).toBe("custom");
   });
@@ -56,18 +56,18 @@ describe("task recurrence preset presentation", () => {
   it("preserves rolling completion metadata when changing a preset", () => {
     expect(
       taskRepeatForPreset("monthly", {
-        strategy: "rolling",
-        frequency: "daily",
-        interval: 3,
+        start: "2026-08-21",
+        rrule: "FREQ=DAILY;INTERVAL=3",
         anchor: "completion",
+        missed: "carry",
         lastCompletedAt: "2026-08-18T09:15:00.000Z",
         completionCount: 4,
       }),
     ).toEqual({
-      strategy: "rolling",
-      frequency: "monthly",
-      interval: 1,
+      start: "2026-08-21",
+      rrule: "FREQ=MONTHLY",
       anchor: "schedule",
+      missed: "carry",
       lastCompletedAt: "2026-08-18T09:15:00.000Z",
       completionCount: 4,
     });

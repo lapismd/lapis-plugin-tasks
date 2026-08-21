@@ -1,4 +1,5 @@
-import type { TaskRepeat, TaskRepeatFrequency } from "./task-document";
+import type { TaskRepeat } from "./task-document";
+import { isLocalDateString } from "./recurrence-engine";
 import {
   normalizeTaskDateOnly,
   todayDateOnly,
@@ -54,10 +55,13 @@ function ordinal(value: number) {
 
 function isSimplePreset(repeat: TaskRepeat) {
   return (
-    repeat.strategy === "rolling" &&
     repeat.anchor === "schedule" &&
+    repeat.missed === "carry" &&
     !repeat.resetChecklist &&
-    !repeat.on?.length
+    !repeat.rdate?.length &&
+    !repeat.exdate?.length &&
+    !repeat.paused &&
+    !repeat.pauseRanges?.length
   );
 }
 
@@ -66,25 +70,38 @@ export function taskRepeatPresetFor(
 ): TaskRepeatPreset {
   if (!repeat) return "none";
   if (!isSimplePreset(repeat)) return "custom";
-  if (repeat.frequency === "weekly" && repeat.interval === 2) {
-    return "biweekly";
-  }
-  if (repeat.interval === 1) return repeat.frequency;
-  return "custom";
+  return (
+    {
+      "FREQ=DAILY": "daily",
+      "FREQ=WEEKLY": "weekly",
+      "FREQ=WEEKLY;INTERVAL=2": "biweekly",
+      "FREQ=MONTHLY": "monthly",
+      "FREQ=YEARLY": "yearly",
+    } as const
+  )[repeat.rrule] ?? "custom";
 }
 
 export function taskRepeatForPreset(
   preset: Exclude<TaskRepeatPreset, "custom">,
   current?: TaskRepeat,
+  start: string | undefined = current?.start,
 ): TaskRepeat | undefined {
   if (preset === "none") return undefined;
-  const frequency: TaskRepeatFrequency =
-    preset === "biweekly" ? "weekly" : preset;
+  if (!isLocalDateString(start)) {
+    throw new Error("A recurrence preset requires a date-only start.");
+  }
+  const rrule = {
+    daily: "FREQ=DAILY",
+    weekly: "FREQ=WEEKLY",
+    biweekly: "FREQ=WEEKLY;INTERVAL=2",
+    monthly: "FREQ=MONTHLY",
+    yearly: "FREQ=YEARLY",
+  }[preset];
   return {
-    strategy: "rolling",
-    frequency,
-    interval: preset === "biweekly" ? 2 : 1,
+    start,
+    rrule,
     anchor: "schedule",
+    missed: "carry",
     ...(current?.lastCompletedAt
       ? { lastCompletedAt: current.lastCompletedAt }
       : {}),

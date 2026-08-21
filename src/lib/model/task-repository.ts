@@ -118,22 +118,16 @@ export function taskRowToSummary(row: AppDatabaseTaskRecord): TaskSummary {
     checklistCompleted: row.checklistCompleted,
     commentCount: row.commentCount,
     repeat:
-      row.repeatStrategy === "rolling" &&
-      ["daily", "weekly", "monthly", "yearly"].includes(
-        row.repeatFrequency ?? "",
-      ) &&
-      ["schedule", "completion"].includes(row.repeatAnchor ?? "")
-        ? {
-            strategy: "rolling",
-            frequency: row.repeatFrequency as
-              | "daily"
-              | "weekly"
-              | "monthly"
-              | "yearly",
-            interval: row.repeatInterval ?? 1,
-            anchor: row.repeatAnchor as "schedule" | "completion",
-          }
+      row.repeat && typeof row.repeat === "object"
+        ? (row.repeat as TaskSummary["repeat"])
         : undefined,
+    tracking:
+      row.tracking && typeof row.tracking === "object"
+        ? (row.tracking as TaskSummary["tracking"])
+        : undefined,
+    effectiveOccurrenceDate: row.effectiveOccurrenceDate ?? undefined,
+    effectiveOccurrenceState: row.effectiveOccurrenceState ?? undefined,
+    effectiveForDate: row.effectiveForDate ?? undefined,
   };
 }
 

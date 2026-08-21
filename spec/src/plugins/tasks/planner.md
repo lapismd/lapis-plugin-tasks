@@ -45,7 +45,8 @@ state:
 
 | State | Owner | Persistence |
 | --- | --- | --- |
-| Task status, plan, deadline, recurrence, and comments | Task Markdown | Persisted in the Task file |
+| Task status, plan, deadline, recurrence, tracking, and comments | Task Markdown | Persisted in the Task file |
+| Effective occurrence and historical statistics | Resolver plus projections | Disposable and date-sensitive |
 | Task/List membership and order | Structural Markdown links | Persisted at exact list-item ranges |
 | Task summaries and relationships | AppDatabase projection | Disposable and rebuildable |
 | Selected bucket, List, Task, or date | Planner controller | In memory |
@@ -55,8 +56,10 @@ state:
 | Hide overdue tasks | Versioned Tasks plugin settings | Persisted as plugin-owned settings |
 
 Today, Review, Upcoming, Anytime, and Logbook are query results, not document
-fields. Daily section placement is derived from `plan.date`, `plan.at`, status,
-completion time, and the configured clock boundaries. See [Daily
+fields. Recurring placement uses one effective occurrence: Review contains
+only carried overdue occurrences and Upcoming contains only the next effective
+date. Daily section placement is derived from the effective date, `plan.at`,
+status, completion time, and the configured clock boundaries. See [Daily
 agenda](./planner/daily-agenda.md).
 
 Every named planner destination repeats its navigation icon before the title in
@@ -75,16 +78,16 @@ Tasks settings section and the legacy plugin settings tab.
 
 The planner passes its injected local clock through every rendered Task row.
 Date-sensitive row controls therefore use the same `today` as the agenda:
-opening recurrence derives its shortcut labels from `plan.date`, and choosing
-recurrence for an unplanned Task atomically creates an Anytime plan for that
-injected date. Standalone Task surfaces use their own injected clock or the
+opening recurrence derives its shortcut labels from the effective plan date,
+and choosing schedule recurrence for an unplanned Task atomically creates an
+Anytime plan and RRULE start for that injected date. Standalone Task surfaces use their own injected clock or the
 local system clock when the host does not supply one. See LN-TASK-048.
 
 The shared quick-create row supplies the same compact input, focused actions,
 normal-weight label, and block-end separation in daily sections, named views,
 and Markdown TaskRuns. Individual pages do not add their own spacing fixes.
 Expanded row metadata composes the shared Design Core controls throughout,
-including shadcn Select triggers for custom recurrence frequency and anchor;
+including structured recurrence controls and Advanced raw RRULE editing;
 planner pages do not substitute native form dropdowns. See LN-TASK-046.
 The shared plan-time popover presents day parts and clock shortcuts in compact
 two-column groups, keeping their smaller section titles subordinate to the
@@ -114,7 +117,7 @@ The implementation is described in three focused chapters:
   interaction.
 
 The task and recurrence schemas are defined separately in [Task documents and
-structural runs](./documents.md) and [Rolling
+structural runs](./documents.md) and [RRULE
 recurrence](./documents/recurrence.md).
 
 ## Catalog boundary

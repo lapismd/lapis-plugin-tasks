@@ -3,7 +3,13 @@ import type {
   ParsedTaskFile,
   TaskDocument,
   TaskRepeat,
+  TaskTracking,
 } from "./task-document";
+import {
+  resolveEffectiveOccurrence,
+  type EffectiveOccurrenceState,
+} from "./effective-occurrence";
+import type { LocalDateString } from "./recurrence-engine";
 
 export type TaskView =
   | "inbox"
@@ -34,13 +40,20 @@ export type TaskSummary = {
   checklistCompleted: number;
   commentCount: number;
   repeat?: TaskRepeat;
+  tracking?: TaskTracking;
+  effectiveOccurrenceDate?: string;
+  effectiveOccurrenceState?: EffectiveOccurrenceState;
+  effectiveForDate?: string;
 };
 
 export function isTaskDocument(document: ParsedTaskFile): document is TaskDocument {
   return document.kind === "task";
 }
 
-export function taskDocumentToSummary(document: ParsedTaskFile): TaskSummary {
+export function taskDocumentToSummary(
+  document: ParsedTaskFile,
+  today?: string,
+): TaskSummary {
   if (document.kind === "task-list-navigation") {
     return {
       id: document.id,
@@ -69,6 +82,14 @@ export function taskDocumentToSummary(document: ParsedTaskFile): TaskSummary {
       commentCount: 0,
     };
   }
+  const effective =
+    document.task.repeat && today
+      ? resolveEffectiveOccurrence(
+          document.task.repeat,
+          document.task.plan?.date as LocalDateString | undefined,
+          today as LocalDateString,
+        )
+      : null;
   return {
     id: document.id,
     path: document.path,
@@ -89,11 +110,19 @@ export function taskDocumentToSummary(document: ParsedTaskFile): TaskSummary {
     checklistCompleted: document.checklist.filter((item) => item.checked).length,
     commentCount: document.task.comments.length,
     repeat: document.task.repeat,
+    tracking: document.task.tracking,
+    effectiveOccurrenceDate: effective?.date,
+    effectiveOccurrenceState: effective?.state,
+    effectiveForDate: effective?.effectiveForDate,
   };
 }
 
 function isOpenTask(summary: TaskSummary): boolean {
   return summary.kind === "task" && summary.status === "open";
+}
+
+function hasEffectiveOccurrence(summary: TaskSummary): boolean {
+  return Boolean(summary.effectiveOccurrenceState);
 }
 
 function startIsActionable(summary: TaskSummary, today: string): boolean {
@@ -116,7 +145,16 @@ export function matchesTaskView(
     case "today":
       return (
         isOpenTask(summary) &&
-        ((Boolean(summary.planDate) && summary.planDate! <= today) ||
+        (((summary.effectiveOccurrenceState === "current" ||
+          summary.effectiveOccurrenceState === "overdue") &&
+          summary.effectiveOccurrenceDate !== undefined &&
+          summary.effectiveOccurrenceDate <= today) ||
+          (summary.effectiveOccurrenceState === "unsupported" &&
+            summary.effectiveOccurrenceDate !== undefined &&
+            summary.effectiveOccurrenceDate <= today) ||
+          (!hasEffectiveOccurrence(summary) &&
+            Boolean(summary.planDate) &&
+            summary.planDate! <= today) ||
           (Boolean(summary.deadline) && summary.deadline! <= today))
       );
     case "anytime":
@@ -128,8 +166,14 @@ export function matchesTaskView(
     case "upcoming":
       return (
         isOpenTask(summary) &&
-        ((Boolean(summary.startDate) && summary.startDate! > today) ||
-          (Boolean(summary.planDate) && summary.planDate! > today) ||
+        ((summary.effectiveOccurrenceState === "future" &&
+          Boolean(summary.effectiveOccurrenceDate)) ||
+          (!hasEffectiveOccurrence(summary) &&
+            Boolean(summary.startDate) &&
+            summary.startDate! > today) ||
+          (!hasEffectiveOccurrence(summary) &&
+            Boolean(summary.planDate) &&
+            summary.planDate! > today) ||
           (Boolean(summary.deadline) && summary.deadline! > today))
       );
     case "someday":
@@ -141,8 +185,10 @@ export function matchesTaskView(
     case "review":
       return (
         isOpenTask(summary) &&
-        Boolean(summary.planDate) &&
-        summary.planDate! < today
+        (summary.effectiveOccurrenceState === "overdue" ||
+          (!hasEffectiveOccurrence(summary) &&
+            Boolean(summary.planDate) &&
+            summary.planDate! < today))
       );
     default:
       return false;

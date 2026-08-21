@@ -91,7 +91,7 @@ files.
 
 Done uses the actual completion date and excludes canceled tasks. Rolling
 recurring completion advances the open Task instead of creating a Done history
-row. See [Rolling recurrence](../documents/recurrence.md).
+row. See [RRULE recurrence](../documents/recurrence.md).
 
 Section headings keep their icon and label at the leading edge and put the
 count next to the disclosure control at the trailing edge. Neutral, warning,

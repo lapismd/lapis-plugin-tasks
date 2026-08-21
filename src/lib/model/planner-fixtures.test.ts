@@ -38,7 +38,12 @@ describe("planner Markdown fixtures", () => {
     ).toMatchObject({ checklistTotal: 3, checklistCompleted: 1 });
     expect(
       tasks.find((task) => task.id === "story-task-daily-reflection")?.repeat,
-    ).toMatchObject({ frequency: "daily", interval: 1, anchor: "schedule" });
+    ).toMatchObject({
+      start: "2026-08-19",
+      rrule: "FREQ=DAILY",
+      anchor: "schedule",
+      missed: "carry",
+    });
   });
 
   it("queries the same fixture set through TaskRepository summaries", async () => {

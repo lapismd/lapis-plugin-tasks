@@ -1,15 +1,30 @@
-# Rolling recurrence
+# RRULE recurrence and habit tracking
 
-Tasks supports one recurrence strategy: a single Task document rolls forward
-after each occurrence. Completion updates that same Markdown file; it does not
-create an occurrence file or a completion-history row.
+Tasks recurrence is date-only and Markdown-first. One `type: task` document
+represents the active rolling Task; RFC 5545 determines its calendar
+occurrences. Daily Markdown documents record what happened on an occurrence.
+Both database projections are disposable and rebuildable.
 
-See LN-TASK-019, LN-TASK-032, and LN-TASK-044.
+See LN-TASK-019, LN-TASK-032, and LN-TASK-044–055.
 
-## Repeat schema
+## Conceptual model
 
-`task.repeat` is optional. When it is present, `frequency` is required and the
-parser normalizes the complete value to this shape:
+The model separates four things that must not collapse into one field:
+
+1. The recurrence set is the RRULE plus DTSTART-like `start`, RDATE, and EXDATE.
+2. Anchor and missed policy select the active occurrence from that set.
+3. The rolling Task plan points at the currently actionable occurrence.
+4. Daily observations record completed or missed outcomes; an expected date
+   without an observation is unrecorded.
+
+The resolver produces one effective occurrence with state `current`,
+`overdue`, `future`, `exhausted`, `paused`, or `unsupported`. It never expands a
+recurring Task into repeated planner rows and never rewrites Task Markdown just
+because the local date changed.
+
+## Canonical repeat schema
+
+`task.repeat` stores the RRULE property value without an `RRULE:` prefix:
 
 ```yaml
 task:
@@ -18,126 +33,162 @@ task:
     date: 2026-08-21
     at: morning
   repeat:
-    strategy: rolling
-    frequency: weekly
-    interval: 2
+    start: 2026-08-21
+    rrule: FREQ=WEEKLY;BYDAY=MO,WE,FR;COUNT=24
     anchor: schedule
+    missed: carry
+    rdate: [2026-08-22]
+    exdate: [2026-08-24]
     resetChecklist: true
-    lastCompletedAt: 2026-08-07T09:15:00.000Z
+    paused: false
+    pauseRanges:
+      - start: 2026-08-10
+        end: 2026-08-12
+    lastCompletedAt: 2026-08-19T09:15:00.000Z
     completionCount: 4
 ```
 
-| Field | Meaning | Parse behavior |
-| --- | --- | --- |
-| `strategy` | Recurrence model | Always normalizes to `rolling` |
-| `frequency` | `daily`, `weekly`, `monthly`, or `yearly` | Required; an invalid value rejects the repeat block with a diagnostic |
-| `interval` | Number of frequency units per advance | Positive number; defaults to `1` |
-| `anchor` | Date used to calculate the next occurrence | `schedule` or `completion`; defaults to `schedule` |
-| `on` | Reserved string-list metadata | Preserved and serialized, but the current scheduler does not interpret it |
-| `resetChecklist` | Whether completion clears lightweight checkboxes | `true` enables reset; otherwise `false` |
-| `lastCompletedAt` | Timestamp of the latest completed occurrence | Optional timestamp string written by the completion mutation |
-| `completionCount` | Number of completed rolling occurrences | Numeric counter; defaults to `0` and increments on completion |
+| Field | Contract |
+| --- | --- |
+| `start` | Local `YYYY-MM-DD` recurrence origin. Required for schedule anchoring; completion anchoring may set it on first completion. |
+| `rrule` | Required RFC 5545 property value retained verbatim. |
+| `anchor` | `schedule` or `completion`; defaults to `schedule`. |
+| `missed` | `carry` or `skip`; defaults to `carry`. Completion anchoring always uses carry. |
+| `rdate` | Optional date-only inclusions composed through `RRuleSet`. |
+| `exdate` | Optional date-only exclusions. EXDATE wins over DTSTART, RRULE, and RDATE. |
+| `resetChecklist` | Completion resets lightweight checklist markers only when true. |
+| `paused` / `pausedSince` | Active pause state and the local date on which it started. |
+| `pauseRanges` | Persisted inclusive historical ranges excluded from expectations. |
+| `lastCompletedAt` | Timestamp of the latest completed occurrence. |
+| `completionCount` | Recurrence lifecycle state required for completion-anchored COUNT; not a displayed statistic. |
 
-`lastCompletedAt` and `completionCount` describe the rolling Task, not separate
-history records. The Markdown document remains authoritative for the complete
-repeat object. The disposable projection indexes only strategy, frequency,
-interval, and anchor for summary queries.
+Date values must be real calendar dates. COUNT and UNTIL are mutually
+exclusive. UNTIL executes only in date-only `YYYYMMDD` form. A completion
+anchor with `missed: skip`, a schedule anchor without `start`, malformed pause
+ranges, invalid timestamps, or a negative/non-integral completion count makes
+the block invalid.
+
+The obsolete `frequency`/`interval`/`strategy`/`on` mapping is invalid
+immediately. Parsing retains the complete opaque YAML block and emits a
+`legacy-repeat` diagnostic. Unrelated Task edits serialize it unchanged;
+recurrence editing must explicitly replace or remove it. Other invalid repeat
+or tracking blocks receive the same non-destructive treatment.
+
+## Library execution boundary
+
+`RecurrenceEngine` is the only package recurrence calculator. It wraps pinned
+`rrule@2.8.1` with date-only `next`, `previous`, and `between` methods and
+composes `RRuleSet` for DTSTART, RDATE, and EXDATE.
+
+Tasks executes only:
+
+- `FREQ=DAILY`, `WEEKLY`, `MONTHLY`, or `YEARLY`
+- `INTERVAL`, `BYDAY`, `BYMONTHDAY`, `BYMONTH`, and `BYSETPOS`
+- `WKST`, `COUNT`, and date-only `UNTIL`
+
+A syntactically valid library rule outside that subset remains a normal
+`TaskRepeat`, retains its raw RRULE, and emits `unsupported-repeat-rule`.
+Planner surfaces keep its current-plan visibility, but completion, skip, and
+automatic advancement fail closed until the user replaces it. Invalid rules
+remain opaque rather than becoming one-off Tasks.
+
+rrule.js documents that it omits a DTSTART that does not match BY rules, unlike
+the RFC recurrence-set model. The adapter adds `start` as an RDATE so it is the
+first instance, then lets EXDATE remove it when explicitly excluded. Calendar
+month and year rules use the library: January 31 skips months without day 31,
+and February 29 yearly recurrence lands on later leap years rather than adding
+365 days.
+
+## Effective occurrence policy
+
+Schedule/carry retains the rolling plan date until completion or explicit
+skip. A date before local today resolves `overdue` and belongs to Review.
+
+Schedule/skip resolves the first library occurrence on or after local today.
+Several offline days therefore change only disposable effective fields; they
+do not cause midnight or startup Task writes and do not create observations.
+
+Completion anchoring always carries. On first completion it may persist the
+action's local date as `start`; subsequent next dates come from the library
+after the local completion date. When no next occurrence exists, completion or
+skip clears the active plan, keeps the Task open, and projects `exhausted`.
+
+Pause begins on the action's local date. Resume closes an inclusive range from
+`pausedSince` through the day before resume, discards any pre-pause carry
+backlog, and selects the first non-paused library occurrence on or after the
+resume date. Paused dates are excluded from history expectations and
+statistics denominators.
+
+## Completion and skip lifecycle
+
+Recurring completion is one guarded transaction after any required daily
+observation write:
+
+1. Reject invalid, unsupported, paused, future, or exhausted recurrence.
+2. Keep `status: open`, clear terminal completion state, and clear inbox.
+3. Advance the active plan with `RecurrenceEngine`, or clear it on exhaustion.
+4. Persist `lastCompletedAt` and increment `completionCount`.
+5. Reset lightweight checklist markers only when `resetChecklist` is true.
+
+Explicit skip ensures an unchecked daily observation, then advances from the
+effective occurrence without writing completion metadata or resetting the
+checklist. The Task stays open. Automatic skip-policy rollover does not write
+Task Markdown and leaves elapsed dates unrecorded.
+
+## Tracking schema
+
+Tracking requires recurrence in this release:
+
+```yaml
+task:
+  tracking:
+    type: count
+    unit: glasses
+    target: 8
+```
+
+| Type | Fields | Completion input |
+| --- | --- | --- |
+| `boolean` | no additional fields | direct check-off |
+| `count` | required `unit`, optional positive numeric `target` | numeric value |
+| `duration` | optional positive duration `target` | duration |
+| `number` | required `unit`, optional positive numeric `target` | numeric value |
+
+Canceling a quantitative prompt makes no change. Confirmation validates and
+writes the idempotent daily observation before advancing the Task. Statistics
+derive from expected dates plus observations; targets and lifecycle metadata
+are not aggregate counters.
 
 ## Recurrence editor
 
-The shared recurrence popover is a structured editor for this schema. Its
-Command View presets are Does not repeat, Daily, Weekly, Every 2 weeks,
-Monthly, and Yearly. Choosing a frequency preset writes schedule anchoring and
-interval `1`; Every 2 weeks writes weekly frequency and interval `2`. Every
-preset change preserves an existing `lastCompletedAt` and `completionCount`.
+The recurrence Command View provides Daily, Weekly, Every 2 weeks, Monthly,
+and Yearly presets plus Advanced raw RRULE editing. Structured controls own
+interval, selected weekdays, monthly positional rules, COUNT/UNTIL end
+conditions, anchor, missed policy, checklist reset, RDATE/EXDATE, pause, and
+tracking. Completion anchoring disables skip policy. Applying any schedule
+preset persists its calendar start; choosing recurrence for an unplanned Task
+also writes that date as canonical Anytime plan context.
 
-The Task's effective `plan.date` supplies the calendar context displayed by
-the shortcut labels:
+Unsupported and invalid rules remain visibly selected with an actionable
+warning. Opening and dismissing the editor does not normalize, remove, or
+execute them.
 
-| Preset | Example for Friday, 21 August 2026 |
-| --- | --- |
-| Daily | Daily |
-| Weekly | Weekly on Friday |
-| Every 2 weeks | Every 2 weeks on Friday |
-| Monthly | Monthly on the 21st |
-| Yearly | Yearly on Aug 21 |
+## Daily outcomes and statistics
 
-An unplanned Task displays `No planned date` and derives those labels from the
-injected local today. Choosing any recurrence other than Does not repeat then
-writes that local date to `task.plan.date` with canonical Anytime `plan.at`
-semantics in the same structured update as `task.repeat`. This gives the first
-occurrence a scheduling anchor. Removing recurrence clears only `task.repeat`;
-it does not clear an existing plan.
+The app provider locates one canonical `type: daily-note`, `date: YYYY-MM-DD`
+document. Tasks materializes at most one exact list item for
+`taskId + occurrenceDate` under `## Tasks` and the configured day section.
+Boolean observations are unchecked/checked Task links. Quantitative entries
+start unchecked and complete as readable `: value unit` or `: duration` lines;
+indented context remains untouched.
 
-Opening the popover visibly marks the persisted preset. Focus or pointer
-interaction outside the popover dismisses it without applying an unfinished
-custom value, matching the plan-date and plan-time pickers.
+An unchecked current or overdue-carry observation is pending. It becomes
+missed after explicit skip or skip-policy expiry. An elapsed expected date with
+no observation is unrecorded. Historical views merge RRULE expectations with
+indexed `tasks/occurrence` rows and distinguish completed, missed, and
+unrecorded outcomes without reopening daily files.
 
-Custom recurrence exposes interval, frequency, schedule/completion anchor, and
-checklist reset. Frequency and anchor use the shared Design Core shadcn Select
-so they retain the same themed trigger, selected indicator, keyboard behavior,
-and overlay semantics as other application controls; they are not native HTML
-select elements. Applying the custom value writes the scheduling fields through
-the Task callback; the canonical mutation merges retained completion metadata
-from the current Markdown document before serialization. Removing
-recurrence clears only `task.repeat`; it does not change the Task's plan or
-checklist. Reserved `on` metadata is not exposed and weekday-set shortcuts are
-not offered because the scheduler does not currently interpret it. See
-LN-TASK-045–046 and LN-TASK-048.
-
-## Completion lifecycle
-
-Completing a non-recurring Task sets `status: completed` and `completedAt`.
-Completing a recurring Task instead performs one roll-forward transaction:
-
-1. Keep `status: open` and clear `completedAt`.
-2. Clear `inbox`.
-3. If a plan exists, advance `plan.date` once and preserve its `plan.at`, time,
-   and duration fields.
-4. Record the completion timestamp in `repeat.lastCompletedAt`.
-5. Increment `repeat.completionCount` once.
-6. If `resetChecklist` is true, change every lightweight checkbox marker in
-   the Task body to unchecked.
-
-A recurring Task without `task.plan` records its completion metadata and stays
-open but does not invent a plan date. Recurring completion therefore does not
-enter the daily agenda's Done section.
-
-## Anchor and date advancement
-
-The anchor chooses the starting date for the next occurrence:
-
-| Anchor | Starting date |
-| --- | --- |
-| `schedule` | Current `plan.date`; a planless recurring Task does not write a next date |
-| `completion` | Local calendar date of the completion timestamp |
-
-The current implementation advances local calendar dates by fixed day counts:
-
-| Frequency | Days added |
-| --- | --- |
-| `daily` | `interval` |
-| `weekly` | `7 × interval` |
-| `monthly` | `30 × interval` |
-| `yearly` | `365 × interval` |
-
-Monthly and yearly recurrence are therefore fixed-day intervals, not
-same-calendar-day rules. Each completion advances exactly one interval; it does
-not synthesize missed occurrences or catch-up history.
-
-## Skip lifecycle
-
-Skip is available only when the Task has both `repeat` and `plan`. It advances
-`plan.date` once with the same anchor and frequency rules, keeps the Task open,
-and leaves `lastCompletedAt`, `completionCount`, and checklist markers
-unchanged. Calling skip without a repeat block or plan is a no-op.
-
-## Source and mutation boundary
-
-`parseRepeat` in `src/lib/model/task-document.ts` owns normalization.
-`nextRollingDate`, `completeTaskDocument`, and `skipOccurrence` in
-`src/lib/model/task-mutations.ts` own advancement. Completion and skip run
-through `TaskRepository`, serialize the updated Task front matter and exact
-checklist marker changes, then reparse and reproject the file. Planner surfaces
-use the injected clock for the completion timestamp. Structural membership
-links in parent Tasks or Lists are not changed by a recurrence mutation.
+Current/longest streak, completion rate, period totals, averages, and latest
+completion are derived. Past missed and unrecorded outcomes break streaks;
+current pending does not. Pause ranges and recurrence exceptions do not enter
+the denominator.

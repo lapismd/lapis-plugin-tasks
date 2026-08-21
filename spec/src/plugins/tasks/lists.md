@@ -1,6 +1,9 @@
 # Lists and hierarchy
 
 Lists are rich Markdown documents, not containers with a generated task body.
+Catalog adaptation preserves public RRULE repeat and tracking metadata while
+structural ownership continues to come only from resolved Markdown links;
+recurrence never invents a parent or repeated List entries.
 The sidebar combines a presentation graph from `task-list-navigation` with the
 validated structural graph derived from Task and List documents. See
 LN-TASK-021 and LN-TASK-023–027.

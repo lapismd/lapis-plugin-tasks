@@ -8,7 +8,17 @@ import {
   type TaskPlan,
   type TaskRepeat,
   type TaskStart,
+  type TaskTracking,
 } from "./task-document";
+import {
+  analyzeRecurrenceRule,
+  isLocalDateString,
+  type LocalDateString,
+} from "./recurrence-engine";
+import {
+  nextRecurrenceDate,
+  resolveEffectiveOccurrence,
+} from "./effective-occurrence";
 
 function requireTask(document: ParsedTaskFile): TaskDocument {
   if (document.kind !== "task") {
@@ -65,39 +75,72 @@ export function setTaskChecklistItemChecked(
   return { ...task, body, checklist };
 }
 
-function addDays(date: string, days: number): string {
-  const [year, month, day] = date.split("-").map(Number);
-  const next = new Date(year!, month! - 1, day! + days);
-  const y = next.getFullYear();
-  const m = String(next.getMonth() + 1).padStart(2, "0");
-  const d = String(next.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+export class TaskRecurrenceMutationError extends Error {
+  readonly code = "recurrence-advancement-blocked";
+
+  constructor(message: string) {
+    super(message);
+    this.name = "TaskRecurrenceMutationError";
+  }
 }
 
-function nextRollingDate(
-  current: string | undefined,
-  completedAt: string,
-  document: TaskDocument,
-): string {
-  const repeat = document.task.repeat;
-  const interval = repeat?.interval ?? 1;
-  const frequency = repeat?.frequency ?? "daily";
-  const anchorDate =
-    repeat?.anchor === "completion"
-      ? completedAt.slice(0, 10)
-      : current ?? completedAt.slice(0, 10);
-  if (frequency === "weekly") return addDays(anchorDate, 7 * interval);
-  if (frequency === "monthly") return addDays(anchorDate, 30 * interval);
-  if (frequency === "yearly") return addDays(anchorDate, 365 * interval);
-  return addDays(anchorDate, interval);
+function requireLocalDate(value: string): LocalDateString {
+  if (!isLocalDateString(value)) {
+    throw new Error(`Expected a local YYYY-MM-DD date; received ${value}.`);
+  }
+  return value;
+}
+
+function actionDate(at: string, localDate?: string): LocalDateString {
+  return requireLocalDate(localDate ?? at.slice(0, 10));
+}
+
+function addCalendarDays(
+  value: LocalDateString,
+  amount: number,
+): LocalDateString {
+  const [year, month, day] = value.split("-").map(Number);
+  const next = new Date(Date.UTC(year!, month! - 1, day! + amount));
+  return `${String(next.getUTCFullYear()).padStart(4, "0")}-${String(
+    next.getUTCMonth() + 1,
+  ).padStart(2, "0")}-${String(next.getUTCDate()).padStart(
+    2,
+    "0",
+  )}` as LocalDateString;
+}
+
+function requireExecutableRepeat(task: TaskDocument): TaskRepeat {
+  if (!task.task.repeat) {
+    if (task.task.unparsedRepeat !== undefined) {
+      throw new TaskRecurrenceMutationError(
+        "This recurrence is invalid or legacy. Replace or remove it before completion or skip.",
+      );
+    }
+    throw new TaskRecurrenceMutationError("This task does not recur.");
+  }
+  const analysis = analyzeRecurrenceRule(task.task.repeat.rrule);
+  if (analysis.status !== "supported") {
+    throw new TaskRecurrenceMutationError(
+      analysis.status === "unsupported"
+        ? `Replace unsupported recurrence properties before advancement: ${analysis.parts.join(", ")}.`
+        : analysis.message,
+    );
+  }
+  if (task.task.repeat.paused) {
+    throw new TaskRecurrenceMutationError(
+      "Resume this recurrence before completion or skip.",
+    );
+  }
+  return task.task.repeat;
 }
 
 export function completeTaskDocument(
   document: ParsedTaskFile,
   at: string,
+  localDate?: string,
 ): ParsedTaskFile {
   const task = requireTask(document);
-  if (!task.task.repeat) {
+  if (!task.task.repeat && task.task.unparsedRepeat === undefined) {
     return {
       ...task,
       updated: at,
@@ -109,16 +152,41 @@ export function completeTaskDocument(
       },
     };
   }
-  const nextDate = nextRollingDate(task.task.plan?.date, at, task);
+  const repeat = requireExecutableRepeat(task);
+  const completedOn = actionDate(at, localDate);
+  const establishedRepeat: TaskRepeat =
+    repeat.anchor === "completion" && !repeat.start
+      ? { ...repeat, start: completedOn, missed: "carry" }
+      : repeat;
+  const occurrence = resolveEffectiveOccurrence(
+    establishedRepeat,
+    task.task.plan?.date as LocalDateString | undefined,
+    completedOn,
+  );
+  if (
+    occurrence.state === "future" ||
+    occurrence.state === "exhausted" ||
+    occurrence.state === "paused" ||
+    occurrence.state === "unsupported"
+  ) {
+    throw new TaskRecurrenceMutationError(
+      `Cannot complete a recurrence in ${occurrence.state} state.`,
+    );
+  }
+  const anchorDate =
+    establishedRepeat.anchor === "completion"
+      ? completedOn
+      : occurrence.date ?? completedOn;
+  const nextDate = nextRecurrenceDate(establishedRepeat, anchorDate, false);
   const body = resetChecklistItems(
     task.body,
-    task.task.repeat.resetChecklist === true,
+    establishedRepeat.resetChecklist === true,
   );
   return {
     ...task,
     updated: at,
     body,
-    checklist: task.task.repeat.resetChecklist
+    checklist: establishedRepeat.resetChecklist
       ? task.checklist.map((item) => ({ ...item, checked: false }))
       : task.checklist,
     task: {
@@ -126,11 +194,14 @@ export function completeTaskDocument(
       status: "open",
       completedAt: undefined,
       inbox: false,
-      plan: task.task.plan ? { ...task.task.plan, date: nextDate } : undefined,
+      plan:
+        task.task.plan && nextDate
+          ? { ...task.task.plan, date: nextDate }
+          : undefined,
       repeat: {
-        ...task.task.repeat,
+        ...establishedRepeat,
         lastCompletedAt: at,
-        completionCount: (task.task.repeat.completionCount ?? 0) + 1,
+        completionCount: (establishedRepeat.completionCount ?? 0) + 1,
       },
     },
   };
@@ -139,17 +210,29 @@ export function completeTaskDocument(
 export function skipOccurrence(
   document: ParsedTaskFile,
   at: string,
+  localDate?: string,
 ): ParsedTaskFile {
   const task = requireTask(document);
-  if (!task.task.repeat || !task.task.plan) return task;
-  const nextDate = nextRollingDate(task.task.plan.date, at, task);
+  if (!task.task.repeat && task.task.unparsedRepeat === undefined) return task;
+  const repeat = requireExecutableRepeat(task);
+  const skippedOn = actionDate(at, localDate);
+  const occurrence = resolveEffectiveOccurrence(
+    repeat,
+    task.task.plan?.date as LocalDateString | undefined,
+    skippedOn,
+  );
+  if (!occurrence.date || occurrence.state === "exhausted") return task;
+  const nextDate = nextRecurrenceDate(repeat, occurrence.date, false);
   return {
     ...task,
     updated: at,
     task: {
       ...task.task,
       status: "open",
-      plan: { ...task.task.plan, date: nextDate },
+      plan:
+        task.task.plan && nextDate
+          ? { ...task.task.plan, date: nextDate }
+          : undefined,
     },
   };
 }
@@ -225,13 +308,27 @@ export function setTaskRepeat(
 ): TaskDocument {
   const task = requireTask(document);
   const currentRepeat = task.task.repeat;
-  const nextRepeat = repeat
+  if (repeat) {
+    const analysis = analyzeRecurrenceRule(repeat.rrule);
+    if (analysis.status === "invalid") throw new Error(analysis.message);
+    if (repeat.anchor === "schedule" && !repeat.start) {
+      throw new Error("Schedule-anchored recurrence requires start.");
+    }
+  }
+  const normalizedRepeat = repeat
+    ? repeat.anchor === "completion"
+      ? { ...repeat, missed: "carry" as const }
+      : repeat
+    : undefined;
+  const nextRepeat = normalizedRepeat
     ? {
-        ...repeat,
-        ...(repeat.lastCompletedAt == null && currentRepeat?.lastCompletedAt
+        ...normalizedRepeat,
+        ...(normalizedRepeat.lastCompletedAt == null &&
+        currentRepeat?.lastCompletedAt
           ? { lastCompletedAt: currentRepeat.lastCompletedAt }
           : {}),
-        ...(repeat.completionCount == null && currentRepeat?.completionCount != null
+        ...(normalizedRepeat.completionCount == null &&
+        currentRepeat?.completionCount != null
           ? { completionCount: currentRepeat.completionCount }
           : {}),
       }
@@ -239,7 +336,95 @@ export function setTaskRepeat(
   return {
     ...task,
     updated: at,
-    task: { ...task.task, repeat: nextRepeat },
+    task: {
+      ...task.task,
+      repeat: nextRepeat,
+      unparsedRepeat: undefined,
+      ...(!nextRepeat
+        ? { tracking: undefined, unparsedTracking: undefined }
+        : {}),
+    },
+  };
+}
+
+export function setTaskTracking(
+  document: ParsedTaskFile,
+  tracking: TaskTracking | undefined,
+  at: string,
+): TaskDocument {
+  const task = requireTask(document);
+  if (tracking && !task.task.repeat) {
+    throw new Error("Tracking requires recurrence.");
+  }
+  return {
+    ...task,
+    updated: at,
+    task: {
+      ...task.task,
+      tracking,
+      unparsedTracking: undefined,
+    },
+  };
+}
+
+export function pauseTaskRecurrence(
+  document: ParsedTaskFile,
+  at: string,
+  localDate?: string,
+): TaskDocument {
+  const task = requireTask(document);
+  if (task.task.repeat?.paused) return task;
+  const repeat = requireExecutableRepeat(task);
+  return {
+    ...task,
+    updated: at,
+    task: {
+      ...task.task,
+      repeat: {
+        ...repeat,
+        paused: true,
+        pausedSince: actionDate(at, localDate),
+      },
+    },
+  };
+}
+
+export function resumeTaskRecurrence(
+  document: ParsedTaskFile,
+  at: string,
+  localDate?: string,
+): TaskDocument {
+  const task = requireTask(document);
+  const repeat = task.task.repeat;
+  if (!repeat?.paused || !repeat.pausedSince) return task;
+  const resumedOn = actionDate(at, localDate);
+  const rangeEnd = addCalendarDays(resumedOn, -1);
+  const pauseRanges = [
+    ...(repeat.pauseRanges ?? []),
+    ...(repeat.pausedSince <= rangeEnd
+      ? [{ start: repeat.pausedSince, end: rangeEnd }]
+      : []),
+  ];
+  const resumedRepeat: TaskRepeat = {
+    ...repeat,
+    paused: false,
+    pausedSince: undefined,
+    pauseRanges,
+  };
+  const nextDate = repeat.start
+    ? nextRecurrenceDate(resumedRepeat, resumedOn, true)
+    : resumedOn;
+  return {
+    ...task,
+    updated: at,
+    task: {
+      ...task.task,
+      plan:
+        task.task.plan && nextDate
+          ? { ...task.task.plan, date: nextDate }
+          : undefined,
+      repeat: resumedRepeat,
+    },
   };
 }
 
