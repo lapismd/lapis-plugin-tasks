@@ -15,14 +15,13 @@
   import FormSheet from "@lapismd/design-core/forms/FormSheet.svelte";
   import { Button } from "@lapismd/design-core/shadcn/button";
   import * as Collapsible from "@lapismd/design-core/shadcn/collapsible";
-  import * as Command from "@lapismd/design-core/shadcn/command";
   import * as CommandView from "@lapismd/design-core/shadcn/command-view";
   import * as Field from "@lapismd/design-core/shadcn/field";
   import { Input } from "@lapismd/design-core/shadcn/input";
   import * as Popover from "@lapismd/design-core/shadcn/popover";
-  import * as Select from "@lapismd/design-core/shadcn/select";
   import { Switch } from "@lapismd/design-core/shadcn/switch";
   import * as ToggleGroup from "@lapismd/design-core/shadcn/toggle-group";
+  import ApplicationTaskNaturalRepeatCommand from "./ApplicationTaskNaturalRepeatCommand.svelte";
   import type {
     LocalDateString,
     TaskRepeat,
@@ -32,7 +31,6 @@
   } from "../../model";
   import {
     analyzeRecurrenceRule,
-    buildNaturalTaskRepeatSuggestions,
     buildTaskRepeatPresentation,
     buildTaskPlannerWeek,
     formatTaskRepeatRule,
@@ -76,6 +74,7 @@
   let customSheetOpen = $state(false);
   let rawMode = $state(false);
   let rawRrule = $state("FREQ=WEEKLY");
+  let popoverNaturalRuleInput = $state("");
   let naturalRuleInput = $state("");
   let frequency = $state<EditableFrequency>("WEEKLY");
   let interval = $state(1);
@@ -174,9 +173,6 @@
       todayDateOnly(now ?? new Date()),
     ),
   );
-  const naturalRuleSuggestions = $derived(
-    buildNaturalTaskRepeatSuggestions(naturalRuleInput),
-  );
   const retainedInvalid = $derived(
     invalidRepeat === undefined ? null : JSON.stringify(invalidRepeat, null, 2),
   );
@@ -230,6 +226,7 @@
     const rule = repeat?.rrule ?? "FREQ=WEEKLY";
     syncStructuredRule(rule);
     rawRrule = rule;
+    popoverNaturalRuleInput = "";
     naturalRuleInput = "";
     rawMode = invalidRepeat !== undefined || analyzeRecurrenceRule(rule).status === "unsupported";
     anchor = repeat?.anchor ?? "schedule";
@@ -310,6 +307,26 @@
     try {
       await onSelect?.({ ...base, rrule }, tracking);
       validationMessage = null;
+    } catch (error) {
+      validationMessage = error instanceof Error ? error.message : String(error);
+    }
+  }
+
+  async function applyNaturalRuleFromPopover(
+    suggestion: TaskNaturalRepeatSuggestion,
+  ) {
+    const base = taskRepeatForPreset(
+      "daily",
+      repeat,
+      presentation.referenceDate,
+    )!;
+    const analysis = analyzeRecurrenceRule(suggestion.rrule);
+    try {
+      await onSelect?.({ ...base, rrule: suggestion.rrule }, tracking);
+      validationMessage = analysis.status === "unsupported"
+        ? `Saved for visibility only. Automatic advancement is blocked: ${analysis.parts.join(", ")}.`
+        : null;
+      closePopover();
     } catch (error) {
       validationMessage = error instanceof Error ? error.message : String(error);
     }
@@ -465,9 +482,19 @@
       onFocusOutside={closePopover}
       onpointerdown={(event) => event.stopPropagation()}
     >
-      <div class="task-repeat-picker__reference-date">
-        <CalendarDaysIcon aria-hidden="true" />
-        <span>{presentation.referenceDateLabel}</span>
+      <div class="task-repeat-picker__header">
+        <div class="task-repeat-picker__reference-date">
+          <CalendarDaysIcon aria-hidden="true" />
+          <span>{presentation.referenceDateLabel}</span>
+        </div>
+        <ApplicationTaskNaturalRepeatCommand
+          id={`${uid}-popover-natural-rule`}
+          bind:value={popoverNaturalRuleInput}
+          ariaLabel="Describe recurrence"
+          placeholder="Every weekday"
+          compact
+          onSelect={(suggestion) => void applyNaturalRuleFromPopover(suggestion)}
+        />
       </div>
       {#if retainedInvalid}
         <div class="task-repeat-picker__warning" role="alert">
@@ -557,43 +584,27 @@
               </span>
             </Collapsible.Trigger>
             <Collapsible.Content>
-              <div class="task-repeat-picker__repeat-every-controls">
-                <Input
-                  type="number"
-                  min="1"
-                  step="1"
-                  bind:value={interval}
-                  aria-label="Repeat every interval"
-                  onchange={() => void applyRepeatEvery()}
-                />
-                <Select.Root
-                  type="single"
-                  value={frequency}
-                  onValueChange={(value) => {
-                    if (!isEditableFrequency(value)) return;
-                    void applyRepeatEvery(value);
-                  }}
-                >
-                  <Select.Trigger
-                    role="combobox"
-                    aria-label="Repeat every frequency"
-                    aria-controls={`${uid}-repeat-every-frequency-options`}
-                  >
-                    {frequencyLabels[frequency]}
-                  </Select.Trigger>
-                  <Select.Content
-                    id={`${uid}-repeat-every-frequency-options`}
-                    aria-label="Repeat every frequency options"
-                    portalProps={{ disabled: true }}
-                  >
-                    <Select.Group>
-                      <Select.Item value="DAILY" label="Days">Days</Select.Item>
-                      <Select.Item value="WEEKLY" label="Weeks">Weeks</Select.Item>
-                      <Select.Item value="MONTHLY" label="Months">Months</Select.Item>
-                      <Select.Item value="YEARLY" label="Years">Years</Select.Item>
-                    </Select.Group>
-                  </Select.Content>
-                </Select.Root>
+              <div class="task-repeat-picker__repeat-every-content">
+                <div class="task-repeat-picker__repeat-every-controls">
+                  <Input
+                    type="number"
+                    min="1"
+                    step="1"
+                    bind:value={interval}
+                    aria-label="Repeat every interval"
+                    onchange={() => void applyRepeatEvery()}
+                  />
+                  <InlineOptionPicker
+                    value={frequency}
+                    options={frequencyOptions}
+                    ariaLabel="Repeat every frequency"
+                    presentation="menu"
+                    onChange={(value) => {
+                      if (!isEditableFrequency(value)) return;
+                      void applyRepeatEvery(value);
+                    }}
+                  />
+                </div>
               </div>
               {#if validationMessage}
                 <div class="task-repeat-picker__validation" role="alert">
@@ -652,41 +663,13 @@
               <Field.Description>
                 Try “every weekday” or “every 2 weeks on Monday”.
               </Field.Description>
-              <Command.Root
-                class="task-repeat-picker__natural-rule"
-                label="Describe recurrence"
-                shouldFilter={false}
-                loop
-              >
-                <Command.Input
-                  id={`${uid}-natural-rule`}
-                  bind:value={naturalRuleInput}
-                  aria-label="Describe recurrence"
-                  placeholder="Every weekday"
-                />
-                {#if naturalRuleInput.trim()}
-                  <Command.List aria-label="Natural-language recurrence matches">
-                    {#if naturalRuleSuggestions.length}
-                      <Command.Group value="matches">
-                        {#each naturalRuleSuggestions as suggestion (suggestion.rrule)}
-                          <Command.Item
-                            value={suggestion.rrule}
-                            onSelect={() => selectNaturalRule(suggestion)}
-                          >
-                            <Repeat2Icon aria-hidden="true" />
-                            <span>{suggestion.label}</span>
-                            <Command.Shortcut>{suggestion.rrule}</Command.Shortcut>
-                          </Command.Item>
-                        {/each}
-                      </Command.Group>
-                    {:else}
-                      <Command.Empty forceMount>
-                        No recurrence match
-                      </Command.Empty>
-                    {/if}
-                  </Command.List>
-                {/if}
-              </Command.Root>
+              <ApplicationTaskNaturalRepeatCommand
+                id={`${uid}-natural-rule`}
+                bind:value={naturalRuleInput}
+                ariaLabel="Describe recurrence"
+                placeholder="Every weekday"
+                onSelect={selectNaturalRule}
+              />
             </Field.Field>
             <Field.Field orientation="horizontal" class="task-repeat-picker__setting-row">
               <Field.Content>

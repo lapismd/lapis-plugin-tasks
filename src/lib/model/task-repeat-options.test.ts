@@ -103,6 +103,13 @@ describe("task recurrence preset presentation", () => {
         rrule: "FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,WE",
       },
     ]);
+    expect(buildNaturalTaskRepeatSuggestions("weekday")).toEqual([
+      {
+        input: "weekday",
+        label: "Every weekday",
+        rrule: "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR",
+      },
+    ]);
     expect(buildNaturalTaskRepeatSuggestions("nonsense turtle")).toEqual([]);
   });
 });

@@ -59,24 +59,33 @@ function propertyValue(rule: RRule): string | null {
   return [frequency, ...parts.filter((part) => part !== frequency)].join(";");
 }
 
+function naturalRepeatInputs(input: string): string[] {
+  if (/^(?:every|each)\b/iu.test(input)) return [input];
+  return [`every ${input}`, input];
+}
+
 /** Parse rrule.js natural-language input into a validated Tasks suggestion. */
 export function buildNaturalTaskRepeatSuggestions(
   input: string,
 ): TaskNaturalRepeatSuggestion[] {
   const normalizedInput = input.trim();
   if (!normalizedInput) return [];
-  try {
-    const parsed = RRule.fromText(normalizedInput);
-    const rrule = propertyValue(parsed);
-    if (!rrule || analyzeRecurrenceRule(rrule).status === "invalid") return [];
-    return [{
-      input: normalizedInput,
-      label: formatTaskRepeatRule(rrule),
-      rrule,
-    }];
-  } catch {
-    return [];
+  for (const candidate of naturalRepeatInputs(normalizedInput)) {
+    try {
+      const parsed = RRule.fromText(candidate);
+      const rrule = propertyValue(parsed);
+      if (!rrule || analyzeRecurrenceRule(rrule).status === "invalid") continue;
+      return [{
+        input: normalizedInput,
+        label: formatTaskRepeatRule(rrule),
+        rrule,
+      }];
+    } catch {
+      // Try the next candidate. rrule.js expects many phrases to start with
+      // "every", but users often omit it in compact command inputs.
+    }
   }
+  return [];
 }
 
 function localDateFromDateOnly(value: string): Date | null {

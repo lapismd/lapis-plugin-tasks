@@ -132,13 +132,34 @@
       name: "Choose task recurrence",
     });
     expect(within(recurrenceMenu).queryByText("Presets")).not.toBeInTheDocument();
+    const compactNaturalRule = within(recurrenceMenu).getByRole("combobox", {
+      name: "Describe recurrence",
+    });
+    await userEvent.type(compactNaturalRule, "weekday");
+    await userEvent.click(
+      within(recurrenceMenu).getByRole("option", {
+        name: /Every weekday/,
+      }),
+    );
+    await waitFor(() =>
+      expect(state().repeat).toMatchObject({
+        rrule: "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR",
+        anchor: "schedule",
+        missed: "carry",
+      }),
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Set task recurrence" }));
+    recurrenceMenu = page.getByRole("dialog", {
+      name: "Choose task recurrence",
+    });
     await userEvent.click(
       within(recurrenceMenu).getByRole("button", { name: "Repeat every" }),
     );
+    expect(within(recurrenceMenu).queryByText("Repeat interval")).not.toBeInTheDocument();
     const repeatEveryInterval = within(recurrenceMenu).getByRole("spinbutton", {
       name: "Repeat every interval",
     });
-    const repeatEveryFrequency = within(recurrenceMenu).getByRole("combobox", {
+    const repeatEveryFrequency = within(recurrenceMenu).getByRole("button", {
       name: "Repeat every frequency",
     });
     expect(repeatEveryInterval.tagName).toBe("INPUT");
@@ -153,11 +174,7 @@
     await userEvent.type(repeatEveryInterval, "2");
     await userEvent.click(repeatEveryFrequency);
     await userEvent.click(
-      within(
-        page.getByRole("listbox", {
-          name: "Repeat every frequency options",
-        }),
-      ).getByRole("option", { name: "Months" }),
+      within(recurrenceMenu).getByRole("button", { name: /^Months$/ }),
     );
     await waitFor(() =>
       expect(state().repeat).toMatchObject({
@@ -191,7 +208,7 @@
       }),
     ).toHaveValue(2);
     expect(
-      within(recurrenceMenu).getByRole("combobox", {
+      within(recurrenceMenu).getByRole("button", {
         name: "Repeat every frequency",
       }),
     ).toHaveTextContent("Months");
@@ -209,12 +226,15 @@
       name: "Custom recurrence",
     });
     await waitFor(() => expect(recurrenceDialog).toBeVisible());
+    await waitFor(() => {
+      const recurrenceRect = recurrenceDialog.getBoundingClientRect();
+      expect(recurrenceRect.top).toBeLessThan(2);
+      expect(
+        Math.abs(recurrenceRect.height - canvasElement.ownerDocument.defaultView!.innerHeight),
+      ).toBeLessThan(2);
+    });
     const recurrenceRect = recurrenceDialog.getBoundingClientRect();
     expect(recurrenceRect.width).toBeLessThanOrEqual(520);
-    expect(recurrenceRect.top).toBeLessThan(2);
-    expect(
-      Math.abs(recurrenceRect.height - canvasElement.ownerDocument.defaultView!.innerHeight),
-    ).toBeLessThan(2);
     expect(parseFloat(getComputedStyle(recurrenceDialog).borderRadius)).toBe(0);
     const recurrenceTitle = within(recurrenceDialog).getByText("Custom recurrence", {
       selector: ".form-sheet-title",
