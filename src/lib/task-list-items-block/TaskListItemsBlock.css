@@ -43,8 +43,8 @@
   font-weight: 650;
 }
 
-.task-list-items-block button,
-.task-list-items-block input {
+.task-list-items-block__source,
+.task-list-items-block__fallback {
   font: inherit;
 }
 

@@ -60,10 +60,13 @@ When present, the List chip uses the projected Task List display title. The
 display title prefers front matter `title`, then the first H1, then a humanized
 stable id such as `List Docs` for `list-docs`.
 
-Rich Markdown widgets reset inherited whitespace and typography so rows keep
-the same compact rhythm and card background as planner rows. Ordinary Markdown
-surfaces keep the card within render width, preserve both end radii, and isolate
-the Tasks checkbox tick from host Markdown checkbox selectors.
+Rich Markdown widgets reset inherited whitespace so rows keep the same compact
+rhythm and card background as planner rows, but the wrapper must not overwrite
+row-owned typography. Task title buttons keep the planner row semibold weight in
+reading and live preview, and expanded quick-create inputs keep their medium
+input weight. Ordinary Markdown surfaces keep the card within render width,
+preserve both end radii, and isolate the Tasks checkbox tick from host Markdown
+checkbox selectors.
 
 ## Checklist footer
 

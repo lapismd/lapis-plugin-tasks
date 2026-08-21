@@ -727,6 +727,14 @@
     );
     expect(readingQuickCreateLabel).not.toBeNull();
     expect(getComputedStyle(readingQuickCreateLabel!).fontWeight).toBe("400");
+    const readingTaskTitle = Array.from(
+      readingBlock.querySelectorAll<HTMLElement>(".task-line__title"),
+    ).find(
+      (candidate) => candidate.textContent?.trim() === "Review interview notes",
+    );
+    expect(readingTaskTitle).toBeDefined();
+    expect(Number.parseFloat(getComputedStyle(readingTaskTitle!).fontWeight))
+      .toBeGreaterThanOrEqual(600);
     expect(
       within(readingBlock).queryByRole("button", {
         name: "Edit task run source",
@@ -905,6 +913,14 @@
         )!,
       ).backgroundColor,
     ).not.toBe("rgba(0, 0, 0, 0)");
+    const liveTaskTitle = Array.from(
+      liveBlock!.querySelectorAll<HTMLElement>(".task-line__title"),
+    ).find(
+      (candidate) => candidate.textContent?.trim() === "Review interview notes",
+    );
+    expect(liveTaskTitle).toBeDefined();
+    expect(Number.parseFloat(getComputedStyle(liveTaskTitle!).fontWeight))
+      .toBeGreaterThanOrEqual(600);
     const liveCanvas = within(liveBlock!);
     const liveQuickCreateLabel = liveBlock!.querySelector<HTMLElement>(
       ".task-quick-create-row__label",
@@ -917,6 +933,11 @@
     expect(
       liveCanvas.getByRole("group", { name: "New task options", exact: true }),
     ).toBeVisible();
+    const liveQuickCreateInput = liveCanvas.getByRole("textbox", {
+      name: "New task",
+      exact: true,
+    });
+    expect(getComputedStyle(liveQuickCreateInput).fontWeight).toBe("500");
     expect(
       liveCanvas.getByRole("button", { name: "Set due date", exact: true }),
     ).toBeVisible();
