@@ -40,6 +40,7 @@ export type TaskSummary = {
   checklistCompleted: number;
   commentCount: number;
   repeat?: TaskRepeat;
+  unparsedRepeat?: unknown;
   tracking?: TaskTracking;
   effectiveOccurrenceDate?: string;
   effectiveOccurrenceState?: EffectiveOccurrenceState;
@@ -110,6 +111,7 @@ export function taskDocumentToSummary(
     checklistCompleted: document.checklist.filter((item) => item.checked).length,
     commentCount: document.task.comments.length,
     repeat: document.task.repeat,
+    unparsedRepeat: document.task.unparsedRepeat,
     tracking: document.task.tracking,
     effectiveOccurrenceDate: effective?.date,
     effectiveOccurrenceState: effective?.state,

@@ -101,6 +101,17 @@ export function replaceTitleHeading(body: string, title: string): string {
 }
 
 export function taskRowToSummary(row: AppDatabaseTaskRecord): TaskSummary {
+  const repeatValue =
+    row.repeat && typeof row.repeat === "object"
+      ? (row.repeat as unknown as Record<string, unknown>)
+      : null;
+  const repeat =
+    repeatValue &&
+    typeof repeatValue.rrule === "string" &&
+    (repeatValue.anchor === "schedule" || repeatValue.anchor === "completion") &&
+    (repeatValue.missed === "carry" || repeatValue.missed === "skip")
+      ? (repeatValue as TaskSummary["repeat"])
+      : undefined;
   return {
     id: row.documentId,
     path: row.documentPath,
@@ -119,10 +130,8 @@ export function taskRowToSummary(row: AppDatabaseTaskRecord): TaskSummary {
     checklistTotal: row.checklistTotal,
     checklistCompleted: row.checklistCompleted,
     commentCount: row.commentCount,
-    repeat:
-      row.repeat && typeof row.repeat === "object"
-        ? (row.repeat as TaskSummary["repeat"])
-        : undefined,
+    repeat,
+    unparsedRepeat: repeat ? undefined : repeatValue ?? undefined,
     tracking:
       row.tracking && typeof row.tracking === "object"
         ? (row.tracking as TaskSummary["tracking"])

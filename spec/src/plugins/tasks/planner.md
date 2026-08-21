@@ -94,6 +94,10 @@ and Markdown TaskRuns. Individual pages do not add their own spacing fixes.
 Expanded row metadata composes the shared Design Core controls throughout,
 including structured recurrence controls and Advanced raw RRULE editing;
 planner pages do not substitute native form dropdowns. See LN-TASK-046.
+The editor also owns weekday sets, monthly positional and calendar-day rules,
+yearly month/day, COUNT or date-only UNTIL, RDATE/EXDATE, missed policy,
+checklist reset, pause state, and habit tracking. Unsupported raw rules and
+opaque legacy blocks render actionable warnings and remain `visual-pending`.
 The shared plan-time popover presents day parts and clock shortcuts in compact
 two-column groups, keeping their smaller section titles subordinate to the
 options themselves.

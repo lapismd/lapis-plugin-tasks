@@ -47,7 +47,13 @@ export function projectTask(
         document.task.plan?.date as LocalDateString | undefined,
         today as LocalDateString,
       )
-    : null;
+    : document.task.unparsedRepeat !== undefined
+      ? {
+          date: document.task.plan?.date,
+          state: "unsupported" as const,
+          effectiveForDate: today,
+        }
+      : null;
   return {
     documentPath: document.path,
     documentId: document.id,
@@ -64,7 +70,9 @@ export function projectTask(
     durationMinutes: document.task.plan?.durationMinutes ?? null,
     deadline: document.task.deadline ?? null,
     completedAt: document.task.completedAt ?? null,
-    repeat: document.task.repeat ?? null,
+    repeat: (document.task.repeat ?? document.task.unparsedRepeat ?? null) as
+      | AppDatabaseTaskRecord["repeat"]
+      | null,
     tracking: document.task.tracking ?? null,
     effectiveOccurrenceDate: effective?.date ?? null,
     effectiveOccurrenceState: effective?.state ?? null,

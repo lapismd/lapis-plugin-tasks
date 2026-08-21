@@ -140,6 +140,7 @@ describe("applyCatalogTaskToRepository", () => {
           missed: "carry",
           resetChecklist: true,
         },
+        tracking: { type: "count", unit: "sessions", target: 3 },
         updatedAt: "2026-08-20T12:45:00Z",
       },
       beforeRepeat,
@@ -148,6 +149,9 @@ describe("applyCatalogTaskToRepository", () => {
     expect(repeated).toContain("rrule: FREQ=WEEKLY;INTERVAL=2");
     expect(repeated).toContain("anchor: completion");
     expect(repeated).toContain("resetChecklist: true");
+    expect(repeated).toContain("tracking:");
+    expect(repeated).toContain("unit: sessions");
+    expect(repeated).toContain("target: 3");
     const beforeClearRepeat = catalogTaskFromSummary(
       (await repository.get("t_buy"))!,
     );

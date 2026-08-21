@@ -47,6 +47,7 @@ export function catalogTaskFromSummary(summary: TaskSummary): Task {
     checklistCompleted: summary.checklistCompleted,
     notes: "",
     repeat: summary.repeat,
+    unparsedRepeat: summary.unparsedRepeat,
     tracking: summary.tracking,
     effectiveOccurrenceDate: summary.effectiveOccurrenceDate,
     effectiveOccurrenceState: summary.effectiveOccurrenceState,
@@ -94,6 +95,7 @@ export function catalogTaskFromDocument(document: ParsedTaskFile): Task {
     checklistCompleted: document.checklist.filter((item) => item.checked).length,
     notes: document.body,
     repeat: document.task.repeat,
+    unparsedRepeat: document.task.unparsedRepeat,
     tracking: document.task.tracking,
   });
 }

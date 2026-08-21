@@ -6,6 +6,8 @@ structural ownership continues to come only from resolved Markdown links;
 recurrence never invents a parent or repeated List entries.
 Tracking and recurrence edits continue through the owning Task file and do not
 change its incoming structural List link.
+Catalog round-trips retain tracking and effective-occurrence fields alongside
+the canonical plan while List membership remains link-derived.
 The sidebar combines a presentation graph from `task-list-navigation` with the
 validated structural graph derived from Task and List documents. See
 LN-TASK-021 and LN-TASK-023–027.

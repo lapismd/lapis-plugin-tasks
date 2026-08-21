@@ -39,6 +39,9 @@ comment count. Plan kind is `anytime`, `morning`, `afternoon`, `evening`, or
 `time`, with `planTime` for clock values. Recurrence summaries retain the raw
 RRULE, anchor, missed policy, exceptions, pause state, and lifecycle metadata. Summaries
 do not include body prose or comments text.
+An opaque invalid or legacy mapping uses the same durable recurrence projection
+slot with `unsupported` effective state; the catalog adapter separates it from
+an executable `TaskRepeat` and presents it to the recurrence editor unchanged.
 Catalog adapters preserve the optional checklist total and completed counts
 while continuing to exclude checklist item text. See LN-TASK-033.
 

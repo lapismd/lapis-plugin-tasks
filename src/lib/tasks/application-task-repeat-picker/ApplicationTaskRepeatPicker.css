@@ -43,7 +43,8 @@
   z-index: 1400;
   width: min(22rem, calc(100vw - 1rem));
   --ui-popover-padding: 0;
-  overflow: hidden;
+  max-height: min(46rem, calc(100vh - 1rem));
+  overflow: auto;
 }
 
 .task-repeat-picker__reference-date {
@@ -93,7 +94,8 @@
   font-size: 0.78rem;
 }
 
-.task-repeat-picker__custom input[type="number"] {
+.task-repeat-picker__custom input:not([type="checkbox"]),
+.task-repeat-picker__custom select {
   min-width: 0;
   min-height: 2rem;
   border: 1px solid var(--ui-border, var(--border));
@@ -102,6 +104,71 @@
   color: inherit;
   font: inherit;
   padding: 0.25rem 0.45rem;
+}
+
+.task-repeat-picker__stack {
+  grid-template-columns: 1fr !important;
+  align-items: stretch !important;
+  gap: 0.3rem !important;
+}
+
+.task-repeat-picker__weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.25rem;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.task-repeat-picker__weekdays legend {
+  grid-column: 1 / -1;
+  margin-bottom: 0.25rem;
+  color: var(--ui-muted-foreground, var(--muted-foreground));
+  font-size: 0.72rem;
+}
+
+.task-repeat-picker__weekdays label {
+  display: flex;
+  grid-template-columns: none;
+  justify-content: center;
+  gap: 0.2rem;
+}
+
+.task-repeat-picker__warning,
+.task-repeat-picker__validation {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--ui-border, var(--border));
+  background: color-mix(in srgb, var(--ui-warning, #d97706) 12%, transparent);
+  color: var(--ui-foreground, var(--foreground));
+  font-size: 0.75rem;
+  padding: 0.65rem;
+}
+
+.task-repeat-picker__warning svg {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  color: var(--ui-warning, #d97706);
+}
+
+.task-repeat-picker__warning div {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.task-repeat-picker__warning pre {
+  max-height: 7rem;
+  margin: 0.2rem 0 0;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
+.task-repeat-picker__validation {
+  border: 1px solid color-mix(in srgb, var(--ui-destructive, #dc2626) 45%, transparent);
+  border-radius: var(--radius, 0.4rem);
 }
 
 .task-repeat-picker__custom-field [data-ui-part="select-trigger"] {

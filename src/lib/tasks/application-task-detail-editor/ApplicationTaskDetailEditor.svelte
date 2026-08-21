@@ -295,6 +295,11 @@
       areas: nextTask.areas,
       listId: nextTask.listId,
       repeat: nextTask.repeat,
+      unparsedRepeat: nextTask.unparsedRepeat,
+      tracking: nextTask.tracking,
+      effectiveOccurrenceDate: nextTask.effectiveOccurrenceDate,
+      effectiveOccurrenceState: nextTask.effectiveOccurrenceState,
+      effectiveForDate: nextTask.effectiveForDate,
     });
   }
 </script>

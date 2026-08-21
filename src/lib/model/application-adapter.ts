@@ -25,6 +25,7 @@ export function taskToApplicationTask(task: Task): ApplicationTaskAdapter {
     planDate: task.planDate,
     planAt: task.planAt,
     repeat: task.repeat,
+    unparsedRepeat: task.unparsedRepeat,
     tracking: task.tracking,
     effectiveOccurrenceDate: task.effectiveOccurrenceDate,
     effectiveOccurrenceState: task.effectiveOccurrenceState,
@@ -81,6 +82,9 @@ export function applicationTaskToTask(
     repeat: Object.prototype.hasOwnProperty.call(task, "repeat")
       ? task.repeat
       : existing?.repeat,
+    unparsedRepeat: Object.prototype.hasOwnProperty.call(task, "unparsedRepeat")
+      ? task.unparsedRepeat
+      : existing?.unparsedRepeat,
     tracking: Object.prototype.hasOwnProperty.call(task, "tracking")
       ? task.tracking
       : existing?.tracking,

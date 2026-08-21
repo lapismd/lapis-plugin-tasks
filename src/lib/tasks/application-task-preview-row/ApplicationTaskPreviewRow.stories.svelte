@@ -118,7 +118,7 @@
     );
 
     await userEvent.click(canvas.getByRole("button", { name: "Set task recurrence" }));
-    await userEvent.click(page.getByRole("option", { name: "Repeat every…" }));
+    await userEvent.click(page.getByRole("option", { name: "Advanced recurrence…" }));
     const recurrenceDialog = page.getByRole("dialog", {
       name: "Choose task recurrence",
     });
@@ -163,7 +163,7 @@
     );
     await waitFor(() =>
       expect(state().repeat).toMatchObject({
-        rrule: "FREQ=MONTHLY;INTERVAL=2",
+        rrule: "FREQ=MONTHLY;INTERVAL=2;BYMONTHDAY=22",
         anchor: "completion",
         missed: "carry",
         resetChecklist: true,
@@ -276,6 +276,161 @@
 >
   {#snippet template()}
     <ApplicationTaskPreviewRowSampleStory expandedByDefault />
+  {/snippet}
+</Story>
+
+<Story
+  name="Advanced tracked recurrence"
+  tags={["test", "visual-pending"]}
+  parameters={{ a11y: { test: "off" } }}
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const state = () =>
+      JSON.parse(canvas.getByTestId("task-preview-state").textContent ?? "{}") as Record<string, unknown>;
+
+    await userEvent.click(canvas.getByRole("button", { name: "Set task recurrence" }));
+    const dialog = page.getByRole("dialog", { name: "Choose task recurrence" });
+    const advanced = within(dialog).getByLabelText("Advanced recurrence");
+    const frequencySelect = within(advanced).getByRole("combobox", {
+      name: "Recurrence frequency",
+    });
+    await userEvent.click(frequencySelect);
+    await userEvent.click(
+      within(page.getByRole("listbox", { name: "Recurrence frequency options" }))
+        .getByRole("option", { name: "Weeks" }),
+    );
+    for (const day of ["Mon", "Wed", "Fri"]) {
+      await userEvent.click(within(advanced).getByRole("checkbox", { name: day }));
+    }
+    await userEvent.selectOptions(
+      within(advanced).getByRole("combobox", { name: "Recurrence end condition" }),
+      "count",
+    );
+    const count = within(advanced).getByRole("spinbutton", {
+      name: "Recurrence count",
+    });
+    await userEvent.clear(count);
+    await userEvent.type(count, "12");
+    const anchorSelect = within(advanced).getByRole("combobox", {
+      name: "Recurrence anchor",
+    });
+    await userEvent.click(anchorSelect);
+    await userEvent.click(
+      within(page.getByRole("listbox", { name: "Recurrence anchor options" }))
+        .getByRole("option", { name: "Scheduled date" }),
+    );
+    await userEvent.type(
+      within(advanced).getByRole("textbox", { name: "Additional recurrence dates" }),
+      "2026-09-01",
+    );
+    await userEvent.type(
+      within(advanced).getByRole("textbox", { name: "Excluded recurrence dates" }),
+      "2026-09-03",
+    );
+    await userEvent.click(
+      within(advanced).getByRole("checkbox", { name: "Pause recurrence" }),
+    );
+    await userEvent.selectOptions(
+      within(advanced).getByRole("combobox", { name: "Habit tracking type" }),
+      "count",
+    );
+    await userEvent.type(
+      within(advanced).getByRole("textbox", { name: "Tracking unit" }),
+      "glasses",
+    );
+    await userEvent.type(
+      within(advanced).getByRole("spinbutton", { name: "Tracking target" }),
+      "8",
+    );
+    await userEvent.click(
+      within(advanced).getByRole("button", { name: "Apply recurrence" }),
+    );
+    await waitFor(() => {
+      expect(state().repeat).toMatchObject({
+        start: "2026-08-21",
+        rrule: "FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,WE,FR;COUNT=12",
+        anchor: "schedule",
+        missed: "carry",
+        rdate: ["2026-09-01"],
+        exdate: ["2026-09-03"],
+        paused: true,
+        pausedSince: "2026-08-21",
+      });
+      expect(state().tracking).toEqual({
+        type: "count",
+        unit: "glasses",
+        target: 8,
+      });
+      expect(state().planDate).toBe("2026-08-21");
+    });
+  }}
+>
+  {#snippet template()}
+    <ApplicationTaskPreviewRowSampleStory expandedByDefault recurringByDefault />
+  {/snippet}
+</Story>
+
+<Story
+  name="Unsupported raw recurrence"
+  tags={["test", "visual-pending"]}
+  parameters={{ a11y: { test: "off" } }}
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const state = () =>
+      JSON.parse(canvas.getByTestId("task-preview-state").textContent ?? "{}") as Record<string, unknown>;
+
+    await userEvent.click(canvas.getByRole("button", { name: "Set task recurrence" }));
+    let dialog = page.getByRole("dialog", { name: "Choose task recurrence" });
+    await userEvent.click(within(dialog).getByRole("checkbox", { name: "Edit raw RRULE" }));
+    const raw = within(dialog).getByRole("textbox", { name: "Raw RRULE" });
+    await userEvent.clear(raw);
+    await userEvent.type(raw, "FREQ=DAILY;BYHOUR=9");
+    await userEvent.click(
+      within(dialog).getByRole("button", { name: "Apply recurrence" }),
+    );
+    await waitFor(() =>
+      expect(state().repeat).toMatchObject({ rrule: "FREQ=DAILY;BYHOUR=9" }),
+    );
+
+    await userEvent.click(canvas.getByRole("button", { name: "Set task recurrence" }));
+    dialog = page.getByRole("dialog", { name: "Choose task recurrence" });
+    expect(within(dialog).getByRole("alert")).toHaveTextContent(
+      "Automatic advancement is blocked",
+    );
+  }}
+>
+  {#snippet template()}
+    <ApplicationTaskPreviewRowSampleStory expandedByDefault recurringByDefault />
+  {/snippet}
+</Story>
+
+<Story
+  name="Legacy recurrence replacement"
+  tags={["test", "visual-pending"]}
+  parameters={{ a11y: { test: "off" } }}
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const state = () =>
+      JSON.parse(canvas.getByTestId("task-preview-state").textContent ?? "{}") as Record<string, unknown>;
+
+    await userEvent.click(canvas.getByRole("button", { name: "Set task recurrence" }));
+    const dialog = page.getByRole("dialog", { name: "Choose task recurrence" });
+    expect(within(dialog).getByRole("alert")).toHaveTextContent(
+      "Legacy or invalid recurrence",
+    );
+    expect(within(dialog).getByText(/frequency/)).toBeVisible();
+    await userEvent.click(within(dialog).getByRole("option", { name: "Daily" }));
+    await waitFor(() => {
+      expect(state().repeat).toMatchObject({ rrule: "FREQ=DAILY" });
+      expect(state().unparsedRepeat).toBeUndefined();
+    });
+  }}
+>
+  {#snippet template()}
+    <ApplicationTaskPreviewRowSampleStory expandedByDefault invalidRecurrenceByDefault />
   {/snippet}
 </Story>
 

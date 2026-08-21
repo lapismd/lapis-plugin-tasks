@@ -35,11 +35,16 @@ describe("application task checklist aggregates", () => {
         missed: "carry",
         resetChecklist: true,
       },
+      tracking: { type: "count", unit: "sessions", target: 3 },
     });
     const applicationTask = taskToApplicationTask(task);
     expect(applicationTask.repeat).toEqual(task.repeat);
+    expect(applicationTask.tracking).toEqual(task.tracking);
     expect(applicationTaskToTask("tasks", applicationTask).repeat).toEqual(
       task.repeat,
+    );
+    expect(applicationTaskToTask("tasks", applicationTask).tracking).toEqual(
+      task.tracking,
     );
   });
 });

@@ -7,9 +7,11 @@
   let {
     expandedByDefault = false,
     recurringByDefault = false,
+    invalidRecurrenceByDefault = false,
   }: {
     expandedByDefault?: boolean;
     recurringByDefault?: boolean;
+    invalidRecurrenceByDefault?: boolean;
   } = $props();
 
   let task = $state<ApplicationTask>({
@@ -26,6 +28,9 @@
           lastCompletedAt: "2026-08-18T09:15:00.000Z",
           completionCount: 4,
         }
+      : undefined,
+    unparsedRepeat: untrack(() => invalidRecurrenceByDefault)
+      ? { frequency: "daily", interval: 1, strategy: "rolling" }
       : undefined,
   });
   let expanded = $state(false);

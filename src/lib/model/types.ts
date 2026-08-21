@@ -57,6 +57,7 @@ export type Task = {
   planAt?: TaskCatalogPlanAt;
   planDuration?: string;
   repeat?: TaskRepeat;
+  unparsedRepeat?: unknown;
   tracking?: TaskTracking;
   effectiveOccurrenceDate?: string;
   effectiveOccurrenceState?: EffectiveOccurrenceState;
@@ -98,6 +99,7 @@ export type CreateTaskInput = {
   planAt?: TaskCatalogPlanAt;
   planDuration?: string;
   repeat?: TaskRepeat;
+  unparsedRepeat?: unknown;
   tracking?: TaskTracking;
   effectiveOccurrenceDate?: string;
   effectiveOccurrenceState?: EffectiveOccurrenceState;
@@ -149,6 +151,7 @@ export type ApplicationTaskAdapter = {
   planDate?: string;
   planAt?: TaskCatalogPlanAt;
   repeat?: TaskRepeat;
+  unparsedRepeat?: unknown;
   tracking?: TaskTracking;
   effectiveOccurrenceDate?: string;
   effectiveOccurrenceState?: EffectiveOccurrenceState;

@@ -35,6 +35,7 @@ export function createTask(input: CreateTaskInput): Task {
     planAt: input.planAt,
     planDuration: input.planDuration,
     repeat: input.repeat,
+    unparsedRepeat: input.unparsedRepeat,
     tracking: input.tracking,
     effectiveOccurrenceDate: input.effectiveOccurrenceDate,
     effectiveOccurrenceState: input.effectiveOccurrenceState,
