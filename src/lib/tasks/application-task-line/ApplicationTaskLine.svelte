@@ -22,6 +22,8 @@
     titleDraft = $bindable(""),
     titleInput = $bindable<HTMLInputElement | null>(null),
     titleEditor = $bindable<HTMLDivElement | null>(null),
+    showDueIndicator = true,
+    now = undefined,
     onTitleBlur = () => {},
     onTitleKeydown = () => {},
     onTitleClick = () => {},
@@ -41,6 +43,8 @@
     titleDraft?: string;
     titleInput?: HTMLInputElement | null;
     titleEditor?: HTMLDivElement | null;
+    showDueIndicator?: boolean;
+    now?: Date;
     onTitleBlur?: () => void;
     onTitleKeydown?: (event: KeyboardEvent) => void;
     onTitleClick?: (event: MouseEvent) => void;
@@ -50,7 +54,7 @@
     expandedPanel?: Snippet;
   } = $props();
 
-  const dueSummary = $derived(getDueSummary(task.dueAt));
+  const dueSummary = $derived(getDueSummary(task.dueAt, now));
   const titleExcerpt = $derived(taskBodyExcerpt(task.body));
   const effectiveStatus = $derived(
     task.status ?? (task.done ? "done" : "todo"),
@@ -175,7 +179,7 @@
             aria-label={`${task.priority} priority`}
           ></span>
         {/if}
-        {#if dueSummary && !task.done}
+        {#if showDueIndicator && dueSummary && !task.done}
           <Tooltip.Provider delayDuration={250}>
             <Tooltip.Root>
               <Tooltip.Trigger
@@ -192,7 +196,7 @@
                 sideOffset={6}
                 class="task-line__due-tooltip"
               >
-                Due {dueSummary.shortDate}
+                Due {dueSummary.fullDate}
               </Tooltip.Content>
             </Tooltip.Root>
           </Tooltip.Provider>

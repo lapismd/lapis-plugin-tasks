@@ -9,7 +9,7 @@
   import ApplicationTaskWhenPicker from "../application-task-when-picker/ApplicationTaskWhenPicker.svelte";
 
   type PickerMode = "schedule" | "due";
-  type PickerVariant = "default" | "pill" | "footer";
+  type PickerVariant = "default" | "pill" | "footer" | "chip";
 
   type TaskWhenValue = {
     scheduledAt?: string;

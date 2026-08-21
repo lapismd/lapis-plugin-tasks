@@ -33,7 +33,19 @@ describe("Storybook theme contract", () => {
     expect(toggle).toContain("Switch to dark mode");
     expect(toggle).toContain("Switch to light mode");
     expect(shellStories).toContain('name="Obsidian Dark Contrast"');
+    expect(shellStories).toContain('name="Default Light Contrast"');
     expect(shellStories).toContain('name="Default Dark Contrast"');
+    expect(shellStories).toContain("a11y: workspaceA11y");
+    expect(shellStories).toContain(
+      ".application-planner-task-row__meta .task-when-picker__trigger--chip",
+    );
+    expect(shellStories).toContain(
+      ".application-planner-task-row__meta .task-repeat-picker__trigger--chip",
+    );
+    expect(shellStories).toContain("expectNonTextContrast");
+    expect(shellStories).toContain(
+      'globals={{ theme: "default", colorMode: "light" }}',
+    );
     expect(shellStories).toContain(
       'globals={{ theme: "lapis", colorMode: "dark" }}',
     );

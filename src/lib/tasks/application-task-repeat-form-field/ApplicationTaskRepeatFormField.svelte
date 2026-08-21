@@ -15,10 +15,12 @@
     value,
     update,
     now = undefined,
+    variant = "default",
   }: {
     value: ApplicationTask;
     update: (task: ApplicationTask) => void | Promise<void>;
     now?: Date;
+    variant?: "default" | "chip";
   } = $props();
 
   function selectRepeat(
@@ -71,5 +73,6 @@
   invalidRepeat={value.unparsedRepeat}
   plannedDate={value.planDate ?? value.scheduledAt}
   {now}
+  {variant}
   onSelect={selectRepeat}
 />

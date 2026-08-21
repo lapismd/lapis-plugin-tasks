@@ -90,6 +90,7 @@ export {
   calendarDateFromDate,
   calendarDateFromTaskValue,
   formatCompletedTimestamp,
+  formatFullTaskDate,
   formatShortTaskDate,
   formatTaskPlanAtLabel,
   formatTaskScheduleLabel,

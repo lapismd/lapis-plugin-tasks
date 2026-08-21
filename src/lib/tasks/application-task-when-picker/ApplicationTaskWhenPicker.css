@@ -8,7 +8,8 @@
 }
 
 .task-when-picker[data-variant="default"],
-.task-when-picker[data-variant="footer"] {
+.task-when-picker[data-variant="footer"],
+.task-when-picker[data-variant="chip"] {
   border-radius: 0.32rem;
   background: transparent;
   padding: 0.15rem 0.2rem 0.15rem 0.35rem;
@@ -42,7 +43,10 @@
   gap: 0.35rem;
   border: 0;
   background: transparent;
-  color: var(--kanban-foreground, var(--foreground));
+  color: var(
+    --ui-tasks-chip-foreground,
+    var(--kanban-foreground, var(--foreground))
+  );
   cursor: pointer;
   font: inherit;
   padding: 0;
@@ -112,6 +116,179 @@
   height: 0.85rem;
   flex-shrink: 0;
   color: var(--kanban-muted, var(--muted-foreground));
+}
+
+.task-when-picker__trigger--chip {
+  min-height: 1.45rem;
+  max-width: 100%;
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--kanban-border, var(--border)) 72%,
+      transparent
+    );
+  border-radius: 999px;
+  background: color-mix(
+    in srgb,
+    var(--ui-tasks-info, var(--primary)) 5%,
+    var(--kanban-card, var(--card))
+  );
+  color: var(--kanban-foreground, var(--foreground));
+  font-size: 0.68rem;
+  font-weight: 650;
+  padding: 0 0.45rem;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.task-when-picker__trigger--chip:hover,
+.task-when-picker__trigger--chip:focus-visible,
+.task-when-picker[data-variant="chip"]:has(
+    .task-when-picker__trigger[data-state="open"]
+  )
+  .task-when-picker__trigger--chip {
+  border-color: color-mix(
+    in srgb,
+    var(--ui-tasks-info, var(--primary)) 36%,
+    var(--kanban-border, var(--border))
+  );
+  background: color-mix(
+    in srgb,
+    var(--ui-tasks-info, var(--primary)) 9%,
+    var(--kanban-card, var(--card))
+  );
+  outline: 0;
+}
+
+.task-when-picker__trigger--chip svg {
+  width: 0.78rem;
+  height: 0.78rem;
+  flex: 0 0 auto;
+  color: color-mix(
+    in srgb,
+    var(--ui-tasks-info, var(--primary)) 62%,
+    var(--kanban-foreground, var(--foreground))
+  );
+}
+
+.task-when-picker__trigger--chip span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-when-picker__tooltip-anchor {
+  display: inline-flex;
+  max-width: 100%;
+}
+
+.task-when-picker__chip-date {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-when-picker__chip-separator {
+  min-width: auto;
+  overflow: visible;
+  color: currentColor;
+  opacity: 0.62;
+}
+
+.task-when-picker__chip-time {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.2rem;
+  overflow: visible;
+}
+
+.task-when-picker__chip-time svg {
+  width: 0.72rem;
+  height: 0.72rem;
+}
+
+.task-when-picker__chip-time span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-when-picker__trigger--chip.task-when-picker__trigger--today {
+  background: color-mix(
+    in srgb,
+    var(--ui-tasks-warning, var(--warning)) 5%,
+    var(--kanban-card, var(--card))
+  );
+}
+
+.task-when-picker__trigger--chip.task-when-picker__trigger--today {
+  color: var(
+    --ui-tasks-chip-foreground,
+    var(--kanban-foreground, var(--foreground))
+  );
+}
+
+.task-when-picker__trigger--chip.task-when-picker__trigger--today
+  > svg,
+.task-when-picker__trigger--chip.task-when-picker__trigger--today
+  .task-when-picker__chip-time
+  svg {
+  color: color-mix(
+    in srgb,
+    var(--ui-tasks-warning, var(--warning)) 62%,
+    var(--kanban-foreground, var(--foreground))
+  );
+}
+
+.task-when-picker__trigger--chip.task-when-picker__trigger--today:hover,
+.task-when-picker__trigger--chip.task-when-picker__trigger--today:focus-visible,
+.task-when-picker__trigger--chip.task-when-picker__trigger--today[data-state="open"] {
+  border-color: color-mix(
+    in srgb,
+    var(--ui-tasks-warning, var(--warning)) 38%,
+    var(--kanban-border, var(--border))
+  );
+  background: color-mix(
+    in srgb,
+    var(--ui-tasks-warning, var(--warning)) 9%,
+    var(--kanban-card, var(--card))
+  );
+}
+
+.task-when-picker__trigger--chip.task-when-picker__trigger--overdue {
+  background: color-mix(
+    in srgb,
+    var(--ui-tasks-destructive-text, var(--destructive)) 6%,
+    var(--kanban-card, var(--card))
+  );
+}
+
+.task-when-picker__trigger--chip.task-when-picker__trigger--overdue,
+.task-when-picker__trigger--chip.task-when-picker__trigger--overdue svg {
+  color: var(--ui-tasks-destructive-text, var(--destructive));
+}
+
+.task-when-picker__trigger--chip.task-when-picker__trigger--overdue:hover,
+.task-when-picker__trigger--chip.task-when-picker__trigger--overdue:focus-visible,
+.task-when-picker__trigger--chip.task-when-picker__trigger--overdue[data-state="open"] {
+  border-color: color-mix(
+    in srgb,
+    var(--ui-tasks-destructive-text, var(--destructive)) 36%,
+    var(--kanban-border, var(--border))
+  );
+  background: color-mix(
+    in srgb,
+    var(--ui-tasks-destructive-text, var(--destructive)) 10%,
+    var(--kanban-card, var(--card))
+  );
+}
+
+[data-ui-component="tooltip"][data-ui-part="tooltip-content"].task-when-picker__tooltip {
+  font-size: 0.6875rem;
+  line-height: 0.875rem;
 }
 
 .task-when-picker__trigger--footer {

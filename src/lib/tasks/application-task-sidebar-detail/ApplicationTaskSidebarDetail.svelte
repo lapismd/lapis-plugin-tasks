@@ -43,6 +43,7 @@
     documentModeAction,
     documentBody,
     documentBodyEnabled = false,
+    now = undefined,
     messages,
     onToggleDone = () => {},
     onUpdateTitle = () => {},
@@ -58,6 +59,7 @@
     documentModeAction?: Snippet;
     documentBody?: Snippet;
     documentBodyEnabled?: boolean;
+    now?: Date;
     messages?: Snippet;
     onToggleDone?: (task: Task) => void;
     onUpdateTitle?: (task: Task, title: string) => void;
@@ -78,7 +80,7 @@
   let menuOpen = $state(false);
   let titleEditor = $state<HTMLElement | null>(null);
 
-  const dueSummary = $derived(getDueSummary(task.dueAt));
+  const dueSummary = $derived(getDueSummary(task.dueAt, now));
   const scheduleLabel = $derived.by(() => {
     if (dueSummary) return dueSummary.shortDate;
     return formatTaskScheduleLabel({

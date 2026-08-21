@@ -414,10 +414,18 @@
     --tasks-day-section-color: var(--ui-tasks-day-anytime);
     --tasks-day-section-foreground: color-mix(
       in srgb,
-      var(--tasks-day-section-color) 78%,
-      var(--ui-tasks-foreground)
+      var(--tasks-day-section-color) 58%,
+      black
     );
     gap: 0.4rem;
+  }
+
+  :is(.dark, .theme-dark) .tasks-planner__day-section {
+    --tasks-day-section-foreground: color-mix(
+      in srgb,
+      var(--tasks-day-section-color) 56%,
+      white
+    );
   }
 
   .tasks-planner__day-section[data-day-section="morning"] {
@@ -430,7 +438,6 @@
 
   .tasks-planner__day-section[data-day-section="evening"] {
     --tasks-day-section-color: var(--ui-tasks-day-evening);
-    --tasks-day-section-foreground: var(--ui-tasks-accent-text);
   }
 
   .tasks-planner__day-section[data-day-section="done"] {

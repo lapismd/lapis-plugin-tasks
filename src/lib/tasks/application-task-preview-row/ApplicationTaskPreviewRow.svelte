@@ -72,6 +72,7 @@
      * starting inline title edit (host detail panel is already open).
      */
     selectOnSurfaceClick = false,
+    showDueIndicator = true,
     areaOptions = [],
     onDragStart = () => {},
     onTitleEditStart = () => {},
@@ -101,6 +102,7 @@
     showHoverOpen?: boolean;
     showSwipeTrigger?: boolean;
     selectOnSurfaceClick?: boolean;
+    showDueIndicator?: boolean;
     areaOptions?: TaskListPickerOptionInput[];
     onDragStart?: (event: PointerEvent) => void;
     onTitleEditStart?: (taskId: string) => void;
@@ -123,7 +125,7 @@
   } = $props();
 
   const isOpenSurface = $derived(isExpanded || isClosing);
-  const dueSummary = $derived(getDueSummary(task.dueAt));
+  const dueSummary = $derived(getDueSummary(task.dueAt, now));
   const titleExcerpt = $derived(taskBodyExcerpt(task.body));
   const canMoveUp = $derived(taskIndex > 0);
   const canMoveDown = $derived(taskIndex < taskTotal - 1);
@@ -766,6 +768,8 @@
         <ApplicationTaskLine
           {task}
           titleMode="text"
+          {showDueIndicator}
+          {now}
           ariaExpanded={isExpanded}
           onTitleClick={handleTitleClick}
           {onToggleDone}
@@ -777,6 +781,8 @@
           {isOpenSurface}
           titleMode="inline-edit"
           {titleEditing}
+          {showDueIndicator}
+          {now}
           bind:titleDraft
           bind:titleInput
           bind:titleEditor

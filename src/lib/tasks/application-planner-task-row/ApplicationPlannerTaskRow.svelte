@@ -19,6 +19,8 @@
   import type { TaskListPickerOptionInput } from "../application-task-area-picker";
   import ApplicationTaskChecklistProgress from "../application-task-checklist-progress/ApplicationTaskChecklistProgress.svelte";
   import ApplicationTaskPreviewRow from "../application-task-preview-row/ApplicationTaskPreviewRow.svelte";
+  import ApplicationTaskRepeatFormField from "../application-task-repeat-form-field/ApplicationTaskRepeatFormField.svelte";
+  import ApplicationTaskWhenFormField from "../application-task-when-form-field/ApplicationTaskWhenFormField.svelte";
 
   type ApplicationSummary = {
     title: string;
@@ -101,8 +103,25 @@
   const taskKey = $derived(`${task.applicationId ?? "task"}:${task.id}`);
   const openSurface = $derived(expanded || closing);
   const showSelectedSurface = $derived(selected && !openSurface);
+  const showScheduleChip = $derived(
+    Boolean(
+        applicationTask.scheduledAt ||
+        applicationTask.planDate ||
+        applicationTask.when === "today" ||
+        applicationTask.when === "this-evening",
+    ),
+  );
+  const showRepeatChip = $derived(
+    Boolean(applicationTask.repeat || applicationTask.unparsedRepeat),
+  );
   const showMeta = $derived(
-    Boolean((application && task.applicationId) || task.areas.length || task.listId),
+    Boolean(
+      showScheduleChip ||
+        showRepeatChip ||
+        (application && task.applicationId) ||
+        task.areas.length ||
+        task.listId,
+    ),
   );
   const showRowSwipe = $derived(!openSurface && !dragPreview);
   const swipeEnabled = $derived(showRowSwipe && !dragging);
@@ -136,6 +155,7 @@
       "[data-task-due-picker]",
       "[data-task-when-picker]",
       "[data-task-at-picker]",
+      "[data-task-repeat-picker]",
       "[data-task-area-picker]",
       "[data-task-checklist-progress]",
       "[popover]",
@@ -188,6 +208,37 @@
 
   function updateTaskAreas(areas: string[]) {
     onUpdateTask(task, { areas, listId: areas[0] });
+  }
+
+  function updateTaskSchedule(
+    schedule: Pick<
+      ApplicationTask,
+      "scheduledAt" | "when" | "start" | "planDate" | "planAt"
+    >,
+  ) {
+    onUpdateTask(task, {
+      scheduledAt: schedule.scheduledAt,
+      when: schedule.when,
+      start: schedule.start,
+      planDate: schedule.planDate,
+      planAt: schedule.planAt,
+    });
+  }
+
+  function updateTaskRepeat(nextTask: ApplicationTask) {
+    onUpdateTask(task, {
+      scheduledAt: nextTask.scheduledAt,
+      when: nextTask.when,
+      start: nextTask.start,
+      planDate: nextTask.planDate,
+      planAt: nextTask.planAt,
+      repeat: nextTask.repeat,
+      unparsedRepeat: nextTask.unparsedRepeat,
+      tracking: nextTask.tracking,
+      effectiveOccurrenceDate: nextTask.effectiveOccurrenceDate,
+      effectiveOccurrenceState: nextTask.effectiveOccurrenceState,
+      effectiveForDate: nextTask.effectiveForDate,
+    });
   }
 
   function removeTask() {
@@ -351,6 +402,28 @@
       class="application-planner-task-row__meta"
       data-swipe-item-gesture-ignore
     >
+      {#if showScheduleChip}
+        <ApplicationTaskWhenFormField
+          value={{
+            scheduledAt: applicationTask.scheduledAt,
+            when: applicationTask.when,
+            start: applicationTask.start,
+            planDate: applicationTask.planDate,
+            planAt: applicationTask.planAt,
+          }}
+          variant="chip"
+          {now}
+          update={updateTaskSchedule}
+        />
+      {/if}
+      {#if showRepeatChip}
+        <ApplicationTaskRepeatFormField
+          value={applicationTask}
+          variant="chip"
+          {now}
+          update={updateTaskRepeat}
+        />
+      {/if}
       {#if application && task.applicationId}
         <button
           type="button"

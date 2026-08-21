@@ -28,10 +28,19 @@
   --ui-tasks-accent-foreground: var(--primary-foreground);
   --ui-tasks-card: var(--card);
   --ui-tasks-destructive: var(--destructive);
-  --ui-tasks-destructive-text: var(--ui-tasks-destructive);
+  --ui-tasks-destructive-text: color-mix(
+    in srgb,
+    var(--ui-tasks-destructive) 84%,
+    black
+  );
   --ui-tasks-warning: var(--warning, var(--chart-4, #c99700));
   --ui-tasks-success: var(--success, var(--chart-2, #3d9a5f));
   --ui-tasks-info: var(--info, var(--chart-3, #4f7fd8));
+  --ui-tasks-chip-foreground: color-mix(
+    in srgb,
+    var(--ui-tasks-foreground) 88%,
+    black
+  );
   --ui-tasks-day-anytime: var(--ui-tasks-muted);
   --ui-tasks-day-morning: var(--ui-tasks-warning);
   --ui-tasks-day-afternoon: var(--ui-tasks-info);
@@ -51,5 +60,10 @@
     in srgb,
     var(--ui-tasks-destructive) 60%,
     var(--ui-tasks-foreground)
+  );
+  --ui-tasks-chip-foreground: color-mix(
+    in srgb,
+    var(--ui-tasks-foreground) 88%,
+    white
   );
 }

@@ -11,15 +11,25 @@
     customPropertyContrastRatio,
   } from "./contrast";
 
+  const workspaceA11y = {
+    test: "error",
+    config: {
+      rules: [
+        // Full-shell rows intentionally compose nested task controls.
+        { id: "nested-interactive", enabled: false },
+        // CodeMirror owns its aria-hidden gutter focus behavior upstream.
+        { id: "aria-hidden-focus", enabled: false },
+      ],
+    },
+  } as const;
+
   const { Story } = defineMeta({
     title: "Plugins/Tasks/Shell",
     component: PluginWorkspaceDemo,
-    tags: ["visual-pending"],
+    tags: ["visual-pending", "test"],
     parameters: {
       layout: "fullscreen",
-      a11y: {
-        test: "off",
-      },
+      a11y: workspaceA11y,
       docs: {
         canvas: { className: "workspace-shell-docs-canvas" },
         source: {
@@ -31,18 +41,6 @@
       },
     },
   });
-
-  const darkContrastA11y = {
-    test: "error",
-    config: {
-      rules: [
-        // Full-shell rows intentionally compose nested task controls.
-        { id: "nested-interactive", enabled: false },
-        // CodeMirror owns its aria-hidden gutter focus behavior upstream.
-        { id: "aria-hidden-focus", enabled: false },
-      ],
-    },
-  } as const;
 
   type TaskGroupHeadingTypography = {
     fontFamily: string;
@@ -507,7 +505,86 @@
   }
 
   function expectTextContrast(element: HTMLElement) {
-    expect(computedContrastRatio(element)).toBeGreaterThanOrEqual(4.5);
+    const style = getComputedStyle(element);
+    expect(
+      computedContrastRatio(element),
+      [
+        element.className,
+        element.textContent?.trim(),
+        `color=${style.color}`,
+        `background=${style.backgroundColor}`,
+      ].join(" "),
+    ).toBeGreaterThanOrEqual(4.5);
+  }
+
+  function expectNonTextContrast(element: HTMLElement) {
+    const style = getComputedStyle(element);
+    expect(
+      computedContrastRatio(element),
+      [
+        element.className,
+        element.textContent?.trim(),
+        `color=${style.color}`,
+        `background=${style.backgroundColor}`,
+      ].join(" "),
+    ).toBeGreaterThanOrEqual(3);
+  }
+
+  function expectPlannerMetadataChipContrast(canvasElement: HTMLElement) {
+    const scheduleChips = visibleElements(
+      canvasElement,
+      ".application-planner-task-row__meta .task-when-picker__trigger--chip",
+    );
+    expect(scheduleChips.length).toBeGreaterThan(0);
+    scheduleChips.forEach((chip) => {
+      expectTextContrast(chip);
+      chip
+        .querySelectorAll<HTMLElement>("svg")
+        .forEach(expectNonTextContrast);
+    });
+
+    const repeatChips = visibleElements(
+      canvasElement,
+      ".application-planner-task-row__meta .task-repeat-picker__trigger--chip",
+    );
+    expect(repeatChips.length).toBeGreaterThan(0);
+    repeatChips.forEach((chip) => {
+      expectTextContrast(chip);
+      chip
+        .querySelectorAll<HTMLElement>("svg")
+        .forEach(expectNonTextContrast);
+    });
+  }
+
+  async function exerciseLightThemeContrast(canvasElement: HTMLElement) {
+    const canvas = await waitForReady(canvasElement);
+    await waitFor(() => {
+      expect(canvasElement.ownerDocument.documentElement).not.toHaveClass(
+        "dark",
+      );
+      expect(
+        getComputedStyle(canvasElement.ownerDocument.documentElement)
+          .colorScheme,
+      ).toContain("light");
+    });
+
+    await showDailyAgendaChecklistSummary(canvasElement, canvas);
+    expectPlannerMetadataChipContrast(canvasElement);
+
+    const selectedNavigation = visibleElements(
+      canvasElement,
+      '[data-ui-component="column-canvas"][data-ui-part="column-item"][data-selected="true"]',
+    )[0];
+    expect(selectedNavigation).toBeDefined();
+    expectTextContrast(selectedNavigation!);
+
+    const daySectionHeaders = visibleElements(
+      canvasElement,
+      "[data-day-section] .tasks-planner__day-section-header > button",
+    );
+    expect(daySectionHeaders).toHaveLength(5);
+    daySectionHeaders.forEach(expectTextContrast);
+    await collapseLapisLeftSidebar(canvas);
   }
 
   async function exerciseDarkThemeContrast(canvasElement: HTMLElement) {
@@ -521,6 +598,7 @@
     });
 
     await showDailyAgendaChecklistSummary(canvasElement, canvas);
+    expectPlannerMetadataChipContrast(canvasElement);
 
     const selectedNavigation = visibleElements(
       canvasElement,
@@ -536,9 +614,16 @@
     expect(daySectionHeaders).toHaveLength(5);
     daySectionHeaders.forEach(expectTextContrast);
 
-    const overdue = visibleElements(canvasElement, ".task-line__due--overdue")[0];
+    const overdue = visibleElements(
+      canvasElement,
+      ".task-line__due--overdue, [data-task-overdue-indicator]",
+    )[0];
     expect(overdue).toBeDefined();
-    expectTextContrast(overdue!);
+    if (overdue!.matches("[data-task-overdue-indicator]")) {
+      expectNonTextContrast(overdue!);
+    } else {
+      expectTextContrast(overdue!);
+    }
 
     const quickCreate = visibleElements(
       canvasElement,
@@ -2211,11 +2296,32 @@
 />
 
 <Story
+  name="Default Light Contrast"
+  tags={["test"]}
+  args={{ displayMode: "desktop" }}
+  globals={{ theme: "default", colorMode: "light" }}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          "Guard the Default-light shell and daily agenda chips with explicit WCAG text and non-text contrast assertions.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    canvasElement.style.height = "100%";
+    canvasElement.style.maxHeight = "100%";
+    canvasElement.style.overflow = "hidden";
+    await exerciseLightThemeContrast(canvasElement);
+  }}
+/>
+
+<Story
   name="Obsidian Dark Contrast"
+  tags={["test"]}
   args={{ displayMode: "desktop" }}
   globals={{ theme: "lapis", colorMode: "dark" }}
   parameters={{
-    a11y: darkContrastA11y,
     docs: {
       description: {
         story:
@@ -2233,10 +2339,10 @@
 
 <Story
   name="Default Dark Contrast"
+  tags={["test"]}
   args={{ displayMode: "desktop" }}
   globals={{ theme: "default", colorMode: "dark" }}
   parameters={{
-    a11y: darkContrastA11y,
     docs: {
       description: {
         story:

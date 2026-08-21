@@ -9,6 +9,7 @@ export type TaskDueTone = "today" | "upcoming" | "overdue";
 
 export type TaskDueSummary = {
   shortDate: string;
+  fullDate: string;
   distance: string;
   tone: TaskDueTone;
 };
@@ -72,6 +73,18 @@ export function formatShortTaskDate(dateOnly: string) {
   return `${parsed.getUTCDate()} ${month}`;
 }
 
+export function formatFullTaskDate(dateOnly: string) {
+  const parsed = parseDateOnlyUtc(dateOnly);
+  if (!parsed) return dateOnly;
+  return parsed.toLocaleDateString(undefined, {
+    timeZone: "UTC",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 const CLOCK_RE = /^\d{2}:\d{2}$/;
 
 export function formatTaskPlanAtLabel(input: {
@@ -106,11 +119,14 @@ export function formatTaskScheduleLabel(input: {
   return formatShortTaskDate(scheduled);
 }
 
-export function getDueSummary(dueAt?: string | null): TaskDueSummary | null {
+export function getDueSummary(
+  dueAt?: string | null,
+  now = new Date(),
+): TaskDueSummary | null {
   const dateOnly = normalizeTaskDateOnly(dueAt);
   if (!dateOnly) return null;
 
-  const today = todayDateOnly();
+  const today = todayDateOnly(now);
   const distance = getDayDistance(dateOnly, today);
   let tone: TaskDueTone = "upcoming";
   let distanceLabel = "";
@@ -129,6 +145,7 @@ export function getDueSummary(dueAt?: string | null): TaskDueSummary | null {
 
   return {
     shortDate: formatShortTaskDate(dateOnly),
+    fullDate: formatFullTaskDate(dateOnly),
     distance: distanceLabel,
     tone,
   };

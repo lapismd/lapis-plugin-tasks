@@ -986,6 +986,7 @@
             <ApplicationTaskSidebarDetail
               task={detailTask}
               application={detailApplication}
+              {now}
               documentBodyEnabled={Boolean(
                 app && repository && detailTask.sourcePath,
               )}

@@ -56,9 +56,19 @@ annotates the list under a section or parent list, the option also shows that
 trail with the shared Design Core Breadcrumb component.
 See LN-TASK-013 and LN-TASK-045–046.
 
-When present, the List chip uses the projected Task List display title. The
-display title prefers front matter `title`, then the first H1, then a humanized
-stable id such as `List Docs` for `list-docs`.
+When present, the lower metadata row starts with compact oval controls for a
+Task's planned schedule and recurrence, then application and List chips. The
+schedule and recurrence controls reuse the same picker components as the
+expanded inline editor but use a visible chip surface suitable for the collapsed
+row. Planned schedule chips use the row's injected local clock: only overdue
+planned dates use destructive red treatment, and those overdue chips show the
+relative `N days ago` label with a tooltip containing the full planned date. Day
+part labels such as Morning, Afternoon, and Evening include their day-part icon
+immediately before the text. Deadline keeps its existing title-row due indicator
+styling; moving the planned date into the metadata row must not move or restyle
+that deadline indicator. The List chip uses the projected Task List display
+title. The display title prefers front matter `title`, then the first H1, then a
+humanized stable id such as `List Docs` for `list-docs`.
 
 Rich Markdown widgets reset inherited whitespace so rows keep the same compact
 rhythm and card background as planner rows, but the wrapper must not overwrite

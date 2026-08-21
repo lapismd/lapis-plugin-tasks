@@ -178,7 +178,7 @@
 			: null
 	);
 	const dragPreviewDueLabel = $derived.by(() => {
-		const summary = getDueSummary(dragPreviewTask?.dueAt);
+		const summary = getDueSummary(dragPreviewTask?.dueAt, currentTime());
 		return summary?.shortDate ?? '';
 	});
 

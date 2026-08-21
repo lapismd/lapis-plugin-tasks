@@ -11,6 +11,7 @@ export const tasksTokenNames = {
   accent: "--ui-tasks-accent",
   accentText: "--ui-tasks-accent-text",
   accentForeground: "--ui-tasks-accent-foreground",
+  chipForeground: "--ui-tasks-chip-foreground",
   card: "--ui-tasks-card",
   destructive: "--ui-tasks-destructive",
   destructiveText: "--ui-tasks-destructive-text",

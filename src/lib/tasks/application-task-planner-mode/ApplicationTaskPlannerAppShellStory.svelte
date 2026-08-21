@@ -464,6 +464,7 @@
           <ApplicationTaskSidebarDetail
             task={activeTask}
             application={activeTaskApplication}
+            {now}
             onToggleDone={toggleActiveTaskDone}
             onUpdateTitle={updateActiveTaskTitle}
             onRemoveTask={removeActiveTask}

@@ -4,19 +4,24 @@
   import CalendarDaysIcon from "@lucide/svelte/icons/calendar-days";
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import FlagIcon from "@lucide/svelte/icons/flag";
+  import MoonIcon from "@lucide/svelte/icons/moon";
+  import SunIcon from "@lucide/svelte/icons/sun";
+  import SunriseIcon from "@lucide/svelte/icons/sunrise";
   import XIcon from "@lucide/svelte/icons/x";
   import * as Popover from "@lapismd/design-core/shadcn/popover";
+  import * as Tooltip from "@lapismd/design-core/shadcn/tooltip";
   import type { TaskPlannerQuickPlacement } from "../../model";
 
   import {
     formatTaskScheduleLabel,
+    formatTaskPlanAtLabel,
     getDueSummary,
     normalizeTaskDateOnly,
   } from "../../model";
   import ApplicationTaskWhenPickerContent from "../application-task-when-picker-content/ApplicationTaskWhenPickerContent.svelte";
 
   type PickerMode = "schedule" | "due";
-  type PickerVariant = "default" | "pill" | "footer";
+  type PickerVariant = "default" | "pill" | "footer" | "chip";
 
   let {
     clearable = true,
@@ -49,7 +54,8 @@
   const isDueMode = $derived(mode === "due");
   const resolvedVariant = $derived(variant);
   const normalizedScheduledAt = $derived(normalizeTaskDateOnly(scheduledAt));
-  const dueSummary = $derived(getDueSummary(normalizedScheduledAt));
+  const referenceNow = $derived(now ?? new Date());
+  const dueSummary = $derived(getDueSummary(normalizedScheduledAt, referenceNow));
   const hasValue = $derived(
     isDueMode
       ? Boolean(normalizedScheduledAt)
@@ -60,10 +66,35 @@
     formatTaskScheduleLabel({ when, planAt, scheduledAt, now }) ?? "Anytime",
   );
 
+  const scheduleChipDateLabel = $derived.by(() => {
+    if (dueSummary?.tone === "overdue") return dueSummary.distance;
+    return (
+      formatTaskScheduleLabel({ when, planAt, scheduledAt, now }) ?? "Anytime"
+    );
+  });
+  const scheduleChipTimeLabel = $derived(
+    formatTaskPlanAtLabel({ when, planAt }),
+  );
+  const scheduleChipShowsTime = $derived(
+    scheduleChipTimeLabel !== "Anytime",
+  );
+
   const pillLabel = $derived.by(() => {
     if (!normalizedScheduledAt) return "Due";
     if (dueSummary) return dueSummary.shortDate;
     return normalizedScheduledAt;
+  });
+  const dueChipLabel = $derived.by(() => {
+    if (!normalizedScheduledAt) return "Due";
+    if (dueSummary?.tone === "overdue") return dueSummary.distance;
+    if (dueSummary) return dueSummary.shortDate;
+    return normalizedScheduledAt;
+  });
+  const chipTooltipLabel = $derived.by(() => {
+    if (dueSummary?.tone !== "overdue") return null;
+    return isDueMode
+      ? `Due ${dueSummary.fullDate}`
+      : `Scheduled ${dueSummary.fullDate}`;
   });
 
   const triggerAriaLabel = $derived(
@@ -95,6 +126,33 @@
     closePopover();
   }
 </script>
+
+{#snippet scheduleChipContent()}
+  {#if scheduleChipShowsTime}
+    <span class="task-when-picker__chip-date">{scheduleChipDateLabel}</span>
+    <span class="task-when-picker__chip-separator" aria-hidden="true">·</span>
+    <span class="task-when-picker__chip-time">
+      {#if scheduleChipTimeLabel === "Morning"}
+        <SunriseIcon />
+      {:else if scheduleChipTimeLabel === "Afternoon"}
+        <SunIcon />
+      {:else if scheduleChipTimeLabel === "Evening"}
+        <MoonIcon />
+      {:else}
+        <CalendarClockIcon />
+      {/if}
+      <span>{scheduleChipTimeLabel}</span>
+    </span>
+  {:else}
+    <CalendarClockIcon />
+    <span>{scheduleChipDateLabel}</span>
+  {/if}
+{/snippet}
+
+{#snippet dueChipContent()}
+  <FlagIcon />
+  <span>{dueChipLabel}</span>
+{/snippet}
 
 <div
   class="task-when-picker"
@@ -138,6 +196,56 @@
             <span>{pillLabel}</span>
             <ChevronDownIcon />
           </button>
+        {:else if resolvedVariant === "chip"}
+          {#if chipTooltipLabel}
+            <Tooltip.Provider delayDuration={250}>
+              <Tooltip.Root>
+                <Tooltip.Trigger>
+                  {#snippet child({ props: tooltipProps })}
+                    <span
+                      {...tooltipProps}
+                      class="task-when-picker__tooltip-anchor"
+                    >
+                      <button
+                        {...props}
+                        type="button"
+                        class="task-when-picker__trigger task-when-picker__trigger--chip"
+                        class:task-when-picker__trigger--overdue={dueSummary?.tone === "overdue"}
+                        class:task-when-picker__trigger--today={dueSummary?.tone === "today"}
+                        aria-label={triggerAriaLabel}
+                      >
+                        {#if isDueMode}
+                          {@render dueChipContent()}
+                        {:else}
+                          {@render scheduleChipContent()}
+                        {/if}
+                        <ChevronDownIcon />
+                      </button>
+                    </span>
+                  {/snippet}
+                </Tooltip.Trigger>
+                <Tooltip.Content sideOffset={6} class="task-when-picker__tooltip">
+                  {chipTooltipLabel}
+                </Tooltip.Content>
+              </Tooltip.Root>
+            </Tooltip.Provider>
+          {:else}
+            <button
+              {...props}
+              type="button"
+              class="task-when-picker__trigger task-when-picker__trigger--chip"
+              class:task-when-picker__trigger--overdue={dueSummary?.tone === "overdue"}
+              class:task-when-picker__trigger--today={dueSummary?.tone === "today"}
+              aria-label={triggerAriaLabel}
+            >
+              {#if isDueMode}
+                {@render dueChipContent()}
+              {:else}
+                {@render scheduleChipContent()}
+              {/if}
+              <ChevronDownIcon />
+            </button>
+          {/if}
         {:else}
           <button
             {...props}
@@ -180,7 +288,7 @@
       />
     </Popover.Content>
   </Popover.Root>
-  {#if hasValue && clearable && resolvedVariant !== "pill"}
+  {#if hasValue && clearable && resolvedVariant !== "pill" && resolvedVariant !== "chip"}
     <button
       type="button"
       class={resolvedVariant === "footer"

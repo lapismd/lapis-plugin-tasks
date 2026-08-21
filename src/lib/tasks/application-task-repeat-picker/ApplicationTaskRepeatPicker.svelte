@@ -55,6 +55,7 @@
     invalidRepeat = undefined,
     plannedDate = null,
     now = undefined,
+    variant = "default",
     onSelect = null,
   }: {
     repeat?: TaskRepeat;
@@ -62,6 +63,7 @@
     invalidRepeat?: unknown;
     plannedDate?: string | null;
     now?: Date;
+    variant?: "default" | "chip";
     onSelect?:
       | ((
           repeat: TaskRepeat | undefined,
@@ -461,7 +463,7 @@
   }
 </script>
 
-<div class="task-repeat-picker" data-task-repeat-picker>
+<div class="task-repeat-picker" data-task-repeat-picker data-variant={variant}>
   <Popover.Root bind:open onOpenChange={handlePopoverOpenChange}>
     <Popover.Trigger>
       {#snippet child({ props })}
@@ -469,6 +471,7 @@
           {...props}
           type="button"
           class="task-repeat-picker__trigger"
+          class:task-repeat-picker__trigger--chip={variant === "chip"}
           aria-label="Set task recurrence"
         >
           <Repeat2Icon aria-hidden="true" />

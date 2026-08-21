@@ -282,6 +282,18 @@
     padding-right: 0.15rem;
   }
 
+  .application-planner-task-row__meta .task-when-picker,
+  .application-planner-task-row__meta .task-repeat-picker {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .application-planner-task-row__meta .task-when-picker__trigger--chip,
+  .application-planner-task-row__meta .task-repeat-picker__trigger--chip {
+    min-width: 0;
+    max-width: 100%;
+  }
+
   .application-planner-task-row__application {
     display: inline-flex;
     max-width: 100%;

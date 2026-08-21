@@ -107,6 +107,15 @@ local system clock when the host does not supply one. See LN-TASK-048.
 The shared quick-create row supplies the same compact input, focused actions,
 normal-weight label, and block-end separation in daily sections, named views,
 and Markdown TaskRuns. Individual pages do not add their own spacing fixes.
+Collapsed planner rows show planned schedule and recurrence at the start of the
+lower metadata row, before application and List chips. Those controls reuse the
+same picker components as the expanded inline editor but use compact oval chip
+surfaces. Planned schedule chips derive their tone from the row's injected
+local clock: destructive red treatment is reserved for overdue planned dates,
+which render as `N days ago` and expose the full planned date in a tooltip.
+Morning, Afternoon, and Evening schedule chips show the matching day-part icon
+immediately before the day-part text. Deadline remains the existing title-row
+due indicator and is not moved into the lower metadata row.
 Expanded row metadata composes the shared Design Core controls throughout,
 including structured List, recurrence, and raw RRULE editing; planner pages do
 not substitute native form dropdowns. The List picker keeps the Command View
