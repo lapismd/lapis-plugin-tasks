@@ -8,6 +8,11 @@ import {
   createAppTaskStructureResolver,
   createTasksProjectionRegistration,
 } from "./model/task-index";
+import { createTaskOccurrencesProjectionRegistration } from "./model/task-occurrence";
+import {
+  createAppDailyDocumentMutationStore,
+  TaskOccurrenceRepository,
+} from "./model/task-occurrence-repository";
 import { TaskRepository } from "./model/task-repository";
 import { createVaultTaskFileStore } from "./model/vault-task-file-store";
 import {
@@ -37,7 +42,8 @@ const MANIFEST: PluginManifest = {
 
 export class TasksPlugin extends Plugin {
   readonly repository: TaskRepository;
-  clock: () => Date = () => new Date();
+  readonly occurrences: TaskOccurrenceRepository;
+  private clockSource: () => Date = () => new Date();
   private data: TasksPluginData = migrateTasksPluginData(null);
   private saveQueue: Promise<void> = Promise.resolve();
   private readonly settingsListeners = new Set<(settings: TasksPluginSettings) => void>();
@@ -45,21 +51,65 @@ export class TasksPlugin extends Plugin {
 
   constructor(app: App, pluginManifest: PluginManifest = MANIFEST) {
     super(app, pluginManifest);
+    this.occurrences = new TaskOccurrenceRepository(
+      app.appDatabase,
+      createAppDailyDocumentMutationStore(app),
+      () => this.getSettings().dayParts,
+    );
     this.repository = new TaskRepository(
       app.appDatabase,
       createVaultTaskFileStore(app),
       () => this.clock(),
+      this.occurrences,
     );
+  }
+
+  get clock(): () => Date {
+    return this.clockSource;
+  }
+
+  set clock(clock: () => Date) {
+    this.clockSource = clock;
+    this.repository.invalidateEffectiveOccurrences();
   }
 
   async onload(): Promise<void> {
     this.data = migrateTasksPluginData(await this.loadData());
-    this.registerIndexProjection(
-      createTasksProjectionRegistration(createAppTaskStructureResolver(this.app)),
+    const invalidateTaskProjectionDate = (file: { path: string }) => {
+      if (/\.(?:md|markdown)$/i.test(file.path)) {
+        this.repository.invalidateEffectiveOccurrences();
+      }
+    };
+    const metadataChanged = this.app.metadataCache.on(
+      "changed",
+      invalidateTaskProjectionDate,
     );
+    const metadataDeleted = this.app.metadataCache.on(
+      "deleted",
+      invalidateTaskProjectionDate,
+    );
+    const metadataLoaded = this.app.metadataCache.on("loaded", () => {
+      void this.app.metadataCache.load().then(() => {
+        this.repository.invalidateEffectiveOccurrences();
+        return this.refreshEffectiveOccurrences();
+      });
+    });
+    this.register(() => {
+      this.app.metadataCache.offref(metadataChanged);
+      this.app.metadataCache.offref(metadataDeleted);
+      this.app.metadataCache.offref(metadataLoaded);
+    });
+    this.registerIndexProjection(
+      createTasksProjectionRegistration(
+        createAppTaskStructureResolver(this.app),
+        () => todayDateOnly(this.clock()),
+      ),
+    );
+    this.registerIndexProjection(createTaskOccurrencesProjectionRegistration());
     await this.repository.refreshEffectiveOccurrences(
       todayDateOnly(this.clock()),
     );
+    await this.materializeTrackedToday();
     this.registerMarkdownExtension(
       createTaskStructureMarkdownContribution(this.app, this.repository),
     );
@@ -104,9 +154,24 @@ export class TasksPlugin extends Plugin {
   }
 
   private async refreshEffectiveOccurrences(): Promise<void> {
-    await this.repository.refreshEffectiveOccurrences(
-      todayDateOnly(this.clock()),
-    );
+    const today = todayDateOnly(this.clock());
+    await this.repository.refreshEffectiveOccurrences(today);
+    await this.materializeTrackedToday(today);
+  }
+
+  private async materializeTrackedToday(today = todayDateOnly(this.clock())): Promise<void> {
+    const tasks = await this.repository.today(today);
+    for (const task of tasks) {
+      if (
+        !task.tracking ||
+        task.effectiveOccurrenceState !== "current" ||
+        task.effectiveOccurrenceDate !== today
+      ) {
+        continue;
+      }
+      const document = await this.repository.getTaskDocument(task.path);
+      await this.occurrences.ensure(document, today as `${number}-${number}-${number}`);
+    }
   }
 
   private scheduleLocalDateRefresh(): void {

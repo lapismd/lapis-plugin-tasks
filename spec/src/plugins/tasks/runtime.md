@@ -84,6 +84,14 @@ The live planner also classifies catalog `Task` rows with `classifyTask` in
 `src/lib/model/planner.ts`. That path is the Column Canvas bucket order, not
 a second stored flag. See [Planner](./planner.md).
 
+The plugin also registers public `tasks/occurrence` projection version 1 over
+canonical daily notes. Its rows contain task identity and path, daily-document
+path, occurrence date, observed outcome and tracking value, plus the exact
+source range. `TaskRepository.occurrenceHistory` queries those rows and
+`tasks/task`, then uses the package RRULE engine to derive missing expectations.
+The projection is disposable: deleting the database and reindexing Task and
+daily Markdown recreates the same historical result.
+
 ## Repository and file stores
 
 `TaskRepository` in `src/lib/model/task-repository.ts` is the mutation
@@ -92,11 +100,20 @@ boundary. Production hosts inject `createVaultTaskFileStore` from
 through the public `App` vault. Tests and some catalog paths inject
 `createMemoryTaskFileStore`.
 
-`TasksPlugin.onload` registers the public tasks projection, constructs the
-repository, loads versioned plugin data, registers the Tasks settings tab, and
+`TasksPlugin.onload` registers the public task and occurrence projections,
+constructs the daily-observation and Task repositories, loads versioned plugin
+data, registers the Tasks settings tab, and
 mounts `TasksView` with the repository, injected clock, and live settings
 source. Plugin data owns only presentation settings; task and list state stays
 in Markdown.
+
+The daily-observation repository resolves the API-owned host provider before
+writing. On startup and local-date refresh, only tracked schedule occurrences
+whose effective state is current for today are proactively materialized.
+Quantitative completion processes the readable daily list item before writing
+the next rolling Task plan. A retry after the second write fails reuses the
+same `taskId + occurrenceDate` item. Explicit skip similarly ensures an
+unchecked observation before advancement.
 
 The plugin also registers a Tasks section through the public workspace settings
 controller. This is the settings surface used by the Lapis workspace shell;

@@ -25,6 +25,7 @@
     type StructuralTaskRunEntryInput,
     type StructuralTaskRun,
     type TaskRepository,
+    type TaskOccurrenceHistoryRow,
     todayDateOnly,
   } from "../../model";
   import {
@@ -100,6 +101,8 @@
     repository,
     onRefreshWorkspace,
     onCreateTaskListItem,
+    selectedDate = $bindable(""),
+    historyRows = [],
   }: {
     tasks: Task[];
     now?: Date;
@@ -135,6 +138,8 @@
     app?: App;
     repository?: TaskRepository;
     onRefreshWorkspace?: () => void | Promise<void>;
+    selectedDate?: string;
+    historyRows?: TaskOccurrenceHistoryRow[];
     onCreateTaskListItem?: (
       listPath: string,
       section: StructuralTaskRun,
@@ -207,7 +212,6 @@
   });
 
   let taskView = $state<TaskBucket>("today");
-  let selectedDate = $state("");
   let taskArea = $state<string | null>(null);
   const activePlannerBucket = $derived(
     taskArea
@@ -881,6 +885,7 @@
             {settings}
             {hideCompletedTasks}
             bind:selectedDate
+            {historyRows}
             {applications}
             view={taskView}
             area={taskArea}

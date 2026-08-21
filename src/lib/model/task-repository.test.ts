@@ -8,7 +8,10 @@ import {
 import {
   createMemoryTaskFileStore,
   TaskRepository,
+  type TaskFileStore,
 } from "./task-repository";
+import { TaskOccurrenceRepository } from "./task-occurrence-repository";
+import { scanTaskOccurrenceObservations } from "./task-occurrence";
 
 const TODAY = "2026-08-20";
 
@@ -195,6 +198,7 @@ task:
     await expect(database.getTaskRow({ id: "habit" })).resolves.toMatchObject({
       effectiveForDate: "2026-08-25",
     });
+
   });
 
   it("walks children and the structural parent", async () => {
@@ -345,6 +349,100 @@ task:
     const raw = await files.read("buy.md");
     expect(raw).toContain("status: completed");
     expect(raw).not.toContain("inbox: true");
+  });
+
+  it("retries Task advancement after the daily completion write succeeds", async () => {
+    const raw = `---
+type: task
+id: t_hydrate
+task:
+  status: open
+  inbox: false
+  start: anytime
+  plan:
+    date: 2026-08-20
+    at: morning
+  repeat:
+    start: 2026-08-20
+    rrule: FREQ=DAILY
+    anchor: schedule
+    missed: carry
+  tracking:
+    type: count
+    unit: glasses
+  comments: []
+---
+# Hydrate
+`;
+    const database = new MemoryAppDatabase("occurrence-retry");
+    await database.open();
+    const document = parseTaskDocument(raw, "habit.md")!;
+    await indexTaskDocument(database, document, undefined, TODAY);
+    const taskFiles = new Map([["habit.md", raw]]);
+    let rejectNextTaskWrite = true;
+    const files: TaskFileStore = {
+      async read(path) {
+        return taskFiles.get(path)!;
+      },
+      async write(path, content) {
+        if (rejectNextTaskWrite) {
+          rejectNextTaskWrite = false;
+          throw new Error("simulated task write failure");
+        }
+        taskFiles.set(path, content);
+      },
+    };
+    const dailyFiles = new Map<string, string>();
+    const occurrences = new TaskOccurrenceRepository(
+      database,
+      {
+        async ensure(date) {
+          const path = `daily/${date}.md`;
+          if (!dailyFiles.has(path)) {
+            dailyFiles.set(path, `---\ntype: daily-note\ndate: ${date}\n---\n`);
+          }
+          return { path };
+        },
+        async process(path, mutate) {
+          const next = mutate(dailyFiles.get(path)!);
+          dailyFiles.set(path, next);
+          return next;
+        },
+      },
+      () => ({ afternoonStartsAt: "12:00", eveningStartsAt: "17:00" }),
+    );
+    let currentClock = new Date("2026-08-20T09:00:00");
+    const repository = new TaskRepository(
+      database,
+      files,
+      () => currentClock,
+      occurrences,
+    );
+
+    await expect(
+      repository.complete("habit.md", "2026-08-20T09:00:00Z", 8),
+    ).rejects.toThrow("simulated task write failure");
+    expect(taskFiles.get("habit.md")).toBe(raw);
+    expect(
+      scanTaskOccurrenceObservations(
+        dailyFiles.get("daily/2026-08-20.md")!,
+        "daily/2026-08-20.md",
+      ),
+    ).toMatchObject([{ outcome: "completed", value: 8, unit: "glasses" }]);
+
+    await repository.complete("habit.md", "2026-08-20T09:00:00Z", 8);
+    expect(taskFiles.get("habit.md")).toContain("date: 2026-08-21");
+    expect(dailyFiles.get("daily/2026-08-20.md")?.match(/task-occurrence/g)).toHaveLength(1);
+
+    currentClock = new Date("2026-08-21T09:00:00");
+    await repository.skip("habit.md", "2026-08-21T09:00:00Z");
+    expect(taskFiles.get("habit.md")).toContain("date: 2026-08-22");
+    expect(
+      scanTaskOccurrenceObservations(
+        dailyFiles.get("daily/2026-08-21.md")!,
+        "daily/2026-08-21.md",
+      ),
+    ).toMatchObject([{ outcome: "pending", checked: false }]);
   });
 
   it("lazily loads and safely reprojects one checklist marker", async () => {

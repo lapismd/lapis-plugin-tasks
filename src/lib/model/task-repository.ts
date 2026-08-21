@@ -1,11 +1,15 @@
 import type {
   AppDatabase,
+  AppDatabaseTaskOccurrenceRecord,
   AppDatabaseTaskRecord,
 } from "@lapis-notes/api/app-database";
 import {
   and,
   eq,
+  gte,
+  lte,
   or,
+  PUBLIC_TASK_OCCURRENCES_PROJECTION_ID,
   PUBLIC_TASKS_PROJECTION_ID,
   taskQueryToIndexQuery,
 } from "@lapis-notes/api/app-database";
@@ -66,6 +70,18 @@ import {
 import { projectTask } from "./task-projection";
 import type { TaskSummary, TaskView } from "./task-queries";
 import { todayDateOnly } from "./task-dates";
+import { resolveEffectiveOccurrence } from "./effective-occurrence";
+import { trackingCompletion } from "./task-occurrence";
+import type { TaskOccurrenceRepository } from "./task-occurrence-repository";
+import type { LocalDateString } from "./recurrence-engine";
+import {
+  buildTaskOccurrenceHistory,
+  deriveTaskOccurrenceStatistics,
+  filterTaskOccurrenceHistory,
+  type TaskOccurrenceHistoryFilter,
+  type TaskOccurrenceHistoryRow,
+  type TaskOccurrenceStatistics,
+} from "./task-history";
 
 export type TaskFileStore = {
   read(path: string): Promise<string>;
@@ -144,7 +160,12 @@ export function taskRowToSummary(row: AppDatabaseTaskRecord): TaskSummary {
 
 export class TaskRepository {
   private effectiveRefreshQueue: Promise<void> = Promise.resolve();
-  private effectiveForDate: string | null = null;
+  private effectiveProjectionGeneration = 0;
+  private verifiedEffectiveProjection: {
+    date: string;
+    generation: number;
+  } | null = null;
+  private effectiveVerificationResetTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly effectiveRefreshListeners = new Set<
     (today: string) => void
   >();
@@ -153,10 +174,16 @@ export class TaskRepository {
     private readonly database: AppDatabase,
     private readonly files?: TaskFileStore,
     private readonly clock: () => Date = () => new Date(),
+    private readonly occurrences?: TaskOccurrenceRepository,
   ) {}
 
   invalidateEffectiveOccurrences(): void {
-    this.effectiveForDate = null;
+    this.effectiveProjectionGeneration += 1;
+    this.verifiedEffectiveProjection = null;
+    if (this.effectiveVerificationResetTimer) {
+      clearTimeout(this.effectiveVerificationResetTimer);
+      this.effectiveVerificationResetTimer = null;
+    }
   }
 
   subscribeEffectiveOccurrenceRefresh(
@@ -167,11 +194,23 @@ export class TaskRepository {
   }
 
   async refreshEffectiveOccurrences(today = todayDateOnly(this.clock())): Promise<void> {
-    if (!this.files || this.effectiveForDate === today) return;
+    const generation = this.effectiveProjectionGeneration;
+    if (
+      !this.files ||
+      (this.verifiedEffectiveProjection?.date === today &&
+        this.verifiedEffectiveProjection.generation === generation)
+    ) {
+      return;
+    }
     const refresh = this.effectiveRefreshQueue
       .catch(() => undefined)
       .then(async () => {
-        if (this.effectiveForDate === today) return;
+        if (
+          this.verifiedEffectiveProjection?.date === today &&
+          this.verifiedEffectiveProjection.generation === generation
+        ) {
+          return;
+        }
         const projected = await this.database.queryProjection<AppDatabaseTaskRecord>(
           PUBLIC_TASKS_PROJECTION_ID,
           taskQueryToIndexQuery({ kind: "task" }),
@@ -190,7 +229,18 @@ export class TaskRepository {
             today,
           );
         }
-        this.effectiveForDate = today;
+        if (this.effectiveProjectionGeneration !== generation) return;
+        const verification = { date: today, generation };
+        this.verifiedEffectiveProjection = verification;
+        if (this.effectiveVerificationResetTimer) {
+          clearTimeout(this.effectiveVerificationResetTimer);
+        }
+        this.effectiveVerificationResetTimer = setTimeout(() => {
+          if (this.verifiedEffectiveProjection === verification) {
+            this.verifiedEffectiveProjection = null;
+          }
+          this.effectiveVerificationResetTimer = null;
+        }, 0);
         if (staleRows.length) {
           for (const listener of this.effectiveRefreshListeners) listener(today);
         }
@@ -263,6 +313,7 @@ export class TaskRepository {
       this.database,
       next,
       (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
+      todayDateOnly(this.clock()),
     );
     return next;
   }
@@ -442,7 +493,12 @@ export class TaskRepository {
       throw new Error(`Checklist mutation produced an invalid task: ${path}`);
     }
     await this.files.write(path, nextRaw);
-    await indexTaskDocument(this.database, { ...reparsed, raw: nextRaw });
+    await indexTaskDocument(
+      this.database,
+      { ...reparsed, raw: nextRaw },
+      (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
+      todayDateOnly(this.clock()),
+    );
     return { ...reparsed, raw: nextRaw };
   }
 
@@ -485,6 +541,53 @@ export class TaskRepository {
       },
     );
     return result.rows.map(taskRowToSummary);
+  }
+
+  async occurrenceHistory(
+    start: LocalDateString,
+    end: LocalDateString,
+    today: LocalDateString,
+    filter: TaskOccurrenceHistoryFilter = "all",
+  ): Promise<TaskOccurrenceHistoryRow[]> {
+    await this.refreshEffectiveOccurrences(today);
+    const [taskResult, occurrenceResult] = await Promise.all([
+      this.database.queryProjection<AppDatabaseTaskRecord>(
+        PUBLIC_TASKS_PROJECTION_ID,
+        taskQueryToIndexQuery({ kind: "task" }),
+      ),
+      this.database.queryProjection<AppDatabaseTaskOccurrenceRecord>(
+        PUBLIC_TASK_OCCURRENCES_PROJECTION_ID,
+        {
+          where: and(
+            gte("occurrenceDate", start),
+            lte("occurrenceDate", end),
+          ),
+          orderBy: [{ field: "occurrenceDate", direction: "asc" }],
+        },
+      ),
+    ]);
+    return filterTaskOccurrenceHistory(
+      buildTaskOccurrenceHistory(
+        taskResult.rows.map(taskRowToSummary),
+        occurrenceResult.rows,
+        start,
+        end,
+        today,
+      ),
+      filter,
+    );
+  }
+
+  async occurrenceStatistics(
+    taskId: string,
+    start: LocalDateString,
+    end: LocalDateString,
+    today: LocalDateString,
+  ): Promise<TaskOccurrenceStatistics> {
+    const rows = (await this.occurrenceHistory(start, end, today)).filter(
+      (row) => row.taskId === taskId,
+    );
+    return deriveTaskOccurrenceStatistics(rows, today);
   }
 
   async lists(): Promise<TaskSummary[]> {
@@ -533,6 +636,7 @@ export class TaskRepository {
         this.database,
         document,
         validated.get(document.path) ?? null,
+        todayDateOnly(this.clock()),
       );
     }
     return [...validated.values()].flatMap(
@@ -696,11 +800,36 @@ export class TaskRepository {
     return false;
   }
 
-  async complete(path: string, at: string): Promise<TaskSummary> {
-    const localDate = todayDateOnly(this.clock());
-    return this.mutate(path, (document) =>
-      completeTaskDocument(document, at, localDate),
-    );
+  async complete(path: string, at: string, trackedValue?: number): Promise<TaskSummary> {
+    const localDate = todayDateOnly(this.clock()) as LocalDateString;
+    const current = await this.loadDocument(path);
+    const next = completeTaskDocument(current, at, localDate);
+    if (
+      this.occurrences &&
+      current.kind === "task" &&
+      current.task.repeat &&
+      current.task.tracking
+    ) {
+      const establishedRepeat =
+        current.task.repeat.anchor === "completion" && !current.task.repeat.start
+          ? { ...current.task.repeat, start: localDate, missed: "carry" as const }
+          : current.task.repeat;
+      const occurrence = resolveEffectiveOccurrence(
+        establishedRepeat,
+        current.task.plan?.date as LocalDateString | undefined,
+        localDate,
+      );
+      if (!occurrence.date) {
+        throw new Error("Recurring completion has no effective occurrence date.");
+      }
+      await this.occurrences.complete(
+        current,
+        occurrence.date,
+        trackingCompletion(current.task.tracking, trackedValue),
+      );
+    }
+    await this.writeDocument(next);
+    return taskRowToSummary(projectTask(next, localDate));
   }
 
   async cancel(path: string, at: string): Promise<TaskSummary> {
@@ -920,10 +1049,19 @@ export class TaskRepository {
   }
 
   async skip(path: string, at: string): Promise<TaskSummary> {
-    const localDate = todayDateOnly(this.clock());
-    return this.mutate(path, (document) =>
-      skipOccurrence(document, at, localDate),
-    );
+    const localDate = todayDateOnly(this.clock()) as LocalDateString;
+    const current = await this.loadDocument(path);
+    const next = skipOccurrence(current, at, localDate);
+    if (this.occurrences && current.kind === "task" && current.task.repeat) {
+      const occurrence = resolveEffectiveOccurrence(
+        current.task.repeat,
+        current.task.plan?.date as LocalDateString | undefined,
+        localDate,
+      );
+      if (occurrence.date) await this.occurrences.ensure(current, occurrence.date);
+    }
+    await this.writeDocument(next);
+    return taskRowToSummary(projectTask(next, localDate));
   }
 
   async planFor(
@@ -1236,6 +1374,7 @@ export class TaskRepository {
       this.database,
       { ...next, raw: nextRaw },
       (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
+      todayDateOnly(this.clock()),
     );
   }
 

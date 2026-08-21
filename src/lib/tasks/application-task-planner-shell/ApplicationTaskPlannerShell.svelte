@@ -7,6 +7,7 @@
     todayDateOnly,
     type Task,
     type TaskBucket,
+    type TaskOccurrenceHistoryRow,
     type TaskPlannerQuickPlacement,
     type TaskPlannerRowContext,
     type TaskQuickCreateInput,
@@ -47,6 +48,7 @@
     selectedTaskIds = [],
     draggedTaskIds = [],
     pointerDropTargetId = null,
+    historyRows = [],
     scheduleDropOpen = false,
     scheduleDropValue = null,
     scheduleDropWhen = null,
@@ -79,6 +81,7 @@
     selectedTaskIds?: string[];
     draggedTaskIds?: string[];
     pointerDropTargetId?: string | null;
+    historyRows?: TaskOccurrenceHistoryRow[];
     scheduleDropOpen?: boolean;
     scheduleDropValue?: string | null;
     scheduleDropWhen?: string | null;
@@ -143,6 +146,7 @@
     {selectedTaskIds}
     draggedTaskIds={draggedTaskIds}
     {pointerDropTargetId}
+    {historyRows}
     {onOpenApplication}
     {onCreateTask}
   />

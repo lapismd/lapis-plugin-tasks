@@ -10,6 +10,7 @@
     toListNavNode,
     uniqueListPath,
     navigationPinHref,
+    todayDateOnly,
     type ListTreeDropTarget,
     type TaskListCreateInput,
     type Task,
@@ -18,6 +19,7 @@
     type TaskRepository,
     type ChecklistItem,
     type StructuralTaskRun,
+    type TaskOccurrenceHistoryRow,
   } from "./model";
   import {
     DEFAULT_TASKS_PLUGIN_SETTINGS,
@@ -26,6 +28,7 @@
   } from "./tasks-settings";
   import type { TasksSettingsSource } from "./tasks-view";
   import TasksPlannerCanvas from "./tasks/application-task-planner-mode/TasksPlannerCanvas.svelte";
+  import TaskTrackingCompletionPrompt from "./tasks/task-tracking-completion-prompt/TaskTrackingCompletionPrompt.svelte";
 
   let {
     app,
@@ -57,6 +60,10 @@
   let refreshQueue = $state(Promise.resolve());
   let checklistRefreshVersion = $state(0);
   let settings = $state<TasksPluginSettings>(DEFAULT_TASKS_PLUGIN_SETTINGS);
+  let pendingTrackingCompletion = $state<Task | null>(null);
+  let selectedDate = $state("");
+  let historyRows = $state<TaskOccurrenceHistoryRow[]>([]);
+  let historyRevision = 0;
 
   const currentTime = () => clock();
 
@@ -101,9 +108,61 @@
     return refreshQueue;
   }
 
+  async function loadHistory(date: string) {
+    const revision = ++historyRevision;
+    const today = todayDateOnly(currentTime());
+    if (!date || date >= today) {
+      historyRows = [];
+      return;
+    }
+    const next = await repository.occurrenceHistory(
+      date as `${number}-${number}-${number}`,
+      date as `${number}-${number}-${number}`,
+      today as `${number}-${number}-${number}`,
+    );
+    if (revision === historyRevision) historyRows = next;
+  }
+
+  $effect(() => {
+    const date = selectedDate;
+    void loadHistory(date).catch((error) => {
+      loadError = error instanceof Error ? error.message : String(error);
+    });
+  });
+
   async function saveTask(task: Task) {
     const previous = tasks.find((entry) => entry.id === task.id);
+    const completing =
+      Boolean(previous) &&
+      previous!.status !== "completed" &&
+      previous!.status !== "done" &&
+      (task.status === "completed" || task.status === "done");
+    if (
+      completing &&
+      task.tracking &&
+      task.tracking.type !== "boolean"
+    ) {
+      pendingTrackingCompletion = task;
+      return;
+    }
     await applyCatalogTaskToRepository(repository, task, previous);
+    await queueRefresh();
+  }
+
+  function cancelTrackingCompletion() {
+    pendingTrackingCompletion = null;
+    void queueRefresh();
+  }
+
+  async function confirmTrackingCompletion(value: number) {
+    const task = pendingTrackingCompletion;
+    if (!task) return;
+    await repository.complete(
+      task.sourcePath ?? task.id,
+      task.completedAt ?? currentTime().toISOString(),
+      value,
+    );
+    pendingTrackingCompletion = null;
     await queueRefresh();
   }
 
@@ -251,6 +310,7 @@
 
   onMount(() => {
     settings = settingsSource?.get() ?? DEFAULT_TASKS_PLUGIN_SETTINGS;
+    repository.invalidateEffectiveOccurrences();
     const unsubscribeEffective = repository.subscribeEffectiveOccurrenceRefresh(
       () => void queueRefresh(),
     );
@@ -291,6 +351,8 @@
     {snapshot}
     {app}
     {repository}
+    bind:selectedDate
+    {historyRows}
     applications={[]}
     applicationSummaries={{}}
     showRelated={false}
@@ -312,6 +374,14 @@
     onUpdateSettings={updateSettings}
     onRefreshWorkspace={queueRefresh}
     onCreateTaskListItem={createTaskListItem}
+  />
+{/if}
+
+{#if pendingTrackingCompletion}
+  <TaskTrackingCompletionPrompt
+    task={pendingTrackingCompletion}
+    onCancel={cancelTrackingCompletion}
+    onConfirm={confirmTrackingCompletion}
   />
 {/if}
 

@@ -1,11 +1,13 @@
 <script module lang="ts">
   import { defineMeta } from "@storybook/addon-svelte-csf";
+  import { expect, within } from "storybook/test";
   import { TaskPlannerExample } from "../../catalog.example-sources";
   import {
     samplePlannerApplicationSummaries,
     samplePlannerTasks,
   } from "../story-fixture";
   import TaskPlanner from "./TaskPlanner.svelte";
+  import { selectedDateHistoryStoryRows } from "../task-occurrence-history/history-story-fixtures";
 
   const tasks = samplePlannerTasks();
   const applicationSummaries = { ...samplePlannerApplicationSummaries };
@@ -34,6 +36,31 @@
     <div class="task-story-shell-stage">
       <div class="task-story-shell-stage__surface">
         <TaskPlanner {tasks} view="today" {applicationSummaries} />
+      </div>
+    </div>
+  {/snippet}
+</Story>
+
+<Story
+  name="Historical selected date"
+  tags={["visual-pending", "test"]}
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole("region", { name: "Task occurrence history" })).toBeVisible();
+    await expect(canvas.getByText("3 pages")).toBeVisible();
+    await expect(canvas.getByText("unrecorded")).toBeVisible();
+  }}
+>
+  {#snippet template()}
+    <div class="task-story-shell-stage">
+      <div class="task-story-shell-stage__surface">
+        <TaskPlanner
+          tasks={[]}
+          view="today"
+          selectedDate="2026-08-20"
+          actualToday="2026-08-21"
+          historyRows={selectedDateHistoryStoryRows}
+        />
       </div>
     </div>
   {/snippet}

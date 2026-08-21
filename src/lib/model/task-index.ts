@@ -13,6 +13,7 @@ import {
 } from "@lapis-notes/api/app-database";
 import { parseTaskDocument, type ParsedTaskFile } from "./task-document";
 import { projectTask } from "./task-projection";
+import { todayDateOnly } from "./task-dates";
 import {
   resolveTaskDocumentStructure,
   taskStructureForProjection,
@@ -85,6 +86,7 @@ async function resolvedStructure(
 
 export function createTasksProjectionRegistration(
   resolveTarget: TaskStructureTargetResolver = unresolvedTarget,
+  currentDate: () => string = () => todayDateOnly(),
 ): IndexProjectionRegistration {
   return {
     id: "task",
@@ -97,7 +99,7 @@ export function createTasksProjectionRegistration(
     async project({ file, content }) {
       const document = parseTaskDocument(content, file.path);
       if (!document) return { rows: [], edges: [] };
-      const row = projectTask(document);
+      const row = projectTask(document, currentDate());
       const structure = await resolvedStructure(document, resolveTarget);
       return {
         rows: [

@@ -224,6 +224,14 @@
     canvasElement: HTMLElement,
     canvas: ReturnType<typeof within>,
   ) {
+    const projectedDailyReflection = await storyApp(
+      canvasElement,
+    ).appDatabase.getProjectionRow(
+      "tasks/task",
+      "story-task-daily-reflection",
+    );
+    expect(projectedDailyReflection?.effectiveForDate).toBe("2026-08-19");
+    expect(projectedDailyReflection?.effectiveOccurrenceState).toBe("current");
     const plannerColumn = canvasElement.querySelector<HTMLElement>(
       '[data-column-id="planner"][data-ui-part="column"]',
     )!;
@@ -245,9 +253,10 @@
             button.getClientRects().length > 0,
         );
       expect(navigationItem).toBeDefined();
-      expect(navigationItem!.querySelector("small")).toHaveTextContent(
-        String(expectedView.total),
-      );
+      expect(
+        navigationItem!.querySelector("small")?.textContent,
+        `${expectedView.name} navigation count`,
+      ).toBe(String(expectedView.total));
       await userEvent.click(navigationItem!);
       await waitFor(() => {
         const plannerTitle = plannerColumn.querySelector<HTMLElement>(

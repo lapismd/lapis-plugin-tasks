@@ -105,6 +105,32 @@ describe("planner Markdown fixtures", () => {
     ]);
   });
 
+  it("keeps the app-backed navigation totals stable after occurrence refresh", async () => {
+    const now = new Date(`${PLANNER_FIXTURE_TODAY}T12:00:00`);
+    const database = new MemoryAppDatabase("planner-view-counts");
+    await database.open();
+    const files = Object.fromEntries(
+      plannerMarkdownFixtures.map((fixture) => [fixture.path, fixture.raw]),
+    );
+    const repository = new TaskRepository(
+      database,
+      createMemoryTaskFileStore(files),
+      () => now,
+    );
+    for (const document of parsePlannerFixtures()) {
+      await indexTaskDocument(database, document);
+    }
+    const snapshot = await buildTaskPlannerSnapshotFromRepository(repository, now);
+    expect({
+      inbox: snapshot.inbox.length,
+      review: snapshot.review.length,
+      upcoming: snapshot.upcoming.reduce((total, group) => total + group.tasks.length, 0),
+      anytime: snapshot.anytime.length,
+      someday: snapshot.someday.length,
+      logbook: snapshot.logbook.reduce((total, group) => total + group.tasks.length, 0),
+    }).toEqual({ inbox: 1, review: 1, upcoming: 5, anytime: 2, someday: 1, logbook: 3 });
+  });
+
   it("keeps canceled Markdown tasks in the repository-backed Logbook", async () => {
     const now = new Date(`${PLANNER_FIXTURE_TODAY}T12:00:00`);
     const database = new MemoryAppDatabase("planner-canceled-logbook");

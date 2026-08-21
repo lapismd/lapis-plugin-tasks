@@ -30,6 +30,7 @@
   } from "../tasks/lib/application-task-planner-mode-helpers";
   import TaskQuickCreateActions from "../tasks/task-planner/TaskQuickCreateActions.svelte";
   import TaskQuickCreateRow from "../tasks/task-planner/TaskQuickCreateRow.svelte";
+  import TaskTrackingCompletionPrompt from "../tasks/task-tracking-completion-prompt/TaskTrackingCompletionPrompt.svelte";
   import TaskListItemsListRow from "./TaskListItemsListRow.svelte";
   import TaskRunBlock from "./TaskListItemsBlock.svelte";
   import "./TaskListItemsBlock.css";
@@ -81,6 +82,7 @@
   let selectedTaskIds = $state<string[]>([]);
   let selectionAnchorTaskId = $state<string | null>(null);
   let selectedListPath = $state<string | null>(null);
+  let pendingTrackingCompletion = $state<Task | null>(null);
   let expandedListPaths = $state<string[]>([]);
   let nestedRuns = $state<Record<string, StructuralTaskRun[]>>({});
   let loadRevision = 0;
@@ -180,9 +182,30 @@
     const path = task.sourcePath ?? task.id;
     if (task.status === "completed" || task.status === "done") {
       await repository.reopen(path, new Date().toISOString());
+    } else if (task.tracking && task.tracking.type !== "boolean") {
+      pendingTrackingCompletion = task;
+      return;
     } else {
       await repository.complete(path, new Date().toISOString());
     }
+    await controller?.onRefresh?.();
+    await load();
+  }
+
+  function cancelTrackingCompletion() {
+    pendingTrackingCompletion = null;
+    void load();
+  }
+
+  async function confirmTrackingCompletion(value: number) {
+    const task = pendingTrackingCompletion;
+    if (!task) return;
+    await repository.complete(
+      task.sourcePath ?? task.id,
+      new Date().toISOString(),
+      value,
+    );
+    pendingTrackingCompletion = null;
     await controller?.onRefresh?.();
     await load();
   }
@@ -597,3 +620,11 @@
     </TaskQuickCreateRow>
   {/if}
 </section>
+
+{#if pendingTrackingCompletion}
+  <TaskTrackingCompletionPrompt
+    task={pendingTrackingCompletion}
+    onCancel={cancelTrackingCompletion}
+    onConfirm={confirmTrackingCompletion}
+  />
+{/if}

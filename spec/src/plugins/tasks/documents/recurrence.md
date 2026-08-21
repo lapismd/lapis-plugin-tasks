@@ -182,6 +182,13 @@ Boolean observations are unchecked/checked Task links. Quantitative entries
 start unchecked and complete as readable `: value unit` or `: duration` lines;
 indented context remains untouched.
 
+Each item carries a trailing `task-occurrence` HTML comment containing encoded
+task identity, occurrence date, tracking kind, and quantitative unit where
+needed. The visible Task link remains ordinary Markdown. The marker makes
+identity independent of titles and paths, while the projection records the
+exact list-item range. A guarded mutation replaces only the first list-item
+line and preserves the range's indented contextual Markdown.
+
 An unchecked current or overdue-carry observation is pending. It becomes
 missed after explicit skip or skip-policy expiry. An elapsed expected date with
 no observation is unrecorded. Historical views merge RRULE expectations with
@@ -191,4 +198,6 @@ unrecorded outcomes without reopening daily files.
 Current/longest streak, completion rate, period totals, averages, and latest
 completion are derived. Past missed and unrecorded outcomes break streaks;
 current pending does not. Pause ranges and recurrence exceptions do not enter
-the denominator.
+the denominator. The all filter shows every outcome, completed shows checked
+observations, and missed combines explicitly missed and unrecorded expected
+dates so absent daily files remain distinguishable in the row label.

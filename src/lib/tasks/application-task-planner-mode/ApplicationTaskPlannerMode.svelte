@@ -14,6 +14,7 @@
 		type TaskAreaSummary,
 		type TaskPlannerMovePatch,
 		type TaskPlannerQuickPlacement,
+		type TaskOccurrenceHistoryRow,
 		type TaskPlannerRowContext,
 		type TaskQuickCreateInput,
 		type ChecklistItem
@@ -93,7 +94,8 @@
 		onSaveApplication = () => {},
 		onOpenApplication = () => {},
 		onDragTargetChange = () => {},
-		reviewContent
+		reviewContent,
+		historyRows = []
 	}: {
 		tasks?: Task[];
 		now?: Date;
@@ -129,6 +131,7 @@
 		onOpenApplication?: (applicationId: string) => void | Promise<void>;
 		onDragTargetChange?: (targetId: string | null) => void;
 		reviewContent?: Snippet;
+		historyRows?: TaskOccurrenceHistoryRow[];
 	} = $props();
 
 	let expandedTaskId = $state<string | null>(null);
@@ -833,6 +836,7 @@
 	{selectedTaskIds}
 	{draggedTaskIds}
 	{pointerDropTargetId}
+	{historyRows}
 	{scheduleDropOpen}
 	{scheduleDropValue}
 	{scheduleDropWhen}

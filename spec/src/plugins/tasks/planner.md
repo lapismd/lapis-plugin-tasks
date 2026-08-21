@@ -67,6 +67,14 @@ and the resolver date. Classification, upcoming grouping, selected-day
 inclusion, and overdue decoration consume those effective fields. Paused and
 exhausted recurrence remains open in Anytime rather than surfacing a stale plan.
 
+When Today selects a date before local today, the planner swaps its actionable
+day sections for occurrence history. The workspace queries disposable
+`tasks/occurrence` rows for that date and merges them with RRULE expectations;
+the presentation labels completed, missed, and unrecorded outcomes and offers
+all/completed/missed filters. It does not reopen daily Markdown files. Returning
+to today restores the current actionable sections and their ordinary planner
+controls.
+
 Every named planner destination repeats its navigation icon before the title in
 the planner-column header. The label, icon, navigation count, rendered rows,
 and empty state all come from the same selected bucket rather than separate

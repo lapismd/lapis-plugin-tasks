@@ -199,7 +199,10 @@ unsupported structural candidates all bound or split a run.
 
 The public projection stores enough information to reproduce source order,
 perform guarded edits, and refresh recurrence-derived effective dates without
-changing the source document:
+changing the source document. Projection registration and every repository-owned
+reindex use the same injected local-date source, so a metadata rebuild,
+structural validation, or checklist edit cannot replace refreshed occurrence
+state with a different calendar day:
 
 ```ts
 interface StructuralEntry {

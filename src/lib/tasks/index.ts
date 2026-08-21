@@ -21,6 +21,8 @@ export { default as ApplicationTaskPlannerShell } from "./application-task-plann
 export { default as ApplicationTaskPlannerMode } from "./application-task-planner-mode/ApplicationTaskPlannerMode.svelte";
 export { default as ApplicationTaskSidebarDetail } from "./application-task-sidebar-detail/ApplicationTaskSidebarDetail.svelte";
 export { default as ApplicationPlannerTaskRow } from "./application-planner-task-row/ApplicationPlannerTaskRow.svelte";
+export { default as TaskTrackingCompletionPrompt } from "./task-tracking-completion-prompt/TaskTrackingCompletionPrompt.svelte";
+export { default as TaskOccurrenceHistory } from "./task-occurrence-history/TaskOccurrenceHistory.svelte";
 
 export { buildApplicationTaskReferenceIndex } from "./lib/references";
 export * from "./lib/references-task";

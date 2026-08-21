@@ -38,6 +38,7 @@
     todayDateOnly,
     type TaskDaySection,
     type TaskPlannerDateGroup,
+    type TaskOccurrenceHistoryRow,
     type TaskPlannerRowContext,
     type TaskPlannerUpcomingRow,
   } from '../../model';
@@ -58,6 +59,7 @@
   import PlannerSortableRow from "./PlannerSortableRow.svelte";
   import TaskQuickCreateActions from "./TaskQuickCreateActions.svelte";
   import TaskQuickCreateRow from "./TaskQuickCreateRow.svelte";
+  import TaskOccurrenceHistory from "../task-occurrence-history/TaskOccurrenceHistory.svelte";
 
   type ApplicationSummary = {
     title: string;
@@ -95,6 +97,7 @@
     selectedTaskIds = [],
     draggedTaskIds = [],
     pointerDropTargetId = null,
+    historyRows = [],
     onCreateTask = undefined,
   }: {
     tasks?: Task[];
@@ -112,6 +115,7 @@
     selectedTaskIds?: string[];
     draggedTaskIds?: string[];
     pointerDropTargetId?: string | null;
+    historyRows?: TaskOccurrenceHistoryRow[];
     onCreateTask?: (input: TaskQuickCreateInput) => void | Promise<void>;
   } = $props();
 
@@ -867,16 +871,20 @@
     {#if selectedArea}
       {@render taskList(areaTasks, selectedArea.title, `area:${selectedArea.id}`)}
     {:else if view === "today"}
-      <div class="tasks-planner__day-sections">
-        {#each daySections as section (section.id)}
-          {@render daySection(
-            section.id,
-            section.label,
-            section.icon,
-            visibleDaySnapshot[section.id],
-          )}
-        {/each}
-      </div>
+      {#if selectedDate < actualToday}
+        <TaskOccurrenceHistory rows={historyRows} />
+      {:else}
+        <div class="tasks-planner__day-sections">
+          {#each daySections as section (section.id)}
+            {@render daySection(
+              section.id,
+              section.label,
+              section.icon,
+              visibleDaySnapshot[section.id],
+            )}
+          {/each}
+        </div>
+      {/if}
     {:else if view === "inbox"}
       {@render taskList(snapshot.inbox, "Inbox tasks", "inbox")}
     {:else if view === "review"}

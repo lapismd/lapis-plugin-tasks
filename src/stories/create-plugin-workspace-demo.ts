@@ -155,9 +155,10 @@ export async function bootPluginWorkspaceDemo(): Promise<{
     optionalCorePlugins: "configured",
   });
   const tasksPlugin = app.plugins.plugins.get("tasks");
-  if (tasksPlugin instanceof TasksPlugin) {
-    tasksPlugin.clock = () => new Date(`${PLANNER_FIXTURE_TODAY}T12:00:00`);
+  if (!(tasksPlugin instanceof TasksPlugin)) {
+    throw new Error("The Tasks workspace fixture could not resolve TasksPlugin.");
   }
+  tasksPlugin.clock = () => new Date(`${PLANNER_FIXTURE_TODAY}T12:00:00`);
   const stopWatchingMetadata = app.metadataTypeManager.trackChanges();
   await app.metadataCache.load();
   const searchPlugin = app.plugins.plugins.get("search");
