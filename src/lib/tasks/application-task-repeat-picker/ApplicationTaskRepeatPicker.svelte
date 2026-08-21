@@ -32,6 +32,7 @@
   import {
     analyzeRecurrenceRule,
     buildTaskRepeatPresentation,
+    buildTaskRepeatHeader,
     buildTaskPlannerWeek,
     formatTaskRepeatRule,
     isLocalDateString,
@@ -167,6 +168,11 @@
     repeatEverySelected ? "repeat-every" : customSelected ? "custom" : preset,
   );
   const presentation = $derived(buildTaskRepeatPresentation(plannedDate, now ?? new Date()));
+  const recurrenceHeader = $derived.by(() =>
+    invalidRepeat !== undefined
+      ? { label: "Recurrence needs attention" }
+      : buildTaskRepeatHeader(repeat, plannedDate)
+  );
   const recurrenceWeek = $derived(
     buildTaskPlannerWeek(
       presentation.referenceDate,
@@ -483,9 +489,14 @@
       onpointerdown={(event) => event.stopPropagation()}
     >
       <div class="task-repeat-picker__header">
-        <div class="task-repeat-picker__reference-date">
-          <CalendarDaysIcon aria-hidden="true" />
-          <span>{presentation.referenceDateLabel}</span>
+        <div class="task-repeat-picker__summary">
+          <Repeat2Icon aria-hidden="true" />
+          <span>{recurrenceHeader.label}</span>
+          {#if recurrenceHeader.dateContext}
+            <span class="task-repeat-picker__summary-context">
+              {recurrenceHeader.dateContext}
+            </span>
+          {/if}
         </div>
         <ApplicationTaskNaturalRepeatCommand
           id={`${uid}-popover-natural-rule`}

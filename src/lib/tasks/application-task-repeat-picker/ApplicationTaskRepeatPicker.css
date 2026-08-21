@@ -71,7 +71,7 @@
   padding: 0.65rem;
 }
 
-.task-repeat-picker__reference-date {
+.task-repeat-picker__summary {
   display: flex;
   align-items: center;
   gap: 0.55rem;
@@ -80,10 +80,15 @@
   font-weight: 600;
 }
 
-.task-repeat-picker__reference-date svg {
+.task-repeat-picker__summary svg {
   width: 1rem;
   height: 1rem;
   color: var(--ui-muted-foreground, var(--muted-foreground));
+}
+
+.task-repeat-picker__summary-context {
+  color: var(--ui-muted-foreground, var(--muted-foreground));
+  font-weight: 500;
 }
 
 .task-repeat-picker__option-context {

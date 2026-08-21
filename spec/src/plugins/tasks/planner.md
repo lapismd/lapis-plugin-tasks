@@ -114,14 +114,17 @@ surface, showing display titles with wrapped Markdown file paths and optional
 navigation breadcrumbs from the List tree. Tasks-owned Command View popovers
 that replace Popover padding with internal list spacing also clear the inherited
 Popover content gap, so direct children do not add another layout gap around
-menu content. The compact recurrence popover starts with the same
-natural-language recurrence Command used by the custom sheet, then its presets.
-Natural-language recurrence accepts omitted leading `every` by retrying with
-that prefix before reporting no match. Its no-apply `Repeat every…` disclosure
-uses an unlabeled transparent control row: a number input and Forms Inline
-Option Picker frequency control share one row. `Custom
-recurrence…` opens a separately scrollable, flat, full-height Design Core Form
-Sheet while closing the popover.
+menu content. The compact recurrence popover header starts with the current
+RRULE's friendly text, not the selected-date label. When a planned or
+repeat-start date exists and the rule does not already carry a day/date
+selector, the date is appended as muted anchor context such as `on the 18th`;
+undated tasks omit that context. The header then provides the same
+natural-language recurrence Command used by the custom sheet. Natural-language
+recurrence accepts omitted leading `every` by retrying with that prefix before
+reporting no match. Its no-apply `Repeat every…` disclosure uses an unlabeled
+transparent control row: a number input and Forms Inline Option Picker
+frequency control share one row. `Custom recurrence…` opens a separately
+scrollable, flat, full-height Design Core Form Sheet while closing the popover.
 Its compact header uses the stronger Task-detail title weight and reuses the
 Task-detail close control's bordered circular geometry, centered icon scale,
 and shadow, with a grey resting surface and stronger hover contrast against the

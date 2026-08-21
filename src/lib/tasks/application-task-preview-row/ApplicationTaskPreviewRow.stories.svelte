@@ -132,6 +132,11 @@
       name: "Choose task recurrence",
     });
     expect(within(recurrenceMenu).queryByText("Presets")).not.toBeInTheDocument();
+    expect(within(recurrenceMenu).getByText("Every week")).toBeVisible();
+    expect(
+      recurrenceMenu.querySelector(".task-repeat-picker__summary-context"),
+    ).toHaveTextContent("on the 22nd");
+    expect(within(recurrenceMenu).queryByText("Sat, Aug 22")).not.toBeInTheDocument();
     const compactNaturalRule = within(recurrenceMenu).getByRole("combobox", {
       name: "Describe recurrence",
     });
@@ -410,7 +415,10 @@
     let recurrenceDialog = page.getByRole("dialog", {
       name: "Choose task recurrence",
     });
-    expect(within(recurrenceDialog).getByText("No planned date")).toBeVisible();
+    expect(within(recurrenceDialog).queryByText("No planned date")).not.toBeInTheDocument();
+    expect(
+      recurrenceDialog.querySelector(".task-repeat-picker__summary"),
+    ).toHaveTextContent("Does not repeat");
     expect(within(recurrenceDialog).queryByText("Presets")).not.toBeInTheDocument();
     expect(
       within(recurrenceDialog).getByRole("button", { name: "Repeat every" }),
@@ -477,7 +485,12 @@
     recurrenceDialog = page.getByRole("dialog", {
       name: "Choose task recurrence",
     });
-    expect(within(recurrenceDialog).getByText("Today")).toBeVisible();
+    expect(
+      recurrenceDialog.querySelector(".task-repeat-picker__summary"),
+    ).toHaveTextContent("Every week");
+    expect(
+      recurrenceDialog.querySelector(".task-repeat-picker__summary-context"),
+    ).toHaveTextContent("on the 21st");
     expect(
       within(recurrenceDialog).getByRole("option", {
         name: "Weekly on Friday",

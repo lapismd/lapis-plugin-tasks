@@ -30,6 +30,11 @@ export type TaskRepeatPresentation = {
   options: TaskRepeatPresetOption[];
 };
 
+export type TaskRepeatHeader = {
+  label: string;
+  dateContext?: string;
+};
+
 export type TaskNaturalRepeatSuggestion = {
   input: string;
   label: string;
@@ -115,6 +120,24 @@ function ordinal(value: number) {
   return `${value}${suffix}`;
 }
 
+function rulePartValue(rule: string, key: string): string | undefined {
+  return rule.split(";").find((part) => part.startsWith(`${key}=`))?.slice(key.length + 1);
+}
+
+function ruleUsesExplicitDateSelector(rrule: string) {
+  return Boolean(
+    rulePartValue(rrule, "BYDAY") ||
+      rulePartValue(rrule, "BYMONTHDAY") ||
+      rulePartValue(rrule, "BYMONTH"),
+  );
+}
+
+function formatRepeatAnchorDateContext(date: string): string | undefined {
+  const parsed = localDateFromDateOnly(date);
+  if (!parsed) return undefined;
+  return `on the ${ordinal(parsed.getDate())}`;
+}
+
 function isSimplePreset(repeat: TaskRepeat) {
   return (
     repeat.anchor === "schedule" &&
@@ -171,6 +194,24 @@ export function taskRepeatForPreset(
       ? { completionCount: current.completionCount }
       : {}),
   };
+}
+
+export function buildTaskRepeatHeader(
+  repeat: TaskRepeat | undefined,
+  plannedDate: string | null | undefined,
+): TaskRepeatHeader {
+  if (!repeat) return { label: "Does not repeat" };
+  const label = formatTaskRepeatRule(repeat.rrule);
+  const anchorDate = normalizeTaskDateOnly(plannedDate) ??
+    normalizeTaskDateOnly(repeat.start);
+  if (!anchorDate || ruleUsesExplicitDateSelector(repeat.rrule)) {
+    return { label };
+  }
+  const dateContext = formatRepeatAnchorDateContext(anchorDate);
+  if (!dateContext || label.toLowerCase().includes(dateContext.toLowerCase())) {
+    return { label };
+  }
+  return { label, dateContext };
 }
 
 export function buildTaskRepeatPresentation(

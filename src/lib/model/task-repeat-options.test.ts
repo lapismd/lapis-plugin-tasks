@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   buildNaturalTaskRepeatSuggestions,
+  buildTaskRepeatHeader,
   buildTaskRepeatPresentation,
   formatTaskRepeatRule,
   taskRepeatForPreset,
@@ -82,6 +83,33 @@ describe("task recurrence preset presentation", () => {
       ),
     ).toBe("Every 2 weeks on Monday, Wednesday, Friday for 12 times");
     expect(formatTaskRepeatRule("not-an-rrule")).toBe("not-an-rrule");
+  });
+
+  it("summarizes the active recurrence before date context in picker headers", () => {
+    expect(buildTaskRepeatHeader(undefined, "2026-08-18")).toEqual({
+      label: "Does not repeat",
+    });
+    expect(
+      buildTaskRepeatHeader({
+        start: "2026-08-18",
+        rrule: "FREQ=WEEKLY;INTERVAL=3",
+        anchor: "schedule",
+        missed: "carry",
+      }, undefined),
+    ).toEqual({
+      label: "Every 3 weeks",
+      dateContext: "on the 18th",
+    });
+    expect(
+      buildTaskRepeatHeader({
+        start: "2026-08-18",
+        rrule: "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR",
+        anchor: "schedule",
+        missed: "carry",
+      }, "2026-08-18"),
+    ).toEqual({
+      label: "Every weekday",
+    });
   });
 
   it("builds validated recurrence matches from natural language", () => {
