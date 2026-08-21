@@ -948,6 +948,7 @@
                 showLabel={false}
                 uppercase={false}
                 placeholder="Tomorrow or 2026-09-01"
+                suggestionPortalProps={{ disabled: true }}
                 onChange={updateAdditionalDates}
               />
             </Field.Field>
@@ -963,6 +964,7 @@
                 showLabel={false}
                 uppercase={false}
                 placeholder="Next Friday or 2026-09-03"
+                suggestionPortalProps={{ disabled: true }}
                 onChange={updateExcludedDates}
               />
             </Field.Field>

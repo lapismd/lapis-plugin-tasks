@@ -524,8 +524,12 @@
     });
     await userEvent.click(additionalDates);
     await userEvent.type(additionalDates, "tom");
+    const tomorrowOption = within(dialog).getByRole("option", {
+      name: "Tomorrow",
+    });
+    expect(tomorrowOption).toBeVisible();
     await userEvent.click(
-      page.getByRole("option", { name: "Tomorrow" }),
+      tomorrowOption,
     );
     expect(dialog).toBeVisible();
     expect(state().repeat).toMatchObject({ rrule: "FREQ=DAILY;INTERVAL=2" });
@@ -543,6 +547,8 @@
       within(customForm).getByRole("combobox", { name: "Excluded recurrence dates" }),
       "2026-09-03{Enter}",
     );
+    expect(dialog).toBeVisible();
+    expect(state().repeat).toMatchObject({ rrule: "FREQ=DAILY;INTERVAL=2" });
     await userEvent.click(
       within(customForm).getByRole("switch", { name: "Pause recurrence" }),
     );

@@ -121,7 +121,9 @@ The sheet follows the Tasks settings composition: calendar-like weekday toggles,
 Switch controls for boolean policy, Cycle Picker for tracking type, and
 Chip Autocomplete for RDATE/EXDATE. Date chips share the plan-date selector's
 natural-language parser and normalize against the injected clock before the
-canonical local dates are persisted. The custom sheet also accepts
+canonical local dates are persisted. Their suggestion popovers remain inside
+the sheet so accepting a suggestion is not treated as an outside interaction.
+The custom sheet also accepts
 natural-language recurrence descriptions through rrule.js and presents a
 friendly `toText()` summary instead of exposing the stored property value as
 the primary label. Nested controls edit a draft: tag suggestions, date values,
