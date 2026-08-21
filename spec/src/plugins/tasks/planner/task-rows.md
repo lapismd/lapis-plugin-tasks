@@ -46,8 +46,11 @@ canonical Task document.
 
 Plan time uses a Command View popover with the four day parts, common `09:00`,
 `12:00`, and `17:00` shortcuts, and a Design Core Time Picker for an exact
-clock value. The List control uses the standard Command View presentation
-without Tasks-owned panel heading chrome. See LN-TASK-013 and LN-TASK-045–046.
+clock value. Day parts and shortcuts each form a two-column grid. Their group
+headings and the Custom time title use a smaller, de-emphasized type scale so
+the selectable values remain the visual focus. The List control uses the
+standard Command View presentation without Tasks-owned panel heading chrome.
+See LN-TASK-013 and LN-TASK-045–046.
 
 When present, the List chip uses the projected Task List display title. The
 display title prefers front matter `title`, then the first H1, then a humanized

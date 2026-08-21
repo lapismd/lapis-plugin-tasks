@@ -71,6 +71,9 @@ and Markdown TaskRuns. Individual pages do not add their own spacing fixes.
 Expanded row metadata composes the shared Design Core controls throughout,
 including shadcn Select triggers for custom recurrence frequency and anchor;
 planner pages do not substitute native form dropdowns. See LN-TASK-046.
+The shared plan-time popover presents day parts and clock shortcuts in compact
+two-column groups, keeping their smaller section titles subordinate to the
+options themselves.
 
 ## Component map
 

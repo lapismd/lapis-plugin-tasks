@@ -108,7 +108,11 @@
     >
       <CommandView.Root label="Choose planner time" loop>
         <CommandView.List aria-label="Planner time shortcuts">
-          <CommandView.Group value="day-parts" heading="Day parts">
+          <CommandView.Group
+            class="task-at-picker__option-grid"
+            value="day-parts"
+            heading="Day parts"
+          >
             <CommandView.Item value="morning" data-checked={isMorning} onSelect={() => void select("morning")}>
               <CommandView.ItemIcon><SunriseIcon aria-hidden="true" /></CommandView.ItemIcon>
               <CommandView.ItemLabel>Morning</CommandView.ItemLabel>
@@ -126,7 +130,11 @@
               <CommandView.ItemLabel>Anytime</CommandView.ItemLabel>
             </CommandView.Item>
           </CommandView.Group>
-          <CommandView.Group value="shortcuts" heading="Shortcuts">
+          <CommandView.Group
+            class="task-at-picker__option-grid"
+            value="shortcuts"
+            heading="Shortcuts"
+          >
             {#each ["09:00", "12:00", "17:00"] as time (time)}
               <CommandView.Item value={time} data-checked={selectedAt === time} onSelect={() => void select(time)}>
                 <CommandView.ItemIcon><Clock3Icon aria-hidden="true" /></CommandView.ItemIcon>
