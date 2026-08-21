@@ -113,6 +113,10 @@ do not substitute native form dropdowns. The compact recurrence popover starts
 directly with its presets, keeps a no-apply `Repeat every…` number/frequency
 row behind one disclosure, and hands `Custom recurrence…` to a separately
 scrollable, flat, full-height Design Core Form Sheet while closing the popover.
+Its compact header uses the stronger Task-detail title weight and reuses the
+Task-detail close control's bordered circular geometry, centered icon scale,
+and shadow, with a grey resting surface and stronger hover contrast against the
+white or themed sheet surface.
 The sheet follows the Tasks settings composition: calendar-like weekday toggles,
 Switch controls for boolean policy, Cycle Picker for tracking type, and
 Chip Autocomplete for RDATE/EXDATE. Date chips share the plan-date selector's

@@ -197,22 +197,42 @@
 .task-repeat-picker__sheet .form-sheet-title {
   margin: 0;
   font-size: 0.9rem;
+  font-weight: 700;
   line-height: 1;
   outline: none;
 }
 
 .task-repeat-picker__sheet .ui-form-sheet__close:hover,
 .task-repeat-picker__sheet .ui-form-sheet__close:focus-visible {
-  background: var(--task-repeat-picker-control-hover) !important;
+  border-color: var(--ui-form-border, var(--border));
+  background: color-mix(
+    in srgb,
+    var(--ui-form-foreground, var(--foreground)) 14%,
+    var(--ui-form-muted-surface, var(--muted))
+  ) !important;
   color: var(--ui-form-foreground, var(--foreground));
+  outline: 0;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 5%);
 }
 
 .task-repeat-picker__sheet .ui-form-sheet__close {
-  width: 1.8rem;
-  height: 1.8rem;
-  border-radius: 50%;
+  box-sizing: border-box;
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  place-items: center;
+  border-color: var(--ui-form-border, var(--border));
+  border-radius: 999px;
   background: var(--ui-form-muted-surface, var(--muted));
   color: var(--ui-form-foreground, var(--foreground));
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 5%);
+  padding: 0;
+}
+
+.task-repeat-picker__sheet .ui-form-sheet__close svg {
+  width: 0.95rem;
+  height: 0.95rem;
 }
 
 .task-repeat-picker__sheet

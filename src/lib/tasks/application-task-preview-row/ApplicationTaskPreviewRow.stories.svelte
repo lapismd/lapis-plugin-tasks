@@ -216,6 +216,39 @@
       Math.abs(recurrenceRect.height - canvasElement.ownerDocument.defaultView!.innerHeight),
     ).toBeLessThan(2);
     expect(parseFloat(getComputedStyle(recurrenceDialog).borderRadius)).toBe(0);
+    const recurrenceTitle = within(recurrenceDialog).getByText("Custom recurrence", {
+      selector: ".form-sheet-title",
+    });
+    expect(
+      Number.parseInt(getComputedStyle(recurrenceTitle).fontWeight, 10),
+    ).toBeGreaterThanOrEqual(700);
+    const closeButton = within(recurrenceDialog).getByRole("button", {
+      name: "Close",
+    });
+    const closeRect = closeButton.getBoundingClientRect();
+    const closeIconRect = closeButton
+      .querySelector("svg")!
+      .getBoundingClientRect();
+    expect(closeRect.width).toBeCloseTo(32, 0);
+    expect(closeRect.height).toBeCloseTo(32, 0);
+    expect(
+      parseFloat(getComputedStyle(closeButton).borderRadius),
+    ).toBeGreaterThanOrEqual(16);
+    expect(
+      Math.abs(
+        closeIconRect.left + closeIconRect.width / 2 -
+          (closeRect.left + closeRect.width / 2),
+      ),
+    ).toBeLessThan(1);
+    expect(
+      Math.abs(
+        closeIconRect.top + closeIconRect.height / 2 -
+          (closeRect.top + closeRect.height / 2),
+      ),
+    ).toBeLessThan(1);
+    expect(getComputedStyle(closeButton).backgroundColor).not.toBe(
+      getComputedStyle(recurrenceDialog).backgroundColor,
+    );
     const interval = within(recurrenceDialog).getByRole("spinbutton", {
       name: "Recurrence interval",
     });
