@@ -158,7 +158,7 @@
       planner: {
         defaultWidth: 540,
         minWidth: 360,
-        maxWidth: 720,
+        maxWidth: null,
         pathLevel: 1,
         collapsible: true,
         resizable: true,
@@ -166,7 +166,7 @@
       detail: {
         defaultWidth: 360,
         minWidth: 300,
-        maxWidth: 520,
+        maxWidth: null,
         pathLevel: 2,
         closeable: true,
         resizable: true,
@@ -174,7 +174,7 @@
       related: {
         defaultWidth: 340,
         minWidth: 280,
-        maxWidth: 480,
+        maxWidth: null,
         pathLevel: 3,
         closeable: true,
         resizable: true,

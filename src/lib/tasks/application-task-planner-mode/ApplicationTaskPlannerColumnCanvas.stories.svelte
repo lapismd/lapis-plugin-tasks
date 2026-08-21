@@ -41,18 +41,68 @@
   play={async (context) => {
     const canvas = within(context.canvasElement);
     expect(canvas.getByText("All lists")).toBeVisible();
+    const canvasRoot = context.canvasElement.querySelector<HTMLElement>(
+      '[data-ui-component="column-canvas"][data-ui-part="root"]',
+    )!;
+    await waitFor(() =>
+      expect(canvasRoot).toHaveAttribute("data-display-mode", "wide"),
+    );
+    await waitFor(() =>
+      expect(
+        context.canvasElement.querySelector(
+          '[data-column-id="tasks"] [data-resize-mode="pair"]',
+        ),
+      ).not.toBeNull(),
+      { timeout: 5_000 },
+    );
     const tasksResizeHandle = canvas.getByRole("separator", {
-      name: "Resize Tasks column",
+      name: "Resize Tasks and planner columns",
     });
-    const tasksColumn = context.canvasElement.querySelector<HTMLElement>(
+    let tasksColumn = context.canvasElement.querySelector<HTMLElement>(
       '[data-column-id="tasks"][data-ui-part="column"]',
     )!;
-    const plannerColumn = context.canvasElement.querySelector<HTMLElement>(
+    let plannerColumn = context.canvasElement.querySelector<HTMLElement>(
       '[data-column-id="planner"][data-ui-part="column"]',
     )!;
     const plannerStartBorderWidth = Number.parseFloat(
       getComputedStyle(plannerColumn).borderLeftWidth,
     );
+    const rootStyle = getComputedStyle(canvasRoot);
+    const canvasInnerRight =
+      canvasRoot.getBoundingClientRect().right -
+      Number.parseFloat(rootStyle.paddingRight);
+    async function dragPair(handle: HTMLElement, deltaX: number) {
+      const bounds = handle.getBoundingClientRect();
+      const startX = bounds.left + bounds.width / 2;
+      const y = bounds.top + bounds.height / 2;
+      await fireEvent.pointerDown(handle, {
+        pointerId: 1,
+        isPrimary: true,
+        button: 0,
+        buttons: 1,
+        clientX: startX,
+        clientY: y,
+      });
+      await fireEvent.pointerMove(window, {
+        pointerId: 1,
+        clientX: startX + deltaX,
+        clientY: y,
+      });
+      await fireEvent.pointerUp(window, {
+        pointerId: 1,
+        clientX: startX + deltaX,
+        clientY: y,
+      });
+    }
+    expect(plannerColumn.getBoundingClientRect().right).toBeCloseTo(
+      canvasInnerRight,
+      1,
+    );
+    expect(tasksColumn.getBoundingClientRect().right).toBeCloseTo(
+      plannerColumn.getBoundingClientRect().left,
+      1,
+    );
+    expect(tasksResizeHandle).toHaveAttribute("data-resize-mode", "pair");
     expect(
       tasksResizeHandle.getBoundingClientRect().right -
         plannerColumn.getBoundingClientRect().left,
@@ -98,10 +148,55 @@
     expect(getComputedStyle(tasksResizeHandle).backgroundColor).toBe(
       "rgba(0, 0, 0, 0)",
     );
+    const initialTasksWidth = tasksColumn.getBoundingClientRect().width;
+    const initialPlannerWidth = plannerColumn.getBoundingClientRect().width;
+    await fireEvent.pointerMove(window, {
+      pointerId: 1,
+      clientX: resizeStart.left + resizeStart.width / 2 - 40,
+      clientY: resizeStart.top + resizeStart.height / 2,
+    });
+    await waitFor(() => {
+      expect(tasksColumn.getBoundingClientRect().width).toBeLessThan(
+        initialTasksWidth,
+      );
+      expect(plannerColumn.getBoundingClientRect().width).toBeGreaterThan(
+        initialPlannerWidth,
+      );
+    });
+    expect(
+      tasksColumn.getBoundingClientRect().width +
+        plannerColumn.getBoundingClientRect().width,
+    ).toBeCloseTo(initialTasksWidth + initialPlannerWidth, 1);
     await fireEvent.pointerUp(window);
     await waitFor(() =>
       expect(tasksResizeHandle).not.toHaveAttribute("data-resizing"),
     );
+    const resizedTasksWidth = tasksColumn.getBoundingClientRect().width;
+    const resizedPlannerWidth = plannerColumn.getBoundingClientRect().width;
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Collapse Tasks column" }),
+    );
+    await waitFor(() =>
+      expect(plannerColumn.getBoundingClientRect().width).toBeGreaterThan(
+        resizedPlannerWidth,
+      ),
+    );
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Expand Tasks column" }),
+    );
+    await waitFor(() => {
+      tasksColumn = context.canvasElement.querySelector<HTMLElement>(
+        '[data-column-id="tasks"][data-ui-part="column"]',
+      )!;
+      expect(tasksColumn.getBoundingClientRect().width).toBeCloseTo(
+        resizedTasksWidth,
+        1,
+      );
+      expect(plannerColumn.getBoundingClientRect().width).toBeCloseTo(
+        resizedPlannerWidth,
+        1,
+      );
+    });
     expect(
       canvas.getByRole("button", { name: "Collapse All lists section" }),
     ).toBeVisible();
@@ -615,6 +710,205 @@
           '[data-slot="context-menu-content"]',
         ),
       ).toBeNull();
+    });
+
+    const tailorRow = canvas
+      .getByRole("button", {
+        name: "Tailor platform CV variant",
+        exact: true,
+      })
+      .closest<HTMLElement>("[data-planner-task-id]")!;
+    await fireEvent.click(
+      within(tailorRow).getByRole("button", {
+        name: "Open task details for Tailor platform CV variant",
+      }),
+    );
+    let detailColumn: HTMLElement;
+    let plannerDetailHandle: HTMLElement;
+    await waitFor(
+      () => {
+        detailColumn = context.canvasElement.querySelector<HTMLElement>(
+          '[data-column-id="detail"][data-ui-part="column"]',
+        )!;
+        plannerDetailHandle = context.canvasElement.querySelector<HTMLElement>(
+          '[data-column-id="planner"] [data-resize-mode="pair"]',
+        )!;
+        expect(detailColumn).not.toBeNull();
+        expect(plannerDetailHandle).not.toBeNull();
+        expect(detailColumn.getBoundingClientRect().right).toBeCloseTo(
+          canvasInnerRight,
+          1,
+        );
+      },
+      { timeout: 5_000 },
+    );
+    expect(
+      detailColumn!.querySelector('[data-ui-part="resize-handle"]'),
+    ).toBeNull();
+    const plannerBeforePairResize = plannerColumn.getBoundingClientRect().width;
+    const detailBeforePairResize = detailColumn!.getBoundingClientRect().width;
+    await dragPair(plannerDetailHandle!, 48);
+    await waitFor(() => {
+      expect(plannerColumn.getBoundingClientRect().width).toBeGreaterThan(
+        plannerBeforePairResize,
+      );
+      expect(detailColumn!.getBoundingClientRect().width).toBeLessThan(
+        detailBeforePairResize,
+      );
+    });
+    expect(
+      plannerColumn.getBoundingClientRect().width +
+        detailColumn!.getBoundingClientRect().width,
+    ).toBeCloseTo(plannerBeforePairResize + detailBeforePairResize, 1);
+    const resizedPlannerDetail = {
+      planner: plannerColumn.getBoundingClientRect().width,
+      detail: detailColumn!.getBoundingClientRect().width,
+    };
+
+    await fireEvent.click(
+      canvas.getByRole("button", { name: "Collapse planner column" }),
+    );
+    await waitFor(() => {
+      const collapsedPlanner = context.canvasElement.querySelector<HTMLElement>(
+        '[data-column-id="planner"][data-ui-part="collapsed-column"]',
+      );
+      tasksColumn = context.canvasElement.querySelector<HTMLElement>(
+        '[data-column-id="tasks"][data-ui-part="column"]',
+      )!;
+      detailColumn = context.canvasElement.querySelector<HTMLElement>(
+        '[data-column-id="detail"][data-ui-part="column"]',
+      )!;
+      expect(collapsedPlanner).not.toBeNull();
+      expect(collapsedPlanner).not.toHaveAttribute("data-responsive-stage");
+      expect(tasksColumn).toHaveAttribute("data-responsive-stage", "pair");
+      expect(detailColumn).toHaveAttribute("data-responsive-stage", "pair");
+      expect(detailColumn.getBoundingClientRect().right).toBeCloseTo(
+        canvasInnerRight,
+        1,
+      );
+    });
+    await fireEvent.click(
+      canvas.getByRole("button", { name: "Expand planner column" }),
+    );
+    await waitFor(() => {
+      plannerColumn = context.canvasElement.querySelector<HTMLElement>(
+        '[data-column-id="planner"][data-ui-part="column"]',
+      )!;
+      detailColumn = context.canvasElement.querySelector<HTMLElement>(
+        '[data-column-id="detail"][data-ui-part="column"]',
+      )!;
+      expect(plannerColumn).toHaveAttribute("data-responsive-stage", "pair");
+      expect(detailColumn).toHaveAttribute("data-responsive-stage", "pair");
+      expect(plannerColumn.getBoundingClientRect().width).toBeCloseTo(
+        resizedPlannerDetail.planner,
+        1,
+      );
+      expect(detailColumn.getBoundingClientRect().width).toBeCloseTo(
+        resizedPlannerDetail.detail,
+        1,
+      );
+    });
+
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Open Nova Bank" }),
+    );
+    let relatedColumn: HTMLElement;
+    let detailRelatedHandle: HTMLElement;
+    await waitFor(
+      () => {
+        detailColumn = context.canvasElement.querySelector<HTMLElement>(
+          '[data-column-id="detail"][data-ui-part="column"]',
+        )!;
+        relatedColumn = context.canvasElement.querySelector<HTMLElement>(
+          '[data-column-id="related"][data-ui-part="column"]',
+        )!;
+        detailRelatedHandle = context.canvasElement.querySelector<HTMLElement>(
+          '[data-column-id="detail"] [data-resize-mode="pair"]',
+        )!;
+        expect(relatedColumn).not.toBeNull();
+        expect(detailRelatedHandle).not.toBeNull();
+        expect(relatedColumn.getBoundingClientRect().right).toBeCloseTo(
+          canvasInnerRight,
+          1,
+        );
+      },
+      { timeout: 5_000 },
+    );
+    expect(
+      relatedColumn!.querySelector('[data-ui-part="resize-handle"]'),
+    ).toBeNull();
+    const detailBeforeRelatedResize = detailColumn!.getBoundingClientRect().width;
+    const relatedBeforeResize = relatedColumn!.getBoundingClientRect().width;
+    await dragPair(detailRelatedHandle!, -36);
+    await waitFor(() => {
+      expect(detailColumn!.getBoundingClientRect().width).toBeLessThan(
+        detailBeforeRelatedResize,
+      );
+      expect(relatedColumn!.getBoundingClientRect().width).toBeGreaterThan(
+        relatedBeforeResize,
+      );
+    });
+    expect(
+      detailColumn!.getBoundingClientRect().width +
+        relatedColumn!.getBoundingClientRect().width,
+    ).toBeCloseTo(detailBeforeRelatedResize + relatedBeforeResize, 1);
+
+    const resizedDetailRelated = {
+      detail: detailColumn!.getBoundingClientRect().width,
+      related: relatedColumn!.getBoundingClientRect().width,
+    };
+    canvasRoot.scrollTo({ left: 0, behavior: "auto" });
+    await fireEvent.scroll(canvasRoot);
+    await new Promise((resolve) => setTimeout(resolve, 220));
+    expect(canvasRoot.scrollLeft).toBeLessThan(2);
+    expect(detailColumn).toHaveAttribute("data-responsive-stage", "pair");
+    expect(relatedColumn).toHaveAttribute("data-responsive-stage", "pair");
+    expect(detailColumn!.getBoundingClientRect().width).toBeCloseTo(
+      resizedDetailRelated.detail,
+      1,
+    );
+    expect(relatedColumn!.getBoundingClientRect().width).toBeCloseTo(
+      resizedDetailRelated.related,
+      1,
+    );
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Close Nova Bank column" }),
+    );
+    await waitFor(() => {
+      detailColumn = context.canvasElement.querySelector<HTMLElement>(
+        '[data-column-id="detail"][data-ui-part="column"]',
+      )!;
+      expect(
+        context.canvasElement.querySelector('[data-column-id="related"]'),
+      ).toBeNull();
+      expect(plannerColumn.getBoundingClientRect().width).toBeCloseTo(
+        resizedPlannerDetail.planner,
+        1,
+      );
+      expect(detailColumn.getBoundingClientRect().width).toBeCloseTo(
+        resizedPlannerDetail.detail,
+        1,
+      );
+    });
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Close detail column" }),
+    );
+    await waitFor(() => {
+      tasksColumn = context.canvasElement.querySelector<HTMLElement>(
+        '[data-column-id="tasks"][data-ui-part="column"]',
+      )!;
+      expect(
+        context.canvasElement.querySelector('[data-column-id="detail"]'),
+      ).toBeNull();
+      expect(tasksColumn.getBoundingClientRect().width).toBeCloseTo(
+        resizedTasksWidth,
+        1,
+      );
+      expect(plannerColumn.getBoundingClientRect().width).toBeCloseTo(
+        resizedPlannerWidth,
+        1,
+      );
     });
   }}
 >

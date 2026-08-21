@@ -23,6 +23,14 @@ Host movable panels remain unspecified. The package registers one `tasks`
 main-area view; Storybook catalog compositions exercise the same public
 controllers and components without defining another runtime.
 
+On a wide adaptive canvas, the active adjacent columns share the visible stage
+through Design Core's public pair-sizing contract. Tasks keeps its navigation
+column narrow and finite while Planner, Detail, and Related are unbounded
+content columns. Design Core owns inverse divider movement, collapse-time
+stretching, collapsed-rail exclusion and width deduction, per-pair split
+restoration, sticky-context reservation, continuous manual scrolling, and the
+unchanged compact behavior.
+
 ## Planner state model
 
 The planner combines disposable query state with short-lived presentation

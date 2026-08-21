@@ -21,6 +21,23 @@ The planner column exposes its controller-owned collapse action. A linked List
 opens to the right without replacing its parent and uses the same bordered,
 rounded column treatment as the planner body.
 
+In desktop adaptive mode, the Tasks navigation keeps a finite maximum width.
+Planner, Detail, and Related declare `maxWidth: null`, so the active adjacent
+pair can use the complete visible stage. Design Core owns the paired allocator,
+shared divider, inverse resize, collapse-time stretching, and per-pair split
+restoration; Tasks does not calculate or persist widths itself. Navigating
+deeper changes the active pair from Tasks/Planner to Planner/Detail and then
+Detail/Related without discarding an earlier split. Compact/mobile mode keeps
+one full-width active column and exposes no shared divider.
+
+Collapsed columns are rails rather than pair members. Their widths and the
+spacing around them remain deducted while Design Core pairs the next expanded
+column. After structural navigation activates a pair, ordinary horizontal
+scrolling moves through the existing canvas without changing widths, selecting
+a different pair, or realigning the viewport. When Tasks becomes a sticky rail,
+its complete outer slot remains ahead of the active content pair so the overlay
+does not obstruct the leading column.
+
 The first-column resize handle centers its transparent pointer target across
 the planner start border. The adjacent planner surface paints and clips the
 hover accent inside its rounded start corners, so the visual handle complements

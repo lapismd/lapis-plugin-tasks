@@ -81,6 +81,13 @@
     return canvas;
   }
 
+  function columnCanvasInnerRight(root: HTMLElement): number {
+    return (
+      root.getBoundingClientRect().right -
+      Number.parseFloat(getComputedStyle(root).paddingRight)
+    );
+  }
+
   async function showDailyAgendaChecklistSummary(
     canvasElement: HTMLElement,
     canvas: ReturnType<typeof within>,
@@ -793,11 +800,13 @@
       "[data-task-sidebar-detail]",
     )!;
     expect(taskDetail.querySelector("[data-task-markdown-surface]")).toBeVisible();
-    const redundantTaskTitle = taskDetail.querySelector<HTMLElement>(
-      'h1[data-task-markdown-redundant-title="true"]',
-    );
-    expect(redundantTaskTitle).not.toBeNull();
-    expect(redundantTaskTitle).not.toBeVisible();
+    await waitFor(() => {
+      const redundantTaskTitle = taskDetail.querySelector<HTMLElement>(
+        'h1[data-task-markdown-redundant-title="true"]',
+      );
+      expect(redundantTaskTitle).not.toBeNull();
+      expect(redundantTaskTitle).not.toBeVisible();
+    });
     expect(
       within(taskDetail).getByRole("textbox", { name: "Task title" }),
     ).toHaveTextContent("Review interview notes");
@@ -1455,6 +1464,25 @@
     // Tasks surface when opened directly in Storybook.
     await showDailyAgendaChecklistSummary(canvasElement, canvas);
     await collapseLapisLeftSidebar(canvas);
+    const desktopCanvasRoot = canvasElement.querySelector<HTMLElement>(
+      '[data-ui-component="column-canvas"][data-ui-part="root"]',
+    )!;
+    await waitFor(() => {
+      const desktopPlannerColumn = canvasElement.querySelector<HTMLElement>(
+        '[data-column-id="planner"][data-ui-part="column"]',
+      );
+      expect(desktopCanvasRoot).toHaveAttribute("data-display-mode", "wide");
+      expect(
+        canvasElement.querySelector(
+          '[data-column-id="tasks"] [data-resize-mode="pair"]',
+        ),
+      ).not.toBeNull();
+      expect(desktopPlannerColumn).not.toBeNull();
+      expect(desktopPlannerColumn!.getBoundingClientRect().right).toBeCloseTo(
+        columnCanvasInnerRight(desktopCanvasRoot),
+        1,
+      );
+    });
   }}
 />
 
@@ -1481,6 +1509,15 @@
     expect(app.plugins.isPluginEnabled("tasks")).toBe(true);
     expect(canvasElement.querySelector('[data-ui-component="workspace-mobile"]')).toBeVisible();
     expect(app.workspace.getLeavesOfType("tasks")).toHaveLength(1);
+    const mobileCanvasRoot = canvasElement.querySelector<HTMLElement>(
+      '[data-ui-component="column-canvas"][data-ui-part="root"]',
+    )!;
+    await waitFor(() =>
+      expect(mobileCanvasRoot).toHaveAttribute("data-display-mode", "compact"),
+    );
+    expect(
+      mobileCanvasRoot.querySelector('[data-resize-mode="pair"]'),
+    ).toBeNull();
     expect(
       await canvas.findByText("Tailor platform CV variant"),
     ).toBeVisible();
@@ -1822,6 +1859,75 @@
       { timeout: 5_000 },
     );
     await collapseLapisLeftSidebar(canvas);
+    const deepCanvasRoot = canvasElement.querySelector<HTMLElement>(
+      '[data-ui-component="column-canvas"][data-ui-part="root"]',
+    )!;
+    const deepPlannerBeforeScroll = canvasElement.querySelector<HTMLElement>(
+      '[data-column-id="planner"][data-ui-part="column"]',
+    )!;
+    const deepDetailBeforeScroll = canvasElement.querySelector<HTMLElement>(
+      '[data-column-id="detail"][data-ui-part="column"]',
+    )!;
+    await waitFor(() => {
+      expect(deepPlannerBeforeScroll).toHaveAttribute(
+        "data-responsive-stage",
+        "pair",
+      );
+      expect(deepDetailBeforeScroll).toHaveAttribute(
+        "data-responsive-stage",
+        "pair",
+      );
+      expect(deepPlannerBeforeScroll.getBoundingClientRect().width).toBeLessThan(
+        deepCanvasRoot.clientWidth - 200,
+      );
+      expect(deepDetailBeforeScroll.getBoundingClientRect().width).toBeGreaterThan(
+        200,
+      );
+    });
+    const deepPairWidths = {
+      planner: deepPlannerBeforeScroll.getBoundingClientRect().width,
+      detail: deepDetailBeforeScroll.getBoundingClientRect().width,
+    };
+    deepCanvasRoot.scrollTo({
+      left: deepCanvasRoot.scrollWidth,
+      behavior: "auto",
+    });
+    await fireEvent.scroll(deepCanvasRoot);
+    await waitFor(() => {
+      const deepPlannerColumn = canvasElement.querySelector<HTMLElement>(
+        '[data-column-id="planner"][data-ui-part="column"]',
+      );
+      const deepDetailColumn = canvasElement.querySelector<HTMLElement>(
+        '[data-column-id="detail"][data-ui-part="column"]',
+      );
+      const stickyTasks = canvasElement.querySelector<HTMLElement>(
+        '[data-ui-part="sticky-stack"]',
+      );
+      expect(deepCanvasRoot).toHaveAttribute("data-display-mode", "wide");
+      expect(
+        canvasElement.querySelector(
+          '[data-column-id="planner"] [data-resize-mode="pair"]',
+        ),
+      ).not.toBeNull();
+      expect(deepPlannerColumn).not.toBeNull();
+      expect(deepDetailColumn).not.toBeNull();
+      expect(stickyTasks).not.toBeNull();
+      expect(stickyTasks!.getBoundingClientRect().right).toBeLessThanOrEqual(
+        deepPlannerColumn!.getBoundingClientRect().left + 1,
+      );
+      expect(deepPlannerColumn!.getBoundingClientRect().width).toBeCloseTo(
+        deepPairWidths.planner,
+        1,
+      );
+      expect(deepDetailColumn!.getBoundingClientRect().width).toBeCloseTo(
+        deepPairWidths.detail,
+        1,
+      );
+      expect(deepDetailColumn!.getBoundingClientRect().right).toBeCloseTo(
+        columnCanvasInnerRight(deepCanvasRoot),
+        1,
+      );
+    });
   }}
 />
 

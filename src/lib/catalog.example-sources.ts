@@ -148,9 +148,9 @@ export const ApplicationTaskPlannerColumnCanvasExample = `<script lang="ts">
 
   const canvas = ColumnCanvas.createColumnCanvasController({
     columns: {
-      tasks: { defaultWidth: 196, minWidth: 180, pathLevel: 0, collapsible: true },
-      planner: { defaultWidth: 540, pathLevel: 1, resizable: true },
-      detail: { defaultWidth: 360, pathLevel: 2, closeable: true },
+      tasks: { defaultWidth: 196, minWidth: 180, maxWidth: 280, pathLevel: 0, collapsible: true },
+      planner: { defaultWidth: 540, maxWidth: null, pathLevel: 1, resizable: true },
+      detail: { defaultWidth: 360, maxWidth: null, pathLevel: 2, closeable: true },
     },
     initialPath: ["today"],
   });
