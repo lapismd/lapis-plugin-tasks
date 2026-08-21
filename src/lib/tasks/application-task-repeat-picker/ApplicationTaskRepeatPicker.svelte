@@ -9,6 +9,7 @@
   import FormSheet from "@lapismd/design-core/forms/FormSheet.svelte";
   import { Button } from "@lapismd/design-core/shadcn/button";
   import * as Collapsible from "@lapismd/design-core/shadcn/collapsible";
+  import * as Command from "@lapismd/design-core/shadcn/command";
   import * as CommandView from "@lapismd/design-core/shadcn/command-view";
   import * as Field from "@lapismd/design-core/shadcn/field";
   import { Input } from "@lapismd/design-core/shadcn/input";
@@ -25,13 +26,17 @@
   } from "../../model";
   import {
     analyzeRecurrenceRule,
+    buildNaturalTaskRepeatSuggestions,
     buildTaskRepeatPresentation,
+    buildTaskPlannerWeek,
+    formatTaskRepeatRule,
     isLocalDateString,
     parseNaturalDueDate,
     taskRepeatForPreset,
     taskRepeatPresetFor,
     todayDateOnly,
     type TaskRepeatPreset,
+    type TaskNaturalRepeatSuggestion,
   } from "../../model";
 
   type EditableFrequency = "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
@@ -65,6 +70,7 @@
   let customSheetOpen = $state(false);
   let rawMode = $state(false);
   let rawRrule = $state("FREQ=WEEKLY");
+  let naturalRuleInput = $state("");
   let frequency = $state<EditableFrequency>("WEEKLY");
   let interval = $state(1);
   let weekdays = $state<string[]>([]);
@@ -145,6 +151,15 @@
     repeatEverySelected ? "repeat-every" : customSelected ? "custom" : preset,
   );
   const presentation = $derived(buildTaskRepeatPresentation(plannedDate, now ?? new Date()));
+  const recurrenceWeek = $derived(
+    buildTaskPlannerWeek(
+      presentation.referenceDate,
+      todayDateOnly(now ?? new Date()),
+    ),
+  );
+  const naturalRuleSuggestions = $derived(
+    buildNaturalTaskRepeatSuggestions(naturalRuleInput),
+  );
   const retainedInvalid = $derived(
     invalidRepeat === undefined ? null : JSON.stringify(invalidRepeat, null, 2),
   );
@@ -162,15 +177,14 @@
     if (knownPreset !== "custom") {
       return presentation.options.find((option) => option.value === knownPreset)?.label ?? "Does not repeat";
     }
-    return repeat.rrule;
+    return formatTaskRepeatRule(repeat.rrule);
   });
 
   function partValue(rule: string, key: string): string | undefined {
     return rule.split(";").find((part) => part.startsWith(`${key}=`))?.slice(key.length + 1);
   }
 
-  function syncControlsFromRepeat() {
-    const rule = repeat?.rrule ?? "FREQ=WEEKLY";
+  function syncStructuredRule(rule: string) {
     const nextFrequency = partValue(rule, "FREQ");
     frequency = nextFrequency === "DAILY" || nextFrequency === "WEEKLY" || nextFrequency === "MONTHLY" || nextFrequency === "YEARLY"
       ? nextFrequency : "WEEKLY";
@@ -193,7 +207,13 @@
     endMode = countValue ? "count" : untilValue ? "until" : "never";
     count = Number(countValue ?? 1);
     until = untilValue ? `${untilValue.slice(0, 4)}-${untilValue.slice(4, 6)}-${untilValue.slice(6, 8)}` : "";
+  }
+
+  function syncControlsFromRepeat() {
+    const rule = repeat?.rrule ?? "FREQ=WEEKLY";
+    syncStructuredRule(rule);
     rawRrule = rule;
+    naturalRuleInput = "";
     rawMode = invalidRepeat !== undefined || analyzeRecurrenceRule(rule).status === "unsupported";
     anchor = repeat?.anchor ?? "schedule";
     missed = repeat?.missed ?? "carry";
@@ -308,6 +328,15 @@
   function updateExcludedDates(values: string[]) {
     const normalized = normalizeDateChips(values, "Excluded dates");
     if (normalized) exdateValues = normalized;
+  }
+
+  function selectNaturalRule(suggestion: TaskNaturalRepeatSuggestion) {
+    rawRrule = suggestion.rrule;
+    const analysis = analyzeRecurrenceRule(suggestion.rrule);
+    rawMode = analysis.status === "unsupported";
+    if (!rawMode) syncStructuredRule(suggestion.rrule);
+    naturalRuleInput = suggestion.input;
+    validationMessage = null;
   }
 
   function previousDate(value: LocalDateString): LocalDateString {
@@ -567,13 +596,10 @@
     bodyDensity="dense"
     class="task-repeat-picker__sheet"
   >
-    <form
+    <div
       class="task-repeat-picker__custom"
+      role="form"
       aria-label="Custom recurrence form"
-      onsubmit={(event) => {
-        event.preventDefault();
-        void applyCustom();
-      }}
     >
       <Field.Group class="task-repeat-picker__settings">
         <Field.Set class="task-repeat-picker__settings-section">
@@ -582,6 +608,49 @@
             Choose when this task repeats and when the series ends.
           </Field.Description>
           <div class="task-repeat-picker__settings-card">
+            <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--stacked">
+              <Field.Label for={`${uid}-natural-rule`}>
+                Describe recurrence
+              </Field.Label>
+              <Field.Description>
+                Try “every weekday” or “every 2 weeks on Monday”.
+              </Field.Description>
+              <Command.Root
+                class="task-repeat-picker__natural-rule"
+                label="Describe recurrence"
+                shouldFilter={false}
+                loop
+              >
+                <Command.Input
+                  id={`${uid}-natural-rule`}
+                  bind:value={naturalRuleInput}
+                  aria-label="Describe recurrence"
+                  placeholder="Every weekday"
+                />
+                {#if naturalRuleInput.trim()}
+                  <Command.List aria-label="Natural-language recurrence matches">
+                    {#if naturalRuleSuggestions.length}
+                      <Command.Group value="matches">
+                        {#each naturalRuleSuggestions as suggestion (suggestion.rrule)}
+                          <Command.Item
+                            value={suggestion.rrule}
+                            onSelect={() => selectNaturalRule(suggestion)}
+                          >
+                            <Repeat2Icon aria-hidden="true" />
+                            <span>{suggestion.label}</span>
+                            <Command.Shortcut>{suggestion.rrule}</Command.Shortcut>
+                          </Command.Item>
+                        {/each}
+                      </Command.Group>
+                    {:else}
+                      <Command.Empty forceMount>
+                        No recurrence match
+                      </Command.Empty>
+                    {/if}
+                  </Command.List>
+                {/if}
+              </Command.Root>
+            </Field.Field>
             <Field.Field orientation="horizontal" class="task-repeat-picker__setting-row">
               <Field.Content>
                 <Field.Label for={`${uid}-raw-rule`}>Edit raw RRULE</Field.Label>
@@ -653,9 +722,17 @@
                     aria-label="Recurrence weekdays"
                     class="task-repeat-picker__weekday-grid"
                   >
-                    {#each weekdayOptions as [day, dayLabel, fullDayLabel]}
-                      <ToggleGroup.Item value={day} aria-label={fullDayLabel}>
-                        {dayLabel}
+                    {#each recurrenceWeek as calendarDay, index (calendarDay.date)}
+                      {@const [day, , fullDayLabel] = weekdayOptions[index]!}
+                      <ToggleGroup.Item
+                        value={day}
+                        aria-label={fullDayLabel}
+                        title={calendarDay.date}
+                      >
+                        <span class="task-repeat-picker__weekday-label">
+                          {calendarDay.weekday}
+                        </span>
+                        <strong>{calendarDay.dayNumber}</strong>
                       </ToggleGroup.Item>
                     {/each}
                   </ToggleGroup.Root>
@@ -978,8 +1055,10 @@
         </div>
       {/if}
       <div class="task-repeat-picker__sheet-actions">
-        <Button type="submit">Apply recurrence</Button>
+        <Button type="button" onclick={() => void applyCustom()}>
+          Apply recurrence
+        </Button>
       </div>
-    </form>
+    </div>
   </FormSheet>
 </div>

@@ -1,5 +1,9 @@
 import type { TaskRepeat } from "./task-document";
-import { isLocalDateString } from "./recurrence-engine";
+import { RRule } from "rrule";
+import {
+  analyzeRecurrenceRule,
+  isLocalDateString,
+} from "./recurrence-engine";
 import {
   normalizeTaskDateOnly,
   todayDateOnly,
@@ -25,6 +29,55 @@ export type TaskRepeatPresentation = {
   referenceDateLabel: string;
   options: TaskRepeatPresetOption[];
 };
+
+export type TaskNaturalRepeatSuggestion = {
+  input: string;
+  label: string;
+  rrule: string;
+};
+
+function sentenceCase(value: string): string {
+  return value.length ? `${value[0]!.toUpperCase()}${value.slice(1)}` : value;
+}
+
+/** Present a stored RRULE property value as reader-facing recurrence text. */
+export function formatTaskRepeatRule(rrule: string): string {
+  try {
+    const text = RRule.fromString(rrule).toText();
+    return text ? sentenceCase(text) : rrule;
+  } catch {
+    return rrule;
+  }
+}
+
+function propertyValue(rule: RRule): string | null {
+  const serialized = rule.toString();
+  if (!serialized.startsWith("RRULE:")) return null;
+  const parts = serialized.slice("RRULE:".length).split(";");
+  const frequency = parts.find((part) => part.startsWith("FREQ="));
+  if (!frequency) return null;
+  return [frequency, ...parts.filter((part) => part !== frequency)].join(";");
+}
+
+/** Parse rrule.js natural-language input into a validated Tasks suggestion. */
+export function buildNaturalTaskRepeatSuggestions(
+  input: string,
+): TaskNaturalRepeatSuggestion[] {
+  const normalizedInput = input.trim();
+  if (!normalizedInput) return [];
+  try {
+    const parsed = RRule.fromText(normalizedInput);
+    const rrule = propertyValue(parsed);
+    if (!rrule || analyzeRecurrenceRule(rrule).status === "invalid") return [];
+    return [{
+      input: normalizedInput,
+      label: formatTaskRepeatRule(rrule),
+      rrule,
+    }];
+  } catch {
+    return [];
+  }
+}
 
 function localDateFromDateOnly(value: string): Date | null {
   const [year, month, day] = value.split("-").map(Number);

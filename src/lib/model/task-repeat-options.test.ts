@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildNaturalTaskRepeatSuggestions,
   buildTaskRepeatPresentation,
+  formatTaskRepeatRule,
   taskRepeatForPreset,
   taskRepeatPresetFor,
 } from "./task-repeat-options";
@@ -71,5 +73,36 @@ describe("task recurrence preset presentation", () => {
       lastCompletedAt: "2026-08-18T09:15:00.000Z",
       completionCount: 4,
     });
+  });
+
+  it("presents custom rules as friendly recurrence text", () => {
+    expect(
+      formatTaskRepeatRule(
+        "FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,WE,FR;COUNT=12",
+      ),
+    ).toBe("Every 2 weeks on Monday, Wednesday, Friday for 12 times");
+    expect(formatTaskRepeatRule("not-an-rrule")).toBe("not-an-rrule");
+  });
+
+  it("builds validated recurrence matches from natural language", () => {
+    expect(buildNaturalTaskRepeatSuggestions("every weekday")).toEqual([
+      {
+        input: "every weekday",
+        label: "Every weekday",
+        rrule: "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR",
+      },
+    ]);
+    expect(
+      buildNaturalTaskRepeatSuggestions(
+        "every 2 weeks on monday and wednesday",
+      ),
+    ).toEqual([
+      {
+        input: "every 2 weeks on monday and wednesday",
+        label: "Every 2 weeks on Monday, Wednesday",
+        rrule: "FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,WE",
+      },
+    ]);
+    expect(buildNaturalTaskRepeatSuggestions("nonsense turtle")).toEqual([]);
   });
 });

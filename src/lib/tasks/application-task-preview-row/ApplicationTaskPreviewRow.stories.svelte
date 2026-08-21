@@ -1,6 +1,6 @@
 <script module lang="ts">
   import { defineMeta } from "@storybook/addon-svelte-csf";
-  import { expect, userEvent, waitFor, within } from "storybook/test";
+  import { expect, fireEvent, userEvent, waitFor, within } from "storybook/test";
   import { ApplicationTaskPreviewRowExample } from "../../catalog.example-sources";
   import ApplicationTaskPreviewRow from "./ApplicationTaskPreviewRow.svelte";
   import ApplicationTaskPreviewRowChecklistStory from "./ApplicationTaskPreviewRowChecklistStory.svelte";
@@ -404,18 +404,63 @@
       }),
     );
     const dialog = page.getByRole("dialog", { name: "Custom recurrence" });
-    const customForm = within(dialog).getByLabelText("Custom recurrence form");
-    const frequencySelect = within(customForm).getByRole("combobox", {
-      name: "Recurrence frequency",
+    const customForm = within(dialog).getByRole("form", {
+      name: "Custom recurrence form",
     });
-    await userEvent.click(frequencySelect);
-    await userEvent.click(
-      within(page.getByRole("listbox", { name: "Recurrence frequency options" }))
-        .getByRole("option", { name: "Weeks" }),
+    const naturalRule = within(customForm).getByRole("combobox", {
+      name: "Describe recurrence",
+    });
+    await userEvent.type(
+      naturalRule,
+      "every 2 weeks on Monday, Wednesday, and Friday",
     );
+    await userEvent.click(
+      within(customForm).getByRole("option", {
+        name: /Every 2 weeks on Monday, Wednesday, Friday/,
+      }),
+    );
+    expect(
+      within(customForm).getByRole("switch", { name: "Edit raw RRULE" }),
+    ).not.toBeChecked();
+    expect(
+      within(customForm).getByRole("combobox", {
+        name: "Recurrence frequency",
+      }),
+    ).toHaveTextContent("Weeks");
+    expect(
+      within(customForm).getByRole("spinbutton", {
+        name: "Recurrence interval",
+      }),
+    ).toHaveValue(2);
+    expect(state().repeat).toMatchObject({ rrule: "FREQ=DAILY;INTERVAL=2" });
     for (const day of ["Monday", "Wednesday", "Friday"]) {
-      await userEvent.click(within(customForm).getByRole("button", { name: day }));
+      const weekday = within(customForm).getByRole("button", { name: day });
+      expect(weekday).toHaveAttribute("aria-pressed", "true");
     }
+    const tuesday = within(customForm).getByRole("button", { name: "Tuesday" });
+    expect(tuesday).toHaveTextContent(/Tue\s*18/);
+    expect(tuesday).toHaveAttribute("aria-pressed", "false");
+    await userEvent.click(tuesday);
+    expect(tuesday).toHaveAttribute("aria-pressed", "true");
+    await userEvent.click(tuesday);
+    expect(tuesday).toHaveAttribute("aria-pressed", "false");
+    await userEvent.click(
+      within(customForm).getByRole("combobox", {
+        name: "Recurrence end condition",
+      }),
+    );
+    await userEvent.click(
+      within(
+        page.getByRole("listbox", {
+          name: "Recurrence end condition options",
+        }),
+      ).getByRole("option", { name: "On date" }),
+    );
+    const until = within(customForm).getByLabelText("Recurrence until");
+    await fireEvent.change(until, { target: { value: "2026-09-30" } });
+    await userEvent.type(until, "{Enter}");
+    expect(dialog).toBeVisible();
+    expect(state().repeat).toMatchObject({ rrule: "FREQ=DAILY;INTERVAL=2" });
     await userEvent.click(
       within(customForm).getByRole("combobox", {
         name: "Recurrence end condition",
@@ -441,12 +486,18 @@
       within(page.getByRole("listbox", { name: "Recurrence anchor options" }))
         .getByRole("option", { name: "Scheduled date" }),
     );
-    await userEvent.type(
-      within(customForm).getByRole("combobox", { name: "Additional recurrence dates" }),
-      "tomorrow{Enter}",
+    const additionalDates = within(customForm).getByRole("combobox", {
+      name: "Additional recurrence dates",
+    });
+    await userEvent.click(additionalDates);
+    await userEvent.type(additionalDates, "tom");
+    await userEvent.click(
+      page.getByRole("option", { name: "Tomorrow" }),
     );
+    expect(dialog).toBeVisible();
+    expect(state().repeat).toMatchObject({ rrule: "FREQ=DAILY;INTERVAL=2" });
     await userEvent.type(
-      within(customForm).getByRole("combobox", { name: "Additional recurrence dates" }),
+      additionalDates,
       "not a date{Enter}",
     );
     expect(within(customForm).getByRole("alert")).toHaveTextContent(
@@ -506,6 +557,11 @@
     );
     await waitForPointerInteraction(
       canvas.getByRole("button", { name: "Set task recurrence" }),
+    );
+    expect(
+      canvas.getByRole("button", { name: "Set task recurrence" }),
+    ).toHaveTextContent(
+      "Every 2 weeks on Monday, Wednesday, Friday for 12 times",
     );
   }}
 >

@@ -117,7 +117,12 @@ The sheet follows the Tasks settings composition: calendar-like weekday toggles,
 Switch controls for boolean policy, Cycle Picker for tracking type, and
 Chip Autocomplete for RDATE/EXDATE. Date chips share the plan-date selector's
 natural-language parser and normalize against the injected clock before the
-canonical local dates are persisted. See LN-TASK-046.
+canonical local dates are persisted. The custom sheet also accepts
+natural-language recurrence descriptions through rrule.js and presents a
+friendly `toText()` summary instead of exposing the stored property value as
+the primary label. Nested controls edit a draft: tag suggestions, date values,
+Select choices, and recurrence matches remain in the sheet until the explicit
+Apply action. See LN-TASK-046.
 The editor also owns weekday sets, monthly positional and calendar-day rules,
 yearly month/day, COUNT or date-only UNTIL, RDATE/EXDATE, missed policy,
 checklist reset, pause state, and habit tracking. Unsupported raw rules and
