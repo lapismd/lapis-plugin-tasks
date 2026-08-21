@@ -16,6 +16,7 @@
 
   import type { ApplicationTask } from '../../model';
   import ApplicationTaskAreaPicker from "../application-task-area-picker/ApplicationTaskAreaPicker.svelte";
+  import type { TaskListPickerOptionInput } from "../application-task-area-picker";
   import ApplicationTaskChecklistProgress from "../application-task-checklist-progress/ApplicationTaskChecklistProgress.svelte";
   import ApplicationTaskPreviewRow from "../application-task-preview-row/ApplicationTaskPreviewRow.svelte";
 
@@ -74,7 +75,7 @@
     dragPreview?: boolean;
     reorderable?: boolean;
     selectOnSurfaceClick?: boolean;
-    areaOptions?: string[];
+    areaOptions?: TaskListPickerOptionInput[];
     onRequestOpen?: (
       taskId: string,
       source?: "details-button" | "inline",

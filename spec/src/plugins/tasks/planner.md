@@ -108,11 +108,14 @@ The shared quick-create row supplies the same compact input, focused actions,
 normal-weight label, and block-end separation in daily sections, named views,
 and Markdown TaskRuns. Individual pages do not add their own spacing fixes.
 Expanded row metadata composes the shared Design Core controls throughout,
-including structured recurrence controls and raw RRULE editing; planner pages
-do not substitute native form dropdowns. The compact recurrence popover starts
-directly with its presets, keeps a no-apply `Repeat every…` number/frequency
-row behind one disclosure, and hands `Custom recurrence…` to a separately
-scrollable, flat, full-height Design Core Form Sheet while closing the popover.
+including structured List, recurrence, and raw RRULE editing; planner pages do
+not substitute native form dropdowns. The List picker keeps the Command View
+surface, showing display titles with wrapped Markdown file paths and optional
+navigation breadcrumbs from the List tree. The compact recurrence popover
+starts directly with its presets, keeps a no-apply `Repeat every…`
+number/frequency row behind one disclosure, and hands `Custom recurrence…` to a
+separately scrollable, flat, full-height Design Core Form Sheet while closing
+the popover.
 Its compact header uses the stronger Task-detail title weight and reuses the
 Task-detail close control's bordered circular geometry, centered icon scale,
 and shadow, with a grey resting surface and stronger hover contrast against the

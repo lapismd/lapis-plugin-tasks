@@ -18,6 +18,7 @@
 
   import type { ApplicationTask, ApplicationTaskPriority } from "../../model";
   import { formatCompletedTimestamp } from "../../model";
+  import type { TaskListPickerOptionInput } from "../application-task-area-picker";
   import ApplicationTaskAreaFormField from "../application-task-area-form-field/ApplicationTaskAreaFormField.svelte";
   import ApplicationTaskInlineOptionFormField from "../application-task-inline-option-form-field/ApplicationTaskInlineOptionFormField.svelte";
   import ApplicationTaskAtFormField from "../application-task-at-form-field/ApplicationTaskAtFormField.svelte";
@@ -34,7 +35,7 @@
     onRemoveTask = () => {},
   }: {
     task: ApplicationTask;
-    areaOptions?: string[];
+    areaOptions?: TaskListPickerOptionInput[];
     showRemove?: boolean;
     now?: Date;
     onUpdateTask?: (taskId: string, patch: Partial<ApplicationTask>) => void;

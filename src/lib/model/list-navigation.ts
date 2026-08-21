@@ -162,13 +162,13 @@ export function moveNavigationPin(
 }
 
 export function listTreeFromAreas(
-  areas: Array<{ id: string; title: string; count: number }>,
+  areas: Array<{ id: string; title: string; count: number; path?: string }>,
 ): TaskListNavigationSnapshot {
   return {
     sections: [],
     unpinned: areas.map((area) => ({
       id: area.id,
-      path: area.id,
+      path: area.path ?? area.id,
       title: area.title,
       count: area.count,
       hasChildren: false,

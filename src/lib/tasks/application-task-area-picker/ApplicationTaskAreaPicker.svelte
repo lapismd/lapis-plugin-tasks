@@ -2,9 +2,14 @@
 	import './ApplicationTaskAreaPicker.css';
 	import FolderIcon from '@lucide/svelte/icons/folder';
 	import PlusIcon from '@lucide/svelte/icons/plus';
+	import * as Breadcrumb from '@lapismd/design-core/shadcn/breadcrumb';
 	import * as CommandView from '@lapismd/design-core/shadcn/command-view';
 	import * as Popover from '@lapismd/design-core/shadcn/popover';
-	import { formatTaskListIdTitle } from '../../model';
+	import { formatTaskListIdTitle, listsMatch } from '../../model';
+	import type {
+		TaskListPickerOption,
+		TaskListPickerOptionInput
+	} from './types';
 
 	let {
 		areas = [],
@@ -16,7 +21,7 @@
 	}: {
 		areas?: string[];
 		listId?: string | null;
-		options?: string[];
+		options?: TaskListPickerOptionInput[];
 		variant?: 'chip' | 'footer';
 		ariaLabel?: string;
 		onChange?: (areas: string[]) => void | Promise<void>;
@@ -26,26 +31,101 @@
 	let query = $state('');
 	let input = $state<HTMLInputElement | null>(null);
 
+	type NormalizedTaskListPickerOption = TaskListPickerOption & {
+		key: string;
+		searchText: string;
+	};
+
+	function normalizePickerOption(
+		option: TaskListPickerOptionInput
+	): NormalizedTaskListPickerOption | null {
+		const raw = typeof option === 'string' ? { title: option } : option;
+		const title = raw.title.trim();
+		if (!title) return null;
+		const id = raw.id?.trim() || undefined;
+		const path = raw.path?.trim() || undefined;
+		const breadcrumb = raw.breadcrumb
+			?.map((segment) => segment.trim())
+			.filter(Boolean);
+		return {
+			...raw,
+			id,
+			title,
+			path,
+			breadcrumb,
+			key: id ?? path ?? title,
+			searchText: [title, id, path, ...(breadcrumb ?? [])]
+				.filter(Boolean)
+				.join(' ')
+				.toLowerCase()
+		};
+	}
+
+	function optionMatchesValue(
+		option: NormalizedTaskListPickerOption,
+		value: string | null | undefined
+	) {
+		const needle = value?.trim();
+		if (!needle) return false;
+		return listsMatch(
+			{
+				id: option.id ?? option.title,
+				title: option.title,
+				path: option.path
+			},
+			needle
+		);
+	}
+
+	const normalizedOptions = $derived.by(() => {
+		const seen = new Set<string>();
+		return options
+			.map(normalizePickerOption)
+			.filter((option): option is NormalizedTaskListPickerOption => Boolean(option))
+			.filter((option) => {
+				const key = option.key.toLowerCase();
+				if (seen.has(key)) return false;
+				seen.add(key);
+				return true;
+			})
+			.sort((left, right) => left.title.localeCompare(right.title));
+	});
+	const selectedOption = $derived.by(() => {
+		const area = areas[0]?.trim();
+		const id = listId?.trim();
+		return (
+			normalizedOptions.find(
+				(option) =>
+					optionMatchesValue(option, id) || optionMatchesValue(option, area)
+			) ?? null
+		);
+	});
 	const primaryArea = $derived.by(() => {
 		const area = areas[0]?.trim();
 		const id = listId?.trim();
+		if (selectedOption) return selectedOption.title;
 		if (area && area !== id) return area;
 		return formatTaskListIdTitle(id ?? area) ?? '';
 	});
-	const normalizedOptions = $derived(
-		Array.from(new Set(options.map((area) => area.trim()).filter(Boolean))).sort((left, right) =>
-			left.localeCompare(right)
-		)
-	);
 	const filteredOptions = $derived.by(() => {
 		const normalizedQuery = query.trim().toLowerCase();
 		if (!normalizedQuery) return normalizedOptions;
-		return normalizedOptions.filter((area) => area.toLowerCase().includes(normalizedQuery));
+		return normalizedOptions.filter((option) =>
+			option.searchText.includes(normalizedQuery)
+		);
 	});
 	const customArea = $derived.by(() => {
 		const next = query.trim();
 		if (!next) return '';
-		return normalizedOptions.some((area) => area.toLowerCase() === next.toLowerCase()) ? '' : next;
+		const needle = next.toLowerCase();
+		return normalizedOptions.some(
+			(option) =>
+				option.title.toLowerCase() === needle ||
+				option.id?.toLowerCase() === needle ||
+				option.path?.toLowerCase() === needle
+		)
+			? ''
+			: next;
 	});
 
 	function closePicker() {
@@ -85,7 +165,7 @@
 
 		<Popover.Content
 			class="application-task-area-picker__panel"
-			style="--ui-popover-width: 22rem"
+			style="--ui-popover-width: min(24rem, calc(100vw - 2rem))"
 			align="start"
 			sideOffset={6}
 			role="dialog"
@@ -121,13 +201,45 @@
 								<CommandView.ItemLabel>No list</CommandView.ItemLabel>
 							</CommandView.Item>
 						{/if}
-						{#each filteredOptions as area (area)}
+						{#each filteredOptions as option (option.key)}
 							<CommandView.Item
-								value={area}
-								data-checked={area === primaryArea}
-								onSelect={() => selectArea(area)}
+								value={option.key}
+								data-checked={option === selectedOption}
+								onSelect={() => selectArea(option.title)}
 							>
-								<CommandView.ItemLabel>{area}</CommandView.ItemLabel>
+								<CommandView.ItemIcon>
+									<FolderIcon aria-hidden="true" />
+								</CommandView.ItemIcon>
+								<CommandView.ItemLabel>{option.title}</CommandView.ItemLabel>
+								{#if option.path || option.breadcrumb?.length}
+									<div class="application-task-area-picker__option-meta">
+										{#if option.path}
+											<span class="application-task-area-picker__option-path">
+												{option.path}
+											</span>
+										{/if}
+										{#if option.breadcrumb?.length}
+											<div
+												class="application-task-area-picker__breadcrumb-shell"
+												role="group"
+												aria-label={`List breadcrumb for ${option.title}`}
+											>
+												<Breadcrumb.Root class="application-task-area-picker__breadcrumb">
+													<Breadcrumb.List>
+														{#each option.breadcrumb as segment, index}
+															<Breadcrumb.Item>
+																<Breadcrumb.Page>{segment}</Breadcrumb.Page>
+															</Breadcrumb.Item>
+															{#if index < (option.breadcrumb?.length ?? 0) - 1}
+																<Breadcrumb.Separator />
+															{/if}
+														{/each}
+													</Breadcrumb.List>
+												</Breadcrumb.Root>
+											</div>
+										{/if}
+									</div>
+								{/if}
 							</CommandView.Item>
 						{/each}
 						{#if customArea}

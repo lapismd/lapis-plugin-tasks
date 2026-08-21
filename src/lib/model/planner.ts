@@ -2,6 +2,7 @@ import { catalogTaskFromSummary } from "./catalog-adapter";
 import {
   listTreeFromAreas,
   toListNavNode,
+  type TaskListNavNode,
   type TaskListNavigationSnapshot,
 } from "./list-navigation";
 import type { TaskRepository } from "./task-repository";
@@ -45,6 +46,8 @@ export type TaskAreaSummary = {
   id: string;
   title: string;
   count: number;
+  path?: string;
+  breadcrumb?: string[];
 };
 
 export type TaskPlannerRowContext = {
@@ -829,6 +832,45 @@ function groupByDate(
     }));
 }
 
+function compactBreadcrumbSegments(segments: string[]) {
+  const compacted: string[] = [];
+  for (const rawSegment of segments) {
+    const segment = rawSegment.trim();
+    if (!segment) continue;
+    if (compacted.at(-1) === segment) continue;
+    compacted.push(segment);
+  }
+  return compacted;
+}
+
+function collectListBreadcrumbs(tree: TaskListNavigationSnapshot) {
+  const breadcrumbs = new Map<string, string[]>();
+  const visit = (nodes: TaskListNavNode[], trail: string[]) => {
+    for (const node of nodes) {
+      const nextTrail = compactBreadcrumbSegments([...trail, node.title]);
+      if (nextTrail.length > 1) {
+        breadcrumbs.set(node.id, nextTrail);
+        breadcrumbs.set(node.path, nextTrail);
+      }
+      visit(node.children, nextTrail);
+    }
+  };
+  for (const section of tree.sections) visit(section.lists, [section.title]);
+  visit(tree.unpinned, []);
+  return breadcrumbs;
+}
+
+function withListNavigationBreadcrumbs(
+  areas: TaskAreaSummary[],
+  tree: TaskListNavigationSnapshot,
+): TaskAreaSummary[] {
+  const breadcrumbs = collectListBreadcrumbs(tree);
+  return areas.map((area) => {
+    const breadcrumb = breadcrumbs.get(area.id) ?? breadcrumbs.get(area.path ?? "");
+    return breadcrumb ? { ...area, breadcrumb } : area;
+  });
+}
+
 export function buildUpcomingRows(
   groups: TaskPlannerDateGroup[],
   today: string,
@@ -925,6 +967,7 @@ export async function buildTaskPlannerSnapshotFromRepository(
       .map((list) => ({
         id: list.id,
         title: list.title,
+        path: list.path,
         count: tasks.filter((task) => task.listId === list.id).length,
       }))
       .sort((left, right) => left.title.localeCompare(right.title));
@@ -933,6 +976,10 @@ export async function buildTaskPlannerSnapshotFromRepository(
     snapshot.areas.map((area) => [area.id, area.count] as const),
   );
   snapshot.listTree = await buildListNavigationSnapshot(repository, counts);
+  snapshot.areas = withListNavigationBreadcrumbs(
+    snapshot.areas,
+    snapshot.listTree,
+  );
   snapshot.listTree.diagnostics.unshift(
     ...structureDiagnostics.map((diagnostic) => ({
       code: diagnostic.code,

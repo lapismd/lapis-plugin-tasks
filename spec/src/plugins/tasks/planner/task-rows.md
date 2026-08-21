@@ -50,6 +50,10 @@ clock value. Day parts and shortcuts each form a two-column grid. Their group
 headings and the Custom time title use a smaller, de-emphasized type scale so
 the selectable values remain the visual focus. The List control uses the
 standard Command View presentation without Tasks-owned panel heading chrome.
+Known list options show the display title first, then the wrapped source
+Markdown path in smaller supporting text. When the list navigation index
+annotates the list under a section or parent list, the option also shows that
+trail with the shared Design Core Breadcrumb component.
 See LN-TASK-013 and LN-TASK-045–046.
 
 When present, the List chip uses the projected Task List display title. The

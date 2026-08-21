@@ -43,6 +43,7 @@
   import ApplicationMarkdownPreview from "../../model/ReferenceMarkdownPreview.svelte";
   import { asSnippet } from "../../as-snippet";
   import ApplicationTaskLine from "../application-task-line/ApplicationTaskLine.svelte";
+  import type { TaskListPickerOptionInput } from "../application-task-area-picker";
   import ApplicationTaskChecklistProgress from "../application-task-checklist-progress/ApplicationTaskChecklistProgress.svelte";
 
   let {
@@ -100,7 +101,7 @@
     showHoverOpen?: boolean;
     showSwipeTrigger?: boolean;
     selectOnSurfaceClick?: boolean;
-    areaOptions?: string[];
+    areaOptions?: TaskListPickerOptionInput[];
     onDragStart?: (event: PointerEvent) => void;
     onTitleEditStart?: (taskId: string) => void;
     onRequestOpen?: (

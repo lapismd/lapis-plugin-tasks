@@ -200,6 +200,19 @@ describe("planner Markdown fixtures", () => {
       ]),
     );
     expect(
+      snapshot.areas.find((area) => area.id === "list-docs"),
+    ).toMatchObject({
+      title: "Docs",
+      path: "lists/docs.md",
+    });
+    expect(
+      snapshot.areas.find((area) => area.id === "list-writing"),
+    ).toMatchObject({
+      title: "Writing",
+      path: "lists/writing.md",
+      breadcrumb: ["Docs", "Writing"],
+    });
+    expect(
       snapshot.listTree.sections
         .find((section) => section.title === "Long Flow")
         ?.lists[0]?.children.map((child) => child.title),

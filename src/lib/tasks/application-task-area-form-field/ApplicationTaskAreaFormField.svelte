@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ApplicationTaskAreaPicker from '../application-task-area-picker/ApplicationTaskAreaPicker.svelte';
+	import type { TaskListPickerOptionInput } from '../application-task-area-picker';
 
 	let {
 		value = [],
@@ -9,7 +10,7 @@
 	}: {
 		value?: string[];
 		update: (areas: string[]) => void | Promise<void>;
-		options?: string[];
+		options?: TaskListPickerOptionInput[];
 		ariaLabel?: string;
 	} = $props();
 </script>
@@ -20,4 +21,3 @@
 	{ariaLabel}
 	onChange={(areas) => void update(areas)}
 />
-

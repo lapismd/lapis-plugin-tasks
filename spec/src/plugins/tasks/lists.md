@@ -117,9 +117,12 @@ lists, and New list.
 
 `ApplicationTaskAreaPicker` remains the catalog List picker. It uses Design
 Core's standard Command View search, group, item, icon, label, and selected
-state without a Tasks-owned panel heading. Choosing an existing List carries
-the selected value through compatibility `areas` and `listId`; the repository
-resolves that value against existing List ids and display titles before it
-attaches the Task through a structural entry. It never mints a duplicate
-identifier such as `list-list-applications`. Planning, time, and recurrence
-changes do not alter structural parenthood.
+state without a Tasks-owned panel heading. Each known List option shows the
+resolved display title first, the source Markdown path below it as wrapped
+supporting text, and a compact Design Core Breadcrumb when `lists.md`
+navigation metadata supplies a section or parent trail. Choosing an existing
+List carries the selected value through compatibility `areas` and `listId`; the
+repository resolves that value against existing List ids and display titles
+before it attaches the Task through a structural entry. It never mints a
+duplicate identifier such as `list-list-applications`. Planning, time, and
+recurrence changes do not alter structural parenthood.

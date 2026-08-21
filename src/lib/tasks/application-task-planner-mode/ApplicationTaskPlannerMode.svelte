@@ -774,7 +774,7 @@
 		<ApplicationPlannerTaskRow
 		{task}
 		{application}
-		areaOptions={taskAreas.map((item) => item.title)}
+		areaOptions={taskAreas}
 		taskIndex={context.index}
 		taskTotal={context.total}
 		sortableGroup={context.group}
@@ -805,7 +805,7 @@
 	<ApplicationPlannerTaskRow
 		{task}
 		{application}
-		areaOptions={taskAreas.map((item) => item.title)}
+		areaOptions={taskAreas}
 		taskIndex={0}
 		taskTotal={1}
 		sortableGroup="planner-drag-preview"
