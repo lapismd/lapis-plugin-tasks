@@ -83,7 +83,8 @@
   padding: 0.65rem;
 }
 
-.task-repeat-picker__custom label {
+.task-repeat-picker__custom label,
+.task-repeat-picker__custom-field {
   display: grid;
   grid-template-columns: minmax(6rem, 1fr) minmax(7rem, 1fr);
   align-items: center;
@@ -92,8 +93,7 @@
   font-size: 0.78rem;
 }
 
-.task-repeat-picker__custom input[type="number"],
-.task-repeat-picker__custom select {
+.task-repeat-picker__custom input[type="number"] {
   min-width: 0;
   min-height: 2rem;
   border: 1px solid var(--ui-border, var(--border));
@@ -102,6 +102,11 @@
   color: inherit;
   font: inherit;
   padding: 0.25rem 0.45rem;
+}
+
+.task-repeat-picker__custom-field [data-ui-part="select-trigger"] {
+  width: 100%;
+  min-width: 0;
 }
 
 .task-repeat-picker__custom .task-repeat-picker__check {

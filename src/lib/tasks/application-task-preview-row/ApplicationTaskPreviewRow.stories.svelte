@@ -127,13 +127,29 @@
     });
     await userEvent.clear(interval);
     await userEvent.type(interval, "2");
-    await userEvent.selectOptions(
-      within(recurrenceDialog).getByLabelText("Recurrence frequency"),
-      "monthly",
+    const frequencySelect = within(recurrenceDialog).getByRole("combobox", {
+      name: "Recurrence frequency",
+    });
+    expect(frequencySelect.tagName).toBe("BUTTON");
+    await userEvent.click(frequencySelect);
+    await userEvent.click(
+      within(
+        page.getByRole("listbox", {
+          name: "Recurrence frequency options",
+        }),
+      ).getByRole("option", { name: "Months" }),
     );
-    await userEvent.selectOptions(
-      within(recurrenceDialog).getByLabelText("Recurrence anchor"),
-      "completion",
+    const anchorSelect = within(recurrenceDialog).getByRole("combobox", {
+      name: "Recurrence anchor",
+    });
+    expect(anchorSelect.tagName).toBe("BUTTON");
+    await userEvent.click(anchorSelect);
+    await userEvent.click(
+      within(
+        page.getByRole("listbox", {
+          name: "Recurrence anchor options",
+        }),
+      ).getByRole("option", { name: "Completion date" }),
     );
     await userEvent.click(
       within(recurrenceDialog).getByRole("checkbox", {

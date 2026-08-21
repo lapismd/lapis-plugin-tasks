@@ -68,6 +68,9 @@ local system clock when the host does not supply one. See LN-TASK-048.
 The shared quick-create row supplies the same compact input, focused actions,
 normal-weight label, and block-end separation in daily sections, named views,
 and Markdown TaskRuns. Individual pages do not add their own spacing fixes.
+Expanded row metadata composes the shared Design Core controls throughout,
+including shadcn Select triggers for custom recurrence frequency and anchor;
+planner pages do not substitute native form dropdowns. See LN-TASK-046.
 
 ## Component map
 

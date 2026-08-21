@@ -6,6 +6,7 @@
   import Repeat2Icon from "@lucide/svelte/icons/repeat-2";
   import * as CommandView from "@lapismd/design-core/shadcn/command-view";
   import * as Popover from "@lapismd/design-core/shadcn/popover";
+  import * as Select from "@lapismd/design-core/shadcn/select";
 
   import type {
     TaskRepeat,
@@ -37,6 +38,18 @@
   let interval = $state(1);
   let anchor = $state<TaskRepeatAnchor>("schedule");
   let resetChecklist = $state(false);
+  const uid = $props.id();
+
+  const frequencyLabels: Record<TaskRepeatFrequency, string> = {
+    daily: "Days",
+    weekly: "Weeks",
+    monthly: "Months",
+    yearly: "Years",
+  };
+  const anchorLabels: Record<TaskRepeatAnchor, string> = {
+    schedule: "Scheduled date",
+    completion: "Completion date",
+  };
 
   const preset = $derived(taskRepeatPresetFor(repeat));
   const activePreset = $derived(custom ? "custom" : preset);
@@ -171,22 +184,56 @@
             <span>Every</span>
             <input type="number" min="1" step="1" bind:value={interval} aria-label="Recurrence interval" />
           </label>
-          <label>
+          <div class="task-repeat-picker__custom-field">
             <span>Frequency</span>
-            <select bind:value={frequency} aria-label="Recurrence frequency">
-              <option value="daily">Days</option>
-              <option value="weekly">Weeks</option>
-              <option value="monthly">Months</option>
-              <option value="yearly">Years</option>
-            </select>
-          </label>
-          <label>
+            <Select.Root type="single" bind:value={frequency}>
+              <Select.Trigger
+                role="combobox"
+                aria-label="Recurrence frequency"
+                aria-controls={`${uid}-recurrence-frequency-options`}
+              >
+                {frequencyLabels[frequency]}
+              </Select.Trigger>
+              <Select.Content
+                id={`${uid}-recurrence-frequency-options`}
+                aria-label="Recurrence frequency options"
+                portalProps={{ disabled: true }}
+              >
+                <Select.Group>
+                  <Select.Item value="daily" label="Days">Days</Select.Item>
+                  <Select.Item value="weekly" label="Weeks">Weeks</Select.Item>
+                  <Select.Item value="monthly" label="Months">Months</Select.Item>
+                  <Select.Item value="yearly" label="Years">Years</Select.Item>
+                </Select.Group>
+              </Select.Content>
+            </Select.Root>
+          </div>
+          <div class="task-repeat-picker__custom-field">
             <span>Advance from</span>
-            <select bind:value={anchor} aria-label="Recurrence anchor">
-              <option value="schedule">Scheduled date</option>
-              <option value="completion">Completion date</option>
-            </select>
-          </label>
+            <Select.Root type="single" bind:value={anchor}>
+              <Select.Trigger
+                role="combobox"
+                aria-label="Recurrence anchor"
+                aria-controls={`${uid}-recurrence-anchor-options`}
+              >
+                {anchorLabels[anchor]}
+              </Select.Trigger>
+              <Select.Content
+                id={`${uid}-recurrence-anchor-options`}
+                aria-label="Recurrence anchor options"
+                portalProps={{ disabled: true }}
+              >
+                <Select.Group>
+                  <Select.Item value="schedule" label="Scheduled date">
+                    Scheduled date
+                  </Select.Item>
+                  <Select.Item value="completion" label="Completion date">
+                    Completion date
+                  </Select.Item>
+                </Select.Group>
+              </Select.Content>
+            </Select.Root>
+          </div>
           <label class="task-repeat-picker__check">
             <input type="checkbox" bind:checked={resetChecklist} />
             <span>Reset checklist on completion</span>

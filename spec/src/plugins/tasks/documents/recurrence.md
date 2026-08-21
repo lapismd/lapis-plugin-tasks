@@ -74,9 +74,12 @@ interaction outside the popover dismisses it without applying an unfinished
 custom value, matching the plan-date and plan-time pickers.
 
 Custom recurrence exposes interval, frequency, schedule/completion anchor, and
-checklist reset. Applying it writes the scheduling fields through the Task
-callback; the canonical mutation merges retained completion metadata from the
-current Markdown document before serialization. Removing
+checklist reset. Frequency and anchor use the shared Design Core shadcn Select
+so they retain the same themed trigger, selected indicator, keyboard behavior,
+and overlay semantics as other application controls; they are not native HTML
+select elements. Applying the custom value writes the scheduling fields through
+the Task callback; the canonical mutation merges retained completion metadata
+from the current Markdown document before serialization. Removing
 recurrence clears only `task.repeat`; it does not change the Task's plan or
 checklist. Reserved `on` metadata is not exposed and weekday-set shortcuts are
 not offered because the scheduler does not currently interpret it. See
