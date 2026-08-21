@@ -108,8 +108,12 @@ The shared quick-create row supplies the same compact input, focused actions,
 normal-weight label, and block-end separation in daily sections, named views,
 and Markdown TaskRuns. Individual pages do not add their own spacing fixes.
 Expanded row metadata composes the shared Design Core controls throughout,
-including structured recurrence controls and Advanced raw RRULE editing;
-planner pages do not substitute native form dropdowns. See LN-TASK-046.
+including structured recurrence controls and raw RRULE editing; planner pages
+do not substitute native form dropdowns. The compact recurrence popover starts
+directly with its presets, keeps a no-apply `Repeat every…` number/frequency
+row behind one disclosure, and hands `Custom recurrence…` to a separately
+scrollable, bounded, inset Design Core Form Sheet styled like Task detail while
+closing the popover. See LN-TASK-046.
 The editor also owns weekday sets, monthly positional and calendar-day rules,
 yearly month/day, COUNT or date-only UNTIL, RDATE/EXDATE, missed policy,
 checklist reset, pause state, and habit tracking. Unsupported raw rules and
