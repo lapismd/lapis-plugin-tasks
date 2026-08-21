@@ -30,6 +30,7 @@
       : undefined,
   });
   let expanded = $state(false);
+  const now = new Date("2026-08-21T10:00:00");
 
   function updateTask(_taskId: string, patch: Partial<ApplicationTask>) {
     task = {
@@ -42,6 +43,7 @@
 <div class="task-story-frame task-story-frame--xl">
   <ApplicationTaskPreviewRow
     {task}
+    {now}
     isExpanded={expandedByDefault || expanded}
     taskIndex={0}
     taskTotal={2}

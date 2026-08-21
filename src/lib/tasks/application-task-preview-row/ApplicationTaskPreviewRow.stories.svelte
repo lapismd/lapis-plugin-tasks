@@ -106,7 +106,7 @@
     });
 
     await userEvent.click(canvas.getByRole("button", { name: "Set task recurrence" }));
-    await userEvent.click(page.getByRole("option", { name: "Weekly" }));
+    await userEvent.click(page.getByRole("option", { name: /^Weekly\b/ }));
     await waitFor(() =>
       expect(state().repeat).toMatchObject({
         frequency: "weekly",
@@ -118,7 +118,7 @@
     );
 
     await userEvent.click(canvas.getByRole("button", { name: "Set task recurrence" }));
-    await userEvent.click(page.getByRole("option", { name: "Custom recurrence" }));
+    await userEvent.click(page.getByRole("option", { name: "Repeat every…" }));
     const recurrenceDialog = page.getByRole("dialog", {
       name: "Choose task recurrence",
     });
@@ -167,6 +167,99 @@
 >
   {#snippet template()}
     <ApplicationTaskPreviewRowSampleStory expandedByDefault recurringByDefault />
+  {/snippet}
+</Story>
+
+<Story
+  name="Recurrence date fallback"
+  tags={["test", "visual-pending"]}
+  parameters={{
+    a11y: { test: "off" },
+    docs: {
+      description: {
+        story:
+          "The recurrence menu dismisses outside, derives presets from the effective plan date, restores the selected preset, and plans an undated Task for injected local today.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const state = () =>
+      JSON.parse(canvas.getByTestId("task-preview-state").textContent ?? "{}") as Record<string, unknown>;
+
+    await userEvent.click(canvas.getByRole("button", { name: "Set task recurrence" }));
+    let recurrenceDialog = page.getByRole("dialog", {
+      name: "Choose task recurrence",
+    });
+    expect(within(recurrenceDialog).getByText("No planned date")).toBeVisible();
+    expect(
+      within(recurrenceDialog).getByRole("option", {
+        name: "Does not repeat",
+      }),
+    ).toHaveAttribute("aria-current", "true");
+    expect(
+      within(recurrenceDialog).getByRole("option", {
+        name: "Weekly on Friday",
+      }),
+    ).toBeVisible();
+    expect(
+      within(recurrenceDialog).getByRole("option", {
+        name: "Every 2 weeks on Friday",
+      }),
+    ).toBeVisible();
+    expect(
+      within(recurrenceDialog).getByRole("option", {
+        name: "Monthly on the 21st",
+      }),
+    ).toBeVisible();
+    expect(
+      within(recurrenceDialog).getByRole("option", {
+        name: "Yearly on Aug 21",
+      }),
+    ).toBeVisible();
+
+    await userEvent.click(canvas.getByRole("textbox", { name: "Task title" }));
+    await waitFor(() =>
+      expect(
+        page.queryByRole("dialog", { name: "Choose task recurrence" }),
+      ).not.toBeInTheDocument(),
+    );
+
+    await userEvent.click(canvas.getByRole("button", { name: "Set task recurrence" }));
+    recurrenceDialog = page.getByRole("dialog", {
+      name: "Choose task recurrence",
+    });
+    await userEvent.click(
+      within(recurrenceDialog).getByRole("option", {
+        name: "Weekly on Friday",
+      }),
+    );
+    await waitFor(() => {
+      expect(state().planDate).toBe("2026-08-21");
+      expect(state().scheduledAt).toBe("2026-08-21");
+      expect(state().planAt).toBe("anytime");
+      expect(state().repeat).toMatchObject({
+        frequency: "weekly",
+        interval: 1,
+        anchor: "schedule",
+      });
+    });
+
+    await userEvent.click(canvas.getByRole("button", { name: "Set task recurrence" }));
+    recurrenceDialog = page.getByRole("dialog", {
+      name: "Choose task recurrence",
+    });
+    expect(within(recurrenceDialog).getByText("Today")).toBeVisible();
+    expect(
+      within(recurrenceDialog).getByRole("option", {
+        name: "Weekly on Friday",
+      }),
+    ).toHaveAttribute("aria-current", "true");
+  }}
+>
+  {#snippet template()}
+    <ApplicationTaskPreviewRowSampleStory expandedByDefault />
   {/snippet}
 </Story>
 

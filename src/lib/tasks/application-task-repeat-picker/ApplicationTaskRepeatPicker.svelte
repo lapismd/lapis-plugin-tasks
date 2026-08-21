@@ -1,6 +1,7 @@
 <script lang="ts">
   import "./ApplicationTaskRepeatPicker.css";
   import CalendarDaysIcon from "@lucide/svelte/icons/calendar-days";
+  import CheckIcon from "@lucide/svelte/icons/check";
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import Repeat2Icon from "@lucide/svelte/icons/repeat-2";
   import * as CommandView from "@lapismd/design-core/shadcn/command-view";
@@ -11,12 +12,22 @@
     TaskRepeatAnchor,
     TaskRepeatFrequency,
   } from "../../model";
+  import {
+    buildTaskRepeatPresentation,
+    taskRepeatForPreset,
+    taskRepeatPresetFor,
+    type TaskRepeatPreset,
+  } from "../../model";
 
   let {
     repeat = undefined,
+    plannedDate = null,
+    now = undefined,
     onSelect = null,
   }: {
     repeat?: TaskRepeat;
+    plannedDate?: string | null;
+    now?: Date;
     onSelect?: ((repeat: TaskRepeat | undefined) => void | Promise<void>) | null;
   } = $props();
 
@@ -27,18 +38,11 @@
   let anchor = $state<TaskRepeatAnchor>("schedule");
   let resetChecklist = $state(false);
 
-  const preset = $derived.by(() => {
-    if (!repeat) return "none";
-    if (
-      repeat.interval === 1 &&
-      repeat.anchor === "schedule" &&
-      !repeat.resetChecklist &&
-      !repeat.on?.length
-    ) {
-      return repeat.frequency;
-    }
-    return "custom";
-  });
+  const preset = $derived(taskRepeatPresetFor(repeat));
+  const activePreset = $derived(custom ? "custom" : preset);
+  const presentation = $derived(
+    buildTaskRepeatPresentation(plannedDate, now ?? new Date()),
+  );
 
   const label = $derived.by(() => {
     if (!repeat) return "Does not repeat";
@@ -61,20 +65,15 @@
     custom = preset === "custom";
   });
 
-  async function selectPreset(value: "none" | TaskRepeatFrequency) {
-    if (value === "none") {
-      await onSelect?.(undefined);
-    } else {
-      await onSelect?.({
-        strategy: "rolling",
-        frequency: value,
-        interval: 1,
-        anchor: "schedule",
-        ...(repeat?.lastCompletedAt ? { lastCompletedAt: repeat.lastCompletedAt } : {}),
-        ...(repeat?.completionCount != null ? { completionCount: repeat.completionCount } : {}),
-      });
-    }
+  function closePopover() {
     open = false;
+  }
+
+  async function selectPreset(
+    value: Exclude<TaskRepeatPreset, "custom">,
+  ) {
+    await onSelect?.(taskRepeatForPreset(value, repeat));
+    closePopover();
   }
 
   async function applyCustom() {
@@ -87,7 +86,7 @@
       ...(repeat?.lastCompletedAt ? { lastCompletedAt: repeat.lastCompletedAt } : {}),
       ...(repeat?.completionCount != null ? { completionCount: repeat.completionCount } : {}),
     });
-    open = false;
+    closePopover();
   }
 </script>
 
@@ -110,24 +109,58 @@
       role="dialog"
       aria-label="Choose task recurrence"
       trapFocus={false}
+      onFocusOutside={closePopover}
       onpointerdown={(event) => event.stopPropagation()}
     >
-      <CommandView.Root label="Recurrence presets" loop>
+      <div class="task-repeat-picker__reference-date">
+        <CalendarDaysIcon aria-hidden="true" />
+        <span>{presentation.referenceDateLabel}</span>
+      </div>
+      <CommandView.Root value={activePreset} label="Recurrence presets" loop>
         <CommandView.List aria-label="Recurrence presets">
           <CommandView.Group value="presets" heading="Presets">
-            <CommandView.Item value="none" data-checked={preset === "none"} onSelect={() => void selectPreset("none")}>
+            <CommandView.Item
+              value="none"
+              data-checked={preset === "none"}
+              aria-current={preset === "none" ? "true" : undefined}
+              onSelect={() => void selectPreset("none")}
+            >
               <CommandView.ItemIcon><CalendarDaysIcon aria-hidden="true" /></CommandView.ItemIcon>
               <CommandView.ItemLabel>Does not repeat</CommandView.ItemLabel>
+              {#if preset === "none"}
+                <CheckIcon class="task-repeat-picker__selected" data-ui-part="trailing" aria-hidden="true" />
+              {/if}
             </CommandView.Item>
-            {#each ["daily", "weekly", "monthly", "yearly"] as value (value)}
-              <CommandView.Item value={value} data-checked={preset === value} onSelect={() => void selectPreset(value as TaskRepeatFrequency)}>
+            {#each presentation.options as option (option.value)}
+              <CommandView.Item
+                value={option.value}
+                data-checked={preset === option.value}
+                aria-current={preset === option.value ? "true" : undefined}
+                onSelect={() => void selectPreset(option.value)}
+              >
                 <CommandView.ItemIcon><Repeat2Icon aria-hidden="true" /></CommandView.ItemIcon>
-                <CommandView.ItemLabel>{value[0]!.toUpperCase() + value.slice(1)}</CommandView.ItemLabel>
+                <CommandView.ItemLabel>
+                  {option.label}
+                  {#if option.context}
+                    <span class="task-repeat-picker__option-context">{option.context}</span>
+                  {/if}
+                </CommandView.ItemLabel>
+                {#if preset === option.value}
+                  <CheckIcon class="task-repeat-picker__selected" data-ui-part="trailing" aria-hidden="true" />
+                {/if}
               </CommandView.Item>
             {/each}
-            <CommandView.Item value="custom" data-checked={preset === "custom"} onSelect={() => (custom = true)}>
+            <CommandView.Item
+              value="custom"
+              data-checked={preset === "custom"}
+              aria-current={preset === "custom" ? "true" : undefined}
+              onSelect={() => (custom = true)}
+            >
               <CommandView.ItemIcon><Repeat2Icon aria-hidden="true" /></CommandView.ItemIcon>
-              <CommandView.ItemLabel>Custom recurrence</CommandView.ItemLabel>
+              <CommandView.ItemLabel>Repeat every…</CommandView.ItemLabel>
+              {#if preset === "custom"}
+                <CheckIcon class="task-repeat-picker__selected" data-ui-part="trailing" aria-hidden="true" />
+              {/if}
             </CommandView.Item>
           </CommandView.Group>
         </CommandView.List>

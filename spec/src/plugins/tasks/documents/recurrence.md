@@ -46,17 +46,41 @@ interval, and anchor for summary queries.
 ## Recurrence editor
 
 The shared recurrence popover is a structured editor for this schema. Its
-Command View presets are Does not repeat, Daily, Weekly, Monthly, and Yearly.
-Choosing a frequency preset writes interval `1` with schedule anchoring while
-preserving an existing `lastCompletedAt` and `completionCount`.
+Command View presets are Does not repeat, Daily, Weekly, Every 2 weeks,
+Monthly, and Yearly. Choosing a frequency preset writes schedule anchoring and
+interval `1`; Every 2 weeks writes weekly frequency and interval `2`. Every
+preset change preserves an existing `lastCompletedAt` and `completionCount`.
+
+The Task's effective `plan.date` supplies the calendar context displayed by
+the shortcut labels:
+
+| Preset | Example for Friday, 21 August 2026 |
+| --- | --- |
+| Daily | Daily |
+| Weekly | Weekly on Friday |
+| Every 2 weeks | Every 2 weeks on Friday |
+| Monthly | Monthly on the 21st |
+| Yearly | Yearly on Aug 21 |
+
+An unplanned Task displays `No planned date` and derives those labels from the
+injected local today. Choosing any recurrence other than Does not repeat then
+writes that local date to `task.plan.date` with canonical Anytime `plan.at`
+semantics in the same structured update as `task.repeat`. This gives the first
+occurrence a scheduling anchor. Removing recurrence clears only `task.repeat`;
+it does not clear an existing plan.
+
+Opening the popover visibly marks the persisted preset. Focus or pointer
+interaction outside the popover dismisses it without applying an unfinished
+custom value, matching the plan-date and plan-time pickers.
 
 Custom recurrence exposes interval, frequency, schedule/completion anchor, and
 checklist reset. Applying it writes the scheduling fields through the Task
 callback; the canonical mutation merges retained completion metadata from the
 current Markdown document before serialization. Removing
 recurrence clears only `task.repeat`; it does not change the Task's plan or
-checklist. Reserved `on` metadata is not exposed because the scheduler does not
-currently interpret it. See LN-TASK-045–046.
+checklist. Reserved `on` metadata is not exposed and weekday-set shortcuts are
+not offered because the scheduler does not currently interpret it. See
+LN-TASK-045–046 and LN-TASK-048.
 
 ## Completion lifecycle
 

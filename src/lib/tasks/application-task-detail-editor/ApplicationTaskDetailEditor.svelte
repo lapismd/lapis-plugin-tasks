@@ -29,12 +29,14 @@
     task,
     areaOptions = [],
     showRemove = false,
+    now = undefined,
     onUpdateTask = () => {},
     onRemoveTask = () => {},
   }: {
     task: ApplicationTask;
     areaOptions?: string[];
     showRemove?: boolean;
+    now?: Date;
     onUpdateTask?: (taskId: string, patch: Partial<ApplicationTask>) => void;
     onRemoveTask?: (taskId: string) => void;
   } = $props();
@@ -238,15 +240,16 @@
           },
         },
       }),
-      customField<ApplicationTask, undefined, ApplicationTask["repeat"]>({
+      customField<ApplicationTask, undefined, ApplicationTask>({
         id: "task-detail-repeat",
         label: "Repeat",
-        get: (value) => value.repeat,
-        set: (value, repeat) => ({ ...value, repeat }),
+        get: (value) => value,
+        set: (_value, nextTask) => nextTask,
         renderers: {
           edit: {
             component: ApplicationTaskRepeatFormField,
             wrapper: "none",
+            props: () => ({ now }),
           },
         },
       }),

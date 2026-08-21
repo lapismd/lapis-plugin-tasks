@@ -83,6 +83,7 @@
     onToggleChecklistItem,
     checklistRefreshVersion = 0,
     showChecklistProgress = true,
+    now = undefined,
   }: {
     task: ApplicationTask;
     taskIndex?: number;
@@ -117,6 +118,7 @@
     ) => Promise<ChecklistItem[]>;
     checklistRefreshVersion?: number;
     showChecklistProgress?: boolean;
+    now?: Date;
   } = $props();
 
   const isOpenSurface = $derived(isExpanded || isClosing);
@@ -349,15 +351,16 @@
           },
         },
       }),
-      customField<ApplicationTask, undefined, ApplicationTask["repeat"]>({
+      customField<ApplicationTask, undefined, ApplicationTask>({
         id: "task-preview-repeat",
         label: "Repeat",
-        get: (value) => value.repeat,
-        set: (value, repeat) => ({ ...value, repeat }),
+        get: (value) => value,
+        set: (_value, nextTask) => nextTask,
         renderers: {
           edit: {
             component: ApplicationTaskRepeatFormField,
             wrapper: "none",
+            props: () => ({ now }),
           },
         },
       }),

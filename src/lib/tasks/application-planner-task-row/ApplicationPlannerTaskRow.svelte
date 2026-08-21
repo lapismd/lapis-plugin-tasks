@@ -34,6 +34,7 @@
     dragging = false,
     selected = false,
     overdue = false,
+    now = undefined,
     selectionPosition = null,
     expanded = false,
     closing = false,
@@ -66,6 +67,7 @@
     dragging?: boolean;
     selected?: boolean;
     overdue?: boolean;
+    now?: Date;
     selectionPosition?: PlannerSelectionPosition | null;
     expanded?: boolean;
     closing?: boolean;
@@ -332,6 +334,7 @@
       showHoverOpen={false}
       showSwipeTrigger={showRowSwipe}
       {selectOnSurfaceClick}
+      {now}
       {onDragStart}
       onTitleEditStart={() => onStartTitleEdit(task)}
       onRequestOpen={(_taskId, source) => onRequestOpen(task.id, source)}

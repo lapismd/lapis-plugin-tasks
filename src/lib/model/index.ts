@@ -38,6 +38,7 @@ export * from "./task-queries";
 export * from "./task-mutations";
 export * from "./task-projection";
 export * from "./task-repository";
+export * from "./task-repeat-options";
 export * from "./task-list-items";
 export * from "./task-structure";
 export { createVaultTaskFileStore } from "./vault-task-file-store";

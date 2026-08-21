@@ -58,6 +58,13 @@ will perform: **Hide overdue tasks** or **Show overdue tasks**. Day-part
 boundaries and the overdue default are available through both the host's public
 Tasks settings section and the legacy plugin settings tab.
 
+The planner passes its injected local clock through every rendered Task row.
+Date-sensitive row controls therefore use the same `today` as the agenda:
+opening recurrence derives its shortcut labels from `plan.date`, and choosing
+recurrence for an unplanned Task atomically creates an Anytime plan for that
+injected date. Standalone Task surfaces use their own injected clock or the
+local system clock when the host does not supply one. See LN-TASK-048.
+
 The shared quick-create row supplies the same compact input, focused actions,
 normal-weight label, and block-end separation in daily sections, named views,
 and Markdown TaskRuns. Individual pages do not add their own spacing fixes.

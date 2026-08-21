@@ -778,6 +778,7 @@
 		dragging={Boolean(context.dragged)}
 		selected={Boolean(context.selected)}
 		overdue={view === 'today' && !area && isTaskOverdueForDay(task, selectedDate)}
+		now={currentTime()}
 		selectionPosition={context.selectionPosition ?? null}
 		expanded={expandedTaskId === taskKey}
 		closing={closingTaskId === taskKey}
@@ -807,6 +808,7 @@
 		sortableGroup="planner-drag-preview"
 		dragging
 		dragPreview
+		now={currentTime()}
 	/>
 {/snippet}
 
