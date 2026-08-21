@@ -77,6 +77,7 @@
 .application-task-area-picker__panel {
   z-index: 1400;
   width: min(24rem, calc(100vw - 2rem));
+  --ui-popover-gap: 0;
   --ui-popover-padding: 0;
   overflow: hidden;
   --ui-command-view-list-max-height: 16rem;

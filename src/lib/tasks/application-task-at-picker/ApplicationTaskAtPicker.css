@@ -67,6 +67,7 @@
 .task-at-picker__panel {
   z-index: 1400;
   width: min(22rem, calc(100vw - 1rem));
+  --ui-popover-gap: 0;
   --ui-popover-padding: 0;
   overflow: hidden;
 }

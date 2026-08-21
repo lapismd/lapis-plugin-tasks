@@ -42,6 +42,7 @@
 .task-repeat-picker__panel {
   z-index: 1400;
   width: min(22rem, calc(100vw - 1rem));
+  --ui-popover-gap: 0;
   --ui-popover-padding: 0;
   max-height: min(46rem, calc(100vh - 1rem));
   overflow: auto;
