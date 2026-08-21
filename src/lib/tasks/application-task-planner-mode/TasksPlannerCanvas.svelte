@@ -921,7 +921,7 @@
           id={detail.columnId}
           class={detail.kind === "list"
             ? "task-column-canvas-story__linked-list-column"
-            : undefined}
+            : "task-column-canvas-story__task-detail-column"}
         >
           {#if detail.kind === "list" && app && repository && detail.path}
             <ColumnCanvas.Header>

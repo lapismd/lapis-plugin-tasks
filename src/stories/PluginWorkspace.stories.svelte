@@ -1850,6 +1850,19 @@
       expect(detailColumns[1]).toHaveAttribute("data-column-id", "detail-2");
       expect(detailColumns[1]).toHaveTextContent("Coordinate the launch");
     });
+    const coordinateDetailColumn = canvasElement.querySelector<HTMLElement>(
+      '[data-column-id="detail-2"][data-ui-part="column"]',
+    )!;
+    const coordinateDetailSurface =
+      coordinateDetailColumn.querySelector<HTMLElement>(
+        "[data-task-sidebar-detail]",
+      )!;
+    expect(getComputedStyle(coordinateDetailColumn).borderTopWidth).toBe("0px");
+    expect(
+      Number.parseFloat(
+        getComputedStyle(coordinateDetailSurface).borderTopWidth,
+      ),
+    ).toBeGreaterThan(0);
     await fireEvent.click(
       await canvas.findByRole("button", {
         name: "Open list Launch Operations to the right",

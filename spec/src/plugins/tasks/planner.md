@@ -38,6 +38,11 @@ column that owns it. Selecting a different child from an ancestor replaces
 only that ancestor's descendant branch; closing a column removes it and every
 descendant while leaving earlier context mounted.
 
+A directly mounted Task detail owns the single visible border, radius, and
+surface around its column. Its containing Column Canvas lane remains
+transparent and borderless for every runtime detail ID. Linked-List documents
+instead retain the standard bordered and rounded Column Canvas treatment.
+
 ## Planner state model
 
 The planner combines disposable query state with short-lived presentation
