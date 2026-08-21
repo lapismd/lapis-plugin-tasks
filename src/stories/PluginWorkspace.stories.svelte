@@ -88,6 +88,31 @@
     );
   }
 
+  async function dragColumnPair(handle: HTMLElement, deltaX: number) {
+    const bounds = handle.getBoundingClientRect();
+    const startX = bounds.left + bounds.width / 2;
+    const y = bounds.top + bounds.height / 2;
+    const ownerWindow = handle.ownerDocument.defaultView!;
+    await fireEvent.pointerDown(handle, {
+      pointerId: 1,
+      isPrimary: true,
+      button: 0,
+      buttons: 1,
+      clientX: startX,
+      clientY: y,
+    });
+    await fireEvent.pointerMove(ownerWindow, {
+      pointerId: 1,
+      clientX: startX + deltaX,
+      clientY: y,
+    });
+    await fireEvent.pointerUp(ownerWindow, {
+      pointerId: 1,
+      clientX: startX + deltaX,
+      clientY: y,
+    });
+  }
+
   async function showDailyAgendaChecklistSummary(
     canvasElement: HTMLElement,
     canvas: ReturnType<typeof within>,
@@ -1972,6 +1997,53 @@
         1,
       );
     });
+
+    const plannerColumn = canvasElement.querySelector<HTMLElement>(
+      '[data-column-id="planner"][data-ui-part="column"]',
+    )!;
+    const firstDetailColumn = canvasElement.querySelector<HTMLElement>(
+      '[data-column-id="detail"][data-ui-part="column"]',
+    )!;
+    const plannerDetailHandle = plannerColumn.querySelector<HTMLElement>(
+      '[data-ui-part="resize-handle"][data-resize-mode="pair"]',
+    )!;
+    expect(plannerDetailHandle).not.toBeNull();
+    plannerDetailHandle.scrollIntoView({ inline: "center", block: "nearest" });
+    await fireEvent.scroll(deepCanvasRoot);
+    const scrollBeforeEarlierPair = deepCanvasRoot.scrollLeft;
+    await dragColumnPair(plannerDetailHandle, 0);
+    await waitFor(() => {
+      expect(plannerColumn).toHaveAttribute("data-responsive-stage", "pair");
+      expect(firstDetailColumn).toHaveAttribute(
+        "data-responsive-stage",
+        "pair",
+      );
+      expect(
+        Math.abs(deepCanvasRoot.scrollLeft - scrollBeforeEarlierPair),
+      ).toBeLessThan(1);
+    });
+    const earlierPairWidths = {
+      planner: plannerColumn.getBoundingClientRect().width,
+      detail: firstDetailColumn.getBoundingClientRect().width,
+    };
+    await dragColumnPair(plannerDetailHandle, -32);
+    await waitFor(() => {
+      expect(plannerColumn.getBoundingClientRect().width).toBeCloseTo(
+        earlierPairWidths.planner - 32,
+        0,
+      );
+      expect(firstDetailColumn.getBoundingClientRect().width).toBeCloseTo(
+        earlierPairWidths.detail + 32,
+        0,
+      );
+      expect(
+        Math.abs(deepCanvasRoot.scrollLeft - scrollBeforeEarlierPair),
+      ).toBeLessThan(1);
+    });
+    expect(
+      plannerColumn.getBoundingClientRect().width +
+        firstDetailColumn.getBoundingClientRect().width,
+    ).toBeCloseTo(earlierPairWidths.planner + earlierPairWidths.detail, 0);
   }}
 />
 

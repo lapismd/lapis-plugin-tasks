@@ -33,8 +33,11 @@ shared divider, inverse resize, collapse-time stretching, and per-pair split
 restoration; Tasks does not calculate or persist widths itself. Navigating
 deeper changes the active pair from Tasks/Planner to Planner/Detail and then
 through each adjacent pair in the dynamic detail stack without discarding an
-earlier split. Compact/mobile mode keeps one full-width active column and
-exposes no shared divider.
+earlier split. Starting a pointer, keyboard, or reset interaction on an earlier
+eligible divider reactivates that adjacent expanded pair without moving the
+canvas, and decreasing its left column increases the right column by the same
+amount. Compact/mobile mode keeps one full-width active column and exposes no
+shared divider.
 
 Collapsed columns are rails rather than pair members. Their widths and the
 spacing around them remain deducted while Design Core pairs the next expanded
@@ -115,5 +118,6 @@ sidebar so the current Tasks surface is the visual focus.
 
 The focused Deep Navigation Flow keeps the full
 List → Task → List → Task → Task descendant chain mounted as five distinct
-detail columns and checks the deepest pair while the earlier context remains
-available through native horizontal scrolling.
+detail columns, checks the deepest pair, and then verifies that the earlier
+Planner/Detail divider activates and resizes those columns inversely without
+moving the native horizontal position.
