@@ -209,8 +209,13 @@
       name: "Custom recurrence",
     });
     await waitFor(() => expect(recurrenceDialog).toBeVisible());
-    expect(recurrenceDialog.getBoundingClientRect().width).toBeLessThanOrEqual(430);
-    expect(parseFloat(getComputedStyle(recurrenceDialog).borderRadius)).toBeGreaterThan(0);
+    const recurrenceRect = recurrenceDialog.getBoundingClientRect();
+    expect(recurrenceRect.width).toBeLessThanOrEqual(520);
+    expect(recurrenceRect.top).toBeLessThan(2);
+    expect(
+      Math.abs(recurrenceRect.height - canvasElement.ownerDocument.defaultView!.innerHeight),
+    ).toBeLessThan(2);
+    expect(parseFloat(getComputedStyle(recurrenceDialog).borderRadius)).toBe(0);
     const interval = within(recurrenceDialog).getByRole("spinbutton", {
       name: "Recurrence interval",
     });
@@ -241,7 +246,7 @@
       ).getByRole("option", { name: "Completion date" }),
     );
     await userEvent.click(
-      within(recurrenceDialog).getByRole("checkbox", {
+      within(recurrenceDialog).getByRole("switch", {
         name: "Reset checklist on completion",
       }),
     );
@@ -408,8 +413,8 @@
       within(page.getByRole("listbox", { name: "Recurrence frequency options" }))
         .getByRole("option", { name: "Weeks" }),
     );
-    for (const day of ["Mon", "Wed", "Fri"]) {
-      await userEvent.click(within(customForm).getByRole("checkbox", { name: day }));
+    for (const day of ["Monday", "Wednesday", "Friday"]) {
+      await userEvent.click(within(customForm).getByRole("button", { name: day }));
     }
     await userEvent.click(
       within(customForm).getByRole("combobox", {
@@ -437,22 +442,32 @@
         .getByRole("option", { name: "Scheduled date" }),
     );
     await userEvent.type(
-      within(customForm).getByRole("textbox", { name: "Additional recurrence dates" }),
-      "2026-09-01",
+      within(customForm).getByRole("combobox", { name: "Additional recurrence dates" }),
+      "tomorrow{Enter}",
     );
     await userEvent.type(
-      within(customForm).getByRole("textbox", { name: "Excluded recurrence dates" }),
-      "2026-09-03",
+      within(customForm).getByRole("combobox", { name: "Additional recurrence dates" }),
+      "not a date{Enter}",
+    );
+    expect(within(customForm).getByRole("alert")).toHaveTextContent(
+      "could not understand",
+    );
+    expect(
+      within(customForm).getByRole("button", { name: "Remove 2026-08-22" }),
+    ).toBeVisible();
+    await userEvent.type(
+      within(customForm).getByRole("combobox", { name: "Excluded recurrence dates" }),
+      "2026-09-03{Enter}",
     );
     await userEvent.click(
-      within(customForm).getByRole("checkbox", { name: "Pause recurrence" }),
+      within(customForm).getByRole("switch", { name: "Pause recurrence" }),
     );
     await userEvent.click(
-      within(customForm).getByRole("combobox", { name: "Habit tracking type" }),
+      within(customForm).getByRole("button", { name: "Select Tracking type" }),
     );
     await userEvent.click(
       within(
-        page.getByRole("listbox", { name: "Habit tracking type options" }),
+        within(customForm).getByRole("listbox", { name: "Tracking type options" }),
       ).getByRole("option", { name: "Count" }),
     );
     await userEvent.type(
@@ -472,7 +487,7 @@
         rrule: "FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,WE,FR;COUNT=12",
         anchor: "schedule",
         missed: "carry",
-        rdate: ["2026-09-01"],
+        rdate: ["2026-08-22"],
         exdate: ["2026-09-03"],
         paused: true,
         pausedSince: "2026-08-21",
@@ -519,7 +534,7 @@
       }),
     );
     let dialog = page.getByRole("dialog", { name: "Custom recurrence" });
-    await userEvent.click(within(dialog).getByRole("checkbox", { name: "Edit raw RRULE" }));
+    await userEvent.click(within(dialog).getByRole("switch", { name: "Edit raw RRULE" }));
     const raw = within(dialog).getByRole("textbox", { name: "Raw RRULE" });
     await userEvent.clear(raw);
     await userEvent.type(raw, "FREQ=DAILY;BYHOUR=9");

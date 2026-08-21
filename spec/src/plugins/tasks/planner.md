@@ -112,8 +112,12 @@ including structured recurrence controls and raw RRULE editing; planner pages
 do not substitute native form dropdowns. The compact recurrence popover starts
 directly with its presets, keeps a no-apply `Repeat every…` number/frequency
 row behind one disclosure, and hands `Custom recurrence…` to a separately
-scrollable, bounded, inset Design Core Form Sheet styled like Task detail while
-closing the popover. See LN-TASK-046.
+scrollable, flat, full-height Design Core Form Sheet while closing the popover.
+The sheet follows the Tasks settings composition: calendar-like weekday toggles,
+Switch controls for boolean policy, Cycle Picker for tracking type, and
+Chip Autocomplete for RDATE/EXDATE. Date chips share the plan-date selector's
+natural-language parser and normalize against the injected clock before the
+canonical local dates are persisted. See LN-TASK-046.
 The editor also owns weekday sets, monthly positional and calendar-day rules,
 yearly month/day, COUNT or date-only UNTIL, RDATE/EXDATE, missed policy,
 checklist reset, pause state, and habit tracking. Unsupported raw rules and

@@ -185,7 +185,10 @@ function shiftDate(
   return nextDate;
 }
 
-export function buildNaturalDateSuggestions(query: string): TaskDateSuggestion[] {
+export function buildNaturalDateSuggestions(
+  query: string,
+  now = new Date(),
+): TaskDateSuggestion[] {
   const trimmed = query.trim();
   if (!trimmed) return [];
 
@@ -196,7 +199,7 @@ export function buildNaturalDateSuggestions(query: string): TaskDateSuggestion[]
       const direction = rawAmount < 0 ? "earlier" : "later";
       const signedAmount = rawAmount;
       const absoluteAmount = Math.abs(rawAmount);
-      const baseDate = new Date();
+      const baseDate = new Date(now);
       return [
         {
           id: "days",
@@ -226,7 +229,7 @@ export function buildNaturalDateSuggestions(query: string): TaskDateSuggestion[]
     }
   }
 
-  const parsed = parseChronoDate(trimmed);
+  const parsed = parseChronoDate(trimmed, now);
   if (!parsed) return [];
 
   return [
@@ -239,8 +242,8 @@ export function buildNaturalDateSuggestions(query: string): TaskDateSuggestion[]
   ];
 }
 
-export function parseNaturalDueDate(query: string) {
-  const suggestions = buildNaturalDateSuggestions(query);
+export function parseNaturalDueDate(query: string, now = new Date()) {
+  const suggestions = buildNaturalDateSuggestions(query, now);
   return suggestions[0]?.date;
 }
 
@@ -303,4 +306,3 @@ export function taskPreviewCloseAnimationMs(
   }
   return TASK_PREVIEW_CLOSE_ANIMATION_MS;
 }
-

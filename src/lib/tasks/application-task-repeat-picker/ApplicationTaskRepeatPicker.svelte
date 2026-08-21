@@ -5,12 +5,17 @@
   import CheckIcon from "@lucide/svelte/icons/check";
   import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import Repeat2Icon from "@lucide/svelte/icons/repeat-2";
+  import { ChipAutocomplete, CyclePicker } from "@lapismd/design-core/forms";
   import FormSheet from "@lapismd/design-core/forms/FormSheet.svelte";
+  import { Button } from "@lapismd/design-core/shadcn/button";
   import * as Collapsible from "@lapismd/design-core/shadcn/collapsible";
   import * as CommandView from "@lapismd/design-core/shadcn/command-view";
+  import * as Field from "@lapismd/design-core/shadcn/field";
   import { Input } from "@lapismd/design-core/shadcn/input";
   import * as Popover from "@lapismd/design-core/shadcn/popover";
   import * as Select from "@lapismd/design-core/shadcn/select";
+  import { Switch } from "@lapismd/design-core/shadcn/switch";
+  import * as ToggleGroup from "@lapismd/design-core/shadcn/toggle-group";
   import type {
     LocalDateString,
     TaskRepeat,
@@ -22,6 +27,7 @@
     analyzeRecurrenceRule,
     buildTaskRepeatPresentation,
     isLocalDateString,
+    parseNaturalDueDate,
     taskRepeatForPreset,
     taskRepeatPresetFor,
     todayDateOnly,
@@ -72,8 +78,8 @@
   let endMode = $state<EndMode>("never");
   let count = $state(1);
   let until = $state("");
-  let rdateText = $state("");
-  let exdateText = $state("");
+  let rdateValues = $state<LocalDateString[]>([]);
+  let exdateValues = $state<LocalDateString[]>([]);
   let resetChecklist = $state(false);
   let paused = $state(false);
   let trackingType = $state<TrackingType>("none");
@@ -83,8 +89,13 @@
   const uid = $props.id();
 
   const weekdayOptions = [
-    ["MO", "Mon"], ["TU", "Tue"], ["WE", "Wed"], ["TH", "Thu"],
-    ["FR", "Fri"], ["SA", "Sat"], ["SU", "Sun"],
+    ["MO", "Mon", "Monday"],
+    ["TU", "Tue", "Tuesday"],
+    ["WE", "Wed", "Wednesday"],
+    ["TH", "Thu", "Thursday"],
+    ["FR", "Fri", "Friday"],
+    ["SA", "Sat", "Saturday"],
+    ["SU", "Sun", "Sunday"],
   ] as const;
   const frequencyLabels: Record<EditableFrequency, string> = {
     DAILY: "Days", WEEKLY: "Weeks", MONTHLY: "Months", YEARLY: "Years",
@@ -98,6 +109,16 @@
   const trackingTypeLabels: Record<TrackingType, string> = {
     none: "None", boolean: "Boolean", count: "Count", duration: "Duration", number: "Number",
   };
+  const trackingOptions = Object.entries(trackingTypeLabels).map(
+    ([value, label]) => ({ value, label }),
+  );
+  const naturalDateInputs = [
+    "Today",
+    "Tomorrow",
+    "Next week",
+    "Next Monday",
+    "Next Friday",
+  ];
   const anchorLabels: Record<TaskRepeatAnchor, string> = {
     schedule: "Scheduled date", completion: "Completion date",
   };
@@ -176,8 +197,8 @@
     rawMode = invalidRepeat !== undefined || analyzeRecurrenceRule(rule).status === "unsupported";
     anchor = repeat?.anchor ?? "schedule";
     missed = repeat?.missed ?? "carry";
-    rdateText = repeat?.rdate?.join(", ") ?? "";
-    exdateText = repeat?.exdate?.join(", ") ?? "";
+    rdateValues = [...(repeat?.rdate ?? [])];
+    exdateValues = [...(repeat?.exdate ?? [])];
     resetChecklist = repeat?.resetChecklist ?? false;
     paused = repeat?.paused ?? false;
     trackingType = tracking?.type ?? "none";
@@ -216,6 +237,10 @@
     return value === "DAILY" || value === "WEEKLY" || value === "MONTHLY" || value === "YEARLY";
   }
 
+  function isTrackingType(value: string): value is TrackingType {
+    return value in trackingTypeLabels;
+  }
+
   async function applyRepeatEvery(nextFrequency = frequency) {
     frequency = nextFrequency;
     interval = Math.max(1, Math.trunc(interval || 1));
@@ -231,10 +256,6 @@
     } catch (error) {
       validationMessage = error instanceof Error ? error.message : String(error);
     }
-  }
-
-  function toggleWeekday(day: string) {
-    weekdays = weekdays.includes(day) ? weekdays.filter((value) => value !== day) : [...weekdays, day];
   }
 
   function buildStructuredRule(): string {
@@ -259,11 +280,34 @@
     return parts.join(";");
   }
 
-  function parseDateList(value: string, name: string): LocalDateString[] | undefined {
-    if (!value.trim()) return undefined;
-    const dates = value.split(/[\s,]+/u).map((date) => date.trim()).filter(Boolean);
-    if (!dates.every(isLocalDateString)) throw new Error(`${name} must contain only YYYY-MM-DD dates.`);
-    return [...new Set(dates)] as LocalDateString[];
+  function normalizeDateChips(
+    values: string[],
+    name: string,
+  ): LocalDateString[] | null {
+    const normalized: LocalDateString[] = [];
+    for (const rawValue of values) {
+      const value = rawValue.trim();
+      const parsed = isLocalDateString(value)
+        ? value
+        : parseNaturalDueDate(value, now ?? new Date());
+      if (!parsed || !isLocalDateString(parsed)) {
+        validationMessage = `${name} could not understand “${value}”. Enter a date such as tomorrow, next Friday, or 2026-09-01.`;
+        return null;
+      }
+      if (!normalized.includes(parsed)) normalized.push(parsed);
+    }
+    validationMessage = null;
+    return normalized;
+  }
+
+  function updateAdditionalDates(values: string[]) {
+    const normalized = normalizeDateChips(values, "Additional dates");
+    if (normalized) rdateValues = normalized;
+  }
+
+  function updateExcludedDates(values: string[]) {
+    const normalized = normalizeDateChips(values, "Excluded dates");
+    if (normalized) exdateValues = normalized;
   }
 
   function previousDate(value: LocalDateString): LocalDateString {
@@ -292,8 +336,8 @@
       if (analysis.status === "invalid") throw new Error(analysis.message);
       if (endMode === "until" && !rawMode && !isLocalDateString(until)) throw new Error("Until must be a YYYY-MM-DD date.");
       const actionDate = todayDateOnly(now ?? new Date()) as LocalDateString;
-      const rdate = parseDateList(rdateText, "Additional dates");
-      const exdate = parseDateList(exdateText, "Excluded dates");
+      const rdate = rdateValues.length ? rdateValues : undefined;
+      const exdate = exdateValues.length ? exdateValues : undefined;
       const pauseRanges = [...(repeat?.pauseRanges ?? [])];
       let pausedSince = repeat?.pausedSince;
       if (paused && !repeat?.paused) pausedSince = actionDate;
@@ -523,342 +567,419 @@
     bodyDensity="dense"
     class="task-repeat-picker__sheet"
   >
-    <div class="task-repeat-picker__custom" aria-label="Custom recurrence form">
-      <label class="task-repeat-picker__check">
-        <input type="checkbox" bind:checked={rawMode} />
-        <span>Edit raw RRULE</span>
-      </label>
-      {#if rawMode}
-        <label class="task-repeat-picker__stack">
-          <span>RRULE property value</span>
-          <Input
-            bind:value={rawRrule}
-            aria-label="Raw RRULE"
-            placeholder="FREQ=WEEKLY;BYDAY=MO,WE,FR"
-          />
-        </label>
-      {:else}
-        <label>
-          <span>Every</span>
-          <Input
-            type="number"
-            min="1"
-            step="1"
-            bind:value={interval}
-            aria-label="Recurrence interval"
-          />
-        </label>
-        <div class="task-repeat-picker__custom-field">
-          <span>Frequency</span>
-          <Select.Root type="single" bind:value={frequency}>
-            <Select.Trigger
-              role="combobox"
-              aria-label="Recurrence frequency"
-              aria-controls={`${uid}-recurrence-frequency-options`}
-            >
-              {frequencyLabels[frequency]}
-            </Select.Trigger>
-            <Select.Content
-              id={`${uid}-recurrence-frequency-options`}
-              aria-label="Recurrence frequency options"
-              portalProps={{ disabled: true }}
-            >
-              <Select.Group>
-                <Select.Item value="DAILY" label="Days">Days</Select.Item>
-                <Select.Item value="WEEKLY" label="Weeks">Weeks</Select.Item>
-                <Select.Item value="MONTHLY" label="Months">Months</Select.Item>
-                <Select.Item value="YEARLY" label="Years">Years</Select.Item>
-              </Select.Group>
-            </Select.Content>
-          </Select.Root>
-        </div>
-        {#if frequency === "WEEKLY"}
-          <fieldset class="task-repeat-picker__weekdays">
-            <legend>Weekdays</legend>
-            {#each weekdayOptions as [day, dayLabel]}
-              <label>
-                <input
-                  type="checkbox"
-                  checked={weekdays.includes(day)}
-                  onchange={() => toggleWeekday(day)}
-                />
-                <span>{dayLabel}</span>
-              </label>
-            {/each}
-          </fieldset>
-        {/if}
-        {#if frequency === "MONTHLY"}
-          <div class="task-repeat-picker__custom-field">
-            <span>Monthly rule</span>
-            <Select.Root type="single" bind:value={monthlyMode}>
-              <Select.Trigger
-                role="combobox"
-                aria-label="Monthly recurrence mode"
-                aria-controls={`${uid}-recurrence-monthly-mode-options`}
-              >
-                {monthlyModeLabels[monthlyMode]}
-              </Select.Trigger>
-              <Select.Content
-                id={`${uid}-recurrence-monthly-mode-options`}
-                aria-label="Monthly recurrence mode options"
-                portalProps={{ disabled: true }}
-              >
-                <Select.Group>
-                  <Select.Item value="month-day" label="Calendar day">
-                    Calendar day
-                  </Select.Item>
-                  <Select.Item value="position" label="Positional weekday">
-                    Positional weekday
-                  </Select.Item>
-                </Select.Group>
-              </Select.Content>
-            </Select.Root>
-          </div>
-          {#if monthlyMode === "position"}
-            <label>
-              <span>Position</span>
-              <Input
-                type="number"
-                min="-5"
-                max="5"
-                bind:value={position}
-                aria-label="Monthly position"
+    <form
+      class="task-repeat-picker__custom"
+      aria-label="Custom recurrence form"
+      onsubmit={(event) => {
+        event.preventDefault();
+        void applyCustom();
+      }}
+    >
+      <Field.Group class="task-repeat-picker__settings">
+        <Field.Set class="task-repeat-picker__settings-section">
+          <Field.Legend>Schedule</Field.Legend>
+          <Field.Description>
+            Choose when this task repeats and when the series ends.
+          </Field.Description>
+          <div class="task-repeat-picker__settings-card">
+            <Field.Field orientation="horizontal" class="task-repeat-picker__setting-row">
+              <Field.Content>
+                <Field.Label for={`${uid}-raw-rule`}>Edit raw RRULE</Field.Label>
+                <Field.Description>
+                  Use the RFC recurrence value directly for unsupported rules.
+                </Field.Description>
+              </Field.Content>
+              <Switch
+                id={`${uid}-raw-rule`}
+                bind:checked={rawMode}
+                aria-label="Edit raw RRULE"
               />
-            </label>
-            <div class="task-repeat-picker__custom-field">
-              <span>Weekday</span>
-              <Select.Root type="single" bind:value={positionalWeekday}>
+            </Field.Field>
+
+            {#if rawMode}
+              <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--stacked">
+                <Field.Label for={`${uid}-rrule`}>RRULE property value</Field.Label>
+                <Input
+                  id={`${uid}-rrule`}
+                  bind:value={rawRrule}
+                  aria-label="Raw RRULE"
+                  placeholder="FREQ=WEEKLY;BYDAY=MO,WE,FR"
+                />
+              </Field.Field>
+            {:else}
+              <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--stacked">
+                <Field.Label>Repeat interval</Field.Label>
+                <div class="task-repeat-picker__control-grid">
+                  <Input
+                    type="number"
+                    min="1"
+                    step="1"
+                    bind:value={interval}
+                    aria-label="Recurrence interval"
+                  />
+                  <Select.Root type="single" bind:value={frequency}>
+                    <Select.Trigger
+                      role="combobox"
+                      aria-label="Recurrence frequency"
+                      aria-controls={`${uid}-recurrence-frequency-options`}
+                    >
+                      {frequencyLabels[frequency]}
+                    </Select.Trigger>
+                    <Select.Content
+                      id={`${uid}-recurrence-frequency-options`}
+                      aria-label="Recurrence frequency options"
+                      portalProps={{ disabled: true }}
+                    >
+                      <Select.Group>
+                        <Select.Item value="DAILY" label="Days">Days</Select.Item>
+                        <Select.Item value="WEEKLY" label="Weeks">Weeks</Select.Item>
+                        <Select.Item value="MONTHLY" label="Months">Months</Select.Item>
+                        <Select.Item value="YEARLY" label="Years">Years</Select.Item>
+                      </Select.Group>
+                    </Select.Content>
+                  </Select.Root>
+                </div>
+              </Field.Field>
+
+              {#if frequency === "WEEKLY"}
+                <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--stacked">
+                  <Field.Label>Weekdays</Field.Label>
+                  <ToggleGroup.Root
+                    type="multiple"
+                    bind:value={weekdays}
+                    variant="outline"
+                    spacing={2}
+                    size="sm"
+                    aria-label="Recurrence weekdays"
+                    class="task-repeat-picker__weekday-grid"
+                  >
+                    {#each weekdayOptions as [day, dayLabel, fullDayLabel]}
+                      <ToggleGroup.Item value={day} aria-label={fullDayLabel}>
+                        {dayLabel}
+                      </ToggleGroup.Item>
+                    {/each}
+                  </ToggleGroup.Root>
+                </Field.Field>
+              {/if}
+
+              {#if frequency === "MONTHLY"}
+                <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--stacked">
+                  <Field.Label>Monthly rule</Field.Label>
+                  <Select.Root type="single" bind:value={monthlyMode}>
+                    <Select.Trigger
+                      role="combobox"
+                      aria-label="Monthly recurrence mode"
+                      aria-controls={`${uid}-recurrence-monthly-mode-options`}
+                    >
+                      {monthlyModeLabels[monthlyMode]}
+                    </Select.Trigger>
+                    <Select.Content
+                      id={`${uid}-recurrence-monthly-mode-options`}
+                      aria-label="Monthly recurrence mode options"
+                      portalProps={{ disabled: true }}
+                    >
+                      <Select.Group>
+                        <Select.Item value="month-day" label="Calendar day">Calendar day</Select.Item>
+                        <Select.Item value="position" label="Positional weekday">Positional weekday</Select.Item>
+                      </Select.Group>
+                    </Select.Content>
+                  </Select.Root>
+                </Field.Field>
+                {#if monthlyMode === "position"}
+                  <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--stacked">
+                    <Field.Label>Position and weekday</Field.Label>
+                    <div class="task-repeat-picker__control-grid">
+                      <Input
+                        type="number"
+                        min="-5"
+                        max="5"
+                        bind:value={position}
+                        aria-label="Monthly position"
+                      />
+                      <Select.Root type="single" bind:value={positionalWeekday}>
+                        <Select.Trigger
+                          role="combobox"
+                          aria-label="Monthly weekday"
+                          aria-controls={`${uid}-recurrence-monthly-weekday-options`}
+                        >
+                          {weekdayOptions.find(([day]) => day === positionalWeekday)?.[1] ?? "Mon"}
+                        </Select.Trigger>
+                        <Select.Content
+                          id={`${uid}-recurrence-monthly-weekday-options`}
+                          aria-label="Monthly weekday options"
+                          portalProps={{ disabled: true }}
+                        >
+                          <Select.Group>
+                            {#each weekdayOptions as [day, dayLabel]}
+                              <Select.Item value={day} label={dayLabel}>{dayLabel}</Select.Item>
+                            {/each}
+                          </Select.Group>
+                        </Select.Content>
+                      </Select.Root>
+                    </div>
+                  </Field.Field>
+                {:else}
+                  <Field.Field class="task-repeat-picker__setting-row">
+                    <Field.Label for={`${uid}-month-day`}>Month day</Field.Label>
+                    <Input
+                      id={`${uid}-month-day`}
+                      type="number"
+                      min="-31"
+                      max="31"
+                      bind:value={monthDay}
+                      aria-label="Month day"
+                    />
+                  </Field.Field>
+                {/if}
+              {/if}
+
+              {#if frequency === "YEARLY"}
+                <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--stacked">
+                  <Field.Label>Annual date</Field.Label>
+                  <div class="task-repeat-picker__control-grid">
+                    <Input
+                      type="number"
+                      min="1"
+                      max="12"
+                      bind:value={yearMonth}
+                      aria-label="Year month"
+                    />
+                    <Input
+                      type="number"
+                      min="1"
+                      max="31"
+                      bind:value={monthDay}
+                      aria-label="Year month day"
+                    />
+                  </div>
+                </Field.Field>
+              {/if}
+
+              <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--stacked">
+                <Field.Label>Ends</Field.Label>
+                <Select.Root type="single" bind:value={endMode}>
+                  <Select.Trigger
+                    role="combobox"
+                    aria-label="Recurrence end condition"
+                    aria-controls={`${uid}-recurrence-end-options`}
+                  >
+                    {endModeLabels[endMode]}
+                  </Select.Trigger>
+                  <Select.Content
+                    id={`${uid}-recurrence-end-options`}
+                    aria-label="Recurrence end condition options"
+                    portalProps={{ disabled: true }}
+                  >
+                    <Select.Group>
+                      <Select.Item value="never" label="Never">Never</Select.Item>
+                      <Select.Item value="count" label="After count">After count</Select.Item>
+                      <Select.Item value="until" label="On date">On date</Select.Item>
+                    </Select.Group>
+                  </Select.Content>
+                </Select.Root>
+              </Field.Field>
+              {#if endMode === "count"}
+                <Field.Field class="task-repeat-picker__setting-row">
+                  <Field.Label for={`${uid}-count`}>Occurrences</Field.Label>
+                  <Input
+                    id={`${uid}-count`}
+                    type="number"
+                    min="1"
+                    bind:value={count}
+                    aria-label="Recurrence count"
+                  />
+                </Field.Field>
+              {/if}
+              {#if endMode === "until"}
+                <Field.Field class="task-repeat-picker__setting-row">
+                  <Field.Label for={`${uid}-until`}>Until</Field.Label>
+                  <Input
+                    id={`${uid}-until`}
+                    type="date"
+                    bind:value={until}
+                    aria-label="Recurrence until"
+                  />
+                </Field.Field>
+              {/if}
+            {/if}
+          </div>
+        </Field.Set>
+
+        <Field.Set class="task-repeat-picker__settings-section">
+          <Field.Legend>Behavior</Field.Legend>
+          <Field.Description>
+            Control advancement, exceptions, checklist resets, and pauses.
+          </Field.Description>
+          <div class="task-repeat-picker__settings-card">
+            <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--stacked">
+              <Field.Label>Advance from</Field.Label>
+              <Select.Root type="single" bind:value={anchor}>
                 <Select.Trigger
                   role="combobox"
-                  aria-label="Monthly weekday"
-                  aria-controls={`${uid}-recurrence-monthly-weekday-options`}
+                  aria-label="Recurrence anchor"
+                  aria-controls={`${uid}-recurrence-anchor-options`}
                 >
-                  {weekdayOptions.find(([day]) => day === positionalWeekday)?.[1] ?? "Mon"}
+                  {anchorLabels[anchor]}
                 </Select.Trigger>
                 <Select.Content
-                  id={`${uid}-recurrence-monthly-weekday-options`}
-                  aria-label="Monthly weekday options"
+                  id={`${uid}-recurrence-anchor-options`}
+                  aria-label="Recurrence anchor options"
                   portalProps={{ disabled: true }}
                 >
                   <Select.Group>
-                    {#each weekdayOptions as [day, dayLabel]}
-                      <Select.Item value={day} label={dayLabel}>{dayLabel}</Select.Item>
-                    {/each}
+                    <Select.Item value="schedule" label="Scheduled date">Scheduled date</Select.Item>
+                    <Select.Item value="completion" label="Completion date">Completion date</Select.Item>
                   </Select.Group>
                 </Select.Content>
               </Select.Root>
-            </div>
-          {:else}
-            <label>
-              <span>Month day</span>
-              <Input
-                type="number"
-                min="-31"
-                max="31"
-                bind:value={monthDay}
-                aria-label="Month day"
+            </Field.Field>
+            <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--stacked">
+              <Field.Label>Missed dates</Field.Label>
+              <Select.Root
+                type="single"
+                bind:value={missed}
+                disabled={anchor === "completion"}
+              >
+                <Select.Trigger
+                  role="combobox"
+                  aria-label="Missed occurrence policy"
+                  aria-controls={`${uid}-recurrence-missed-options`}
+                >
+                  {missedLabels[anchor === "completion" ? "carry" : missed]}
+                </Select.Trigger>
+                <Select.Content
+                  id={`${uid}-recurrence-missed-options`}
+                  aria-label="Missed occurrence policy options"
+                  portalProps={{ disabled: true }}
+                >
+                  <Select.Group>
+                    <Select.Item value="carry" label="Carry overdue">Carry overdue</Select.Item>
+                    <Select.Item value="skip" label="Skip missed dates">Skip missed dates</Select.Item>
+                  </Select.Group>
+                </Select.Content>
+              </Select.Root>
+            </Field.Field>
+            <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--stacked">
+              <Field.Label>Additional dates</Field.Label>
+              <Field.Description>
+                Add dates outside the normal rule using natural language.
+              </Field.Description>
+              <ChipAutocomplete
+                value={rdateValues}
+                suggestions={naturalDateInputs}
+                label="Additional recurrence dates"
+                showLabel={false}
+                uppercase={false}
+                placeholder="Tomorrow or 2026-09-01"
+                onChange={updateAdditionalDates}
               />
-            </label>
-          {/if}
-        {/if}
-        {#if frequency === "YEARLY"}
-          <label>
-            <span>Month</span>
-            <Input
-              type="number"
-              min="1"
-              max="12"
-              bind:value={yearMonth}
-              aria-label="Year month"
-            />
-          </label>
-          <label>
-            <span>Month day</span>
-            <Input
-              type="number"
-              min="1"
-              max="31"
-              bind:value={monthDay}
-              aria-label="Year month day"
-            />
-          </label>
-        {/if}
-        <div class="task-repeat-picker__custom-field">
-          <span>Ends</span>
-          <Select.Root type="single" bind:value={endMode}>
-            <Select.Trigger
-              role="combobox"
-              aria-label="Recurrence end condition"
-              aria-controls={`${uid}-recurrence-end-options`}
-            >
-              {endModeLabels[endMode]}
-            </Select.Trigger>
-            <Select.Content
-              id={`${uid}-recurrence-end-options`}
-              aria-label="Recurrence end condition options"
-              portalProps={{ disabled: true }}
-            >
-              <Select.Group>
-                <Select.Item value="never" label="Never">Never</Select.Item>
-                <Select.Item value="count" label="After count">After count</Select.Item>
-                <Select.Item value="until" label="On date">On date</Select.Item>
-              </Select.Group>
-            </Select.Content>
-          </Select.Root>
-        </div>
-        {#if endMode === "count"}
-          <label>
-            <span>Occurrences</span>
-            <Input
-              type="number"
-              min="1"
-              bind:value={count}
-              aria-label="Recurrence count"
-            />
-          </label>
-        {/if}
-        {#if endMode === "until"}
-          <label>
-            <span>Until</span>
-            <Input type="date" bind:value={until} aria-label="Recurrence until" />
-          </label>
-        {/if}
-      {/if}
-      <div class="task-repeat-picker__custom-field">
-        <span>Missed dates</span>
-        <Select.Root
-          type="single"
-          bind:value={missed}
-          disabled={anchor === "completion"}
-        >
-          <Select.Trigger
-            role="combobox"
-            aria-label="Missed occurrence policy"
-            aria-controls={`${uid}-recurrence-missed-options`}
-          >
-            {missedLabels[anchor === "completion" ? "carry" : missed]}
-          </Select.Trigger>
-          <Select.Content
-            id={`${uid}-recurrence-missed-options`}
-            aria-label="Missed occurrence policy options"
-            portalProps={{ disabled: true }}
-          >
-            <Select.Group>
-              <Select.Item value="carry" label="Carry overdue">Carry overdue</Select.Item>
-              <Select.Item value="skip" label="Skip missed dates">Skip missed dates</Select.Item>
-            </Select.Group>
-          </Select.Content>
-        </Select.Root>
-      </div>
-      <div class="task-repeat-picker__custom-field">
-        <span>Advance from</span>
-        <Select.Root type="single" bind:value={anchor}>
-          <Select.Trigger
-            role="combobox"
-            aria-label="Recurrence anchor"
-            aria-controls={`${uid}-recurrence-anchor-options`}
-          >
-            {anchorLabels[anchor]}
-          </Select.Trigger>
-          <Select.Content
-            id={`${uid}-recurrence-anchor-options`}
-            aria-label="Recurrence anchor options"
-            portalProps={{ disabled: true }}
-          >
-            <Select.Group>
-              <Select.Item value="schedule" label="Scheduled date">
-                Scheduled date
-              </Select.Item>
-              <Select.Item value="completion" label="Completion date">
-                Completion date
-              </Select.Item>
-            </Select.Group>
-          </Select.Content>
-        </Select.Root>
-      </div>
-      <label class="task-repeat-picker__stack">
-        <span>Additional dates (RDATE)</span>
-        <Input
-          bind:value={rdateText}
-          aria-label="Additional recurrence dates"
-          placeholder="2026-09-01, 2026-09-03"
-        />
-      </label>
-      <label class="task-repeat-picker__stack">
-        <span>Excluded dates (EXDATE)</span>
-        <Input
-          bind:value={exdateText}
-          aria-label="Excluded recurrence dates"
-          placeholder="2026-09-02"
-        />
-      </label>
-      <label class="task-repeat-picker__check">
-        <input type="checkbox" bind:checked={resetChecklist} />
-        <span>Reset checklist on completion</span>
-      </label>
-      <label class="task-repeat-picker__check">
-        <input type="checkbox" bind:checked={paused} />
-        <span>{paused ? "Recurrence paused" : "Pause recurrence"}</span>
-      </label>
-      <div class="task-repeat-picker__custom-field">
-        <span>Tracking</span>
-        <Select.Root type="single" bind:value={trackingType}>
-          <Select.Trigger
-            role="combobox"
-            aria-label="Habit tracking type"
-            aria-controls={`${uid}-recurrence-tracking-options`}
-          >
-            {trackingTypeLabels[trackingType]}
-          </Select.Trigger>
-          <Select.Content
-            id={`${uid}-recurrence-tracking-options`}
-            aria-label="Habit tracking type options"
-            portalProps={{ disabled: true }}
-          >
-            <Select.Group>
-              <Select.Item value="none" label="None">None</Select.Item>
-              <Select.Item value="boolean" label="Boolean">Boolean</Select.Item>
-              <Select.Item value="count" label="Count">Count</Select.Item>
-              <Select.Item value="duration" label="Duration">Duration</Select.Item>
-              <Select.Item value="number" label="Number">Number</Select.Item>
-            </Select.Group>
-          </Select.Content>
-        </Select.Root>
-      </div>
-      {#if trackingType === "count" || trackingType === "number"}
-        <label>
-          <span>Unit</span>
-          <Input
-            bind:value={trackingUnit}
-            aria-label="Tracking unit"
-            placeholder="glasses"
-          />
-        </label>
-      {/if}
-      {#if trackingType !== "none" && trackingType !== "boolean"}
-        <label>
-          <span>Target</span>
-          <Input
-            type={trackingType === "duration" ? "text" : "number"}
-            min={trackingType === "duration" ? undefined : "0"}
-            bind:value={trackingTarget}
-            aria-label="Tracking target"
-            placeholder={trackingType === "duration" ? "30m" : "8"}
-          />
-        </label>
-      {/if}
+            </Field.Field>
+            <Field.Field class="task-repeat-picker__setting-row task-repeat-picker__setting-row--stacked">
+              <Field.Label>Excluded dates</Field.Label>
+              <Field.Description>
+                Skip individual dates using the same date language as Schedule.
+              </Field.Description>
+              <ChipAutocomplete
+                value={exdateValues}
+                suggestions={naturalDateInputs}
+                label="Excluded recurrence dates"
+                showLabel={false}
+                uppercase={false}
+                placeholder="Next Friday or 2026-09-03"
+                onChange={updateExcludedDates}
+              />
+            </Field.Field>
+            <Field.Field orientation="horizontal" class="task-repeat-picker__setting-row">
+              <Field.Content>
+                <Field.Label for={`${uid}-reset-checklist`}>
+                  Reset checklist on completion
+                </Field.Label>
+                <Field.Description>
+                  Start each occurrence with unchecked checklist items.
+                </Field.Description>
+              </Field.Content>
+              <Switch
+                id={`${uid}-reset-checklist`}
+                bind:checked={resetChecklist}
+                aria-label="Reset checklist on completion"
+              />
+            </Field.Field>
+            <Field.Field orientation="horizontal" class="task-repeat-picker__setting-row">
+              <Field.Content>
+                <Field.Label for={`${uid}-paused`}>
+                  {paused ? "Recurrence paused" : "Pause recurrence"}
+                </Field.Label>
+                <Field.Description>
+                  Keep the rule without scheduling future occurrences.
+                </Field.Description>
+              </Field.Content>
+              <Switch
+                id={`${uid}-paused`}
+                bind:checked={paused}
+                aria-label={paused ? "Recurrence paused" : "Pause recurrence"}
+              />
+            </Field.Field>
+          </div>
+        </Field.Set>
+
+        <Field.Set class="task-repeat-picker__settings-section">
+          <Field.Legend>Tracking</Field.Legend>
+          <Field.Description>
+            Optionally track completion as a habit or measurable target.
+          </Field.Description>
+          <div class="task-repeat-picker__settings-card">
+            <Field.Field orientation="horizontal" class="task-repeat-picker__setting-row">
+              <Field.Content>
+                <Field.Label>Tracking type</Field.Label>
+                <Field.Description>
+                  Cycle between boolean, count, duration, and numeric tracking.
+                </Field.Description>
+              </Field.Content>
+              <CyclePicker
+                value={trackingType}
+                options={trackingOptions}
+                ariaLabel="Tracking type"
+                onChange={(value) => {
+                  if (isTrackingType(value)) trackingType = value;
+                }}
+              />
+            </Field.Field>
+            {#if trackingType === "count" || trackingType === "number"}
+              <Field.Field class="task-repeat-picker__setting-row">
+                <Field.Label for={`${uid}-tracking-unit`}>Unit</Field.Label>
+                <Input
+                  id={`${uid}-tracking-unit`}
+                  bind:value={trackingUnit}
+                  aria-label="Tracking unit"
+                  placeholder="glasses"
+                />
+              </Field.Field>
+            {/if}
+            {#if trackingType !== "none" && trackingType !== "boolean"}
+              <Field.Field class="task-repeat-picker__setting-row">
+                <Field.Label for={`${uid}-tracking-target`}>Target</Field.Label>
+                <Input
+                  id={`${uid}-tracking-target`}
+                  type={trackingType === "duration" ? "text" : "number"}
+                  min={trackingType === "duration" ? undefined : "0"}
+                  bind:value={trackingTarget}
+                  aria-label="Tracking target"
+                  placeholder={trackingType === "duration" ? "30m" : "8"}
+                />
+              </Field.Field>
+            {/if}
+          </div>
+        </Field.Set>
+      </Field.Group>
+
       {#if validationMessage}
         <div class="task-repeat-picker__validation" role="alert">
           {validationMessage}
         </div>
       {/if}
-      <button
-        type="button"
-        class="task-repeat-picker__apply"
-        onclick={() => void applyCustom()}
-      >
-        Apply recurrence
-      </button>
-    </div>
+      <div class="task-repeat-picker__sheet-actions">
+        <Button type="submit">Apply recurrence</Button>
+      </div>
+    </form>
   </FormSheet>
 </div>
