@@ -91,7 +91,13 @@
 
   $effect(() => {
     const activeTaskId = controller?.activeTaskId;
-    if (!activeTaskId || selectedTaskIds.includes(activeTaskId)) return;
+    if (activeTaskId === undefined) return;
+    if (!activeTaskId) {
+      selectedTaskIds = [];
+      selectionAnchorTaskId = null;
+      return;
+    }
+    if (selectedTaskIds.includes(activeTaskId)) return;
     selectedTaskIds = [activeTaskId];
     selectionAnchorTaskId = activeTaskId;
   });

@@ -1793,30 +1793,74 @@
         exact: true,
       }),
     );
+    await waitFor(() => {
+      const detailColumns = canvasElement.querySelectorAll(
+        '[data-column-id^="detail"][data-ui-part="column"]',
+      );
+      expect(detailColumns).toHaveLength(1);
+      expect(detailColumns[0]).toHaveAttribute("data-column-id", "detail");
+      expect(detailColumns[0]).toHaveTextContent("Release Train");
+    });
     await fireEvent.click(
       await canvas.findByRole("button", {
         name: "Open task details for Coordinate the launch",
         exact: true,
       }, { timeout: 5_000 }),
     );
+    await waitFor(() => {
+      const detailColumns = canvasElement.querySelectorAll(
+        '[data-column-id^="detail"][data-ui-part="column"]',
+      );
+      expect(detailColumns).toHaveLength(2);
+      expect(detailColumns[0]).toHaveTextContent("Release Train");
+      expect(detailColumns[1]).toHaveAttribute("data-column-id", "detail-2");
+      expect(detailColumns[1]).toHaveTextContent("Coordinate the launch");
+    });
     await fireEvent.click(
       await canvas.findByRole("button", {
         name: "Open list Launch Operations to the right",
         exact: true,
       }, { timeout: 5_000 }),
     );
+    await waitFor(() => {
+      const detailColumns = canvasElement.querySelectorAll(
+        '[data-column-id^="detail"][data-ui-part="column"]',
+      );
+      expect(detailColumns).toHaveLength(3);
+      expect(detailColumns[1]).toHaveTextContent("Coordinate the launch");
+      expect(detailColumns[2]).toHaveAttribute("data-column-id", "detail-3");
+      expect(detailColumns[2]).toHaveTextContent("Launch Operations");
+    });
     await fireEvent.click(
       await canvas.findByRole("button", {
         name: "Open task details for Ship the release",
         exact: true,
       }, { timeout: 5_000 }),
     );
+    await waitFor(() => {
+      const detailColumns = canvasElement.querySelectorAll(
+        '[data-column-id^="detail"][data-ui-part="column"]',
+      );
+      expect(detailColumns).toHaveLength(4);
+      expect(detailColumns[2]).toHaveTextContent("Launch Operations");
+      expect(detailColumns[3]).toHaveAttribute("data-column-id", "detail-4");
+      expect(detailColumns[3]).toHaveTextContent("Ship the release");
+    });
     await fireEvent.click(
       await canvas.findByRole("button", {
         name: "Open task details for Verify the status page",
         exact: true,
       }, { timeout: 5_000 }),
     );
+    await waitFor(() => {
+      const detailColumns = canvasElement.querySelectorAll(
+        '[data-column-id^="detail"][data-ui-part="column"]',
+      );
+      expect(detailColumns).toHaveLength(5);
+      expect(detailColumns[3]).toHaveTextContent("Ship the release");
+      expect(detailColumns[4]).toHaveAttribute("data-column-id", "detail-5");
+      expect(detailColumns[4]).toHaveTextContent("Verify the status page");
+    });
     const confirmChecklistLabel = await canvas.findByText(
       "Confirm every region is healthy",
       {},
@@ -1862,31 +1906,31 @@
     const deepCanvasRoot = canvasElement.querySelector<HTMLElement>(
       '[data-ui-component="column-canvas"][data-ui-part="root"]',
     )!;
-    const deepPlannerBeforeScroll = canvasElement.querySelector<HTMLElement>(
-      '[data-column-id="planner"][data-ui-part="column"]',
+    const deepLeadingBeforeScroll = canvasElement.querySelector<HTMLElement>(
+      '[data-column-id="detail-4"][data-ui-part="column"]',
     )!;
-    const deepDetailBeforeScroll = canvasElement.querySelector<HTMLElement>(
-      '[data-column-id="detail"][data-ui-part="column"]',
+    const deepTrailingBeforeScroll = canvasElement.querySelector<HTMLElement>(
+      '[data-column-id="detail-5"][data-ui-part="column"]',
     )!;
     await waitFor(() => {
-      expect(deepPlannerBeforeScroll).toHaveAttribute(
+      expect(deepLeadingBeforeScroll).toHaveAttribute(
         "data-responsive-stage",
         "pair",
       );
-      expect(deepDetailBeforeScroll).toHaveAttribute(
+      expect(deepTrailingBeforeScroll).toHaveAttribute(
         "data-responsive-stage",
         "pair",
       );
-      expect(deepPlannerBeforeScroll.getBoundingClientRect().width).toBeLessThan(
+      expect(deepLeadingBeforeScroll.getBoundingClientRect().width).toBeLessThan(
         deepCanvasRoot.clientWidth - 200,
       );
-      expect(deepDetailBeforeScroll.getBoundingClientRect().width).toBeGreaterThan(
+      expect(deepTrailingBeforeScroll.getBoundingClientRect().width).toBeGreaterThan(
         200,
       );
     });
     const deepPairWidths = {
-      planner: deepPlannerBeforeScroll.getBoundingClientRect().width,
-      detail: deepDetailBeforeScroll.getBoundingClientRect().width,
+      leading: deepLeadingBeforeScroll.getBoundingClientRect().width,
+      trailing: deepTrailingBeforeScroll.getBoundingClientRect().width,
     };
     deepCanvasRoot.scrollTo({
       left: deepCanvasRoot.scrollWidth,
@@ -1894,11 +1938,11 @@
     });
     await fireEvent.scroll(deepCanvasRoot);
     await waitFor(() => {
-      const deepPlannerColumn = canvasElement.querySelector<HTMLElement>(
-        '[data-column-id="planner"][data-ui-part="column"]',
+      const deepLeadingColumn = canvasElement.querySelector<HTMLElement>(
+        '[data-column-id="detail-4"][data-ui-part="column"]',
       );
-      const deepDetailColumn = canvasElement.querySelector<HTMLElement>(
-        '[data-column-id="detail"][data-ui-part="column"]',
+      const deepTrailingColumn = canvasElement.querySelector<HTMLElement>(
+        '[data-column-id="detail-5"][data-ui-part="column"]',
       );
       const stickyTasks = canvasElement.querySelector<HTMLElement>(
         '[data-ui-part="sticky-stack"]',
@@ -1906,24 +1950,24 @@
       expect(deepCanvasRoot).toHaveAttribute("data-display-mode", "wide");
       expect(
         canvasElement.querySelector(
-          '[data-column-id="planner"] [data-resize-mode="pair"]',
+          '[data-column-id="detail-4"] [data-resize-mode="pair"]',
         ),
       ).not.toBeNull();
-      expect(deepPlannerColumn).not.toBeNull();
-      expect(deepDetailColumn).not.toBeNull();
+      expect(deepLeadingColumn).not.toBeNull();
+      expect(deepTrailingColumn).not.toBeNull();
       expect(stickyTasks).not.toBeNull();
       expect(stickyTasks!.getBoundingClientRect().right).toBeLessThanOrEqual(
-        deepPlannerColumn!.getBoundingClientRect().left + 1,
+        deepLeadingColumn!.getBoundingClientRect().left + 1,
       );
-      expect(deepPlannerColumn!.getBoundingClientRect().width).toBeCloseTo(
-        deepPairWidths.planner,
+      expect(deepLeadingColumn!.getBoundingClientRect().width).toBeCloseTo(
+        deepPairWidths.leading,
         1,
       );
-      expect(deepDetailColumn!.getBoundingClientRect().width).toBeCloseTo(
-        deepPairWidths.detail,
+      expect(deepTrailingColumn!.getBoundingClientRect().width).toBeCloseTo(
+        deepPairWidths.trailing,
         1,
       );
-      expect(deepDetailColumn!.getBoundingClientRect().right).toBeCloseTo(
+      expect(deepTrailingColumn!.getBoundingClientRect().right).toBeCloseTo(
         columnCanvasInnerRight(deepCanvasRoot),
         1,
       );

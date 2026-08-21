@@ -38,12 +38,34 @@
   import TaskMarkdownSurface from "../../task-list-markdown-surface/TaskListMarkdownSurface.svelte";
   import TaskTodayActionsMenu from "../task-planner/TaskTodayActionsMenu.svelte";
   import type { TasksMarkdownSurfaceController } from "../../task-list-surface";
+  import {
+    appendDetailColumn,
+    unwindDetailColumns,
+  } from "./detail-column-stack";
   import "./ApplicationTaskPlannerColumnCanvasStory.css";
 
   type ApplicationSummary = {
     title: string;
     subtitle?: string;
     color?: string;
+  };
+
+  type MarkdownSurfaceHandle = {
+    enter: () => void;
+    exit: () => Promise<boolean>;
+  };
+
+  type DetailColumnEntry = {
+    columnId: string;
+    key: string;
+    kind: "task" | "list";
+    taskId?: string;
+    path?: string;
+    title?: string;
+    editing: boolean;
+    sourceOrdinal: number | null;
+    selectedListPath: string | null;
+    surface: MarkdownSurfaceHandle | null;
   };
 
   let {
@@ -177,6 +199,7 @@
         maxWidth: null,
         pathLevel: 3,
         closeable: true,
+        closed: true,
         resizable: true,
       },
     },
@@ -191,9 +214,12 @@
       ? null
       : (plannerBuckets.find((bucket) => bucket.id === taskView) ?? null),
   );
-  let activeTaskId = $state<string | null>(null);
-  let activeListPath = $state<string | null>(null);
-  let activeLinkedList = $state<{ path: string; title: string } | null>(null);
+  let detailColumns = $state<DetailColumnEntry[]>([]);
+  let plannerSelectedListPath = $state<string | null>(null);
+  const detailSurfaceControllers = new Map<
+    string,
+    { key: string; controller: TasksMarkdownSurfaceController }
+  >();
   let activeDropTargetId = $state<string | null>(null);
   let taskListEditing = $state(false);
   let taskListSourceOrdinal = $state<number | null>(null);
@@ -201,21 +227,10 @@
     enter: () => void;
     exit: () => Promise<boolean>;
   } | null>(null);
-  let linkedListEditing = $state(false);
-  let linkedListSourceOrdinal = $state<number | null>(null);
-  let linkedListSurface = $state<{
-    enter: () => void;
-    exit: () => Promise<boolean>;
-  } | null>(null);
-  let taskDocumentEditing = $state(false);
-  let taskDocumentSourceOrdinal = $state<number | null>(null);
-  let taskDocumentSurface = $state<{
-    enter: () => void;
-    exit: () => Promise<boolean>;
-  } | null>(null);
   let hideCompletedTasks = $state(false);
   let markAllIncompletePending = $state(false);
   let previousTaskArea: string | null | undefined;
+  let relatedApplicationId = $state<string | null>(null);
 
   const activePlannerLabel = $derived(
     taskArea
@@ -238,12 +253,6 @@
     taskListSourceOrdinal = null;
   });
 
-  $effect(() => {
-    activeTaskId;
-    taskDocumentEditing = false;
-    taskDocumentSourceOrdinal = null;
-  });
-
   $effect.pre(() => {
     if (!selectedDate) selectedDate = actualToday;
   });
@@ -261,22 +270,15 @@
   const actualTodaySnapshot = $derived(
     buildTaskPlannerDaySnapshot(tasks, actualToday, settings, actualToday),
   );
-  const activeTask = $derived(
-    activeTaskId
-      ? (tasks.find((task) => task.id === activeTaskId) ?? null)
-      : null,
-  );
-  const activeTaskApplication = $derived(
-    activeTask?.applicationId
-      ? (applicationSummaries[activeTask.applicationId] ?? null)
-      : null,
+  const plannerActiveTaskId = $derived(
+    detailColumns[0]?.kind === "task" ? (detailColumns[0].taskId ?? null) : null,
   );
   const relatedApplication = $derived.by(() => {
     if (!showRelated) return null;
-    const relatedId = canvas.pathAt(2);
-    if (!relatedId) return null;
-    return applications.find((application) => application.id === relatedId) ??
-      null;
+    if (!relatedApplicationId) return null;
+    return applications.find(
+      (application) => application.id === relatedApplicationId,
+    ) ?? null;
   });
 
   function isBucket(id: string): id is TaskBucket {
@@ -290,9 +292,9 @@
     } else {
       taskArea = id;
     }
-    activeTaskId = null;
-    activeListPath = null;
-    activeLinkedList = null;
+    detailColumns = [];
+    plannerSelectedListPath = null;
+    relatedApplicationId = null;
     if (!canvas.isSelected(0, id)) {
       canvas.select(0, id);
       return;
@@ -300,91 +302,197 @@
     canvas.clearFrom(1);
   }
 
-  function handleActiveTaskChange(taskId: string | null) {
-    if (taskId) {
-      activeListPath = null;
-      activeLinkedList = null;
-      activeTaskId = taskId;
-      if (canvas.pathAt(1) === taskId) {
-        canvas.open("detail");
-        return;
-      }
-      canvas.select(1, taskId);
-      return;
-    }
-    activeTaskId = null;
-    canvas.close("detail");
-    if (canvas.pathAt(1)) canvas.clearFrom(1);
+  function detailColumnId(index: number): string {
+    return index === 0 ? "detail" : `detail-${index + 1}`;
   }
 
-  async function closeDetailColumn(): Promise<boolean> {
-    if (
-      activeLinkedList &&
-      linkedListSurface &&
-      !(await linkedListSurface.exit())
-    ) {
-      return false;
+  function detailColumnTitle(entry: DetailColumnEntry): string {
+    if (entry.kind === "list") return entry.title ?? entry.path ?? "List";
+    return (
+      tasks.find((task) => task.id === entry.taskId)?.title ??
+      entry.taskId ??
+      "Task"
+    );
+  }
+
+  function childEntry(sourceIndex: number): DetailColumnEntry | null {
+    return detailColumns[sourceIndex + 1] ?? null;
+  }
+
+  function activeTaskIdFor(sourceIndex: number): string | null {
+    const child = childEntry(sourceIndex);
+    return child?.kind === "task" ? (child.taskId ?? null) : null;
+  }
+
+  function activeListPathFor(sourceIndex: number): string | null {
+    if (sourceIndex < 0) return plannerSelectedListPath;
+    return detailColumns[sourceIndex]?.selectedListPath ?? null;
+  }
+
+  function setSelectedListPath(sourceIndex: number, path: string | null) {
+    if (sourceIndex < 0) {
+      plannerSelectedListPath = path;
+      return;
     }
-    activeTaskId = null;
-    activeListPath = null;
-    activeLinkedList = null;
-    linkedListEditing = false;
-    linkedListSourceOrdinal = null;
-    canvas.clearFrom(1);
+    const source = detailColumns[sourceIndex];
+    if (source) source.selectedListPath = path;
+  }
+
+  async function exitDetailEditorsFrom(startIndex: number): Promise<boolean> {
+    for (let index = detailColumns.length - 1; index >= startIndex; index -= 1) {
+      const entry = detailColumns[index];
+      if (entry.editing && entry.surface && !(await entry.surface.exit())) {
+        return false;
+      }
+    }
     return true;
   }
 
-  function handleActiveListChange(path: string | null) {
-    activeListPath = path;
+  function createDetailEntry(
+    index: number,
+    target:
+      | { kind: "task"; taskId: string }
+      | { kind: "list"; path: string; title: string },
+  ): DetailColumnEntry {
+    return {
+      columnId: detailColumnId(index),
+      key:
+        target.kind === "task"
+          ? `task:${target.taskId}`
+          : `list:${target.path}`,
+      kind: target.kind,
+      ...(target.kind === "task"
+        ? { taskId: target.taskId }
+        : { path: target.path, title: target.title }),
+      editing: false,
+      sourceOrdinal: null,
+      selectedListPath: null,
+      surface: null,
+    };
   }
 
-  async function handleOpenList(path: string, title: string) {
-    if (
-      activeLinkedList?.path !== path &&
-      linkedListEditing &&
-      !(await linkedListSurface?.exit())
-    ) {
+  async function openDetail(
+    sourceIndex: number,
+    target:
+      | { kind: "task"; taskId: string }
+      | { kind: "list"; path: string; title: string },
+  ): Promise<void> {
+    const targetIndex = sourceIndex + 1;
+    if (!(await exitDetailEditorsFrom(targetIndex))) return;
+
+    const nextEntry = createDetailEntry(targetIndex, target);
+    const current = detailColumns[targetIndex];
+    const entry = current?.key === nextEntry.key ? current : nextEntry;
+    const columnId = detailColumnId(targetIndex);
+    canvas.ensureColumn(columnId, {
+      defaultWidth: 360,
+      minWidth: 300,
+      maxWidth: null,
+      pathLevel: targetIndex + 2,
+      closeable: true,
+      resizable: true,
+    });
+    detailColumns = appendDetailColumn(detailColumns, sourceIndex, entry);
+    relatedApplicationId = null;
+
+    const selectionLevel = targetIndex + 1;
+    if (canvas.pathAt(selectionLevel) === entry.key) {
+      canvas.clearFrom(selectionLevel + 1);
+      canvas.open(columnId);
       return;
     }
-    activeTaskId = null;
-    activeListPath = path;
-    activeLinkedList = { path, title };
-    linkedListEditing = false;
-    linkedListSourceOrdinal = null;
-    const pathKey = `list:${path}`;
-    if (canvas.pathAt(1) === pathKey) {
-      canvas.open("detail");
+    canvas.select(selectionLevel, entry.key);
+  }
+
+  async function handleActiveTaskChange(
+    sourceIndex: number,
+    taskId: string | null,
+  ) {
+    if (taskId) {
+      setSelectedListPath(sourceIndex, null);
+      await openDetail(sourceIndex, { kind: "task", taskId });
       return;
     }
-    canvas.select(1, pathKey);
+    await closeDetailColumn(sourceIndex + 1);
+  }
+
+  async function closeDetailColumn(index: number): Promise<boolean> {
+    const entry = detailColumns[index];
+    if (!entry) return true;
+    if (!(await exitDetailEditorsFrom(index))) {
+      canvas.open(entry.columnId);
+      return false;
+    }
+    detailColumns = unwindDetailColumns(detailColumns, index);
+    setSelectedListPath(index - 1, null);
+    relatedApplicationId = null;
+    canvas.clearFrom(index + 1);
+    return true;
+  }
+
+  function handleActiveListChange(sourceIndex: number, path: string | null) {
+    setSelectedListPath(sourceIndex, path);
+  }
+
+  async function handleOpenList(
+    sourceIndex: number,
+    path: string,
+    title: string,
+  ) {
+    setSelectedListPath(sourceIndex, path);
+    await openDetail(sourceIndex, { kind: "list", path, title });
   }
 
   async function deleteLinkedList(path: string, parentPath: string) {
     if (!repository) return;
-    if (activeLinkedList?.path === path && !(await closeDetailColumn())) return;
+    const openIndex = detailColumns.findIndex(
+      (entry) => entry.kind === "list" && entry.path === path,
+    );
+    if (openIndex >= 0 && !(await closeDetailColumn(openIndex))) return;
     await repository.deleteList(path, (now ?? clock()).toISOString(), {
       skipParentPaths: [parentPath],
     });
-    if (activeListPath === path) activeListPath = null;
+    if (plannerSelectedListPath === path) plannerSelectedListPath = null;
+    for (const entry of detailColumns) {
+      if (entry.selectedListPath === path) entry.selectedListPath = null;
+    }
     await onRefreshWorkspace?.();
   }
 
-  function handleOpenApplication(applicationId: string) {
+  async function handleOpenApplication(
+    applicationId: string,
+    sourceIndex = -1,
+  ) {
     if (!showRelated) {
       onOpenApplication(applicationId);
       return;
     }
-    const ownerId =
-      activeTask?.applicationId === applicationId
-        ? activeTask.id
-        : (tasks.find((task) => task.applicationId === applicationId)?.id ??
-          null);
-    if (ownerId) handleActiveTaskChange(ownerId);
-    if (canvas.pathAt(2) === applicationId) {
+    let ownerIndex = sourceIndex;
+    if (ownerIndex < 0) {
+      const ownerId =
+        tasks.find((task) => task.applicationId === applicationId)?.id ?? null;
+      if (ownerId) {
+        await handleActiveTaskChange(-1, ownerId);
+        ownerIndex = 0;
+      }
+    }
+    if (!(await exitDetailEditorsFrom(ownerIndex + 1))) return;
+    detailColumns = unwindDetailColumns(detailColumns, ownerIndex + 1);
+    relatedApplicationId = applicationId;
+    canvas.ensureColumn("related", {
+      defaultWidth: 340,
+      minWidth: 280,
+      maxWidth: null,
+      pathLevel: ownerIndex + 3,
+      closeable: true,
+      resizable: true,
+    });
+    const selectionLevel = ownerIndex + 2;
+    if (canvas.pathAt(selectionLevel) === `application:${applicationId}`) {
       canvas.open("related");
       return;
     }
-    canvas.select(2, applicationId);
+    canvas.select(selectionLevel, `application:${applicationId}`);
     onOpenApplication(applicationId);
   }
 
@@ -429,9 +537,9 @@
     await onUpdateSettings({ dailyAgenda: { hideOverdueTasks } });
   }
 
-  function removeActiveTask(task: Task) {
+  function removeActiveTask(task: Task, detailIndex: number) {
     onDeleteTask(task);
-    handleActiveTaskChange(null);
+    void closeDetailColumn(detailIndex);
   }
 
   async function moveStructuralEntry(
@@ -465,18 +573,18 @@
       return tasks;
     },
     get activeTaskId() {
-      return activeTaskId;
+      return activeTaskIdFor(-1);
     },
     get activeListPath() {
-      return activeListPath;
+      return activeListPathFor(-1);
     },
     get pageTitle() {
       return activePlannerLabel;
     },
     hideMatchingDocumentTitle: true,
-    onActiveTaskChange: handleActiveTaskChange,
-    onActiveListChange: handleActiveListChange,
-    onOpenList: handleOpenList,
+    onActiveTaskChange: (taskId) => handleActiveTaskChange(-1, taskId),
+    onActiveListChange: (path) => handleActiveListChange(-1, path),
+    onOpenList: (path, title) => handleOpenList(-1, path, title),
     onSaveTask: (task) => onSaveTask(task),
     onDeleteTask: (task) => onDeleteTask(task),
     onDeleteList: deleteLinkedList,
@@ -504,95 +612,75 @@
     onMoveEntry: moveStructuralEntry,
   };
 
-  const linkedListSurfaceController: TasksMarkdownSurfaceController = {
-    kind: "tasks-markdown",
-    get tasks() {
-      return tasks;
-    },
-    get activeTaskId() {
-      return activeTaskId;
-    },
-    get activeListPath() {
-      return activeListPath;
-    },
-    get pageTitle() {
-      return activeLinkedList?.title ?? null;
-    },
-    hideMatchingDocumentTitle: true,
-    onActiveTaskChange: handleActiveTaskChange,
-    onActiveListChange: handleActiveListChange,
-    onOpenList: handleOpenList,
-    onSaveTask: (task) => onSaveTask(task),
-    onDeleteTask: (task) => onDeleteTask(task),
-    onDeleteList: deleteLinkedList,
-    onRefresh: () => onRefreshWorkspace?.(),
-    onOpenNote: (path) => onOpenNote?.(path),
-    get sourceRunOrdinal() {
-      return linkedListSourceOrdinal;
-    },
-    onRevealSource: (section) => {
-      linkedListSourceOrdinal = section.ordinal;
-      linkedListSurface?.enter();
-    },
-    onCreateInSection: (section, input) => {
-      return onCreateTaskListItem?.(section.documentPath, section, input);
-    },
-    onReorderSection: async (section, entries) => {
-      if (!repository) return;
-      await repository.replaceStructuralTaskRun(
-        section.documentPath,
-        section,
-        entries,
-      );
-      await onRefreshWorkspace?.();
-    },
-    onMoveEntry: moveStructuralEntry,
-  };
+  function detailSurfaceController(
+    entry: DetailColumnEntry,
+  ): TasksMarkdownSurfaceController {
+    const cached = detailSurfaceControllers.get(entry.columnId);
+    if (cached?.key === entry.key) return cached.controller;
 
-  const taskDocumentSurfaceController: TasksMarkdownSurfaceController = {
-    kind: "tasks-markdown",
-    get tasks() {
-      return tasks;
-    },
-    get activeTaskId() {
-      return activeTaskId;
-    },
-    get activeListPath() {
-      return activeListPath;
-    },
-    get pageTitle() {
-      return activeTask?.title ?? null;
-    },
-    hideMatchingDocumentTitle: true,
-    onActiveTaskChange: handleActiveTaskChange,
-    onActiveListChange: handleActiveListChange,
-    onOpenList: handleOpenList,
-    onSaveTask: (task) => onSaveTask(task),
-    onDeleteTask: (task) => onDeleteTask(task),
-    onDeleteList: deleteLinkedList,
-    onRefresh: () => onRefreshWorkspace?.(),
-    onOpenNote: (path) => onOpenNote?.(path),
-    get sourceRunOrdinal() {
-      return taskDocumentSourceOrdinal;
-    },
-    onRevealSource: (run) => {
-      taskDocumentSourceOrdinal = run.ordinal;
-      taskDocumentSurface?.enter();
-    },
-    onCreateInSection: (run, input) => {
-      return onCreateTaskListItem?.(run.documentPath, run, input);
-    },
-    onReorderSection: async (run, entries) => {
-      if (!repository) return;
-      await repository.replaceStructuralTaskRun(
-        run.documentPath,
-        run,
-        entries,
+    const sourceIndex = () =>
+      detailColumns.findIndex(
+        (candidate) => candidate.columnId === entry.columnId,
       );
-      await onRefreshWorkspace?.();
-    },
-    onMoveEntry: moveStructuralEntry,
-  };
+    const controller: TasksMarkdownSurfaceController = {
+      kind: "tasks-markdown",
+      get tasks() {
+        return tasks;
+      },
+      get activeTaskId() {
+        return activeTaskIdFor(sourceIndex());
+      },
+      get activeListPath() {
+        return activeListPathFor(sourceIndex());
+      },
+      get pageTitle() {
+        return detailColumnTitle(entry);
+      },
+      hideMatchingDocumentTitle: true,
+      onActiveTaskChange: (taskId) =>
+        handleActiveTaskChange(sourceIndex(), taskId),
+      onActiveListChange: (path) =>
+        handleActiveListChange(sourceIndex(), path),
+      onOpenList: (path, title) =>
+        handleOpenList(sourceIndex(), path, title),
+      onSaveTask: (task) => onSaveTask(task),
+      onDeleteTask: async (task) => {
+        onDeleteTask(task);
+        const child = childEntry(sourceIndex());
+        if (child?.kind === "task" && child.taskId === task.id) {
+          await closeDetailColumn(sourceIndex() + 1);
+        }
+      },
+      onDeleteList: deleteLinkedList,
+      onRefresh: () => onRefreshWorkspace?.(),
+      onOpenNote: (path) => onOpenNote?.(path),
+      get sourceRunOrdinal() {
+        return entry.sourceOrdinal;
+      },
+      onRevealSource: (run) => {
+        entry.sourceOrdinal = run.ordinal;
+        entry.surface?.enter();
+      },
+      onCreateInSection: (run, input) => {
+        return onCreateTaskListItem?.(run.documentPath, run, input);
+      },
+      onReorderSection: async (run, entries) => {
+        if (!repository) return;
+        await repository.replaceStructuralTaskRun(
+          run.documentPath,
+          run,
+          entries,
+        );
+        await onRefreshWorkspace?.();
+      },
+      onMoveEntry: moveStructuralEntry,
+    };
+    detailSurfaceControllers.set(entry.columnId, {
+      key: entry.key,
+      controller,
+    });
+    return controller;
+  }
 
   function editTaskListDocument() {
     taskListSourceOrdinal = null;
@@ -603,22 +691,13 @@
     if (await taskListSurface?.exit()) taskListSourceOrdinal = null;
   }
 
-  function editLinkedListDocument() {
-    linkedListSourceOrdinal = null;
-    linkedListSurface?.enter();
+  function editDetailDocument(entry: DetailColumnEntry) {
+    entry.sourceOrdinal = null;
+    entry.surface?.enter();
   }
 
-  function editTaskDocument() {
-    taskDocumentSourceOrdinal = null;
-    taskDocumentSurface?.enter();
-  }
-
-  async function readTaskDocument() {
-    if (await taskDocumentSurface?.exit()) taskDocumentSourceOrdinal = null;
-  }
-
-  async function readLinkedListDocument() {
-    if (await linkedListSurface?.exit()) linkedListSourceOrdinal = null;
+  async function readDetailDocument(entry: DetailColumnEntry) {
+    if (await entry.surface?.exit()) entry.sourceOrdinal = null;
   }
 
   function bucketCount(bucket: TaskBucket) {
@@ -805,11 +884,12 @@
             {applications}
             view={taskView}
             area={taskArea}
-            {activeTaskId}
+            activeTaskId={plannerActiveTaskId}
             detailsPresentation="external"
             taskAreas={snapshot.areas}
             {applicationSummaries}
-            onActiveTaskChange={handleActiveTaskChange}
+            onActiveTaskChange={(taskId) =>
+              void handleActiveTaskChange(-1, taskId)}
             {onSaveTask}
             {onCreateTask}
             {onDeleteTask}
@@ -817,116 +897,135 @@
             {onToggleChecklistItem}
             {checklistRefreshVersion}
             {onSaveApplication}
-            onOpenApplication={handleOpenApplication}
+            onOpenApplication={(applicationId) =>
+              void handleOpenApplication(applicationId, -1)}
             onDragTargetChange={(targetId) => (activeDropTargetId = targetId)}
             />
           {/if}
         </div>
       </ColumnCanvas.Column>
 
-      <ColumnCanvas.Column
-        id="detail"
-        class={activeLinkedList
-          ? "task-column-canvas-story__linked-list-column"
-          : undefined}
-      >
-        {#if activeLinkedList && app && repository}
-          <ColumnCanvas.Header>
-            <div
-              data-ui-component="column-canvas"
-              data-ui-part="column-header-main"
-            >
-              <ColumnCanvas.Title>{activeLinkedList.title}</ColumnCanvas.Title>
-            </div>
-            <ColumnCanvas.HeaderActions>
-              <button
-                type="button"
-                class="task-column-canvas-story__markdown-mode"
-                aria-label={linkedListEditing
-                  ? `Read ${activeLinkedList.title}`
-                  : `Edit ${activeLinkedList.title}`}
-                title={linkedListEditing ? "Reading view" : "Edit"}
-                onclick={() =>
-                  linkedListEditing
-                    ? void readLinkedListDocument()
-                    : editLinkedListDocument()}
+      {#each detailColumns as detail, detailIndex (detail.columnId)}
+        {@const detailTitle = detailColumnTitle(detail)}
+        {@const detailTask =
+          detail.kind === "task"
+            ? (tasks.find((task) => task.id === detail.taskId) ?? null)
+            : null}
+        {@const surfaceController = detailSurfaceController(detail)}
+        <ColumnCanvas.Column
+          id={detail.columnId}
+          class={detail.kind === "list"
+            ? "task-column-canvas-story__linked-list-column"
+            : undefined}
+        >
+          {#if detail.kind === "list" && app && repository && detail.path}
+            <ColumnCanvas.Header>
+              <div
+                data-ui-component="column-canvas"
+                data-ui-part="column-header-main"
               >
-                {#if linkedListEditing}
-                  <BookOpenIcon aria-hidden="true" />
-                {:else}
-                  <PencilIcon aria-hidden="true" />
-                {/if}
-              </button>
-              <ColumnCanvas.Close onclick={() => void closeDetailColumn()} />
-            </ColumnCanvas.HeaderActions>
-          </ColumnCanvas.Header>
-          <div class="task-column-canvas-story__pane">
-            <TaskMarkdownSurface
-              bind:this={linkedListSurface}
-              bind:editing={linkedListEditing}
-              {app}
-              {repository}
-              path={activeLinkedList.path}
-              controller={linkedListSurfaceController}
-            />
-          </div>
-        {:else if activeTask}
-          <ApplicationTaskSidebarDetail
-            task={activeTask}
-            application={activeTaskApplication}
-            documentBodyEnabled={Boolean(
-              app && repository && activeTask.sourcePath,
-            )}
-            onToggleDone={toggleActiveTaskDone}
-            onUpdateTitle={updateActiveTaskTitle}
-            onRemoveTask={removeActiveTask}
-            onOpenApplication={handleOpenApplication}
-          >
-            {#snippet closeAction()}
-              <ColumnCanvas.Close onclick={() => void closeDetailColumn()} />
-            {/snippet}
-            {#snippet documentModeAction()}
-              {#if app && repository && activeTask.sourcePath}
+                <ColumnCanvas.Title>{detailTitle}</ColumnCanvas.Title>
+              </div>
+              <ColumnCanvas.HeaderActions>
                 <button
                   type="button"
                   class="task-column-canvas-story__markdown-mode"
-                  aria-label={taskDocumentEditing
-                    ? `Read ${activeTask.title}`
-                    : `Edit ${activeTask.title}`}
-                  title={taskDocumentEditing ? "Reading view" : "Edit"}
+                  aria-label={detail.editing
+                    ? `Read ${detailTitle}`
+                    : `Edit ${detailTitle}`}
+                  title={detail.editing ? "Reading view" : "Edit"}
                   onclick={() =>
-                    taskDocumentEditing
-                      ? void readTaskDocument()
-                      : editTaskDocument()}
+                    detail.editing
+                      ? void readDetailDocument(detail)
+                      : editDetailDocument(detail)}
                 >
-                  {#if taskDocumentEditing}
+                  {#if detail.editing}
                     <BookOpenIcon aria-hidden="true" />
                   {:else}
                     <PencilIcon aria-hidden="true" />
                   {/if}
                 </button>
-              {/if}
-            {/snippet}
-            {#snippet documentBody()}
-              {#if app && repository && activeTask.sourcePath}
-                <TaskMarkdownSurface
-                  bind:this={taskDocumentSurface}
-                  bind:editing={taskDocumentEditing}
-                  {app}
-                  {repository}
-                  path={activeTask.sourcePath!}
-                  controller={taskDocumentSurfaceController}
+                <ColumnCanvas.Close
+                  onclick={() => void closeDetailColumn(detailIndex)}
                 />
-              {/if}
-            {/snippet}
-          </ApplicationTaskSidebarDetail>
-        {:else}
-          <div class="task-column-canvas-story__related-empty">
-            <ColumnCanvas.Close onclick={() => void closeDetailColumn()} />
-            <p>Select a Task’s details control to open it here.</p>
-          </div>
-        {/if}
-      </ColumnCanvas.Column>
+              </ColumnCanvas.HeaderActions>
+            </ColumnCanvas.Header>
+            <div class="task-column-canvas-story__pane">
+              <TaskMarkdownSurface
+                bind:this={detail.surface}
+                bind:editing={detail.editing}
+                {app}
+                {repository}
+                path={detail.path}
+                controller={surfaceController}
+              />
+            </div>
+          {:else if detailTask}
+            {@const detailApplication = detailTask.applicationId
+              ? (applicationSummaries[detailTask.applicationId] ?? null)
+              : null}
+            <ApplicationTaskSidebarDetail
+              task={detailTask}
+              application={detailApplication}
+              documentBodyEnabled={Boolean(
+                app && repository && detailTask.sourcePath,
+              )}
+              onToggleDone={toggleActiveTaskDone}
+              onUpdateTitle={updateActiveTaskTitle}
+              onRemoveTask={(task) => removeActiveTask(task, detailIndex)}
+              onOpenApplication={(applicationId) =>
+                void handleOpenApplication(applicationId, detailIndex)}
+            >
+              {#snippet closeAction()}
+                <ColumnCanvas.Close
+                  onclick={() => void closeDetailColumn(detailIndex)}
+                />
+              {/snippet}
+              {#snippet documentModeAction()}
+                {#if app && repository && detailTask.sourcePath}
+                  <button
+                    type="button"
+                    class="task-column-canvas-story__markdown-mode"
+                    aria-label={detail.editing
+                      ? `Read ${detailTitle}`
+                      : `Edit ${detailTitle}`}
+                    title={detail.editing ? "Reading view" : "Edit"}
+                    onclick={() =>
+                      detail.editing
+                        ? void readDetailDocument(detail)
+                        : editDetailDocument(detail)}
+                  >
+                    {#if detail.editing}
+                      <BookOpenIcon aria-hidden="true" />
+                    {:else}
+                      <PencilIcon aria-hidden="true" />
+                    {/if}
+                  </button>
+                {/if}
+              {/snippet}
+              {#snippet documentBody()}
+                {#if app && repository && detailTask.sourcePath}
+                  <TaskMarkdownSurface
+                    bind:this={detail.surface}
+                    bind:editing={detail.editing}
+                    {app}
+                    {repository}
+                    path={detailTask.sourcePath}
+                    controller={surfaceController}
+                  />
+                {/if}
+              {/snippet}
+            </ApplicationTaskSidebarDetail>
+          {:else}
+            <div class="task-column-canvas-story__related-empty">
+              <ColumnCanvas.Close
+                onclick={() => void closeDetailColumn(detailIndex)}
+              />
+              <p>The selected Task is no longer available.</p>
+            </div>
+          {/if}
+        </ColumnCanvas.Column>
+      {/each}
 
       {#if showRelated}
         <ColumnCanvas.Column

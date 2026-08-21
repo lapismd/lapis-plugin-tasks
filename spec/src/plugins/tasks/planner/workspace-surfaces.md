@@ -15,11 +15,16 @@ See LN-TASK-012, LN-TASK-022, LN-TASK-035, LN-TASK-037, and LN-TASK-047.
 1. a leading Tasks column with named views and the List tree;
 2. a middle planner column containing `ApplicationTaskPlannerMode` or the
    selected document surface;
-3. an optional closeable Task detail or linked-List column.
+3. a closeable stack of Task detail and linked-List columns, one per opened
+   descendant.
 
 The planner column exposes its controller-owned collapse action. A linked List
-opens to the right without replacing its parent and uses the same bordered,
-rounded column treatment as the planner body.
+or Task opened from any document appends immediately to that document's right
+without replacing its parent. Each entry retains its own selection and editor
+state and uses the same bordered, rounded column treatment as the planner body.
+Choosing a different child from an ancestor truncates only the descendant
+branch to its right. Closing a column performs the same branch unwind while
+leaving every ancestor intact.
 
 In desktop adaptive mode, the Tasks navigation keeps a finite maximum width.
 Planner, Detail, and Related declare `maxWidth: null`, so the active adjacent
@@ -27,8 +32,9 @@ pair can use the complete visible stage. Design Core owns the paired allocator,
 shared divider, inverse resize, collapse-time stretching, and per-pair split
 restoration; Tasks does not calculate or persist widths itself. Navigating
 deeper changes the active pair from Tasks/Planner to Planner/Detail and then
-Detail/Related without discarding an earlier split. Compact/mobile mode keeps
-one full-width active column and exposes no shared divider.
+through each adjacent pair in the dynamic detail stack without discarding an
+earlier split. Compact/mobile mode keeps one full-width active column and
+exposes no shared divider.
 
 Collapsed columns are rails rather than pair members. Their widths and the
 spacing around them remain deducted while Design Core pairs the next expanded
@@ -106,3 +112,8 @@ behavior.
 Desktop and phone-width stories use the same pinned clock as the repository
 snapshot. Their final state returns to Today and collapses the Lapis left
 sidebar so the current Tasks surface is the visual focus.
+
+The focused Deep Navigation Flow keeps the full
+List → Task → List → Task → Task descendant chain mounted as five distinct
+detail columns and checks the deepest pair while the earlier context remains
+available through native horizontal scrolling.

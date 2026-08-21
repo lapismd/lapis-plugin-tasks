@@ -12,8 +12,8 @@ See LN-TASK-010, LN-TASK-012, and LN-TASK-018.
 
 The planner has four responsibilities:
 
-1. Compose List navigation, the active planning surface, and optional detail
-   columns with Design Core Column Canvas.
+1. Compose List navigation, the active planning surface, and a branch-aware
+   stack of Task/List detail columns with Design Core Column Canvas.
 2. Derive named views and selected-day sections from projected task summaries.
 3. Route user actions back to the authoritative Markdown files.
 4. Preserve the richer Markdown presentation when a Task or List document is
@@ -31,6 +31,13 @@ stretching, collapsed-rail exclusion and width deduction, per-pair split
 restoration, sticky-context reservation, continuous manual scrolling, and the
 unchanged compact behavior.
 
+Each Task or nested List opened from the planner or an existing detail appends
+one distinct runtime column beside its owning surface. The in-memory detail
+stack retains every ancestor and scopes selection plus editor state to the
+column that owns it. Selecting a different child from an ancestor replaces
+only that ancestor's descendant branch; closing a column removes it and every
+descendant while leaving earlier context mounted.
+
 ## Planner state model
 
 The planner combines disposable query state with short-lived presentation
@@ -42,7 +49,7 @@ state:
 | Task/List membership and order | Structural Markdown links | Persisted at exact list-item ranges |
 | Task summaries and relationships | AppDatabase projection | Disposable and rebuildable |
 | Selected bucket, List, Task, or date | Planner controller | In memory |
-| Section disclosure and open detail columns | Planner presentation | In memory |
+| Section disclosure and ordered detail-column branch | Planner presentation | In memory |
 | Day-part boundaries | Versioned Tasks plugin settings | Persisted as plugin-owned settings |
 | Hide completed tasks | Today presentation | In memory |
 | Hide overdue tasks | Versioned Tasks plugin settings | Persisted as plugin-owned settings |
@@ -90,6 +97,7 @@ flowchart LR
   navigation["List navigation and named views"] --> canvas["TasksPlannerCanvas"]
   canvas --> body["Planner or Markdown file surface"]
   body --> detail["Task detail or linked List column"]
+  detail --> descendant["Next Task or linked List column"]
   repository["TaskRepository"] --> projection["TaskSummary projection"]
   projection --> body
   body --> repository
