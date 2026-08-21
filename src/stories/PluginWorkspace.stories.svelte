@@ -1744,11 +1744,12 @@
       const file = app.vault.getFileByPath(path)!;
       expect(await app.vault.cachedRead(file)).toContain(`](${target})`);
     }
-    expect(
-      await app.vault.cachedRead(
-        app.vault.getFileByPath("upcoming/verify-status-page.md")!,
-      ),
-    ).toContain("- [ ] Confirm every region is healthy");
+    const finalTaskFile = app.vault.getFileByPath(
+      "upcoming/verify-status-page.md",
+    )!;
+    expect(await app.vault.cachedRead(finalTaskFile)).toContain(
+      "- [ ] Confirm every region is healthy",
+    );
     await fireEvent.click(
       canvas.getByRole("button", {
         name: "Open list Release Train to the right",
@@ -1779,14 +1780,47 @@
         exact: true,
       }, { timeout: 5_000 }),
     );
-    expect(
-      await canvas.findByText(
-        "Confirm every region is healthy",
-        {},
-        { timeout: 5_000 },
-      ),
-    ).toBeVisible();
+    const confirmChecklistLabel = await canvas.findByText(
+      "Confirm every region is healthy",
+      {},
+      { timeout: 5_000 },
+    );
+    expect(confirmChecklistLabel).toBeVisible();
     expect(canvas.getByText("Publish the final release note")).toBeVisible();
+    const finalTaskDetail = confirmChecklistLabel.closest<HTMLElement>(
+      "[data-task-sidebar-detail]",
+    )!;
+    const confirmChecklistItem = confirmChecklistLabel.closest("li")!;
+    const confirmCheckbox = within(confirmChecklistItem).getByRole("checkbox", {
+      name: "Toggle task",
+    });
+    expect(finalTaskDetail).toBeVisible();
+    expect(confirmCheckbox).toBeEnabled();
+    await userEvent.click(confirmCheckbox);
+    await waitFor(
+      async () => {
+        expect(await app.vault.cachedRead(finalTaskFile)).toContain(
+          "- [x] Confirm every region is healthy",
+        );
+      },
+      { timeout: 5_000 },
+    );
+    const refreshedConfirmLabel = await within(finalTaskDetail).findByText(
+      "Confirm every region is healthy",
+    );
+    const refreshedConfirmCheckbox = within(
+      refreshedConfirmLabel.closest("li")!,
+    ).getByRole("checkbox", { name: "Toggle task" });
+    expect(refreshedConfirmCheckbox).toBeChecked();
+    await userEvent.click(refreshedConfirmCheckbox);
+    await waitFor(
+      async () => {
+        expect(await app.vault.cachedRead(finalTaskFile)).toContain(
+          "- [ ] Confirm every region is healthy",
+        );
+      },
+      { timeout: 5_000 },
+    );
     await collapseLapisLeftSidebar(canvas);
   }}
 />

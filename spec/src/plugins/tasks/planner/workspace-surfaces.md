@@ -5,7 +5,7 @@ active planner or document, and contextual details in one horizontally
 composable surface. This chapter describes that composition and the ownership
 rules for its Markdown editors.
 
-See LN-TASK-012, LN-TASK-022, LN-TASK-035, and LN-TASK-037.
+See LN-TASK-012, LN-TASK-022, LN-TASK-035, LN-TASK-037, and LN-TASK-047.
 
 ## Column composition
 
@@ -63,6 +63,14 @@ CodeMirror transactions and use the editor's serialized save. Read-only
 structural edits reread the document and use guarded repository ranges. Linked
 Task changes always update the child Task through `TaskRepository`, followed by
 projection refresh.
+
+Lightweight checklist items inside the complete Task or List file surface stay
+owned by the host Markdown provider. In writable preview, the checkbox supplies
+an exact source range, the provider applies it to the current buffer, and the
+complete document passes through the same serialized writer as live-preview
+editing. This path preserves surrounding Markdown and never invokes Tasks'
+ordinal checklist mutation; that guarded repository operation is reserved for
+projected checklist controls such as the task-row footer.
 
 The Markdown file surface is keyed by its container and file path. Refreshing a
 child title, schedule, status, or checklist therefore updates rows in place
