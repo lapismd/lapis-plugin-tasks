@@ -41,7 +41,10 @@ descendant while leaving earlier context mounted.
 A directly mounted Task detail owns the single visible border, radius, and
 surface around its column. Its containing Column Canvas lane remains
 transparent and borderless for every runtime detail ID. Linked-List documents
-instead retain the standard bordered and rounded Column Canvas treatment.
+instead retain the standard bordered and rounded Column Canvas treatment. The
+title of the selected List column and every linked-List detail column begins
+with the same List glyph used by structural nested-List rows, while Task detail
+chrome remains task-specific.
 
 ## Planner state model
 

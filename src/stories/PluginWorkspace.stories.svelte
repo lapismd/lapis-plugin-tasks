@@ -1804,6 +1804,11 @@
         exact: true,
       }),
     ).toBeVisible();
+    expect(
+      canvasElement.querySelector(
+        '[data-column-id="planner"] [data-task-list-column-icon]',
+      ),
+    ).toBeVisible();
     const expectedLinks = [
       ["lists/release-flow.md", "./release-train.md"],
       ["lists/release-train.md", "../upcoming/coordinate-launch.md"],
@@ -1834,6 +1839,9 @@
       expect(detailColumns).toHaveLength(1);
       expect(detailColumns[0]).toHaveAttribute("data-column-id", "detail");
       expect(detailColumns[0]).toHaveTextContent("Release Train");
+      expect(
+        detailColumns[0].querySelector("[data-task-list-column-icon]"),
+      ).toBeVisible();
     });
     await fireEvent.click(
       await canvas.findByRole("button", {
@@ -1877,6 +1885,9 @@
       expect(detailColumns[1]).toHaveTextContent("Coordinate the launch");
       expect(detailColumns[2]).toHaveAttribute("data-column-id", "detail-3");
       expect(detailColumns[2]).toHaveTextContent("Launch Operations");
+      expect(
+        detailColumns[2].querySelector("[data-task-list-column-icon]"),
+      ).toBeVisible();
     });
     await fireEvent.click(
       await canvas.findByRole("button", {

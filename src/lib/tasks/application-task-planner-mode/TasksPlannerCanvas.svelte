@@ -5,6 +5,7 @@
   import CalendarDaysIcon from "@lucide/svelte/icons/calendar-days";
   import CircleAlertIcon from "@lucide/svelte/icons/circle-alert";
   import CircleEllipsisIcon from "@lucide/svelte/icons/circle-ellipsis";
+  import FolderKanbanIcon from "@lucide/svelte/icons/folder-kanban";
   import InboxIcon from "@lucide/svelte/icons/inbox";
   import ListTodoIcon from "@lucide/svelte/icons/list-todo";
   import PencilIcon from "@lucide/svelte/icons/pencil";
@@ -815,6 +816,11 @@
               <span class="task-column-canvas-story__planner-title">
                 {#if activePlannerBucket}
                   <activePlannerBucket.icon aria-hidden="true" />
+                {:else if taskArea}
+                  <FolderKanbanIcon
+                    aria-hidden="true"
+                    data-task-list-column-icon
+                  />
                 {/if}
                 <span>{activePlannerLabel}</span>
               </span>
@@ -929,7 +935,15 @@
                 data-ui-component="column-canvas"
                 data-ui-part="column-header-main"
               >
-                <ColumnCanvas.Title>{detailTitle}</ColumnCanvas.Title>
+                <ColumnCanvas.Title>
+                  <span class="task-column-canvas-story__planner-title">
+                    <FolderKanbanIcon
+                      aria-hidden="true"
+                      data-task-list-column-icon
+                    />
+                    <span>{detailTitle}</span>
+                  </span>
+                </ColumnCanvas.Title>
               </div>
               <ColumnCanvas.HeaderActions>
                 <button
