@@ -154,15 +154,44 @@
     const compactNaturalRule = within(recurrenceMenu).getByRole("combobox", {
       name: "Describe recurrence",
     });
+    const compactNaturalCommand = compactNaturalRule.closest(
+      ".task-repeat-picker__natural-rule",
+    ) as HTMLElement | null;
+    const compactNaturalInputGroup = compactNaturalCommand?.querySelector(
+      '[data-ui-part="input-group"]',
+    ) as HTMLElement | null;
+    expect(compactNaturalCommand).not.toBeNull();
+    expect(compactNaturalInputGroup).not.toBeNull();
+    if (!compactNaturalCommand || !compactNaturalInputGroup) {
+      throw new Error("Natural recurrence command did not render its expected input shell.");
+    }
+    expect(getComputedStyle(compactNaturalCommand).overflow).toBe("hidden");
+    expect(
+      Number.parseFloat(getComputedStyle(compactNaturalCommand).borderTopLeftRadius),
+    ).toBeGreaterThan(0);
+    expect(getComputedStyle(compactNaturalInputGroup).borderTopLeftRadius).toBe("0px");
     await userEvent.type(compactNaturalRule, "weekday");
     const naturalMatches = within(recurrenceMenu).getByRole("listbox", {
       name: "Natural-language recurrence matches",
     });
-    await userEvent.click(
-      within(naturalMatches).getByRole("option", {
-        name: /Every weekday/,
-      }),
+    const naturalWeekdayOption = within(naturalMatches).getByRole("option", {
+      name: /Every weekday/,
+    });
+    const naturalLabel = naturalWeekdayOption.querySelector(
+      ".task-repeat-picker__natural-suggestion-label",
+    ) as HTMLElement | null;
+    const naturalShortcut = naturalWeekdayOption.querySelector(
+      '[data-ui-part="command-shortcut"]',
+    ) as HTMLElement | null;
+    expect(naturalLabel).not.toBeNull();
+    expect(naturalShortcut).not.toBeNull();
+    if (!naturalLabel || !naturalShortcut) {
+      throw new Error("Natural recurrence suggestion did not render label and shortcut rows.");
+    }
+    expect(naturalShortcut.getBoundingClientRect().top).toBeGreaterThanOrEqual(
+      naturalLabel.getBoundingClientRect().bottom - 1,
     );
+    await userEvent.click(naturalWeekdayOption);
     await waitFor(() =>
       expect(state().repeat).toMatchObject({
         rrule: "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR",

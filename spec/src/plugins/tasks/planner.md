@@ -127,8 +127,12 @@ shortcuts. Its natural-language command remains bounded to the fixed-width
 popover, wraps long suggestion text, gives the input only a neutral grey
 search-style focus ring without changing the border, and uses the same neutral
 grey suggestion hover and selected states as the preset menu items rather than
-the recurrence accent. Suggestions use a two-row label/shortcut layout so long
-RRULE values wrap without colliding with the label. Only the preset list scrolls;
+the recurrence accent. Suggestions use a two-row label/shortcut layout with an
+explicit label element and an independent shortcut row so inherited Command
+shortcut or check-icon styles cannot place RRULE values over the label. The
+natural-language command clips its children to the outer input radius and keeps
+the inner input group square so inherited input backgrounds cannot leak through
+the rounded corners. Only the preset list scrolls;
 `Repeat every…` and `Custom recurrence…` stay pinned in the popover footer. Its
 no-apply `Repeat every…` disclosure uses an unlabeled transparent control row:
 a number input and Forms Inline Option Picker frequency control share one row.

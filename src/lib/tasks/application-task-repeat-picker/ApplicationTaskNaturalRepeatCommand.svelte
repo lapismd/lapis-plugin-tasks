@@ -52,7 +52,9 @@
               onSelect={() => void onSelect(suggestion)}
             >
               <Repeat2Icon aria-hidden="true" />
-              <span>{suggestion.label}</span>
+              <span class="task-repeat-picker__natural-suggestion-label">
+                {suggestion.label}
+              </span>
               <Command.Shortcut>{suggestion.rrule}</Command.Shortcut>
             </Command.Item>
           {/each}

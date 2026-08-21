@@ -579,15 +579,25 @@
 }
 
 .task-repeat-picker__natural-rule[data-ui-component="command"] {
+  --task-repeat-picker-natural-radius: calc(var(--ui-form-radius, var(--radius)) * 0.75);
   width: 100%;
   max-width: 100%;
   min-width: 0;
   height: auto;
-  overflow: visible;
+  overflow: hidden;
   border: 1px solid var(--ui-form-border, var(--border));
-  border-radius: calc(var(--ui-form-radius, var(--radius)) * 0.75) !important;
+  border-radius: var(--task-repeat-picker-natural-radius) !important;
   background: var(--ui-form-background, var(--background));
   padding: 0;
+}
+
+.task-repeat-picker__natural-rule[data-ui-component="command"]:focus-within {
+  box-shadow: 0 0 0 3px
+    color-mix(
+      in srgb,
+      var(--task-repeat-picker-menu-ring, var(--ui-form-border, var(--border))) 42%,
+      transparent
+    ) !important;
 }
 
 .task-repeat-picker__natural-rule
@@ -595,30 +605,22 @@
   width: 100%;
   max-width: 100%;
   min-width: 0;
+  border-radius: inherit;
+  background: inherit;
   padding: 0;
 }
 
 .task-repeat-picker__natural-rule
-  [data-ui-part="command-input-wrapper"]
-  > [data-ui-part="input-group"] {
+  [data-ui-component="command"][data-ui-part="command-input-wrapper"]
+  > [data-ui-component="input-group"][data-ui-part="input-group"] {
   width: 100%;
   max-width: 100%;
   min-width: 0;
   border: 0;
-  background: var(--ui-form-background, var(--background));
-  background-color: var(--ui-form-background, var(--background));
-  transition: box-shadow 120ms ease;
-}
-
-.task-repeat-picker__natural-rule
-  [data-ui-part="command-input-wrapper"]
-  > [data-ui-part="input-group"]:focus-within {
-  box-shadow: 0 0 0 3px
-    color-mix(
-      in srgb,
-      var(--task-repeat-picker-menu-ring, var(--ui-form-border, var(--border))) 42%,
-      transparent
-    ) !important;
+  border-radius: 0 !important;
+  background: var(--ui-form-background, var(--background)) !important;
+  background-color: var(--ui-form-background, var(--background)) !important;
+  box-shadow: none !important;
 }
 
 .task-repeat-picker__natural-rule
@@ -646,7 +648,7 @@
 }
 
 .task-repeat-picker__natural-rule [data-ui-part="command-item"] {
-  display: grid;
+  display: grid !important;
   width: 100%;
   min-width: 0;
   max-width: 100%;
@@ -686,7 +688,7 @@
   display: none !important;
 }
 
-.task-repeat-picker__natural-rule [data-ui-part="command-item"] > span {
+.task-repeat-picker__natural-suggestion-label {
   grid-area: label;
   display: block;
   width: 100%;
@@ -705,8 +707,8 @@
 }
 
 .task-repeat-picker__natural-rule [data-ui-part="command-shortcut"] {
-  grid-area: shortcut;
-  display: block;
+  grid-area: shortcut !important;
+  display: block !important;
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -738,6 +740,16 @@
   [data-ui-component="chip-autocomplete"]
   .chip-autocomplete-box {
   background: var(--ui-form-background, var(--background));
+}
+
+@layer utilities {
+  .task-repeat-picker__natural-rule
+    [data-ui-component="command"][data-ui-part="command-input-wrapper"]
+    > [data-ui-component="input-group"][data-ui-part="input-group"] {
+    border-radius: 0 !important;
+    background-color: var(--ui-form-background, var(--background)) !important;
+    box-shadow: none !important;
+  }
 }
 
 .task-repeat-picker__sheet-actions {
