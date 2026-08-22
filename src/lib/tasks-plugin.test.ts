@@ -10,6 +10,10 @@ const notesRoot = resolve(repoRoot, "../lapis-notes");
 describe("TasksPlugin", () => {
   it("registers the planner view from onload and keeps hosts from registering it", () => {
     const source = readFileSync(resolve(sourceRoot, "tasks-plugin.ts"), "utf8");
+    const settingsTab = readFileSync(
+      resolve(sourceRoot, "tasks-settings-tab.ts"),
+      "utf8",
+    );
     const index = readFileSync(resolve(sourceRoot, "index.ts"), "utf8");
     const view = readFileSync(resolve(sourceRoot, "tasks-view.ts"), "utf8");
     const manifest = readFileSync(resolve(repoRoot, "manifest.json"), "utf8");
@@ -38,6 +42,10 @@ describe("TasksPlugin", () => {
     expect(source).toContain("await this.loadData()");
     expect(source).toContain("this.saveData(snapshot)");
     expect(source).toContain("addSettingTab");
+    expect(settingsTab).toContain('.setName("Navigation column")');
+    expect(settingsTab).toContain('.addOption("expanded", "Expanded")');
+    expect(settingsTab).toContain('.addOption("collapsed", "Collapsed")');
+    expect(settingsTab).toContain('.addOption("hidden", "Hidden")');
     expect(source).toContain("registerTasksWorkspaceSettings(this)");
     expect(source).toContain("refreshEffectiveOccurrences");
     expect(source).toContain('"visibilitychange"');
@@ -61,7 +69,9 @@ describe("TasksPlugin", () => {
     expect(Object.keys(runtimeDeps).join("\n")).not.toContain("@stevejuma/ui");
     expect(Object.keys(runtimeDeps).join("\n")).not.toContain("@lapis-server/");
     expect(Object.keys(runtimeDeps).join("\n")).not.toContain("@lapismd/mira");
-    expect(Object.keys(runtimeDeps).join("\n")).not.toContain("@lapis-notes/markdown");
+    expect(Object.keys(runtimeDeps).join("\n")).not.toContain(
+      "@lapis-notes/markdown",
+    );
     expect(pkg).not.toMatch(/"(?:workspace|link|file):/u);
     expect(desktop).toContain("TasksPlugin");
     expect(web).toContain("TasksPlugin");

@@ -8,9 +8,16 @@
   import FolderKanbanIcon from "@lucide/svelte/icons/folder-kanban";
   import InboxIcon from "@lucide/svelte/icons/inbox";
   import ListTodoIcon from "@lucide/svelte/icons/list-todo";
+  import PanelLeftIcon from "@lucide/svelte/icons/panel-left";
+  import PanelLeftOpenIcon from "@lucide/svelte/icons/panel-left-open";
   import PencilIcon from "@lucide/svelte/icons/pencil";
   import * as ColumnCanvas from "@lapismd/design-core/shadcn/column-canvas";
+  import { Button } from "@lapismd/design-core/shadcn/button";
+  import * as Popover from "@lapismd/design-core/shadcn/popover";
+  import * as Tooltip from "@lapismd/design-core/shadcn/tooltip";
   import type { App } from "@lapis-notes/api";
+  import { mergeProps } from "bits-ui";
+  import { onDestroy, untrack } from "svelte";
   import {
     findListNavNode,
     buildTaskPlannerDaySnapshot,
@@ -135,7 +142,9 @@
     onUnpinList?: (path: string) => void;
     onArchiveList?: (path: string) => void;
     onDeleteList?: (path: string) => void;
-    onUpdateSettings?: (patch: TasksPluginSettingsPatch) => void | Promise<void>;
+    onUpdateSettings?: (
+      patch: TasksPluginSettingsPatch,
+    ) => void | Promise<void>;
     app?: App;
     repository?: TaskRepository;
     onRefreshWorkspace?: () => void | Promise<void>;
@@ -173,6 +182,10 @@
     plannerBuckets.map((bucket) => bucket.id),
   );
 
+  const initialNavigationColumnState = untrack(
+    () => settings.planner.navigationColumnState,
+  );
+
   const canvas = ColumnCanvas.createColumnCanvasController({
     columns: {
       tasks: {
@@ -181,6 +194,9 @@
         maxWidth: 280,
         pathLevel: 0,
         collapsible: true,
+        closeable: true,
+        collapsed: initialNavigationColumnState === "collapsed",
+        closed: initialNavigationColumnState === "hidden",
         resizable: true,
       },
       planner: {
@@ -210,6 +226,25 @@
       },
     },
     initialPath: ["today"],
+    saveDebounceMs: 0,
+    onLayoutChange: (layout, event) => {
+      if (
+        event.columnId !== "tasks" ||
+        (event.source !== "collapse" && event.source !== "close")
+      ) {
+        return;
+      }
+      const column = layout.columns.tasks;
+      const navigationColumnState = column?.closed
+        ? "hidden"
+        : column?.collapsed
+          ? "collapsed"
+          : "expanded";
+      if (navigationColumnState === settings.planner.navigationColumnState) {
+        return;
+      }
+      void onUpdateSettings({ planner: { navigationColumnState } });
+    },
   });
 
   let taskView = $state<TaskBucket>("today");
@@ -236,19 +271,41 @@
   let markAllIncompletePending = $state(false);
   let previousTaskArea: string | null | undefined;
   let relatedApplicationId = $state<string | null>(null);
+  let listsPopoverOpen = $state(false);
 
   const activePlannerLabel = $derived(
     taskArea
       ? (findListNavNode(listTree, taskArea)?.title ??
-        snapshot.areas.find((area) => area.id === taskArea)?.title ??
-        taskArea)
+          snapshot.areas.find((area) => area.id === taskArea)?.title ??
+          taskArea)
       : (plannerBuckets.find((bucket) => bucket.id === taskView)?.label ??
-        "Today"),
+          "Today"),
   );
   const selectedListNode = $derived(
     taskArea ? findListNavNode(listTree, taskArea) : null,
   );
   const actualToday = $derived(todayDateOnly(now ?? clock()));
+  const listCount = $derived(snapshot.areas.length);
+  const tasksNavigationExpanded = $derived(
+    canvas.getState("tasks") === "expanded",
+  );
+
+  $effect(() => {
+    const requestedState = settings.planner.navigationColumnState;
+    untrack(() => {
+      const currentState = canvas.getState("tasks");
+      if (requestedState === currentState) return;
+      if (requestedState === "hidden") {
+        canvas.close("tasks");
+        return;
+      }
+      if (currentState === "closed") canvas.open("tasks");
+      if (requestedState === "collapsed") canvas.collapse("tasks");
+      else canvas.expand("tasks");
+    });
+  });
+
+  onDestroy(() => void canvas.dispose());
 
   $effect(() => {
     const nextTaskArea = taskArea;
@@ -276,14 +333,18 @@
     buildTaskPlannerDaySnapshot(tasks, actualToday, settings, actualToday),
   );
   const plannerActiveTaskId = $derived(
-    detailColumns[0]?.kind === "task" ? (detailColumns[0].taskId ?? null) : null,
+    detailColumns[0]?.kind === "task"
+      ? (detailColumns[0].taskId ?? null)
+      : null,
   );
   const relatedApplication = $derived.by(() => {
     if (!showRelated) return null;
     if (!relatedApplicationId) return null;
-    return applications.find(
-      (application) => application.id === relatedApplicationId,
-    ) ?? null;
+    return (
+      applications.find(
+        (application) => application.id === relatedApplicationId,
+      ) ?? null
+    );
   });
 
   function isBucket(id: string): id is TaskBucket {
@@ -291,6 +352,8 @@
   }
 
   function showNav(id: string) {
+    listsPopoverOpen = false;
+    canvas.dismissPreview("tasks");
     if (isBucket(id)) {
       taskView = id;
       taskArea = null;
@@ -344,7 +407,11 @@
   }
 
   async function exitDetailEditorsFrom(startIndex: number): Promise<boolean> {
-    for (let index = detailColumns.length - 1; index >= startIndex; index -= 1) {
+    for (
+      let index = detailColumns.length - 1;
+      index >= startIndex;
+      index -= 1
+    ) {
       const entry = detailColumns[index];
       if (entry.editing && entry.surface && !(await entry.surface.exit())) {
         return false;
@@ -514,7 +581,9 @@
     onSaveTask({
       ...task,
       status: done ? "completed" : "open",
-      completedAt: done ? (task.completedAt ?? (now ?? clock()).toISOString()) : undefined,
+      completedAt: done
+        ? (task.completedAt ?? (now ?? clock()).toISOString())
+        : undefined,
       updatedAt: (now ?? clock()).toISOString(),
     });
   }
@@ -552,12 +621,12 @@
     target: { run: StructuralTaskRun; index: number },
   ) {
     if (!repository) return;
-    const sourceRun = (await repository.getStructuralTaskRuns(
-      source.documentPath,
-    )).find((run) => run.id === source.runId);
-    const targetRun = (await repository.getStructuralTaskRuns(
-      target.run.documentPath,
-    )).find((run) => run.id === target.run.id);
+    const sourceRun = (
+      await repository.getStructuralTaskRuns(source.documentPath)
+    ).find((run) => run.id === source.runId);
+    const targetRun = (
+      await repository.getStructuralTaskRuns(target.run.documentPath)
+    ).find((run) => run.id === target.run.id);
     if (!sourceRun || !targetRun) {
       throw new Error("The task run changed before the move could be saved.");
     }
@@ -644,10 +713,8 @@
       hideMatchingDocumentTitle: true,
       onActiveTaskChange: (taskId) =>
         handleActiveTaskChange(sourceIndex(), taskId),
-      onActiveListChange: (path) =>
-        handleActiveListChange(sourceIndex(), path),
-      onOpenList: (path, title) =>
-        handleOpenList(sourceIndex(), path, title),
+      onActiveListChange: (path) => handleActiveListChange(sourceIndex(), path),
+      onOpenList: (path, title) => handleOpenList(sourceIndex(), path, title),
       onSaveTask: (task) => onSaveTask(task),
       onDeleteTask: async (task) => {
         onDeleteTask(task);
@@ -729,6 +796,24 @@
       0,
     );
   }
+
+  function bucketTooltip(bucket: (typeof plannerBuckets)[number]) {
+    const count = bucketCount(bucket.id);
+    return `${bucket.label} — ${count} ${count === 1 ? "task" : "tasks"}`;
+  }
+
+  function listsTooltip() {
+    return `Lists — ${listCount} ${listCount === 1 ? "list" : "lists"}`;
+  }
+
+  function keepListsPopoverForOwnedOverlay(event: PointerEvent) {
+    if (
+      event.target instanceof Element &&
+      event.target.closest('[data-ui-component="context-menu"]')
+    ) {
+      event.preventDefault();
+    }
+  }
 </script>
 
 <div
@@ -736,25 +821,165 @@
   class:task-column-canvas-story--workspace={variant === "workspace"}
   data-testid="tasks-planner"
 >
-  <div
-    class="task-column-canvas-story__canvas"
-    data-task-planner-column-canvas
-  >
+  <div class="task-column-canvas-story__canvas" data-task-planner-column-canvas>
     <ColumnCanvas.Root controller={canvas} aria-label="Task planner">
       <ColumnCanvas.Column
         id="tasks"
         title="Tasks"
         count={tasks.length}
+        closeable
+        revealOnEdgeHover
+        edgeRevealLabel="Preview Tasks navigation"
         sticky
       >
         {#snippet stickyRail()}
           <ListTodoIcon aria-hidden="true" />
         {/snippet}
+        {#snippet collapsedRail({ expand })}
+          <Tooltip.Provider delayDuration={0}>
+            <nav
+              class="task-column-canvas-story__collapsed-nav"
+              aria-label="Collapsed planner menu"
+            >
+              <Tooltip.Root>
+                <Tooltip.Trigger>
+                  {#snippet child({ props })}
+                    <Button
+                      {...props}
+                      variant="ghost"
+                      size="icon-sm"
+                      class="task-column-canvas-story__collapsed-button"
+                      aria-label="Expand Tasks column"
+                      onclick={expand}
+                    >
+                      <PanelLeftOpenIcon aria-hidden="true" />
+                    </Button>
+                  {/snippet}
+                </Tooltip.Trigger>
+                <Tooltip.Content
+                  side="right"
+                  class="task-column-canvas-story__collapsed-tooltip"
+                >
+                  Expand Tasks
+                </Tooltip.Content>
+              </Tooltip.Root>
+
+              <span
+                class="task-column-canvas-story__collapsed-separator"
+                aria-hidden="true"
+              ></span>
+
+              {#each plannerBuckets as bucket (bucket.id)}
+                {@const count = bucketCount(bucket.id)}
+                <Tooltip.Root>
+                  <Tooltip.Trigger>
+                    {#snippet child({ props })}
+                      <Button
+                        {...props}
+                        variant="ghost"
+                        size="icon-sm"
+                        class="task-column-canvas-story__collapsed-button"
+                        data-selected={!taskArea && taskView === bucket.id}
+                        aria-label={bucketTooltip(bucket)}
+                        aria-pressed={!taskArea && taskView === bucket.id}
+                        onclick={() => showNav(bucket.id)}
+                      >
+                        <bucket.icon aria-hidden="true" />
+                      </Button>
+                    {/snippet}
+                  </Tooltip.Trigger>
+                  <Tooltip.Content
+                    side="right"
+                    class="task-column-canvas-story__collapsed-tooltip"
+                  >
+                    <span>{bucket.label}</span>
+                    <span
+                      class="task-column-canvas-story__collapsed-tooltip-count"
+                    >
+                      {count}
+                    </span>
+                  </Tooltip.Content>
+                </Tooltip.Root>
+              {/each}
+
+              <Popover.Root bind:open={listsPopoverOpen}>
+                <Tooltip.Root>
+                  <Popover.Trigger>
+                    {#snippet child({ props: popoverProps })}
+                      <Tooltip.Trigger>
+                        {#snippet child({ props: tooltipProps })}
+                          {@const triggerProps = mergeProps(
+                            popoverProps,
+                            tooltipProps,
+                          )}
+                          <Button
+                            {...triggerProps}
+                            variant="ghost"
+                            size="icon-sm"
+                            class="task-column-canvas-story__collapsed-button"
+                            data-selected={taskArea !== null}
+                            aria-label={listsTooltip()}
+                            aria-pressed={taskArea !== null}
+                          >
+                            <FolderKanbanIcon aria-hidden="true" />
+                          </Button>
+                        {/snippet}
+                      </Tooltip.Trigger>
+                    {/snippet}
+                  </Popover.Trigger>
+                  <Tooltip.Content
+                    side="right"
+                    class="task-column-canvas-story__collapsed-tooltip"
+                  >
+                    <span>Lists</span>
+                    <span
+                      class="task-column-canvas-story__collapsed-tooltip-count"
+                    >
+                      {listCount}
+                    </span>
+                  </Tooltip.Content>
+                </Tooltip.Root>
+                <Popover.Content
+                  side="right"
+                  align="start"
+                  sideOffset={8}
+                  collisionPadding={8}
+                  onInteractOutside={keepListsPopoverForOwnedOverlay}
+                  class="task-column-canvas-story__lists-popover"
+                  style="--ui-popover-width: min(20rem, calc(100vw - 2rem)); --ui-popover-padding: 0"
+                >
+                  <div class="task-column-canvas-story__lists-popover-scroll">
+                    <TaskListNavTree
+                      tree={listTree}
+                      selectedId={taskArea}
+                      isSelected={(id) => canvas.isSelected(0, id)}
+                      taskDropEnabled={false}
+                      activeDropTargetId={null}
+                      onSelect={showNav}
+                      onExpand={onExpandList}
+                      onDrop={onDropList}
+                      {onRenameList}
+                      {onRenameSection}
+                      {onOpenNote}
+                      {onCreateList}
+                      {onUnpinList}
+                      {onArchiveList}
+                      {onDeleteList}
+                    />
+                  </div>
+                </Popover.Content>
+              </Popover.Root>
+            </nav>
+          </Tooltip.Provider>
+        {/snippet}
         <ColumnCanvas.Body>
           <nav
             class="task-column-canvas-story__nav"
             aria-label="Planner menu"
-            data-planner-menu-dragging={activeDropTargetId !== null || undefined}
+            data-planner-menu-dragging={tasksNavigationExpanded &&
+            activeDropTargetId !== null
+              ? true
+              : undefined}
           >
             <p class="task-column-canvas-story__section-label">Planner</p>
             {#each plannerBuckets as bucket (bucket.id)}
@@ -763,14 +988,22 @@
                 class="task-column-canvas-story__nav-drop"
                 class:task-column-canvas-story__nav-drop--active={activeDropTargetId ===
                   dropId}
-                data-planner-drop-id={dropId}
-                data-planner-drop-mode="valid"
-                data-planner-drop-active={activeDropTargetId === dropId ||
-                  undefined}
-                data-planner-drop-data={JSON.stringify({
-                  type: "planner-sidebar-bucket",
-                  bucket: bucket.id,
-                })}
+                data-planner-drop-id={tasksNavigationExpanded
+                  ? dropId
+                  : undefined}
+                data-planner-drop-mode={tasksNavigationExpanded
+                  ? "valid"
+                  : undefined}
+                data-planner-drop-active={tasksNavigationExpanded &&
+                activeDropTargetId === dropId
+                  ? true
+                  : undefined}
+                data-planner-drop-data={tasksNavigationExpanded
+                  ? JSON.stringify({
+                      type: "planner-sidebar-bucket",
+                      bucket: bucket.id,
+                    })
+                  : undefined}
               >
                 <ColumnCanvas.Item
                   aria-label={bucket.label}
@@ -790,10 +1023,13 @@
               tree={listTree}
               selectedId={taskArea}
               isSelected={(id) => canvas.isSelected(0, id)}
-              {activeDropTargetId}
+              taskDropEnabled={tasksNavigationExpanded}
+              activeDropTargetId={tasksNavigationExpanded
+                ? activeDropTargetId
+                : null}
               onSelect={showNav}
               onExpand={onExpandList}
-              onDrop={onDropList}
+              onDrop={tasksNavigationExpanded ? onDropList : undefined}
               {onRenameList}
               {onRenameSection}
               {onOpenNote}
@@ -808,6 +1044,16 @@
 
       <ColumnCanvas.Column id="planner" aria-label={activePlannerLabel}>
         <ColumnCanvas.Header>
+          <ColumnCanvas.Toggle
+            columnId="tasks"
+            columnTitle="Tasks"
+            previewOnHover
+            aria-label="Toggle Tasks navigation"
+          >
+            {#snippet icon(_state)}
+              <PanelLeftIcon aria-hidden="true" />
+            {/snippet}
+          </ColumnCanvas.Toggle>
           <div
             data-ui-component="column-canvas"
             data-ui-part="column-header-main"
@@ -885,32 +1131,32 @@
             />
           {:else}
             <ApplicationTaskPlannerMode
-            {tasks}
-            {now}
-            {clock}
-            {settings}
-            {hideCompletedTasks}
-            bind:selectedDate
-            {historyRows}
-            {applications}
-            view={taskView}
-            area={taskArea}
-            activeTaskId={plannerActiveTaskId}
-            detailsPresentation="external"
-            taskAreas={snapshot.areas}
-            {applicationSummaries}
-            onActiveTaskChange={(taskId) =>
-              void handleActiveTaskChange(-1, taskId)}
-            {onSaveTask}
-            {onCreateTask}
-            {onDeleteTask}
-            {onLoadChecklist}
-            {onToggleChecklistItem}
-            {checklistRefreshVersion}
-            {onSaveApplication}
-            onOpenApplication={(applicationId) =>
-              void handleOpenApplication(applicationId, -1)}
-            onDragTargetChange={(targetId) => (activeDropTargetId = targetId)}
+              {tasks}
+              {now}
+              {clock}
+              {settings}
+              {hideCompletedTasks}
+              bind:selectedDate
+              {historyRows}
+              {applications}
+              view={taskView}
+              area={taskArea}
+              activeTaskId={plannerActiveTaskId}
+              detailsPresentation="external"
+              taskAreas={snapshot.areas}
+              {applicationSummaries}
+              onActiveTaskChange={(taskId) =>
+                void handleActiveTaskChange(-1, taskId)}
+              {onSaveTask}
+              {onCreateTask}
+              {onDeleteTask}
+              {onLoadChecklist}
+              {onToggleChecklistItem}
+              {checklistRefreshVersion}
+              {onSaveApplication}
+              onOpenApplication={(applicationId) =>
+                void handleOpenApplication(applicationId, -1)}
+              onDragTargetChange={(targetId) => (activeDropTargetId = targetId)}
             />
           {/if}
         </div>

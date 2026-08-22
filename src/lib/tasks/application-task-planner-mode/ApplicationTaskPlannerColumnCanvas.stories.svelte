@@ -1,6 +1,12 @@
 <script module lang="ts">
   import { defineMeta } from "@storybook/addon-svelte-csf";
-  import { expect, fireEvent, userEvent, waitFor, within } from "storybook/test";
+  import {
+    expect,
+    fireEvent,
+    userEvent,
+    waitFor,
+    within,
+  } from "storybook/test";
   import { ApplicationTaskPlannerColumnCanvasExample } from "../../catalog.example-sources";
   import ApplicationTaskPlannerColumnCanvasStory from "./ApplicationTaskPlannerColumnCanvasStory.svelte";
   import { playTitleClickStartsInlineEdit } from "../planner-title-edit-selection.story-play";
@@ -47,12 +53,13 @@
     await waitFor(() =>
       expect(canvasRoot).toHaveAttribute("data-display-mode", "wide"),
     );
-    await waitFor(() =>
-      expect(
-        context.canvasElement.querySelector(
-          '[data-column-id="tasks"] [data-resize-mode="pair"]',
-        ),
-      ).not.toBeNull(),
+    await waitFor(
+      () =>
+        expect(
+          context.canvasElement.querySelector(
+            '[data-column-id="tasks"] [data-resize-mode="pair"]',
+          ),
+        ).not.toBeNull(),
       { timeout: 5_000 },
     );
     const tasksResizeHandle = canvas.getByRole("separator", {
@@ -94,9 +101,11 @@
         clientY: y,
       });
     }
-    expect(plannerColumn.getBoundingClientRect().right).toBeCloseTo(
-      canvasInnerRight,
-      1,
+    await waitFor(() =>
+      expect(plannerColumn.getBoundingClientRect().right).toBeCloseTo(
+        canvasInnerRight,
+        1,
+      ),
     );
     expect(tasksColumn.getBoundingClientRect().right).toBeCloseTo(
       plannerColumn.getBoundingClientRect().left,
@@ -200,7 +209,9 @@
     expect(
       canvas.getByRole("button", { name: "Collapse All lists section" }),
     ).toBeVisible();
-    expect(canvas.getByRole("button", { name: "All lists section" })).toBeVisible();
+    expect(
+      canvas.getByRole("button", { name: "All lists section" }),
+    ).toBeVisible();
     expect(canvas.getByRole("button", { name: "Applications" })).toBeVisible();
     expect(
       context.canvasElement.querySelector(
@@ -268,12 +279,12 @@
       canvas.queryByRole("heading", { name: "Logbook", level: 1 }),
     ).not.toBeInTheDocument();
     const todayNavigation = canvas.getByRole("button", { name: "Today" });
-    expect(todayNavigation.querySelector("small")).toHaveTextContent("8");
+    expect(todayNavigation.querySelector("small")).toHaveTextContent("7");
     await userEvent.click(todayNavigation);
     await waitFor(() =>
       expect(
         plannerColumn.querySelectorAll("[data-planner-sortable-row]"),
-      ).toHaveLength(8),
+      ).toHaveLength(7),
     );
 
     const alignedTitle = await canvas.findByRole("button", {
@@ -290,7 +301,8 @@
     const detailsRect = alignedDetails.getBoundingClientRect();
     expect(
       Math.abs(
-        titleRect.top + titleRect.height / 2 -
+        titleRect.top +
+          titleRect.height / 2 -
           (detailsRect.top + detailsRect.height / 2),
       ),
     ).toBeLessThan(1);
@@ -300,14 +312,15 @@
     });
     expect(overdueIndicator).toBeVisible();
     expect(overdueIndicator.nextElementSibling).toBe(alignedDetails);
-    expect(
-      getComputedStyle(overdueIndicator).backgroundColor,
-    ).not.toBe("rgba(0, 0, 0, 0)");
+    expect(getComputedStyle(overdueIndicator).backgroundColor).not.toBe(
+      "rgba(0, 0, 0, 0)",
+    );
     const overdueRect = overdueIndicator.getBoundingClientRect();
     expect(overdueRect.right).toBeLessThan(detailsRect.left);
     expect(
       Math.abs(
-        overdueRect.top + overdueRect.height / 2 -
+        overdueRect.top +
+          overdueRect.height / 2 -
           (detailsRect.top + detailsRect.height / 2),
       ),
     ).toBeLessThan(1);
@@ -350,7 +363,10 @@
       ).toBeLessThan(60);
     }
     expect(daySections[0]).toHaveAttribute("data-day-section-expanded", "true");
-    expect(daySections[4]).toHaveAttribute("data-day-section-expanded", "false");
+    expect(daySections[4]).toHaveAttribute(
+      "data-day-section-expanded",
+      "false",
+    );
     expect(
       context.canvasElement.querySelector(
         '[data-planner-sortable-list="today:done"]',
@@ -430,7 +446,9 @@
     await userEvent.keyboard("{Escape}");
     await waitForTodayActionsReady();
     await waitFor(() =>
-      expect(canvas.queryByText("Publish the daily status")).not.toBeInTheDocument(),
+      expect(
+        canvas.queryByText("Publish the daily status"),
+      ).not.toBeInTheDocument(),
     );
     await userEvent.click(todayActions);
     const hideCompleted = await documentCanvas.findByRole("menuitemcheckbox", {
@@ -471,7 +489,10 @@
       ":scope > header button",
     )!;
     await userEvent.click(morningDisclosure);
-    expect(daySections[1]).toHaveAttribute("data-day-section-expanded", "false");
+    expect(daySections[1]).toHaveAttribute(
+      "data-day-section-expanded",
+      "false",
+    );
     await userEvent.click(morningDisclosure);
 
     await userEvent.click(
@@ -480,16 +501,19 @@
     expect(
       await canvas.findByRole("heading", { name: "Thursday", level: 1 }),
     ).toBeVisible();
-    const selectedAgendaCalendar = context.canvasElement.querySelector<HTMLElement>(
-      ".tasks-planner__agenda-calendar",
-    )!;
+    const selectedAgendaCalendar =
+      context.canvasElement.querySelector<HTMLElement>(
+        ".tasks-planner__agenda-calendar",
+      )!;
     expect(
       await within(selectedAgendaCalendar).findByRole("heading", {
         name: "Thursday",
         level: 1,
       }),
     ).toBeVisible();
-    expect(within(selectedAgendaCalendar).getByText("August 2026")).toBeVisible();
+    expect(
+      within(selectedAgendaCalendar).getByText("August 2026"),
+    ).toBeVisible();
     const returnToToday = await canvas.findByRole("button", {
       name: "Return to today",
     });
@@ -507,9 +531,10 @@
     expect(
       canvas.getByRole("button", { name: "Wed 2026-08-19, today" }),
     ).toHaveAttribute("aria-pressed", "true");
-    const resetAgendaCalendar = context.canvasElement.querySelector<HTMLElement>(
-      ".tasks-planner__agenda-calendar",
-    )!;
+    const resetAgendaCalendar =
+      context.canvasElement.querySelector<HTMLElement>(
+        ".tasks-planner__agenda-calendar",
+      )!;
     expect(
       within(resetAgendaCalendar).getByRole("heading", {
         name: "Wednesday",
@@ -527,7 +552,9 @@
       within(afternoonSection).getByRole("textbox", { name: "New task" }),
       "Agenda interaction task{Enter}",
     );
-    expect(within(afternoonSection).getByText("Agenda interaction task")).toBeVisible();
+    expect(
+      within(afternoonSection).getByText("Agenda interaction task"),
+    ).toBeVisible();
 
     const checklistDisclosure = canvas.getByRole("button", {
       name: "Show checklist for Review interview notes",
@@ -560,9 +587,8 @@
     const checklistSwipeContent = checklistRow!.querySelector<HTMLElement>(
       ".application-planner-task-row__swipe-content",
     )!;
-    const checklistPreview = checklistRow!.querySelector<HTMLElement>(
-      ".task-preview-row",
-    )!;
+    const checklistPreview =
+      checklistRow!.querySelector<HTMLElement>(".task-preview-row")!;
     expect(getComputedStyle(checklistBody).borderBottomLeftRadius).toBe("0px");
     expect(getComputedStyle(checklistBody).borderBottomRightRadius).toBe("0px");
     expect(getComputedStyle(checklistSwipeContent).transition).toContain(
@@ -589,7 +615,8 @@
       ),
     );
     expect(getComputedStyle(checklistBody).backgroundColor).toBe(bodySurface);
-    const checklistTaskId = (checklistRow as HTMLElement).dataset.plannerTaskId!;
+    const checklistTaskId = (checklistRow as HTMLElement).dataset
+      .plannerTaskId!;
     (checklistRow as HTMLElement).focus();
     await userEvent.keyboard(" ");
     let selectedChecklistRow: HTMLElement | undefined;
@@ -622,8 +649,9 @@
       context.canvasElement.querySelectorAll<HTMLElement>(
         "[data-planner-task-id]",
       ),
-    ).find((row) => row.textContent?.includes("Write flashcards for system design"))
-      ?.dataset.plannerTaskId;
+    ).find((row) =>
+      row.textContent?.includes("Write flashcards for system design"),
+    )?.dataset.plannerTaskId;
     expect(followingTaskId).toBeTruthy();
     const followingTaskRow = Array.from(
       context.canvasElement.querySelectorAll<HTMLElement>(
@@ -652,17 +680,15 @@
         "application-planner-task-row--selected-last",
       );
     });
-    const rangeChecklistBody =
-      rangeChecklistRow!.querySelector<HTMLElement>(
-        ".application-planner-task-row__columns",
-      )!;
+    const rangeChecklistBody = rangeChecklistRow!.querySelector<HTMLElement>(
+      ".application-planner-task-row__columns",
+    )!;
     const rangeChecklistFooter = rangeChecklistRow!.querySelector<HTMLElement>(
       "[data-task-checklist-progress]",
     )!;
-    const rangeFollowingBody =
-      rangeFollowingRow!.querySelector<HTMLElement>(
-        ".application-planner-task-row__columns",
-      )!;
+    const rangeFollowingBody = rangeFollowingRow!.querySelector<HTMLElement>(
+      ".application-planner-task-row__columns",
+    )!;
     expect(getComputedStyle(rangeChecklistBody).borderBottomLeftRadius).toBe(
       "0px",
     );
@@ -698,9 +724,13 @@
     const applications = canvas.getByRole("button", { name: "Applications" });
     await userEvent.pointer({ keys: "[MouseRight]", target: applications });
     const menu = within(context.canvasElement.ownerDocument.body);
-    expect(await menu.findByRole("menuitem", { name: "Open note" })).toBeVisible();
+    expect(
+      await menu.findByRole("menuitem", { name: "Open note" }),
+    ).toBeVisible();
     expect(menu.getByRole("menuitem", { name: "Rename" })).toBeVisible();
-    expect(menu.getByRole("menuitem", { name: "New nested list" })).toBeVisible();
+    expect(
+      menu.getByRole("menuitem", { name: "New nested list" }),
+    ).toBeVisible();
     expect(menu.getByRole("menuitem", { name: "Archive" })).toBeVisible();
     expect(menu.getByRole("menuitem", { name: "Delete" })).toBeVisible();
     await userEvent.keyboard("{Escape}");
@@ -837,7 +867,8 @@
     expect(
       relatedColumn!.querySelector('[data-ui-part="resize-handle"]'),
     ).toBeNull();
-    const detailBeforeRelatedResize = detailColumn!.getBoundingClientRect().width;
+    const detailBeforeRelatedResize =
+      detailColumn!.getBoundingClientRect().width;
     const relatedBeforeResize = relatedColumn!.getBoundingClientRect().width;
     await dragPair(detailRelatedHandle!, -36);
     await waitFor(() => {
@@ -914,5 +945,269 @@
 >
   {#snippet template()}
     <ApplicationTaskPlannerColumnCanvasStory />
+  {/snippet}
+</Story>
+
+<Story
+  name="Navigation states"
+  tags={["visual-pending", "test"]}
+  parameters={{
+    a11y: {
+      test: "error",
+    },
+    docs: {
+      description: {
+        story:
+          "Persisted expanded, collapsed, and hidden Tasks navigation states, including the icon rail, Lists popover, and transient full-height previews.",
+      },
+    },
+  }}
+  play={async (context) => {
+    const canvas = within(context.canvasElement);
+    const tooltipCanvas = within(document.body);
+    const ownerDocument = context.canvasElement.ownerDocument;
+    function portalElement<T extends Element>(selector: string): T | null {
+      return (
+        ownerDocument.querySelector<T>(selector) ??
+        document.querySelector<T>(selector)
+      );
+    }
+    const canvasRoot = context.canvasElement.querySelector<HTMLElement>(
+      '[data-ui-component="column-canvas"][data-ui-part="root"]',
+    )!;
+    await waitFor(() =>
+      expect(canvasRoot).toHaveAttribute("data-display-mode", "wide"),
+    );
+
+    const navigationToggle = canvas.getByRole("button", {
+      name: "Toggle Tasks navigation",
+    });
+    await waitFor(() =>
+      expect(navigationToggle).toHaveAttribute("data-state", "collapsed"),
+    );
+
+    const bucketLabels = [
+      "Inbox — 1 task",
+      "Today — 7 tasks",
+      "Review — 1 task",
+      "Upcoming — 5 tasks",
+      "Anytime — 2 tasks",
+      "Someday — 1 task",
+      "Logbook — 3 tasks",
+    ];
+    for (const label of bucketLabels) {
+      expect(canvas.getByRole("button", { name: label })).toBeVisible();
+    }
+    await userEvent.hover(navigationToggle);
+    await waitFor(
+      () => expect(navigationToggle).toHaveAttribute("aria-expanded", "true"),
+      { timeout: 1_200, interval: 10 },
+    );
+    let preview = context.canvasElement.querySelector<HTMLElement>(
+      '[data-column-id="tasks"][data-ui-part="column-preview"]',
+    );
+    expect(preview).toBeVisible();
+    await userEvent.click(
+      within(preview!).getByRole("button", { name: "Today" }),
+    );
+    await waitFor(() =>
+      expect(
+        context.canvasElement.querySelector(
+          '[data-column-id="tasks"][data-ui-part="column-preview"]',
+        ),
+      ).toBeNull(),
+    );
+    expect(navigationToggle).toHaveAttribute("data-state", "collapsed");
+    await fireEvent.mouseLeave(navigationToggle);
+
+    const todayButton = canvas.getByRole("button", {
+      name: "Today — 7 tasks",
+    });
+    expect(todayButton).toHaveAttribute("aria-pressed", "true");
+    expect(
+      canvas.getByRole("button", { name: "Lists — 5 lists" }),
+    ).toHaveAttribute("aria-pressed", "false");
+
+    await userEvent.hover(todayButton);
+    await waitFor(() =>
+      expect(todayButton).toHaveAttribute("data-state", "instant-open"),
+    );
+    const todayCountChip = await tooltipCanvas.findByText("7");
+    expect(todayCountChip).toHaveClass(
+      "task-column-canvas-story__collapsed-tooltip-count",
+    );
+    expect(
+      within(
+        todayCountChip.closest('[data-ui-part="tooltip-content"]')!,
+      ).getByText("Today"),
+    ).toBeVisible();
+    await userEvent.unhover(todayButton);
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Lists — 5 lists" }),
+    );
+    let listsPopover: HTMLElement | null = null;
+    await waitFor(() => {
+      listsPopover = portalElement<HTMLElement>(
+        ".task-column-canvas-story__lists-popover",
+      );
+      expect(listsPopover).toBeVisible();
+    });
+    expect(within(listsPopover!).getByText("All lists")).toBeVisible();
+    expect(listsPopover!.querySelector("[data-planner-drop-id]")).toBeNull();
+    await userEvent.click(
+      within(listsPopover!).getByRole("button", {
+        name: "Collapse All lists section",
+      }),
+    );
+    expect(listsPopover!).toBeVisible();
+    await userEvent.click(
+      within(listsPopover!).getByRole("button", {
+        name: "Expand All lists section",
+      }),
+    );
+
+    const applications = within(listsPopover!).getByRole("button", {
+      name: "Applications",
+    });
+    await fireEvent.contextMenu(applications);
+    let listActions: HTMLElement | null = null;
+    await waitFor(() => {
+      listActions = portalElement<HTMLElement>(
+        '[role="menu"][aria-label="Applications list actions"]',
+      );
+      expect(listActions).toBeVisible();
+    });
+    await userEvent.click(within(listActions!).getByText("Rename"));
+    expect(listsPopover!).toBeVisible();
+    const renameInput = within(listsPopover!).getByRole("textbox", {
+      name: "Rename Applications",
+    });
+    await userEvent.type(renameInput, "{Enter}");
+    expect(listsPopover!).toBeVisible();
+
+    await userEvent.click(
+      within(listsPopover!).getByRole("button", { name: "Applications" }),
+    );
+    await waitFor(() => expect(listsPopover!).not.toBeVisible());
+    expect(navigationToggle).toHaveAttribute("data-state", "collapsed");
+    expect(
+      canvas.getByRole("button", { name: "Lists — 5 lists" }),
+    ).toHaveAttribute("aria-pressed", "true");
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Expand Tasks column" }),
+    );
+    await waitFor(() =>
+      expect(navigationToggle).toHaveAttribute("data-state", "expanded"),
+    );
+    const closeTasks = canvas.getByRole("button", {
+      name: "Close Tasks column",
+    });
+    await userEvent.click(closeTasks);
+    await waitFor(() =>
+      expect(navigationToggle).toHaveAttribute("data-state", "closed"),
+    );
+    expect(
+      context.canvasElement.querySelector(
+        '[data-column-id="tasks"][data-ui-part="column"]',
+      ),
+    ).toBeNull();
+
+    const edgePreview = canvas.getByRole("button", {
+      name: "Preview Tasks navigation",
+    });
+    edgePreview.focus();
+    await waitFor(() =>
+      expect(
+        context.canvasElement.querySelector(
+          '[data-column-id="tasks"][data-ui-part="column-preview"]',
+        ),
+      ).toBeVisible(),
+    );
+    preview = context.canvasElement.querySelector<HTMLElement>(
+      '[data-column-id="tasks"][data-ui-part="column-preview"]',
+    );
+    expect(preview).toBeVisible();
+    expect(preview).toHaveAttribute("data-state", "closed");
+    await userEvent.click(
+      within(preview!).getByRole("button", { name: "Inbox" }),
+    );
+    await waitFor(() =>
+      expect(
+        context.canvasElement.querySelector(
+          '[data-column-id="tasks"][data-ui-part="column-preview"]',
+        ),
+      ).toBeNull(),
+    );
+    expect(navigationToggle).toHaveAttribute("data-state", "closed");
+
+    await userEvent.hover(edgePreview);
+    await waitFor(() =>
+      expect(
+        context.canvasElement.querySelector(
+          '[data-column-id="tasks"][data-ui-part="column-preview"]',
+        ),
+      ).toBeVisible(),
+    );
+    await userEvent.unhover(edgePreview);
+    await waitFor(
+      () =>
+        expect(
+          context.canvasElement.querySelector(
+            '[data-column-id="tasks"][data-ui-part="column-preview"]',
+          ),
+        ).toBeNull(),
+      { timeout: 1_000 },
+    );
+
+    await userEvent.click(navigationToggle);
+    await waitFor(() =>
+      expect(navigationToggle).toHaveAttribute("data-state", "expanded"),
+    );
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Collapse Tasks column" }),
+    );
+    await waitFor(() =>
+      expect(navigationToggle).toHaveAttribute("data-state", "collapsed"),
+    );
+    const collapsedEdgePreview = canvas.getByRole("button", {
+      name: "Preview Tasks navigation",
+    });
+    collapsedEdgePreview.focus();
+    await waitFor(() =>
+      expect(
+        context.canvasElement.querySelector(
+          '[data-column-id="tasks"][data-ui-part="column-preview"]',
+        ),
+      ).toBeVisible(),
+    );
+    preview = context.canvasElement.querySelector<HTMLElement>(
+      '[data-column-id="tasks"][data-ui-part="column-preview"]',
+    );
+    expect(preview).toBeVisible();
+    await userEvent.click(
+      within(preview!).getByRole("button", { name: "Review" }),
+    );
+    await waitFor(() =>
+      expect(
+        context.canvasElement.querySelector(
+          '[data-column-id="tasks"][data-ui-part="column-preview"]',
+        ),
+      ).toBeNull(),
+    );
+    expect(navigationToggle).toHaveAttribute("data-state", "collapsed");
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Collapse planner column" }),
+    );
+    expect(
+      canvas.getByRole("button", { name: "Expand planner column" }),
+    ).toBeVisible();
+  }}
+>
+  {#snippet template()}
+    <ApplicationTaskPlannerColumnCanvasStory
+      initialNavigationColumnState="collapsed"
+    />
   {/snippet}
 </Story>

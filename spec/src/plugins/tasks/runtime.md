@@ -63,16 +63,16 @@ raw id. See LN-TASK-015 and LN-TASK-026.
 `matchesTaskView` in `src/lib/model/task-queries.ts` is the query-AST meaning
 for named views. Only `kind: task` rows match. See LN-TASK-018.
 
-| View | Open-task match |
-| --- | --- |
-| Inbox | `task.inbox` is true |
-| Today | effective occurrence is current or overdue, or a non-recurring plan/deadline is today or earlier |
-| Anytime | start is actionable and there is no plan date |
-| Upcoming | effective occurrence is future, or a non-recurring start/plan/deadline is after today |
-| Someday | `start` is `someday` |
-| Completed | `status` is `completed` |
-| Logbook | `status` is `completed` or `canceled` |
-| Review | effective occurrence is overdue under carry, or a non-recurring plan is before today |
+| View      | Open-task match                                                                                  |
+| --------- | ------------------------------------------------------------------------------------------------ |
+| Inbox     | `task.inbox` is true                                                                             |
+| Today     | effective occurrence is current or overdue, or a non-recurring plan/deadline is today or earlier |
+| Anytime   | start is actionable and there is no plan date                                                    |
+| Upcoming  | effective occurrence is future, or a non-recurring start/plan/deadline is after today            |
+| Someday   | `start` is `someday`                                                                             |
+| Completed | `status` is `completed`                                                                          |
+| Logbook   | `status` is `completed` or `canceled`                                                            |
+| Review    | effective occurrence is overdue under carry, or a non-recurring plan is before today             |
 
 Start is actionable when it is `anytime`, or a date on or before today.
 Someday starts are not Anytime. A deadline-only open task is Today or
@@ -118,7 +118,8 @@ unchecked observation before advancement.
 The plugin also registers a Tasks section through the public workspace settings
 controller. This is the settings surface used by the Lapis workspace shell;
 the `PluginSettingTab` remains available to Obsidian-compatible hosts. Both
-surfaces persist through the same plugin-owned update queue.
+surfaces persist through the same plugin-owned update queue. Both expose
+Navigation column as an enum with Expanded, Collapsed, and Hidden choices.
 
 The same onload registers the plugin-scoped `task-structure-runs` Markdown
 contribution through the public API. The contribution supplies a CodeMirror
@@ -130,10 +131,17 @@ interaction rules. See LN-TASK-035.
 Settings saves are serialized. The two local `HH:mm` day-part boundaries must
 be valid and ordered. Absent, older, or malformed data uses `12:00` and `17:00`.
 The persisted `dailyAgenda.hideOverdueTasks` preference defaults to false and
-migrates version-1 data without losing valid boundaries. After a successful
-save, every open view receives the persisted snapshot. Boundary changes
+migrates older data without losing valid boundaries. Version 3 adds
+`planner.navigationColumnState`, accepts only `expanded`, `collapsed`, or
+`hidden`, and defaults invalid or missing values to `expanded` without
+discarding other valid settings. After a successful save, every open view
+receives the persisted snapshot. Boundary changes
 reclassify clock-valued tasks; the overdue preference changes selected-agenda
-inclusion. Neither change mutates a Task file. See LN-TASK-029.
+inclusion. Navigation state initializes synchronously from `settingsSource.get`
+to avoid an expanded mount flash, maps to Column Canvas open/collapse/close,
+and persists only Tasks collapse/close layout events. Controller synchronization
+is idempotent; resize and transient preview state are excluded. None of these
+changes mutates a Task file. See LN-TASK-029 and LN-TASK-056.
 
 ## Mutations
 

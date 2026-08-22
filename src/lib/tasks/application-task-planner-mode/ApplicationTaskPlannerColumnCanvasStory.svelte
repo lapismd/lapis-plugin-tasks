@@ -16,12 +16,21 @@
     cloneTasksPluginSettings,
     DEFAULT_TASKS_PLUGIN_SETTINGS,
     patchTasksPluginSettings,
+    type TasksNavigationColumnState,
     type TasksPluginSettingsPatch,
   } from "../../tasks-settings";
+  import { untrack } from "svelte";
   import TasksPlannerCanvas from "./TasksPlannerCanvas.svelte";
 
-  const applicationSummaries =
-    buildPlannerApplicationSummaries(sampleApplicationBoard);
+  let {
+    initialNavigationColumnState = "expanded",
+  }: {
+    initialNavigationColumnState?: TasksNavigationColumnState;
+  } = $props();
+
+  const applicationSummaries = buildPlannerApplicationSummaries(
+    sampleApplicationBoard,
+  );
 
   let tasks = $state(samplePlannerTasks());
   let checklists = $state<Record<string, ChecklistItem[]>>(
@@ -41,7 +50,12 @@
     })),
   );
   let settings = $state(
-    cloneTasksPluginSettings(DEFAULT_TASKS_PLUGIN_SETTINGS),
+    untrack(() =>
+      patchTasksPluginSettings(
+        cloneTasksPluginSettings(DEFAULT_TASKS_PLUGIN_SETTINGS),
+        { planner: { navigationColumnState: initialNavigationColumnState } },
+      ),
+    ),
   );
 
   const now = new Date(`${PLANNER_FIXTURE_TODAY}T12:00:00`);

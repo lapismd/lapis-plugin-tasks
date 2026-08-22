@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { App } from "@lapis-notes/api";
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import {
     applyCatalogTaskToRepository,
     buildTaskPlannerSnapshotFromRepository,
@@ -59,7 +59,9 @@
   let loadError = $state<string | null>(null);
   let refreshQueue = $state(Promise.resolve());
   let checklistRefreshVersion = $state(0);
-  let settings = $state<TasksPluginSettings>(DEFAULT_TASKS_PLUGIN_SETTINGS);
+  let settings = $state<TasksPluginSettings>(
+    untrack(() => settingsSource?.get() ?? DEFAULT_TASKS_PLUGIN_SETTINGS),
+  );
   let pendingTrackingCompletion = $state<Task | null>(null);
   let selectedDate = $state("");
   let historyRows = $state<TaskOccurrenceHistoryRow[]>([]);
@@ -137,11 +139,7 @@
       previous!.status !== "completed" &&
       previous!.status !== "done" &&
       (task.status === "completed" || task.status === "done");
-    if (
-      completing &&
-      task.tracking &&
-      task.tracking.type !== "boolean"
-    ) {
+    if (completing && task.tracking && task.tracking.type !== "boolean") {
       pendingTrackingCompletion = task;
       return;
     }
@@ -187,7 +185,8 @@
         now: currentTime(),
       },
     );
-    if (!task.sourcePath) throw new Error("Created task is missing its vault path.");
+    if (!task.sourcePath)
+      throw new Error("Created task is missing its vault path.");
     await queueRefresh();
     return {
       label: task.title,
@@ -201,7 +200,9 @@
   }
 
   async function loadChecklist(task: Task): Promise<ChecklistItem[]> {
-    const document = await repository.getTaskDocument(task.sourcePath ?? task.id);
+    const document = await repository.getTaskDocument(
+      task.sourcePath ?? task.id,
+    );
     return document.checklist;
   }
 
@@ -233,7 +234,9 @@
         children
           .filter((child) => child.status !== "archived")
           .map((child) =>
-            toListNavNode(child, counts.get(child.id) ?? 0, [], { parentId: id }),
+            toListNavNode(child, counts.get(child.id) ?? 0, [], {
+              parentId: id,
+            }),
           ),
       ),
     };
@@ -309,7 +312,6 @@
   }
 
   onMount(() => {
-    settings = settingsSource?.get() ?? DEFAULT_TASKS_PLUGIN_SETTINGS;
     repository.invalidateEffectiveOccurrences();
     const unsubscribeEffective = repository.subscribeEffectiveOccurrenceRefresh(
       () => void queueRefresh(),

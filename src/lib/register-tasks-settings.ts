@@ -45,6 +45,10 @@ export function registerTasksWorkspaceSettings(
       TASKS_WORKSPACE_SETTING_IDS.hideOverdueTasks,
       settings.dailyAgenda.hideOverdueTasks,
     );
+    controller.update(
+      TASKS_WORKSPACE_SETTING_IDS.navigationColumnState,
+      settings.planner.navigationColumnState,
+    );
     syncing = false;
   };
 
@@ -72,6 +76,11 @@ export function registerTasksWorkspaceSettings(
         dailyAgenda: {
           hideOverdueTasks:
             values[TASKS_WORKSPACE_SETTING_IDS.hideOverdueTasks] === true,
+        },
+        planner: {
+          navigationColumnState: String(
+            values[TASKS_WORKSPACE_SETTING_IDS.navigationColumnState] ?? "",
+          ) as TasksPluginSettings["planner"]["navigationColumnState"],
         },
       })
       .catch((error) => {

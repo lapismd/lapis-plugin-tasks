@@ -1,7 +1,13 @@
 <script lang="ts" module>
   import type { App } from "@lapis-notes/api";
   import { defineMeta } from "@storybook/addon-svelte-csf";
-  import { expect, fireEvent, userEvent, waitFor, within } from "storybook/test";
+  import {
+    expect,
+    fireEvent,
+    userEvent,
+    waitFor,
+    within,
+  } from "storybook/test";
 
   import PluginWorkspaceDemo from "./PluginWorkspaceDemo.svelte";
   import { TasksPlugin } from "../lib";
@@ -175,9 +181,9 @@
       level: 1,
     });
     expect(weekdayHeading).toBeVisible();
-    expect(Number.parseFloat(getComputedStyle(weekdayHeading).fontSize)).toBeLessThanOrEqual(
-      32,
-    );
+    expect(
+      Number.parseFloat(getComputedStyle(weekdayHeading).fontSize),
+    ).toBeLessThanOrEqual(32);
     expect(within(agendaCalendar!).getByText("August 2026")).toBeVisible();
     const plannerContent = agendaCalendar!.closest<HTMLElement>(
       ".tasks-planner__content",
@@ -217,10 +223,13 @@
     const quickCreateRow = quickCreateLabel!.closest<HTMLElement>(
       ".task-quick-create-row",
     );
-    const firstTaskRow = quickCreateRow?.nextElementSibling as HTMLElement | null;
+    const firstTaskRow =
+      quickCreateRow?.nextElementSibling as HTMLElement | null;
     expect(quickCreateRow).not.toBeNull();
     expect(firstTaskRow).not.toBeNull();
-    expect(Number.parseFloat(getComputedStyle(quickCreateRow!).marginBottom)).toBeGreaterThanOrEqual(4);
+    expect(
+      Number.parseFloat(getComputedStyle(quickCreateRow!).marginBottom),
+    ).toBeGreaterThanOrEqual(4);
     expect(
       firstTaskRow!.getBoundingClientRect().top -
         quickCreateRow!.getBoundingClientRect().bottom,
@@ -245,10 +254,7 @@
   ) {
     const projectedDailyReflection = await storyApp(
       canvasElement,
-    ).appDatabase.getProjectionRow(
-      "tasks/task",
-      "story-task-daily-reflection",
-    );
+    ).appDatabase.getProjectionRow("tasks/task", "story-task-daily-reflection");
     expect(projectedDailyReflection?.effectiveForDate).toBe("2026-08-19");
     expect(projectedDailyReflection?.effectiveOccurrenceState).toBe("current");
     const plannerColumn = canvasElement.querySelector<HTMLElement>(
@@ -281,9 +287,7 @@
         const plannerTitle = plannerColumn.querySelector<HTMLElement>(
           ".task-column-canvas-story__planner-title",
         );
-        expect(plannerTitle).toHaveTextContent(
-          expectedView.name,
-        );
+        expect(plannerTitle).toHaveTextContent(expectedView.name);
         expect(plannerTitle?.querySelector("svg")).toBeVisible();
         expect(
           plannerColumn.querySelectorAll("[data-planner-sortable-row]"),
@@ -309,16 +313,14 @@
       expect(
         plannerColumn.querySelectorAll("[data-planner-sortable-row]"),
       ).toHaveLength(8);
-      expect(
-        plannerColumn.querySelectorAll("[data-day-section]"),
-      ).toHaveLength(5);
+      expect(plannerColumn.querySelectorAll("[data-day-section]")).toHaveLength(
+        5,
+      );
       expect(plannerColumn).toHaveTextContent("Daily stand-up reflection");
     });
   }
 
-  async function collapseLapisLeftSidebar(
-    canvas: ReturnType<typeof within>,
-  ) {
+  async function collapseLapisLeftSidebar(canvas: ReturnType<typeof within>) {
     const close = canvas
       .queryAllByRole("button", { name: "Close left sidebar", exact: true })
       .find(
@@ -350,25 +352,51 @@
             getComputedStyle(button).pointerEvents !== "none" &&
             button.getClientRects().length > 0,
         );
-    if (!visibleOpenSettings()) {
+    async function openTasksSettings() {
+      if (!visibleOpenSettings()) {
+        await userEvent.click(
+          canvas.getByRole("button", {
+            name: "Open left sidebar",
+            exact: true,
+          }),
+        );
+      }
+      let openSettings: HTMLElement | undefined;
+      await waitFor(() => {
+        openSettings = visibleOpenSettings();
+        expect(openSettings).toBeDefined();
+      });
+      await userEvent.click(openSettings!);
+      const dialog = await canvas.findByRole("dialog", {
+        name: "Settings",
+        exact: true,
+      });
+      const settingsCanvas = within(dialog);
       await userEvent.click(
-        canvas.getByRole("button", { name: "Open left sidebar", exact: true }),
+        settingsCanvas.getByRole("button", { name: "Tasks", exact: true }),
       );
+      return { dialog, settingsCanvas };
     }
-    let openSettings: HTMLElement | undefined;
-    await waitFor(() => {
-      openSettings = visibleOpenSettings();
-      expect(openSettings).toBeDefined();
-    });
-    await userEvent.click(openSettings!);
-    const dialog = await canvas.findByRole("dialog", {
-      name: "Settings",
-      exact: true,
-    });
-    const settingsCanvas = within(dialog);
-    await userEvent.click(
-      settingsCanvas.getByRole("button", { name: "Tasks", exact: true }),
-    );
+
+    async function closeSettings(settingsCanvas: ReturnType<typeof within>) {
+      const close = settingsCanvas.getByRole("button", {
+        name: "Close settings",
+        exact: true,
+      });
+      await waitFor(() => {
+        expect(getComputedStyle(close).pointerEvents).not.toBe("none");
+      });
+      await userEvent.click(close);
+      await waitFor(() => {
+        expect(
+          canvasElement.querySelector(
+            '[data-ui-component="app-shell-settings-dialog"]',
+          ),
+        ).not.toBeInTheDocument();
+      });
+    }
+
+    let { settingsCanvas } = await openTasksSettings();
     expect(
       settingsCanvas.getByRole("heading", { name: "Tasks", level: 1 }),
     ).toBeVisible();
@@ -398,18 +426,108 @@
         hideOverdueTasks: false,
       });
     });
+
+    const navigationColumn = settingsCanvas.getByRole("combobox", {
+      name: "Navigation column",
+      exact: true,
+    });
+    expect(navigationColumn).toHaveTextContent("Expanded");
+    await userEvent.click(navigationColumn);
     await userEvent.click(
-      settingsCanvas.getByRole("button", {
-        name: "Close settings",
+      within(document.body).getByRole("option", {
+        name: "Collapsed",
         exact: true,
       }),
     );
     await waitFor(() => {
       expect(
+        (tasksPlugin as TasksPlugin).getSettings().planner
+          .navigationColumnState,
+      ).toBe("collapsed");
+      expect(
         canvasElement.querySelector(
-          '[data-ui-component="app-shell-settings-dialog"]',
+          '[data-column-id="tasks"][data-ui-part="collapsed-column"]',
+        ),
+      ).toBeInTheDocument();
+    });
+    await closeSettings(settingsCanvas);
+
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Expand Tasks column", exact: true }),
+    );
+    await waitFor(() => {
+      expect(
+        (tasksPlugin as TasksPlugin).getSettings().planner
+          .navigationColumnState,
+      ).toBe("expanded");
+      expect(
+        canvasElement.querySelector(
+          '[data-column-id="tasks"][data-ui-part="column"]',
+        ),
+      ).toBeVisible();
+    });
+
+    ({ settingsCanvas } = await openTasksSettings());
+    const synchronizedNavigationColumn = settingsCanvas.getByRole("combobox", {
+      name: "Navigation column",
+      exact: true,
+    });
+    expect(synchronizedNavigationColumn).toHaveTextContent("Expanded");
+    await userEvent.click(synchronizedNavigationColumn);
+    await userEvent.click(
+      within(document.body).getByRole("option", {
+        name: "Hidden",
+        exact: true,
+      }),
+    );
+    await waitFor(() => {
+      expect(
+        (tasksPlugin as TasksPlugin).getSettings().planner
+          .navigationColumnState,
+      ).toBe("hidden");
+      expect(
+        canvasElement.querySelector(
+          '[data-column-id="tasks"][data-ui-part="column"]',
         ),
       ).not.toBeInTheDocument();
+    });
+    await closeSettings(settingsCanvas);
+
+    const tasksLeaf = app.workspace.getLeavesOfType("tasks")[0]!;
+    await tasksLeaf.setViewState({ type: "empty", state: {} });
+    await waitFor(() => {
+      expect(canvas.queryByTestId("tasks-planner")).not.toBeInTheDocument();
+    });
+    await tasksLeaf.setViewState({ type: "tasks", state: {} });
+    await waitFor(() => {
+      expect(canvas.getByTestId("tasks-planner")).toBeVisible();
+      expect(
+        canvas.getByRole("button", {
+          name: "Toggle Tasks navigation",
+          exact: true,
+        }),
+      ).toHaveAttribute("data-state", "closed");
+      expect(
+        (tasksPlugin as TasksPlugin).getSettings().planner
+          .navigationColumnState,
+      ).toBe("hidden");
+    });
+    await userEvent.click(
+      canvas.getByRole("button", {
+        name: "Toggle Tasks navigation",
+        exact: true,
+      }),
+    );
+    await waitFor(() => {
+      expect(
+        (tasksPlugin as TasksPlugin).getSettings().planner
+          .navigationColumnState,
+      ).toBe("expanded");
+      expect(
+        canvasElement.querySelector(
+          '[data-column-id="tasks"][data-ui-part="column"]',
+        ),
+      ).toBeVisible();
     });
   }
 
@@ -452,9 +570,7 @@
         expect(app.workspace.getActiveFile()?.path).toBe(path);
         expect(
           Array.from(
-            canvasElement.querySelectorAll<HTMLElement>(
-              readySelector,
-            ),
+            canvasElement.querySelectorAll<HTMLElement>(readySelector),
           ).some((run) => run.getClientRects().length > 0),
         ).toBe(true);
       },
@@ -464,14 +580,15 @@
 
   function visibleTaskRun(canvasElement: HTMLElement, title?: string) {
     const run = Array.from(
-      canvasElement.querySelectorAll<HTMLElement>(
-        "[data-structural-task-run]",
-      ),
+      canvasElement.querySelectorAll<HTMLElement>("[data-structural-task-run]"),
     ).find(
       (candidate) =>
         candidate.getClientRects().length > 0 &&
         (!title ||
-          within(candidate).queryByRole("button", { name: title, exact: true })),
+          within(candidate).queryByRole("button", {
+            name: title,
+            exact: true,
+          })),
     );
     expect(run).toBeDefined();
     return run!;
@@ -591,9 +708,7 @@
     expect(scheduleChips.length).toBeGreaterThan(0);
     scheduleChips.forEach((chip) => {
       expectTextContrast(chip);
-      chip
-        .querySelectorAll<HTMLElement>("svg")
-        .forEach(expectNonTextContrast);
+      chip.querySelectorAll<HTMLElement>("svg").forEach(expectNonTextContrast);
     });
 
     const repeatChips = visibleElements(
@@ -603,9 +718,7 @@
     expect(repeatChips.length).toBeGreaterThan(0);
     repeatChips.forEach((chip) => {
       expectTextContrast(chip);
-      chip
-        .querySelectorAll<HTMLElement>("svg")
-        .forEach(expectNonTextContrast);
+      chip.querySelectorAll<HTMLElement>("svg").forEach(expectNonTextContrast);
     });
   }
 
@@ -709,7 +822,10 @@
       "live-preview",
     );
     await expectTaskGroupHeadingTones(canvasElement, ["anytime", "morning"]);
-    const liveContent = visibleElements(canvasElement, ".cm-editor .cm-content")[0];
+    const liveContent = visibleElements(
+      canvasElement,
+      ".cm-editor .cm-content",
+    )[0];
     expect(liveContent).toBeDefined();
     expectTextContrast(liveContent!);
     visibleElements(
@@ -754,8 +870,7 @@
       )
         .filter((candidate) => candidate.getClientRects().length > 0)
         .sort((left, right) => {
-          const sourceCenter =
-            sourceButtonBox.top + sourceButtonBox.height / 2;
+          const sourceCenter = sourceButtonBox.top + sourceButtonBox.height / 2;
           const leftBox = left.getBoundingClientRect();
           const rightBox = right.getBoundingClientRect();
           return (
@@ -771,7 +886,9 @@
             (headingBox.top + headingBox.height / 2),
         ),
       ).toBeLessThan(4);
-      expect(headingBox.right - sourceButtonBox.right).toBeGreaterThanOrEqual(6);
+      expect(headingBox.right - sourceButtonBox.right).toBeGreaterThanOrEqual(
+        6,
+      );
       expect(headingBox.right - sourceButtonBox.right).toBeLessThanOrEqual(10);
       if (heading.matches(".cm-line")) {
         const foldIndicator = heading.querySelector<HTMLElement>(
@@ -847,7 +964,9 @@
         "Keep interview preparation and follow-up context beneath the live task list.",
       ),
     ).toBeVisible();
-    expect(canvasElement.querySelector("[data-structural-task-run]")).toBeVisible();
+    expect(
+      canvasElement.querySelector("[data-structural-task-run]"),
+    ).toBeVisible();
     const surface = canvasElement.querySelector<HTMLElement>(
       "[data-task-markdown-surface]",
     );
@@ -871,8 +990,9 @@
       (candidate) => candidate.textContent?.trim() === "Review interview notes",
     );
     expect(readingTaskTitle).toBeDefined();
-    expect(Number.parseFloat(getComputedStyle(readingTaskTitle!).fontWeight))
-      .toBeGreaterThanOrEqual(600);
+    expect(
+      Number.parseFloat(getComputedStyle(readingTaskTitle!).fontWeight),
+    ).toBeGreaterThanOrEqual(600);
     expect(
       within(readingBlock).queryByRole("button", {
         name: "Edit task run source",
@@ -896,7 +1016,10 @@
     );
     expect(initiallySelectedRow).not.toBeNull();
     await fireEvent.click(initiallySelectedRow!);
-    expect(initiallySelectedRow).toHaveAttribute("data-planner-selected", "true");
+    expect(initiallySelectedRow).toHaveAttribute(
+      "data-planner-selected",
+      "true",
+    );
     expect(
       canvasElement.querySelector("[data-task-markdown-surface]"),
     ).toHaveAttribute("data-editing", "false");
@@ -942,7 +1065,8 @@
       .getBoundingClientRect();
     expect(
       Math.abs(
-        checkboxRect.top + checkboxRect.height / 2 -
+        checkboxRect.top +
+          checkboxRect.height / 2 -
           (titleRect.top + titleRect.height / 2),
       ),
     ).toBeLessThan(2);
@@ -973,13 +1097,16 @@
       }),
     );
     await waitFor(() => {
-      expect(canvasElement.querySelector("[data-task-sidebar-detail]"))
-        .toBeVisible();
+      expect(
+        canvasElement.querySelector("[data-task-sidebar-detail]"),
+      ).toBeVisible();
     });
     const taskDetail = canvasElement.querySelector<HTMLElement>(
       "[data-task-sidebar-detail]",
     )!;
-    expect(taskDetail.querySelector("[data-task-markdown-surface]")).toBeVisible();
+    expect(
+      taskDetail.querySelector("[data-task-markdown-surface]"),
+    ).toBeVisible();
     await waitFor(() => {
       const redundantTaskTitle = taskDetail.querySelector<HTMLElement>(
         'h1[data-task-markdown-redundant-title="true"]',
@@ -996,8 +1123,9 @@
       }),
     );
     await waitFor(() =>
-      expect(taskDetail.querySelector("[data-task-markdown-surface]"))
-        .toHaveAttribute("data-editing", "true"),
+      expect(
+        taskDetail.querySelector("[data-task-markdown-surface]"),
+      ).toHaveAttribute("data-editing", "true"),
     );
     await userEvent.click(
       within(taskDetail).getByRole("button", {
@@ -1008,14 +1136,17 @@
       canvas.getByRole("button", { name: "Close detail column", exact: true }),
     );
     await waitFor(() => {
-      expect(canvasElement.querySelector("[data-task-sidebar-detail]"))
-        .not.toBeInTheDocument();
+      expect(
+        canvasElement.querySelector("[data-task-sidebar-detail]"),
+      ).not.toBeInTheDocument();
     });
 
     await userEvent.click(
       canvas.getByRole("button", { name: "Edit Applications", exact: true }),
     );
-    await waitFor(() => expect(surface).toHaveAttribute("data-editing", "true"));
+    await waitFor(() =>
+      expect(surface).toHaveAttribute("data-editing", "true"),
+    );
     const liveBlock = canvasElement.querySelector<HTMLElement>(
       ".task-list-items-widget [data-structural-task-run]",
     );
@@ -1038,17 +1169,20 @@
     ).toBe(documentBackground);
     const editorScroller = surface!.querySelector<HTMLElement>(".cm-scroller")!;
     const editorScrollerStyle = getComputedStyle(editorScroller);
-    expect(Number.parseFloat(editorScrollerStyle.paddingTop)).toBeGreaterThan(0);
-    expect(Number.parseFloat(editorScrollerStyle.paddingLeft)).toBeGreaterThan(0);
+    expect(Number.parseFloat(editorScrollerStyle.paddingTop)).toBeGreaterThan(
+      0,
+    );
+    expect(Number.parseFloat(editorScrollerStyle.paddingLeft)).toBeGreaterThan(
+      0,
+    );
     expect(
-      liveBlock!.querySelector<HTMLElement>(".application-planner-task-row")!
+      liveBlock!
+        .querySelector<HTMLElement>(".application-planner-task-row")!
         .getBoundingClientRect().height,
     ).toBeLessThan(80);
     expect(
       getComputedStyle(
-        liveBlock!.querySelector<HTMLElement>(
-          ".application-planner-task-row",
-        )!,
+        liveBlock!.querySelector<HTMLElement>(".application-planner-task-row")!,
       ).backgroundColor,
     ).not.toBe("rgba(0, 0, 0, 0)");
     const liveTaskTitle = Array.from(
@@ -1057,8 +1191,9 @@
       (candidate) => candidate.textContent?.trim() === "Review interview notes",
     );
     expect(liveTaskTitle).toBeDefined();
-    expect(Number.parseFloat(getComputedStyle(liveTaskTitle!).fontWeight))
-      .toBeGreaterThanOrEqual(600);
+    expect(
+      Number.parseFloat(getComputedStyle(liveTaskTitle!).fontWeight),
+    ).toBeGreaterThanOrEqual(600);
     const liveCanvas = within(liveBlock!);
     const liveQuickCreateLabel = liveBlock!.querySelector<HTMLElement>(
       ".task-quick-create-row__label",
@@ -1122,10 +1257,13 @@
     await userEvent.click(
       canvas.getByRole("button", { name: "Read Applications", exact: true }),
     );
-    await waitFor(() => expect(surface).toHaveAttribute("data-editing", "false"));
+    await waitFor(() =>
+      expect(surface).toHaveAttribute("data-editing", "false"),
+    );
     await waitFor(() => {
-      expect(canvasElement.querySelector("[data-structural-task-run]"))
-        .toBeVisible();
+      expect(
+        canvasElement.querySelector("[data-structural-task-run]"),
+      ).toBeVisible();
     });
   }
 
@@ -1147,7 +1285,9 @@
     await userEvent.click(
       canvas.getByRole("button", { name: "Edit Applications", exact: true }),
     );
-    await waitFor(() => expect(surface).toHaveAttribute("data-editing", "true"));
+    await waitFor(() =>
+      expect(surface).toHaveAttribute("data-editing", "true"),
+    );
 
     function liveBlock() {
       return canvasElement.querySelector<HTMLElement>(
@@ -1205,7 +1345,9 @@
       }),
     );
     await waitFor(async () => {
-      expect(await app.vault.cachedRead(taskFile)).toContain("status: completed");
+      expect(await app.vault.cachedRead(taskFile)).toContain(
+        "status: completed",
+      );
     });
     await expectListSource();
     await userEvent.click(
@@ -1304,7 +1446,10 @@
     await expectListSource();
 
     await userEvent.click(
-      within(liveBlock()).getByRole("button", { name: "New task", exact: true }),
+      within(liveBlock()).getByRole("button", {
+        name: "New task",
+        exact: true,
+      }),
     );
     const createInput = within(liveBlock()).getByRole("textbox", {
       name: "New task",
@@ -1374,7 +1519,9 @@
     await userEvent.click(
       canvas.getByRole("button", { name: "Edit Docs", exact: true }),
     );
-    await waitFor(() => expect(docsSurface).toHaveAttribute("data-editing", "true"));
+    await waitFor(() =>
+      expect(docsSurface).toHaveAttribute("data-editing", "true"),
+    );
 
     function docsBlock() {
       return canvasElement.querySelector<HTMLElement>(
@@ -1386,7 +1533,9 @@
       .getByRole("button", { name: "Writing", exact: true })
       .closest<HTMLElement>("[data-task-list-row]")!;
     expect(writingRow.querySelector("[data-task-list-row-icon]")).toBeVisible();
-    expect(writingRow.querySelector("[data-task-checkbox]")).not.toBeInTheDocument();
+    expect(
+      writingRow.querySelector("[data-task-checkbox]"),
+    ).not.toBeInTheDocument();
     const writingDragHandle = within(writingRow).getByRole("button", {
       name: "Reorder list Writing",
       exact: true,
@@ -1415,12 +1564,12 @@
       ".task-column-canvas-story__linked-list-column",
     )!;
     const linkedListColumnStyle = getComputedStyle(linkedListColumn);
-    expect(Number.parseFloat(linkedListColumnStyle.borderTopWidth)).toBeGreaterThan(
-      0,
-    );
-    expect(Number.parseFloat(linkedListColumnStyle.borderTopLeftRadius)).toBeGreaterThan(
-      0,
-    );
+    expect(
+      Number.parseFloat(linkedListColumnStyle.borderTopWidth),
+    ).toBeGreaterThan(0);
+    expect(
+      Number.parseFloat(linkedListColumnStyle.borderTopLeftRadius),
+    ).toBeGreaterThan(0);
 
     const draftRow = within(docsBlock())
       .getByRole("button", { name: "Draft design critique", exact: true })
@@ -1464,7 +1613,9 @@
     );
     await waitFor(async () => {
       expect(app.vault.getFileByPath("lists/writing.md")).toBeNull();
-      expect(await app.vault.cachedRead(docsFile)).not.toContain("./writing.md");
+      expect(await app.vault.cachedRead(docsFile)).not.toContain(
+        "./writing.md",
+      );
       expect(docsSurface).toHaveAttribute("data-editing", "true");
       expect(
         canvas.queryByRole("button", { name: "Edit Writing", exact: true }),
@@ -1499,14 +1650,12 @@
     expect(app.workspace.getLeavesOfType("search")).toHaveLength(1);
     expect(app.workspace.getLeavesOfType("tasks")).toHaveLength(1);
     expect(app.workspace.activeLeaf?.view.getViewType()).toBe("tasks");
-    expect(canvas.getByRole("complementary", { name: "Left sidebar" })).toBeVisible();
     expect(
-      canvas.getByRole("button", { name: "Open Tasks" }),
+      canvas.getByRole("complementary", { name: "Left sidebar" }),
     ).toBeVisible();
+    expect(canvas.getByRole("button", { name: "Open Tasks" })).toBeVisible();
     await exerciseTasksWorkspaceSettings(canvasElement, canvas, app);
-    expect(
-      await canvas.findByText("Tailor platform CV variant"),
-    ).toBeVisible();
+    expect(await canvas.findByText("Tailor platform CV variant")).toBeVisible();
     expect(canvas.getByTestId("tasks-planner")).toBeVisible();
     const collapsePlanner = canvas.getByRole("button", {
       name: "Collapse planner column",
@@ -1534,9 +1683,15 @@
     expect(
       canvas.getByRole("button", { name: "Collapse Applications section" }),
     ).toBeVisible();
-    expect(canvas.getByRole("button", { name: "Collapse Docs section" })).toBeVisible();
-    expect(canvas.getByRole("button", { name: "Collapse CV section" })).toBeVisible();
-    const docsSublist = canvasElement.querySelector('[data-list-sublist="Docs"]');
+    expect(
+      canvas.getByRole("button", { name: "Collapse Docs section" }),
+    ).toBeVisible();
+    expect(
+      canvas.getByRole("button", { name: "Collapse CV section" }),
+    ).toBeVisible();
+    const docsSublist = canvasElement.querySelector(
+      '[data-list-sublist="Docs"]',
+    );
     const docsGuide = docsSublist
       ?.closest(".task-list-tree__branch")
       ?.querySelector("[data-list-guide]");
@@ -1552,9 +1707,13 @@
     const guideCenter = guideBox.left + guideBox.width / 2;
     const chevronTip = chevronBox.left + chevronBox.width / 2;
     expect(Math.abs(guideCenter - chevronTip)).toBeLessThan(1);
-    expect(canvasElement.querySelector('[data-list-section="Docs"]')).toBeVisible();
+    expect(
+      canvasElement.querySelector('[data-list-section="Docs"]'),
+    ).toBeVisible();
     await userEvent.click(canvas.getByRole("button", { name: "Expand Docs" }));
-    expect(await canvas.findByRole("button", { name: "Writing" })).toBeVisible();
+    expect(
+      await canvas.findByRole("button", { name: "Writing" }),
+    ).toBeVisible();
     const inboxDrop = canvasElement.querySelector(
       '[data-planner-drop-id="planner-sidebar:inbox"]',
     );
@@ -1572,7 +1731,9 @@
       canvas.getByRole("progressbar", { name: "Checklist progress: 1 of 3" }),
     ).toBeVisible();
     await exerciseMarkdownNativeList(canvasElement, canvas);
-    await userEvent.click(canvas.getByRole("button", { name: "Today", exact: true }));
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Today", exact: true }),
+    );
     expect(
       canvas.getByRole("progressbar", { name: "Checklist progress: 1 of 3" }),
     ).toBeVisible();
@@ -1607,9 +1768,12 @@
     fireEvent.dragStart(writing.closest("[data-list-path]") ?? writing, {
       dataTransfer,
     });
-    fireEvent.dragOver(applications.closest("[data-list-path]") ?? applications, {
-      dataTransfer,
-    });
+    fireEvent.dragOver(
+      applications.closest("[data-list-path]") ?? applications,
+      {
+        dataTransfer,
+      },
+    );
     fireEvent.drop(applications.closest("[data-list-path]") ?? applications, {
       dataTransfer,
     });
@@ -1642,9 +1806,13 @@
       target: canvas.getByRole("button", { name: "Applications" }),
     });
     const menu = within(canvasElement.ownerDocument.body);
-    expect(await menu.findByRole("menuitem", { name: "Open note" })).toBeVisible();
+    expect(
+      await menu.findByRole("menuitem", { name: "Open note" }),
+    ).toBeVisible();
     expect(menu.getByRole("menuitem", { name: "Rename" })).toBeVisible();
-    expect(menu.getByRole("menuitem", { name: "New nested list" })).toBeVisible();
+    expect(
+      menu.getByRole("menuitem", { name: "New nested list" }),
+    ).toBeVisible();
     expect(menu.getByRole("menuitem", { name: "Unpin" })).toBeVisible();
     expect(menu.getByRole("menuitem", { name: "Archive" })).toBeVisible();
     expect(menu.getByRole("menuitem", { name: "Delete" })).toBeVisible();
@@ -1701,7 +1869,9 @@
     expect(app.plugins.isPluginEnabled("lapis-file-explorer")).toBe(true);
     expect(app.plugins.isPluginEnabled("search")).toBe(true);
     expect(app.plugins.isPluginEnabled("tasks")).toBe(true);
-    expect(canvasElement.querySelector('[data-ui-component="workspace-mobile"]')).toBeVisible();
+    expect(
+      canvasElement.querySelector('[data-ui-component="workspace-mobile"]'),
+    ).toBeVisible();
     expect(app.workspace.getLeavesOfType("tasks")).toHaveLength(1);
     const mobileCanvasRoot = canvasElement.querySelector<HTMLElement>(
       '[data-ui-component="column-canvas"][data-ui-part="root"]',
@@ -1712,9 +1882,7 @@
     expect(
       mobileCanvasRoot.querySelector('[data-resize-mode="pair"]'),
     ).toBeNull();
-    expect(
-      await canvas.findByText("Tailor platform CV variant"),
-    ).toBeVisible();
+    expect(await canvas.findByText("Tailor platform CV variant")).toBeVisible();
     expect(canvas.getByLabelText("Mobile left sidebar")).toBeInTheDocument();
     expect(canvas.getByLabelText("Mobile right sidebar")).toBeInTheDocument();
     await userEvent.click(
@@ -1858,10 +2026,12 @@
     canvasElement.style.overflow = "hidden";
     const canvas = await waitForReady(canvasElement);
     await userEvent.click(await canvas.findByRole("button", { name: "Docs" }));
-    const writingRow = (await canvas.findByRole("button", {
-      name: "Writing",
-      exact: true,
-    })).closest<HTMLElement>("[data-task-list-row]")!;
+    const writingRow = (
+      await canvas.findByRole("button", {
+        name: "Writing",
+        exact: true,
+      })
+    ).closest<HTMLElement>("[data-task-list-row]")!;
     expect(
       within(writingRow).getByRole("button", {
         name: "Reorder list Writing",
@@ -1948,9 +2118,9 @@
         for (const path of deepFixturePaths) {
           const file = app.vault.getFileByPath(path);
           expect(file).toBeTruthy();
-          expect(app.metadataCache.getFileCache(file!)?.frontmatter?.type).toMatch(
-            /^task(?:-list)?$/,
-          );
+          expect(
+            app.metadataCache.getFileCache(file!)?.frontmatter?.type,
+          ).toMatch(/^task(?:-list)?$/);
         }
       },
       { timeout: 10_000 },
@@ -2004,10 +2174,14 @@
       ).toBeVisible();
     });
     await fireEvent.click(
-      await canvas.findByRole("button", {
-        name: "Open task details for Coordinate the launch",
-        exact: true,
-      }, { timeout: 5_000 }),
+      await canvas.findByRole(
+        "button",
+        {
+          name: "Open task details for Coordinate the launch",
+          exact: true,
+        },
+        { timeout: 5_000 },
+      ),
     );
     await waitFor(() => {
       const detailColumns = canvasElement.querySelectorAll(
@@ -2032,10 +2206,14 @@
       ),
     ).toBeGreaterThan(0);
     await fireEvent.click(
-      await canvas.findByRole("button", {
-        name: "Open list Launch Operations to the right",
-        exact: true,
-      }, { timeout: 5_000 }),
+      await canvas.findByRole(
+        "button",
+        {
+          name: "Open list Launch Operations to the right",
+          exact: true,
+        },
+        { timeout: 5_000 },
+      ),
     );
     await waitFor(() => {
       const detailColumns = canvasElement.querySelectorAll(
@@ -2050,10 +2228,14 @@
       ).toBeVisible();
     });
     await fireEvent.click(
-      await canvas.findByRole("button", {
-        name: "Open task details for Ship the release",
-        exact: true,
-      }, { timeout: 5_000 }),
+      await canvas.findByRole(
+        "button",
+        {
+          name: "Open task details for Ship the release",
+          exact: true,
+        },
+        { timeout: 5_000 },
+      ),
     );
     await waitFor(() => {
       const detailColumns = canvasElement.querySelectorAll(
@@ -2065,10 +2247,14 @@
       expect(detailColumns[3]).toHaveTextContent("Ship the release");
     });
     await fireEvent.click(
-      await canvas.findByRole("button", {
-        name: "Open task details for Verify the status page",
-        exact: true,
-      }, { timeout: 5_000 }),
+      await canvas.findByRole(
+        "button",
+        {
+          name: "Open task details for Verify the status page",
+          exact: true,
+        },
+        { timeout: 5_000 },
+      ),
     );
     await waitFor(() => {
       const detailColumns = canvasElement.querySelectorAll(
@@ -2139,12 +2325,12 @@
         "data-responsive-stage",
         "pair",
       );
-      expect(deepLeadingBeforeScroll.getBoundingClientRect().width).toBeLessThan(
-        deepCanvasRoot.clientWidth - 200,
-      );
-      expect(deepTrailingBeforeScroll.getBoundingClientRect().width).toBeGreaterThan(
-        200,
-      );
+      expect(
+        deepLeadingBeforeScroll.getBoundingClientRect().width,
+      ).toBeLessThan(deepCanvasRoot.clientWidth - 200);
+      expect(
+        deepTrailingBeforeScroll.getBoundingClientRect().width,
+      ).toBeGreaterThan(200);
     });
     const deepPairWidths = {
       leading: deepLeadingBeforeScroll.getBoundingClientRect().width,
@@ -2259,10 +2445,7 @@
     const app = storyApp(canvasElement);
     await showDailyAgendaChecklistSummary(canvasElement, canvas);
     const todayHeadingTypography = taskGroupHeadingTypography(
-      visibleElements(
-        canvasElement,
-        ".tasks-planner__day-section-label",
-      )[0]!,
+      visibleElements(canvasElement, ".tasks-planner__day-section-label")[0]!,
     );
     const plannerTaskTitleTypography = taskRowTitleTypography(
       canvas.getByRole("button", {
@@ -2284,7 +2467,9 @@
       "Explore conference talks",
       plannerTaskTitleTypography,
     );
-    expect(run.querySelector("[data-task-drag-handle]")).not.toBeInTheDocument();
+    expect(
+      run.querySelector("[data-task-drag-handle]"),
+    ).not.toBeInTheDocument();
     await expectDedicatedMarkdownCheckbox(run, "Explore conference talks");
 
     await openMarkdownFixture(
@@ -2305,7 +2490,9 @@
       "Explore conference talks",
       plannerTaskTitleTypography,
     );
-    expect(run.querySelector("[data-task-drag-handle]")).not.toBeInTheDocument();
+    expect(
+      run.querySelector("[data-task-drag-handle]"),
+    ).not.toBeInTheDocument();
     await expectDedicatedMarkdownCheckbox(run, "Explore conference talks");
 
     await openMarkdownFixture(
@@ -2323,7 +2510,9 @@
     ).find((heading) => heading.getClientRects().length > 0);
     expect(visibleChecklistHeading).toHaveTextContent("Checklist");
     expect(
-      Array.from(canvasElement.querySelectorAll<HTMLElement>("h2,h3,h4,h5,h6")).find(
+      Array.from(
+        canvasElement.querySelectorAll<HTMLElement>("h2,h3,h4,h5,h6"),
+      ).find(
         (heading) =>
           heading.getClientRects().length > 0 &&
           heading.textContent?.trim() === "Atlas AI loop",
@@ -2348,9 +2537,7 @@
       ).map((row) => row.getAttribute("aria-label")),
     ).toEqual(["Applications", "Docs", "CV", "Release Flow"]);
     const navigationRuns = Array.from(
-      canvasElement.querySelectorAll<HTMLElement>(
-        "[data-structural-task-run]",
-      ),
+      canvasElement.querySelectorAll<HTMLElement>("[data-structural-task-run]"),
     ).filter((candidate) => candidate.getClientRects().length > 0);
     expect(navigationRuns).toHaveLength(4);
     expect(

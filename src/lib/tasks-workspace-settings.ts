@@ -5,26 +5,39 @@ export const TASKS_WORKSPACE_SETTING_IDS = {
   afternoonStartsAt: "tasks.dayParts.afternoonStartsAt",
   eveningStartsAt: "tasks.dayParts.eveningStartsAt",
   hideOverdueTasks: "tasks.dailyAgenda.hideOverdueTasks",
+  navigationColumnState: "tasks.planner.navigationColumnState",
 } as const;
 
 export function createTasksWorkspaceSettingsSection() {
   return {
     id: TASKS_WORKSPACE_SETTINGS_SECTION_ID,
     title: "Tasks",
-    description: "Daily agenda boundaries and visibility preferences.",
+    description:
+      "Planner navigation, daily agenda boundaries, and visibility preferences.",
     icon: "list-todo" as const,
     order: 46,
     navigationGroupId: "core-plugins",
     sourcePluginId: "tasks",
     fields: [
       {
+        id: TASKS_WORKSPACE_SETTING_IDS.navigationColumnState,
+        type: "enum" as const,
+        title: "Navigation column",
+        description: "Choose how much planner navigation remains visible.",
+        default: DEFAULT_TASKS_PLUGIN_SETTINGS.planner.navigationColumnState,
+        options: [
+          { value: "expanded", label: "Expanded" },
+          { value: "collapsed", label: "Collapsed" },
+          { value: "hidden", label: "Hidden" },
+        ],
+      },
+      {
         id: TASKS_WORKSPACE_SETTING_IDS.afternoonStartsAt,
         type: "string" as const,
         presentation: "time" as const,
         title: "Afternoon starts at",
         description: "Clock times at or after this value appear in Afternoon.",
-        default:
-          DEFAULT_TASKS_PLUGIN_SETTINGS.dayParts.afternoonStartsAt,
+        default: DEFAULT_TASKS_PLUGIN_SETTINGS.dayParts.afternoonStartsAt,
         pattern: "^(?:[01]\\d|2[0-3]):[0-5]\\d$",
       },
       {

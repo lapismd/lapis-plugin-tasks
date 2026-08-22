@@ -19,6 +19,16 @@ describe("Tasks workspace settings", () => {
     expect(section.fields).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
+          id: TASKS_WORKSPACE_SETTING_IDS.navigationColumnState,
+          type: "enum",
+          default: "expanded",
+          options: [
+            { value: "expanded", label: "Expanded" },
+            { value: "collapsed", label: "Collapsed" },
+            { value: "hidden", label: "Hidden" },
+          ],
+        }),
+        expect.objectContaining({
           id: TASKS_WORKSPACE_SETTING_IDS.afternoonStartsAt,
           presentation: "time",
           default: "12:00",

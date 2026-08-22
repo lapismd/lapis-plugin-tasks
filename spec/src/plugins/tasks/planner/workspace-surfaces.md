@@ -5,7 +5,8 @@ active planner or document, and contextual details in one horizontally
 composable surface. This chapter describes that composition and the ownership
 rules for its Markdown editors.
 
-See LN-TASK-012, LN-TASK-022, LN-TASK-035, LN-TASK-037, and LN-TASK-047.
+See LN-TASK-012, LN-TASK-022, LN-TASK-035, LN-TASK-037, LN-TASK-047, and
+LN-TASK-056.
 
 ## Column composition
 
@@ -18,7 +19,9 @@ See LN-TASK-012, LN-TASK-022, LN-TASK-035, LN-TASK-037, and LN-TASK-047.
 3. a closeable stack of Task detail and linked-List columns, one per opened
    descendant.
 
-The planner column exposes its controller-owned collapse action. A linked List
+The Tasks column is collapsible and closeable. The first control in the Planner
+header explicitly targets Tasks, while Planner's own controller-owned collapse
+action remains farthest right. A linked List
 or Task opened from any document appends immediately to that document's right
 without replacing its parent. Each entry retains its own selection and editor
 state and uses the same bordered, rounded column treatment as the planner body.
@@ -46,6 +49,28 @@ scrolling moves through the existing canvas without changing widths, selecting
 a different pair, or realigning the viewport. When Tasks becomes a sticky rail,
 its complete outer slot remains ahead of the active content pair so the overlay
 does not obstruct the leading column.
+
+Tasks supplies a consumer-owned collapsed rail rather than Column Canvas's
+fallback vertical title. It contains an expand action, the seven existing
+planner glyphs with task-count Tooltips, and a Lists glyph with a List-count
+Tooltip. The Lists glyph composes the shadcn Tooltip and Popover triggers and
+opens the complete editable `TaskListNavTree` in an approximately 20rem,
+collision-aware surface with its own vertical scroll. Disclosure, rename,
+context-menu actions, and List rearrangement keep that surface open; selecting
+a List closes it without expanding the column. The rail and hidden state omit
+all planner task-drop metadata.
+
+Wide and fixed canvases may temporarily render the ordinary expanded Tasks
+body as a full-height overlay above adjacent columns. A thin neutral-grey,
+zero-width boundary anchor previews immediately on edge hover or focus; the
+Planner-header target previews after 600ms and both paths dismiss after a 120ms
+grace period. Pointer or focus movement into the overlay, including owned
+portalled controls, retains it. The overlay paints the sidebar surface rather
+than inheriting transparency from the inline Tasks column. Clicking either
+trigger makes the durable transition, while selecting inside a preview changes
+navigation and dismisses the overlay without changing the saved
+collapsed/hidden state. Compact mode disables these hover overlays and relies
+on the adjacent click control to recover hidden navigation.
 
 The first-column resize handle centers its transparent pointer target across
 the planner start border. The adjacent planner surface paints and clips the

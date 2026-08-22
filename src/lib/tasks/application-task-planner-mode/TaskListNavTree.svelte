@@ -17,6 +17,7 @@
     tree,
     selectedId = null,
     isSelected,
+    taskDropEnabled = true,
     activeDropTargetId = null,
     onSelect,
     onExpand,
@@ -32,6 +33,7 @@
     tree: TaskListNavigationSnapshot;
     selectedId?: string | null;
     isSelected: (id: string) => boolean;
+    taskDropEnabled?: boolean;
     activeDropTargetId?: string | null;
     onSelect: (id: string) => void;
     onExpand?: (id: string) => void;
@@ -229,7 +231,9 @@
       class="task-list-tree__disclosure"
       class:task-list-tree__disclosure--open={open}
       aria-expanded={open}
-      aria-label={open ? `Collapse ${title} section` : `Expand ${title} section`}
+      aria-label={open
+        ? `Collapse ${title} section`
+        : `Expand ${title} section`}
       onclick={(event) => {
         event.stopPropagation();
         toggleSection(title);
@@ -275,7 +279,11 @@
   </div>
 {/snippet}
 
-{#snippet sectionFolder(title: string, lists: TaskListNavNode[], allLists: boolean)}
+{#snippet sectionFolder(
+  title: string,
+  lists: TaskListNavNode[],
+  allLists: boolean,
+)}
   {@const key = sectionKey(title)}
   {@const open = isSectionOpen(title)}
   {@const editing = editingKey === key}
@@ -286,7 +294,15 @@
       <ContextMenu.Root>
         <ContextMenu.Trigger>
           {#snippet child({ props })}
-            {@render sectionRow(title, lists, allLists, key, open, editing, props)}
+            {@render sectionRow(
+              title,
+              lists,
+              allLists,
+              key,
+              open,
+              editing,
+              props,
+            )}
           {/snippet}
         </ContextMenu.Trigger>
         <ContextMenu.Content aria-label={`${title} section actions`}>
@@ -310,7 +326,8 @@
     {/if}
     {#if open}
       <div class="task-list-tree__branch">
-        <span class="task-list-tree__guide" aria-hidden="true" data-list-guide></span>
+        <span class="task-list-tree__guide" aria-hidden="true" data-list-guide
+        ></span>
         <ul class="task-list-tree__sublist" data-list-sublist={title}>
           {#each lists as node (node.id)}
             {@render listRow(node, 1)}
@@ -340,21 +357,25 @@
       .filter(Boolean)
       .join(" ")}
     class:task-list-tree__row--drop={dropKey === `list:${node.id}` ||
-      activeDropTargetId === dropId}
+      (taskDropEnabled && activeDropTargetId === dropId)}
     class:task-list-tree__row--dragging={draggingPath === node.path}
     role="group"
     data-tree-depth={depth}
     data-list-id={node.id}
     data-list-path={node.path}
     data-drop={dropKey === `list:${node.id}` || undefined}
-    data-planner-drop-id={dropId}
-    data-planner-drop-mode="valid"
-    data-planner-drop-active={activeDropTargetId === dropId || undefined}
-    data-planner-drop-data={JSON.stringify({
-      type: "planner-sidebar-list",
-      listId: node.id,
-      title: node.title,
-    })}
+    data-planner-drop-id={taskDropEnabled ? dropId : undefined}
+    data-planner-drop-mode={taskDropEnabled ? "valid" : undefined}
+    data-planner-drop-active={taskDropEnabled && activeDropTargetId === dropId
+      ? true
+      : undefined}
+    data-planner-drop-data={taskDropEnabled
+      ? JSON.stringify({
+          type: "planner-sidebar-list",
+          listId: node.id,
+          title: node.title,
+        })
+      : undefined}
     draggable={canDrag && !editing}
     ondragstart={(event) => dragPayload(event, node.path)}
     ondragend={endDrag}
@@ -425,12 +446,30 @@
   {@const selected = isSelected(node.id) || selectedId === node.id}
   <li class="task-list-tree__item" style:--task-list-tree-depth={depth}>
     {#if editing || !hasListMenu}
-      {@render listChrome(node, depth, open, editing, nestable, selected, dropId, {})}
+      {@render listChrome(
+        node,
+        depth,
+        open,
+        editing,
+        nestable,
+        selected,
+        dropId,
+        {},
+      )}
     {:else}
       <ContextMenu.Root>
         <ContextMenu.Trigger>
           {#snippet child({ props })}
-            {@render listChrome(node, depth, open, editing, nestable, selected, dropId, props)}
+            {@render listChrome(
+              node,
+              depth,
+              open,
+              editing,
+              nestable,
+              selected,
+              dropId,
+              props,
+            )}
           {/snippet}
         </ContextMenu.Trigger>
         <ContextMenu.Content aria-label={`${node.title} list actions`}>
@@ -480,7 +519,8 @@
     {/if}
     {#if open && node.children.length}
       <div class="task-list-tree__branch">
-        <span class="task-list-tree__guide" aria-hidden="true" data-list-guide></span>
+        <span class="task-list-tree__guide" aria-hidden="true" data-list-guide
+        ></span>
         <ul class="task-list-tree__sublist" data-list-sublist={node.title}>
           {#each node.children as child (child.id)}
             {@render listRow(child, depth + 1)}

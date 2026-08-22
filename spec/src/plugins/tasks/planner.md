@@ -51,17 +51,19 @@ chrome remains task-specific.
 The planner combines disposable query state with short-lived presentation
 state:
 
-| State | Owner | Persistence |
-| --- | --- | --- |
-| Task status, plan, deadline, recurrence, tracking, and comments | Task Markdown | Persisted in the Task file |
-| Effective occurrence and historical statistics | Resolver plus projections | Disposable and date-sensitive |
-| Task/List membership and order | Structural Markdown links | Persisted at exact list-item ranges |
-| Task summaries and relationships | AppDatabase projection | Disposable and rebuildable |
-| Selected bucket, List, Task, or date | Planner controller | In memory |
-| Section disclosure and ordered detail-column branch | Planner presentation | In memory |
-| Day-part boundaries | Versioned Tasks plugin settings | Persisted as plugin-owned settings |
-| Hide completed tasks | Today presentation | In memory |
-| Hide overdue tasks | Versioned Tasks plugin settings | Persisted as plugin-owned settings |
+| State                                                           | Owner                           | Persistence                                              |
+| --------------------------------------------------------------- | ------------------------------- | -------------------------------------------------------- |
+| Task status, plan, deadline, recurrence, tracking, and comments | Task Markdown                   | Persisted in the Task file                               |
+| Effective occurrence and historical statistics                  | Resolver plus projections       | Disposable and date-sensitive                            |
+| Task/List membership and order                                  | Structural Markdown links       | Persisted at exact list-item ranges                      |
+| Task summaries and relationships                                | AppDatabase projection          | Disposable and rebuildable                               |
+| Selected bucket, List, Task, or date                            | Planner controller              | In memory                                                |
+| Section disclosure and ordered detail-column branch             | Planner presentation            | In memory                                                |
+| Day-part boundaries                                             | Versioned Tasks plugin settings | Persisted as plugin-owned settings                       |
+| Hide completed tasks                                            | Today presentation              | In memory                                                |
+| Hide overdue tasks                                              | Versioned Tasks plugin settings | Persisted as plugin-owned settings                       |
+| Navigation column state (`expanded`, `collapsed`, or `hidden`)  | Versioned Tasks plugin settings | Persisted as plugin-owned settings                       |
+| Navigation preview                                              | Column Canvas controller        | Transient; never persisted or emitted as a layout change |
 
 Today, Review, Upcoming, Anytime, and Logbook are query results, not document
 fields. Recurring placement uses one effective occurrence: Review contains
@@ -87,6 +89,32 @@ Every named planner destination repeats its navigation icon before the title in
 the planner-column header. The label, icon, navigation count, rendered rows,
 and empty state all come from the same selected bucket rather than separate
 view-specific headers.
+
+The leading navigation column has three durable presentation states. Expanded
+shows the complete named-view and List tree. Collapsed retains a narrow rail
+with an explicit expand action, the seven named-view icons, and a Lists action;
+each action exposes the same derived count in a Tooltip, and Lists opens the
+complete editable tree in a collision-aware, internally scrollable Popover.
+Hidden removes the navigation column from inline layout. The first action in
+the Planner header targets this navigation column, so it can restore either a
+collapsed or hidden column while the Planner column's own collapse action stays
+at the far end of the header.
+
+On wide and fixed canvases, a collapsed or hidden navigation column can preview
+its complete expanded content as a full-height overlay. The edge trigger opens
+that preview immediately; the adjacent Planner-header toggle uses the shared
+600ms open and 120ms dismissal delays. Preview is transient and does not change
+the saved state. Selecting a destination dismisses the overlay while retaining
+the underlying collapsed or hidden value. Focus and owned portalled menus,
+selects, and popovers keep the preview active. Compact presentation retains
+ordinary Column Canvas lanes and the adjacent click recovery action, but does
+not expose hover previews.
+
+The collapsed Lists Popover stays open for tree disclosure, rename, context
+actions, and rearrangement. Selecting a List closes the Popover, opens the List
+in Planner, and leaves navigation collapsed. Neither collapsed nor hidden
+navigation exposes task-drop hosts or expands during a task drag; dropping a
+task onto a List remains an expanded-navigation workflow. See LN-TASK-056.
 
 Today presents its selected weekday and week strip in one sticky calendar
 surface. That surface paints through the same inline overflow as the task rows

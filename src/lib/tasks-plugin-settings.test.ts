@@ -82,6 +82,10 @@ describe("TasksPlugin settings persistence", () => {
       { hideOverdueTasks: false },
       { hideOverdueTasks: true },
     ]);
+    expect(saved.map((data) => data.settings.planner)).toEqual([
+      { navigationColumnState: "expanded" },
+      { navigationColumnState: "expanded" },
+    ]);
   });
 
   it("continues the persistence queue after a failed save", async () => {
@@ -98,5 +102,26 @@ describe("TasksPlugin settings persistence", () => {
       plugin.updateSettings({ dayParts: { eveningStartsAt: "18:00" } }),
     ).resolves.toBeUndefined();
     expect(saveData).toHaveBeenCalledTimes(2);
+  });
+
+  it("serializes and notifies navigation state saves", async () => {
+    const saveData = vi.fn(async () => {});
+    const plugin = settingsHarness(saveData);
+    const notifications: TasksPluginSettings[] = [];
+    plugin.subscribeSettings((settings) => notifications.push(settings));
+
+    await plugin.updateSettings({
+      planner: { navigationColumnState: "hidden" },
+    });
+
+    expect(saveData).toHaveBeenCalledWith(
+      expect.objectContaining({
+        version: 3,
+        settings: expect.objectContaining({
+          planner: { navigationColumnState: "hidden" },
+        }),
+      }),
+    );
+    expect(notifications.at(-1)?.planner.navigationColumnState).toBe("hidden");
   });
 });
