@@ -92,7 +92,10 @@ body above it keeps square lower corners.
 The body and footer have independent hover surfaces, but the body hover border
 frames the entire card. Selection color continues through the footer. Adjacent
 selected rows square their shared corners so selection color does not leak at
-the edges. Row, body, and swipe surfaces use the same hover timing.
+the edges. In constrained planner mounts, the row hover and selection surfaces
+stay inside the planner's inline gutters and leave a scrollbar-side gap instead
+of stretching edge to edge. Row, body, and swipe surfaces use the same hover
+timing.
 
 Expanded items reuse `ApplicationTaskCheckbox`. Checking an item updates the
 count optimistically, then asks `TaskRepository` to match the derived ordinal

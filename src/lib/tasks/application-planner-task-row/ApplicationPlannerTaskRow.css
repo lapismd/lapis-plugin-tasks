@@ -1,4 +1,12 @@
   .application-planner-task-row {
+    --task-row-inline-overhang: var(
+      --application-planner-task-row-inline-overhang,
+      0.5rem
+    );
+    --task-row-inline-padding: var(
+      --application-planner-task-row-inline-padding,
+      0.5rem
+    );
     --task-row-surface: var(--kanban-card);
 
     display: flex;
@@ -6,10 +14,10 @@
     flex-direction: column;
     align-items: stretch;
     gap: 0;
-    margin: 0 -0.5rem 2px;
+    margin: 0 calc(-1 * var(--task-row-inline-overhang)) 2px;
     border-radius: 0.45rem;
     background: var(--task-row-surface);
-    padding: 0.3rem 0.5rem 0.5rem;
+    padding: 0.3rem var(--task-row-inline-padding) 0.5rem;
     transition:
       background-color 140ms ease,
       box-shadow 140ms ease,
@@ -37,10 +45,10 @@
     align-items: start;
     gap: 0.45rem;
     min-width: 0;
-    margin: -0.3rem -0.5rem -0.5rem;
+    margin: -0.3rem calc(-1 * var(--task-row-inline-padding)) -0.5rem;
     border-radius: 0.45rem;
     background: var(--task-row-surface);
-    padding: 0.3rem 0.5rem 0.5rem;
+    padding: 0.3rem var(--task-row-inline-padding) 0.5rem;
     transition:
       background-color 140ms ease,
       box-shadow 140ms ease;
@@ -497,9 +505,17 @@
 
   @media (max-width: 640px) {
     .application-planner-task-row {
+      --task-row-inline-overhang: var(
+        --application-planner-task-row-inline-overhang,
+        0.35rem
+      );
+      --task-row-inline-padding: var(
+        --application-planner-task-row-inline-padding,
+        0.35rem
+      );
+
       align-items: stretch;
-      margin-inline: -0.35rem;
-      padding: 0.25rem 0.35rem 0.45rem;
+      padding-block: 0.25rem 0.45rem;
     }
 
     .application-planner-task-row__application {

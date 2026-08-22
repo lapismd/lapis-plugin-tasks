@@ -791,6 +791,7 @@
     <section
       bind:this={plannerElement}
       class="tasks-planner__content"
+      class:tasks-planner__content--today={!selectedArea && view === "today"}
       data-planner-legacy-drop-target={pointerDropTargetId ?? undefined}
       data-planner-drag-feedback={dragController
         ? dragController.isExternalTargetActive()

@@ -76,8 +76,9 @@
     )!;
 
     const contentStyle = getComputedStyle(content);
+    expect(Number.parseFloat(contentStyle.paddingTop)).toBe(0);
     expect(Number.parseFloat(contentStyle.paddingLeft)).toBeLessThanOrEqual(9);
-    expect(Number.parseFloat(contentStyle.paddingRight)).toBeLessThanOrEqual(9);
+    expect(Number.parseFloat(contentStyle.paddingRight)).toBeLessThanOrEqual(13);
     expect(getComputedStyle(shortWeekday).display).toBe("none");
     expect(getComputedStyle(narrowWeekday).display).not.toBe("none");
     expect(narrowWeekday.textContent).toBe("M");
@@ -87,6 +88,7 @@
     const weekNavigationBox = weekNavigation.getBoundingClientRect();
     expect(calendarBox.left).toBeCloseTo(plannerBox.left, 1);
     expect(calendarBox.right).toBeCloseTo(plannerBox.right, 1);
+    expect(calendarBox.top).toBeCloseTo(plannerBox.top, 1);
     expect(calendarBox.width).toBeLessThanOrEqual(plannerBox.width + 1);
     expect(weekNavigationBox.left).toBeGreaterThanOrEqual(calendarBox.left - 1);
     expect(weekNavigationBox.right).toBeLessThanOrEqual(calendarBox.right + 1);

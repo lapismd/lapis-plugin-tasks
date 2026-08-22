@@ -91,9 +91,11 @@ view-specific headers.
 Today presents its selected weekday and week strip in one sticky calendar
 surface. That surface paints through the same inline overflow as the task rows
 beneath it, while retaining the surrounding planner padding and scrollbar
-gutter. At constrained sidebar widths, the sticky calendar spans the full
-planner width, while the task rows retain reduced inline padding and the week
-strip switches to single-letter visible weekday labels. Carried-over rows expose an overdue marker beside their detail control,
+gutter. At constrained sidebar widths, the sticky calendar starts at the top of
+the scroll viewport and spans the full planner width, while the task rows retain
+reduced inline padding, leave a scrollbar-side gutter, and the week strip
+switches to single-letter visible weekday labels. Carried-over rows expose an
+overdue marker beside their detail control,
 and the Today actions menu names its persisted overdue toggle for the action it
 will perform: **Hide overdue tasks** or **Show overdue tasks**. Day-part
 boundaries and the overdue default are available through both the host's public

@@ -60,9 +60,10 @@ without an outline ring, while keyboard focus keeps its visible ring.
 When the planner is mounted in a constrained sidebar-width surface, the Today
 calendar responds to the planner's own inline size: surrounding content padding,
 calendar gaps, and date typography reduce, the sticky calendar spans the full
-planner width while rows retain their own inline padding, and weekday labels
-switch from short names to single-letter initials without changing the full
-accessible date label.
+planner width while starting at the top of the scroll viewport, rows retain
+their own inline padding and scrollbar-side gutter, and weekday labels switch
+from short names to single-letter initials without changing the full accessible
+date label.
 
 By default, the selected agenda includes every open task whose plan date or
 deadline is on or before the selected date. The persisted `dailyAgenda.hideOverdueTasks`

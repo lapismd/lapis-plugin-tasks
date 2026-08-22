@@ -193,10 +193,10 @@
       .querySelector<HTMLElement>(
         '[data-ui-part="scroll-area-scrollbar"][data-orientation="vertical"]',
       );
-    expect(Math.abs(calendarBox.left - agendaTaskRowBox.left)).toBeLessThan(1);
-    expect(Math.abs(calendarBox.right - agendaTaskRowBox.right)).toBeLessThan(1);
+    expect(agendaTaskRowBox.left).toBeGreaterThanOrEqual(calendarBox.left - 1);
+    expect(agendaTaskRowBox.right).toBeLessThanOrEqual(calendarBox.right + 1);
     if (plannerScrollbar) {
-      expect(calendarBox.right).toBeLessThan(
+      expect(agendaTaskRowBox.right).toBeLessThan(
         plannerScrollbar.getBoundingClientRect().left,
       );
     }
