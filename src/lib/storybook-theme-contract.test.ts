@@ -22,6 +22,9 @@ describe("Storybook theme contract", () => {
     expect(preview).toContain('icon: "paintbrush"');
     expect(preview).toContain('{ value: "lapis", title: "Obsidian" }');
     expect(preview).toContain('{ value: "default", title: "Default" }');
+    expect(preview).toContain('defaultValue: "lapis"');
+    expect(preview).toContain('theme: "lapis"');
+    expect(preview).toContain('defaultTheme: "lapis"');
     expect(preview).toContain('colorMode: "light"');
     expect(preview).toContain('document.documentElement.classList.toggle(');
     expect(preview).toContain('context.globals.colorMode === "dark"');
@@ -35,6 +38,9 @@ describe("Storybook theme contract", () => {
     expect(shellStories).toContain('name="Obsidian Dark Contrast"');
     expect(shellStories).toContain('name="Default Light Contrast"');
     expect(shellStories).toContain('name="Default Dark Contrast"');
+    expect(shellStories).toContain('theme: "lapis"');
+    expect(shellStories).toContain('colorMode: "light"');
+    expect(shellStories).toContain('data-ui-theme", "lapis"');
     expect(shellStories).toContain("a11y: workspaceA11y");
     expect(shellStories).toContain(
       ".application-planner-task-row__meta .task-when-picker__trigger--chip",

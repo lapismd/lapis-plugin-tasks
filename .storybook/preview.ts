@@ -15,6 +15,7 @@ const preview: Preview = {
   globalTypes: {
     theme: {
       description: "Brand theme",
+      defaultValue: "lapis",
       toolbar: {
         icon: "paintbrush",
         items: [

@@ -27,6 +27,10 @@
     title: "Plugins/Tasks/Shell",
     component: PluginWorkspaceDemo,
     tags: ["visual-pending", "test"],
+    globals: {
+      colorMode: "light",
+      theme: "lapis",
+    },
     parameters: {
       layout: "fullscreen",
       a11y: workspaceA11y,
@@ -67,6 +71,13 @@
       throw new Error("The plugin workspace story has no active Lapis app");
     }
     return root.__lapisApp;
+  }
+
+  function expectObsidianLightTheme(canvasElement: HTMLElement) {
+    const root = canvasElement.ownerDocument.documentElement;
+    expect(root).toHaveAttribute("data-ui-theme", "lapis");
+    expect(root).not.toHaveClass("dark");
+    expect(getComputedStyle(root).colorScheme).toContain("light");
   }
 
   async function waitForReady(canvasElement: HTMLElement) {
@@ -1476,6 +1487,7 @@
     canvasElement.style.maxHeight = "100%";
     canvasElement.style.overflow = "hidden";
     const canvas = await waitForReady(canvasElement);
+    expectObsidianLightTheme(canvasElement);
 
     const app = storyApp(canvasElement);
     expect(app.plugins.isPluginEnabled("lapis-file-explorer")).toBe(true);
