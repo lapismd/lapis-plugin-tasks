@@ -57,6 +57,12 @@ content padding and scrollbar gutter. It stays sticky inside the planner scroll
 viewport, so rows cannot show around its edges while scrolling.
 Week controls are ghost buttons at rest; hover adds a semantic grey border
 without an outline ring, while keyboard focus keeps its visible ring.
+When the planner is mounted in a constrained sidebar-width surface, the Today
+calendar responds to the planner's own inline size: surrounding content padding,
+calendar gaps, and date typography reduce, the sticky calendar spans the full
+planner width while rows retain their own inline padding, and weekday labels
+switch from short names to single-letter initials without changing the full
+accessible date label.
 
 By default, the selected agenda includes every open task whose plan date or
 deadline is on or before the selected date. The persisted `dailyAgenda.hideOverdueTasks`

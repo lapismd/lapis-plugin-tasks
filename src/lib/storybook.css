@@ -97,3 +97,13 @@ body.sb-main-fullscreen #storybook-root:has(.task-story-shell-stage) {
 .task-story-shell-stage__surface--sortable {
   display: flex;
 }
+
+.task-story-shell-stage--constrained-sidebar {
+  width: 22rem;
+  min-width: 0;
+  padding: 0.5rem;
+}
+
+.task-story-shell-stage__surface--constrained-sidebar {
+  width: 100%;
+}

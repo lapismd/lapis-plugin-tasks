@@ -826,7 +826,17 @@
                 aria-label={`${day.weekday} ${day.date}${day.today ? ", today" : ""}`}
                 onclick={() => (selectedDate = day.date)}
               >
-                <span>{day.weekday}</span>
+                <span
+                  class="tasks-planner__week-label tasks-planner__week-label--short"
+                >
+                  {day.weekday}
+                </span>
+                <span
+                  class="tasks-planner__week-label tasks-planner__week-label--narrow"
+                  aria-hidden="true"
+                >
+                  {day.weekday.slice(0, 1)}
+                </span>
                 <strong>{day.dayNumber}</strong>
               </button>
             {/each}

@@ -32,6 +32,7 @@
 	class="tasks-planner__list"
 	class:tasks-planner__list--drop-target={droppable.isDropTarget}
 	data-planner-sortable-list={id}
+	role="group"
 	aria-label={label}
 	{@attach droppable.attach}
 >
