@@ -73,11 +73,13 @@
     return root.__lapisApp;
   }
 
-  function expectObsidianLightTheme(canvasElement: HTMLElement) {
+  async function expectObsidianLightTheme(canvasElement: HTMLElement) {
     const root = canvasElement.ownerDocument.documentElement;
-    expect(root).toHaveAttribute("data-ui-theme", "lapis");
-    expect(root).not.toHaveClass("dark");
-    expect(getComputedStyle(root).colorScheme).toContain("light");
+    await waitFor(() => {
+      expect(root).toHaveAttribute("data-ui-theme", "lapis");
+      expect(root).not.toHaveClass("dark");
+      expect(getComputedStyle(root).colorScheme).toContain("light");
+    });
   }
 
   async function waitForReady(canvasElement: HTMLElement) {
@@ -1487,7 +1489,7 @@
     canvasElement.style.maxHeight = "100%";
     canvasElement.style.overflow = "hidden";
     const canvas = await waitForReady(canvasElement);
-    expectObsidianLightTheme(canvasElement);
+    await expectObsidianLightTheme(canvasElement);
 
     const app = storyApp(canvasElement);
     expect(app.plugins.isPluginEnabled("lapis-file-explorer")).toBe(true);
