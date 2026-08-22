@@ -109,6 +109,11 @@ Live preview exposes one code-icon source control at the trailing edge of its
 grouping-heading pill; reading mode and embeds omit it. Clicking the block body
 never reveals source.
 
+Task rows inside the shared block use the same title typography as the daily
+planner row in both reading preview and live preview. Host Markdown and
+CodeMirror styles must not change the task title's workspace sans family, size,
+normal style, semibold weight, or line height.
+
 An H2-H6 that owns a resolved TaskRun—or a lightweight checklist in a Task
 document—keeps its Markdown semantics and adopts the Today section's category
 typography and pill treatment. Qualifying headings rotate through neutral,

@@ -83,6 +83,13 @@ describe("task-list Markdown contribution", () => {
     );
     expect(styles).toContain("margin-inline: 0;");
     expect(styles).toContain(
+      ".task-list-items-block .application-planner-task-row",
+    );
+    expect(styles).toContain("font-size: 1rem;");
+    expect(styles).toContain(".task-list-items-widget .task-line__title");
+    expect(styles).toContain("font-size: 0.92rem;");
+    expect(styles).toContain("font-weight: 650;");
+    expect(styles).toContain(
       "var(--interactive-accent, var(--ui-tasks-accent, var(--primary)))",
     );
     expect(styles).toContain(

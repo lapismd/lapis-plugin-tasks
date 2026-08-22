@@ -51,6 +51,14 @@
     textTransform: string;
   };
 
+  type TaskRowTitleTypography = {
+    fontFamily: string;
+    fontSize: string;
+    fontStyle: string;
+    fontWeight: string;
+    lineHeight: string;
+  };
+
   function storyApp(canvasElement: HTMLElement): App {
     const root = canvasElement.querySelector<
       HTMLElement & { __lapisApp?: App }
@@ -496,6 +504,38 @@
       lineHeight: style.lineHeight,
       textTransform: style.textTransform,
     };
+  }
+
+  function taskRowTitleTypography(
+    element: HTMLElement,
+  ): TaskRowTitleTypography {
+    const style = getComputedStyle(element);
+    return {
+      fontFamily: style.fontFamily,
+      fontSize: style.fontSize,
+      fontStyle: style.fontStyle,
+      fontWeight: style.fontWeight,
+      lineHeight: style.lineHeight,
+    };
+  }
+
+  function visibleTaskRunTitle(run: HTMLElement, title: string) {
+    const titleButton = within(run).getByRole("button", {
+      name: title,
+      exact: true,
+    });
+    expect(titleButton).toHaveClass("task-line__title");
+    return titleButton;
+  }
+
+  function expectTaskRunTitleTypography(
+    run: HTMLElement,
+    title: string,
+    typography: TaskRowTitleTypography,
+  ) {
+    expect(taskRowTitleTypography(visibleTaskRunTitle(run, title))).toEqual(
+      typography,
+    );
   }
 
   function visibleElements(canvasElement: HTMLElement, selector: string) {
@@ -2210,6 +2250,12 @@
         ".tasks-planner__day-section-label",
       )[0]!,
     );
+    const plannerTaskTitleTypography = taskRowTitleTypography(
+      canvas.getByRole("button", {
+        name: "Review interview notes",
+        exact: true,
+      }),
+    );
 
     await openMarkdownFixture(canvasElement, app, "lists/cv.md", "preview");
     await expectTaskGroupHeadingTones(
@@ -2219,6 +2265,11 @@
     );
     let run = visibleTaskRun(canvasElement, "Explore conference talks");
     await expectContainedMarkdownRun(run, "hidden");
+    expectTaskRunTitleTypography(
+      run,
+      "Explore conference talks",
+      plannerTaskTitleTypography,
+    );
     expect(run.querySelector("[data-task-drag-handle]")).not.toBeInTheDocument();
     await expectDedicatedMarkdownCheckbox(run, "Explore conference talks");
 
@@ -2235,6 +2286,11 @@
     );
     run = visibleTaskRun(canvasElement, "Explore conference talks");
     await expectContainedMarkdownRun(run, "visible");
+    expectTaskRunTitleTypography(
+      run,
+      "Explore conference talks",
+      plannerTaskTitleTypography,
+    );
     expect(run.querySelector("[data-task-drag-handle]")).not.toBeInTheDocument();
     await expectDedicatedMarkdownCheckbox(run, "Explore conference talks");
 

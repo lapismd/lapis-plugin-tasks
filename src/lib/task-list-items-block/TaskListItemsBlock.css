@@ -21,6 +21,27 @@
   white-space: normal;
 }
 
+.task-list-items-block .application-planner-task-row,
+.task-list-items-widget .application-planner-task-row {
+  font-family: var(--ui-workspace-font-sans, var(--font-sans, inherit));
+  font-size: 1rem;
+  font-style: normal;
+  line-height: normal;
+}
+
+.task-list-items-block .task-line__title,
+.task-list-items-block .task-line__title--link,
+.task-list-items-block .task-line__title-input,
+.task-list-items-widget .task-line__title,
+.task-list-items-widget .task-line__title--link,
+.task-list-items-widget .task-line__title-input {
+  font-family: var(--ui-workspace-font-sans, var(--font-sans, inherit));
+  font-size: 0.92rem;
+  font-style: normal;
+  font-weight: 650;
+  line-height: var(--task-line-leading-rail);
+}
+
 .task-list-items-widget .application-planner-task-row,
 .task-list-items-widget .application-planner-task-row__columns,
 .task-list-items-widget
