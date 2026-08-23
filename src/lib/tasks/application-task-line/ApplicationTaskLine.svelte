@@ -2,6 +2,7 @@
 	import './ApplicationTaskLine.css';
   import CheckCircle2Icon from "@lucide/svelte/icons/check-circle-2";
   import CircleIcon from "@lucide/svelte/icons/circle";
+  import CircleXIcon from "@lucide/svelte/icons/circle-x";
   import FlagIcon from "@lucide/svelte/icons/flag";
   import HourglassIcon from "@lucide/svelte/icons/hourglass";
   import * as Tooltip from "@lapismd/design-core/shadcn/tooltip";
@@ -57,7 +58,20 @@
   const dueSummary = $derived(getDueSummary(task.dueAt, now));
   const titleExcerpt = $derived(taskBodyExcerpt(task.body));
   const effectiveStatus = $derived(
-    task.status ?? (task.done ? "done" : "todo"),
+    task.status === "canceled"
+      ? "canceled"
+      : task.status === "waiting"
+        ? "waiting"
+        : task.status === "done" || task.status === "completed" || task.done
+          ? "done"
+          : "todo",
+  );
+  const checkboxStatus = $derived(
+    task.status === "canceled"
+      ? "canceled"
+      : task.done
+        ? "completed"
+        : "open",
   );
   const showPriority = $derived(task.priority && task.priority !== "medium");
 </script>
@@ -72,6 +86,7 @@
     <ApplicationTaskCheckbox
       class="task-line__checkbox"
       checked={task.done}
+      status={checkboxStatus}
       label={`Mark ${titleExcerpt} ${task.done ? "incomplete" : "complete"}`}
       onchange={(event) => onToggleDone(task.id, event)}
     />
@@ -80,12 +95,15 @@
       class="task-line__status-icon"
       class:task-line__status-icon--waiting={effectiveStatus === "waiting"}
       class:task-line__status-icon--done={effectiveStatus === "done"}
+      class:task-line__status-icon--canceled={effectiveStatus === "canceled"}
       aria-hidden="true"
     >
       {#if effectiveStatus === "waiting"}
         <HourglassIcon />
       {:else if effectiveStatus === "done"}
         <CheckCircle2Icon />
+      {:else if effectiveStatus === "canceled"}
+        <CircleXIcon />
       {:else}
         <CircleIcon />
       {/if}

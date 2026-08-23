@@ -299,6 +299,7 @@
           task.status === "canceled" ||
           Boolean(task.completedAt)
         }
+        status={task.status === "canceled" ? "canceled" : undefined}
         label={
           task.status === "done" ||
           task.status === "completed" ||

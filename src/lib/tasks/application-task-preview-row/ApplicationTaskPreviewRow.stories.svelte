@@ -849,6 +849,39 @@
 </Story>
 
 <Story
+  name="Canceled checkbox icon"
+  tags={["test"]}
+  parameters={{
+    a11y: {
+      // The row surface contains nested controls; row-level coverage owns this.
+      test: "off",
+    },
+    docs: {
+      description: {
+        story:
+          "A canceled task keeps the checkbox checked while replacing the completion tick with the red canceled icon.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const checkbox = canvas.getByRole("checkbox", {
+      name: "Mark Tailor platform CV variant incomplete",
+    });
+    expect(checkbox).toBeChecked();
+    expect(checkbox).toHaveAttribute("data-task-checkbox-state", "canceled");
+
+    const rail = checkbox.closest("[data-task-checkbox]");
+    expect(rail).toHaveAttribute("data-task-checkbox-state", "canceled");
+    expect(rail?.querySelector(".task-checkbox__cancel-icon svg")).not.toBeNull();
+  }}
+>
+  {#snippet template()}
+    <ApplicationTaskPreviewRowSampleStory canceledByDefault />
+  {/snippet}
+</Story>
+
+<Story
   name="Open checklist refreshes after an external edit"
   tags={["test"]}
   parameters={{

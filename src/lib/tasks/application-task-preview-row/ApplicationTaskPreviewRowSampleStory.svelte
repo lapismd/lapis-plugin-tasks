@@ -8,17 +8,19 @@
     expandedByDefault = false,
     recurringByDefault = false,
     invalidRecurrenceByDefault = false,
+    canceledByDefault = false,
   }: {
     expandedByDefault?: boolean;
     recurringByDefault?: boolean;
     invalidRecurrenceByDefault?: boolean;
+    canceledByDefault?: boolean;
   } = $props();
 
   let task = $state<ApplicationTask>({
     id: "task-1",
     body: "Tailor platform CV variant",
-    done: false,
-    status: "todo",
+    done: untrack(() => canceledByDefault),
+    status: untrack(() => (canceledByDefault ? "canceled" : "todo")),
     dueAt: "2026-07-02",
     repeat: untrack(() => recurringByDefault)
       ? {

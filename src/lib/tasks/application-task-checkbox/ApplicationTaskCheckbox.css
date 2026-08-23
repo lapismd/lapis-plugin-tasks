@@ -7,7 +7,12 @@
   --task-checkbox-tick-height: 0.4rem;
   --task-checkbox-tick-border: 1.5px;
   --task-checkbox-tick-nudge: -0.04rem;
+  --task-checkbox-canceled-color: var(
+    --ui-tasks-destructive-text,
+    var(--ui-tasks-destructive, var(--destructive, #dc2626))
+  );
 
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -122,6 +127,60 @@
 .task-checkbox input:checked::after {
   border-color: var(--kanban-card, var(--background));
   opacity: 1;
+}
+
+.task-checkbox input[data-task-checkbox-state="canceled"] {
+  border-color: var(--task-checkbox-canceled-color);
+}
+
+.task-checkbox input[data-task-checkbox-state="canceled"]::before {
+  background: color-mix(
+    in srgb,
+    var(--task-checkbox-canceled-color) 12%,
+    transparent
+  );
+}
+
+.task-checkbox input[data-task-checkbox-state="canceled"]::after {
+  border-color: transparent;
+  opacity: 0;
+}
+
+.task-checkbox input[data-task-checkbox-state="canceled"]:hover,
+.task-checkbox input[data-task-checkbox-state="canceled"]:focus-visible {
+  border-color: var(--task-checkbox-canceled-color);
+}
+
+.task-checkbox input[data-task-checkbox-state="canceled"]:hover::before,
+.task-checkbox input[data-task-checkbox-state="canceled"]:focus-visible::before {
+  background: color-mix(
+    in srgb,
+    var(--task-checkbox-canceled-color) 18%,
+    transparent
+  );
+}
+
+.task-checkbox input[data-task-checkbox-state="canceled"]:focus-visible {
+  outline-color: color-mix(
+    in srgb,
+    var(--task-checkbox-canceled-color) 36%,
+    transparent
+  );
+}
+
+.task-checkbox__cancel-icon {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--task-checkbox-canceled-color);
+  pointer-events: none;
+}
+
+.task-checkbox__cancel-icon svg {
+  width: calc(var(--task-checkbox-size) * 0.74);
+  height: calc(var(--task-checkbox-size) * 0.74);
+  stroke-width: 2.35;
 }
 
 @media (prefers-reduced-motion: reduce) {

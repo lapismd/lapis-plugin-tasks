@@ -21,6 +21,12 @@ expanded inline editor. Only the trailing detail control opens Task detail.
 The detail control, checkbox, title line, and leading hover/focus drag handle
 share one vertical center.
 
+Canceled Tasks keep terminal checkbox semantics but do not use the completed
+tick. Their shared row checkbox, read-only status icon, and legacy planner
+fallback marker use the canceled `CircleX` glyph with the Tasks destructive red
+treatment. Checklist item checkboxes continue to use the normal completed tick,
+because checklist item completion is not Task cancellation.
+
 ## Structured metadata editor
 
 The expanded row editor and Task detail use the same field definitions. Their

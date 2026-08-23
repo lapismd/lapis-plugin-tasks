@@ -12,6 +12,7 @@
   import CalendarDaysIcon from "@lucide/svelte/icons/calendar-days";
   import CircleAlertIcon from "@lucide/svelte/icons/circle-alert";
   import CircleEllipsisIcon from "@lucide/svelte/icons/circle-ellipsis";
+  import CircleXIcon from "@lucide/svelte/icons/circle-x";
   import FlagIcon from "@lucide/svelte/icons/flag";
   import FolderKanbanIcon from "@lucide/svelte/icons/folder-kanban";
   import InboxIcon from "@lucide/svelte/icons/inbox";
@@ -551,8 +552,21 @@
   <article
     class="tasks-planner__task"
     class:tasks-planner__task--done={isTaskDone(task)}
+    class:tasks-planner__task--canceled={task.status === "canceled"}
   >
-    <span class="tasks-planner__check" aria-hidden="true"></span>
+    <span
+      class="tasks-planner__check"
+      data-task-checkbox-state={task.status === "canceled"
+        ? "canceled"
+        : isTaskDone(task)
+          ? "completed"
+          : "open"}
+      aria-hidden="true"
+    >
+      {#if task.status === "canceled"}
+        <CircleXIcon />
+      {/if}
+    </span>
     <div class="tasks-planner__task-main">
       <div class="tasks-planner__task-title-row">
         <h3>{task.title}</h3>

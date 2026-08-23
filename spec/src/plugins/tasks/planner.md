@@ -148,6 +148,10 @@ which render as `N days ago` and expose the full planned date in a tooltip.
 Morning, Afternoon, and Evening schedule chips show the matching day-part icon
 immediately before the day-part text. Deadline remains the existing title-row
 due indicator and is not moved into the lower metadata row.
+Canceled task rows retain checked terminal semantics but replace the completed
+checkbox tick with the canceled `CircleX` glyph in destructive red. Read-only
+row icons and legacy planner fallback rows use that same canceled treatment,
+while nested checklist items retain the normal completed tick. See LN-TASK-057.
 Expanded row metadata composes the shared Design Core controls throughout,
 including structured List, recurrence, and raw RRULE editing; planner pages do
 not substitute native form dropdowns. The List picker keeps the Command View

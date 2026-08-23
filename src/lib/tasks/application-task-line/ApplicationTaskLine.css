@@ -40,6 +40,10 @@
     color: var(--ui-tasks-success);
   }
 
+  .task-line__status-icon--canceled {
+    color: var(--ui-tasks-destructive-text, var(--ui-tasks-destructive));
+  }
+
   .task-line__status-icon svg {
     width: 0.85rem;
     height: 0.85rem;
