@@ -263,6 +263,11 @@ task:
   plan:
     date: 2026-08-19
     at: morning
+  repeat:
+    start: 2026-08-18
+    rrule: FREQ=DAILY
+    anchor: schedule
+    missed: carry
 ---
 # Prepare the morning brief
 `,
@@ -281,7 +286,7 @@ task:
     date: 2026-08-19
     at: morning
   repeat:
-    start: 2026-08-19
+    start: 2026-08-18
     rrule: FREQ=DAILY
     anchor: schedule
     missed: carry
@@ -302,6 +307,11 @@ task:
   plan:
     date: 2026-08-19
     at: "12:00"
+  repeat:
+    start: 2026-08-18
+    rrule: FREQ=DAILY
+    anchor: schedule
+    missed: carry
 ---
 # Review the midday handoff
 `,
@@ -526,6 +536,30 @@ task:
 # Submit Nova Bank application
 `,
   },
+];
+
+export const plannerHistoryMarkdownFixtures: PlannerMarkdownFixture[] = [
+  {
+    path: "daily/2026-08-18.md",
+    raw: `---
+type: daily-note
+date: 2026-08-18
+---
+# Tuesday
+
+## Tasks
+
+### Morning
+
+- [x] [Daily stand-up reflection](../inbox/daily-reflection.md) : 3 reflections <!-- task-occurrence task=story-task-daily-reflection date=2026-08-18 kind=count unit=reflections -->
+- [ ] [Prepare the morning brief](../inbox/morning.md) <!-- task-occurrence task=story-task-morning date=2026-08-18 kind=boolean -->
+`,
+  },
+];
+
+export const plannerWorkspaceMarkdownFixtures: PlannerMarkdownFixture[] = [
+  ...plannerMarkdownFixtures,
+  ...plannerHistoryMarkdownFixtures,
 ];
 
 export function parsePlannerFixtures(): ParsedTaskFile[] {

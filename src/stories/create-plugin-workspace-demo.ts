@@ -11,7 +11,7 @@ import { SearchPlugin } from "@lapis-notes/search";
 import { TasksPlugin } from "../lib";
 import {
   PLANNER_FIXTURE_TODAY,
-  plannerMarkdownFixtures,
+  plannerWorkspaceMarkdownFixtures,
 } from "../lib/model/planner-fixtures";
 
 function leaf(
@@ -105,7 +105,10 @@ export function createPluginWorkspaceSeed(): Record<string, string> {
     ),
     ".obsidian/workspace.json": JSON.stringify(workspaceLayout(), null, 2),
     ...Object.fromEntries(
-      plannerMarkdownFixtures.map((fixture) => [fixture.path, fixture.raw]),
+      plannerWorkspaceMarkdownFixtures.map((fixture) => [
+        fixture.path,
+        fixture.raw,
+      ]),
     ),
   };
 }

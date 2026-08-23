@@ -248,6 +248,38 @@
     ).toBeVisible();
   }
 
+  async function showHistoricalSelectedDate(
+    canvasElement: HTMLElement,
+    canvas: ReturnType<typeof within>,
+    { restoreToday = false }: { restoreToday?: boolean } = {},
+  ) {
+    const previousDate = await canvas.findByRole("button", {
+      name: "Tue 2026-08-18",
+      exact: true,
+    });
+    await userEvent.click(previousDate);
+    const history = await canvas.findByRole("region", {
+      name: "Task occurrence history",
+    });
+    expect(history).toBeVisible();
+    expect(within(history).getByText("Daily stand-up reflection")).toBeVisible();
+    expect(within(history).getByText("Prepare the morning brief")).toBeVisible();
+    expect(within(history).getByText("Review the midday handoff")).toBeVisible();
+    expect(within(history).getByText("completed")).toBeVisible();
+    expect(within(history).getByText("missed")).toBeVisible();
+    expect(within(history).getByText("unrecorded")).toBeVisible();
+    expect(within(history).getByText("3 reflections")).toBeVisible();
+    if (!restoreToday) return;
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Return to today", exact: true }),
+    );
+    await waitFor(() => {
+      expect(
+        canvasElement.querySelectorAll<HTMLElement>("[data-day-section]"),
+      ).toHaveLength(5);
+    });
+  }
+
   async function assertTaskDetailMetadataActionRow(
     canvasElement: HTMLElement,
     canvas: ReturnType<typeof within>,
@@ -1750,6 +1782,9 @@
     await exerciseTasksWorkspaceSettings(canvasElement, canvas, app);
     expect(await canvas.findByText("Tailor platform CV variant")).toBeVisible();
     expect(canvas.getByTestId("tasks-planner")).toBeVisible();
+    await showHistoricalSelectedDate(canvasElement, canvas, {
+      restoreToday: true,
+    });
     await assertTaskDetailMetadataActionRow(canvasElement, canvas);
     const collapsePlanner = canvas.getByRole("button", {
       name: "Collapse planner column",
@@ -2517,6 +2552,28 @@
       plannerColumn.getBoundingClientRect().width +
         firstDetailColumn.getBoundingClientRect().width,
     ).toBeCloseTo(earlierPairWidths.planner + earlierPairWidths.detail, 0);
+  }}
+/>
+
+<Story
+  name="Desktop Workspace Historical Date"
+  args={{ displayMode: "desktop" }}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          "Boot the real Tasks workspace and leave the Today planner on a seeded past date so the occurrence history surface is visible.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    canvasElement.style.height = "100%";
+    canvasElement.style.maxHeight = "100%";
+    canvasElement.style.overflow = "hidden";
+    const canvas = await waitForReady(canvasElement);
+    await showDailyAgendaChecklistSummary(canvasElement, canvas);
+    await showHistoricalSelectedDate(canvasElement, canvas);
+    await collapseLapisLeftSidebar(canvas);
   }}
 />
 

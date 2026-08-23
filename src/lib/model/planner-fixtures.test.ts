@@ -2,11 +2,18 @@ import { MemoryAppDatabase } from "@lapis-notes/api/app-database";
 import { describe, expect, it } from "vitest";
 import {
   catalogTasksFromPlannerFixtures,
+  plannerHistoryMarkdownFixtures,
   parsePlannerFixtures,
   plannerMarkdownFixtures,
   PLANNER_FIXTURE_TODAY,
 } from "./planner-fixtures";
+import {
+  PUBLIC_TASK_OCCURRENCES_PROJECTION_ID,
+  TASK_OCCURRENCE_PROJECTION_FIELDS,
+  TASK_OCCURRENCE_PROJECTION_VERSION,
+} from "@lapis-notes/api/app-database";
 import { indexTaskDocument } from "./task-index";
+import { taskOccurrenceProjectionRows } from "./task-occurrence";
 import { createMemoryTaskFileStore, TaskRepository } from "./task-repository";
 import { serializeTaskDocument } from "./task-document";
 import {
@@ -39,7 +46,7 @@ describe("planner Markdown fixtures", () => {
     expect(
       tasks.find((task) => task.id === "story-task-daily-reflection")?.repeat,
     ).toMatchObject({
-      start: "2026-08-19",
+      start: "2026-08-18",
       rrule: "FREQ=DAILY",
       anchor: "schedule",
       missed: "carry",
@@ -129,6 +136,71 @@ describe("planner Markdown fixtures", () => {
       someday: snapshot.someday.length,
       logbook: snapshot.logbook.reduce((total, group) => total + group.tasks.length, 0),
     }).toEqual({ inbox: 1, review: 1, upcoming: 5, anytime: 2, someday: 1, logbook: 3 });
+  });
+
+  it("seeds historical selected-date rows for the real workspace story", async () => {
+    const database = new MemoryAppDatabase("planner-history-fixture");
+    await database.open();
+    for (const document of parsePlannerFixtures()) {
+      await indexTaskDocument(database, document, undefined, PLANNER_FIXTURE_TODAY);
+    }
+    await database.registerProjectionDefinition({
+      projectionId: PUBLIC_TASK_OCCURRENCES_PROJECTION_ID,
+      ownerPluginId: "tasks",
+      schemaVersion: TASK_OCCURRENCE_PROJECTION_VERSION,
+      configHash: "occurrence-v1",
+      visibility: "public",
+      fields: TASK_OCCURRENCE_PROJECTION_FIELDS,
+      active: true,
+      updatedAt: 1,
+    });
+    for (const fixture of plannerHistoryMarkdownFixtures) {
+      const rows = taskOccurrenceProjectionRows(fixture.raw, fixture.path);
+      await database.replaceProjectionSource({
+        projectionId: PUBLIC_TASK_OCCURRENCES_PROJECTION_ID,
+        sourcePath: fixture.path,
+        sourceHash: fixture.raw,
+        rows: rows.map((row, ordinal) => ({
+          id: row.observationId,
+          kind: "observation",
+          ordinal,
+          data: row as unknown as Record<string, unknown>,
+        })),
+        writerPluginId: "tasks",
+      });
+    }
+    const history = await new TaskRepository(database).occurrenceHistory(
+      "2026-08-18",
+      "2026-08-18",
+      PLANNER_FIXTURE_TODAY,
+    );
+    expect(
+      history.map(({ title, outcome, value, unit }) => ({
+        title,
+        outcome,
+        value,
+        unit,
+      })),
+    ).toEqual([
+      {
+        title: "Daily stand-up reflection",
+        outcome: "completed",
+        value: 3,
+        unit: "reflections",
+      },
+      {
+        title: "Prepare the morning brief",
+        outcome: "missed",
+        value: undefined,
+        unit: undefined,
+      },
+      {
+        title: "Review the midday handoff",
+        outcome: "unrecorded",
+        value: undefined,
+        unit: undefined,
+      },
+    ]);
   });
 
   it("keeps canceled Markdown tasks in the repository-backed Logbook", async () => {
