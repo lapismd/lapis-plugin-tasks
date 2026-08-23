@@ -110,7 +110,7 @@ in Markdown.
 The daily-observation repository resolves the API-owned host provider before
 writing. On startup and local-date refresh, only tracked schedule occurrences
 whose effective state is current for today are proactively materialized.
-Quantitative completion processes the readable daily list item before writing
+Tracked recurring completion processes the readable daily list item before writing
 the next rolling Task plan. A retry after the second write fails reuses the
 same `taskId + occurrenceDate` item. Explicit skip similarly ensures an
 unchecked observation before advancement.

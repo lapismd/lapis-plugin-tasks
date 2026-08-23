@@ -51,6 +51,12 @@ describe("planner Markdown fixtures", () => {
       anchor: "schedule",
       missed: "carry",
     });
+    expect(
+      tasks.find((task) => task.id === "story-task-daily-reflection")?.tracking,
+    ).toEqual({
+      type: "count",
+      unit: "reflections",
+    });
   });
 
   it("queries the same fixture set through TaskRepository summaries", async () => {

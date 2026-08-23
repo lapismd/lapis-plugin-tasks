@@ -290,6 +290,9 @@ task:
     rrule: FREQ=DAILY
     anchor: schedule
     missed: carry
+  tracking:
+    type: count
+    unit: reflections
 ---
 # Daily stand-up reflection
 `,

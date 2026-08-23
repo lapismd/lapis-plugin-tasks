@@ -177,11 +177,12 @@ execute them.
 ## Daily outcomes and statistics
 
 The app provider locates one canonical `type: daily-note`, `date: YYYY-MM-DD`
-document. Tasks materializes at most one exact list item for
-`taskId + occurrenceDate` under `## Tasks` and the configured day section.
-Boolean observations are unchecked/checked Task links. Quantitative entries
-start unchecked and complete as readable `: value unit` or `: duration` lines;
-indented context remains untouched.
+document for tracked recurring Tasks. Tasks materializes at most one exact list
+item for `taskId + occurrenceDate` under `## Tasks` and the configured day
+section. Boolean tracked observations are unchecked/checked Task links.
+Quantitative entries start unchecked and complete as readable `: value unit` or
+`: duration` lines; indented context remains untouched. Untracked recurrence
+advances the rolling Task plan without creating a daily observation.
 
 Each item carries a trailing `task-occurrence` HTML comment containing encoded
 task identity, occurrence date, tracking kind, and quantitative unit where
