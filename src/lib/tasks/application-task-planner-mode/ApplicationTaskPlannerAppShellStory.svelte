@@ -17,6 +17,7 @@
     createTask,
     PLANNER_FIXTURE_TODAY,
     sampleApplicationBoard,
+    type ApplicationTask,
     type JobApplication,
     type Task,
     type TaskBucket,
@@ -25,6 +26,7 @@
   import { samplePlannerTasks } from "../story-fixture";
   import ApplicationTaskSidebarDetail from "../application-task-sidebar-detail/ApplicationTaskSidebarDetail.svelte";
   import ApplicationTaskPlannerMode from "./ApplicationTaskPlannerMode.svelte";
+  import { applyApplicationTaskPatch } from "../lib/application-task-planner-mode-helpers";
   import "./ApplicationTaskPlannerAppShellStory.css";
 
   const projects = [
@@ -116,12 +118,6 @@
       ? (tasks.find((task) => task.id === activeTaskId) ?? null)
       : null,
   );
-  const activeTaskApplication = $derived(
-    activeTask?.applicationId
-      ? (applicationSummaries[activeTask.applicationId] ?? null)
-      : null,
-  );
-
   $effect(() => {
     if (detailSidebar.closed && activeTaskId !== null) {
       activeTaskId = null;
@@ -145,6 +141,10 @@
       title,
       updatedAt: new Date().toISOString(),
     });
+  }
+
+  function updateActiveTaskMetadata(task: Task, patch: Partial<ApplicationTask>) {
+    saveTask(applyApplicationTaskPatch(task, patch, new Date().toISOString()));
   }
 
   function toggleActiveTaskDone(task: Task) {
@@ -463,10 +463,11 @@
         {#if activeTask}
           <ApplicationTaskSidebarDetail
             task={activeTask}
-            application={activeTaskApplication}
+            areaOptions={snapshot.areas}
             {now}
             onToggleDone={toggleActiveTaskDone}
             onUpdateTitle={updateActiveTaskTitle}
+            onUpdateTask={updateActiveTaskMetadata}
             onRemoveTask={removeActiveTask}
           >
             {#snippet closeAction()}

@@ -29,11 +29,15 @@ because checklist item completion is not Task cancellation.
 
 ## Structured metadata editor
 
-The expanded row editor and Task detail use the same field definitions. Their
-controls update the active Task value immediately and send one complete patch
-through the owning callback. Canonical runtime adapters then route the changed
-fields through `TaskRepository`, so the Markdown file is edited, reparsed, and
-reprojected instead of leaving the interaction as catalog-only state.
+The expanded row footer and Task detail under-title action row use the same
+layout-transparent metadata action component and field definitions. Their host
+containers provide the same wrapping flex-row styling, so the shared controls
+wrap within the available row or detail header instead of stacking as a form
+column. Their controls update the active Task value immediately and send one
+complete patch through the owning callback. Canonical runtime adapters then
+route the changed fields through `TaskRepository`, so the Markdown file is
+edited, reparsed, and reprojected instead of leaving the interaction as
+catalog-only state.
 
 The canonical controls are:
 
@@ -60,7 +64,7 @@ Known list options show the display title first, then the wrapped source
 Markdown path in smaller supporting text. When the list navigation index
 annotates the list under a section or parent list, the option also shows that
 trail with the shared Design Core Breadcrumb component.
-See LN-TASK-013 and LN-TASK-045–046.
+See LN-TASK-013, LN-TASK-045–046, and LN-TASK-058.
 
 When present, the lower metadata row starts with compact oval controls for a
 Task's planned schedule and recurrence, then application and List chips. The

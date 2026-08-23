@@ -152,9 +152,11 @@ Canceled task rows retain checked terminal semantics but replace the completed
 checkbox tick with the canceled `CircleX` glyph in destructive red. Read-only
 row icons and legacy planner fallback rows use that same canceled treatment,
 while nested checklist items retain the normal completed tick. See LN-TASK-057.
-Expanded row metadata composes the shared Design Core controls throughout,
-including structured List, recurrence, and raw RRULE editing; planner pages do
-not substitute native form dropdowns. The List picker keeps the Command View
+Expanded row metadata and the Task detail under-title action row compose the
+same layout-transparent metadata action component throughout, including
+status, priority, deadline, structured List, recurrence, and raw RRULE editing;
+their host rows own the wrapping flex layout and planner pages do not
+substitute native form dropdowns. The List picker keeps the Command View
 surface, showing display titles with wrapped Markdown file paths and optional
 navigation breadcrumbs from the List tree. Tasks-owned Command View popovers
 that replace Popover padding with internal list spacing also clear the inherited

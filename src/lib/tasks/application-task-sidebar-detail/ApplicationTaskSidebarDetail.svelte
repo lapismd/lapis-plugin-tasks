@@ -1,6 +1,5 @@
 <script lang="ts">
   import "./ApplicationTaskSidebarDetail.css";
-  import CalendarIcon from "@lucide/svelte/icons/calendar";
   import CopyPlusIcon from "@lucide/svelte/icons/copy-plus";
   import EllipsisVerticalIcon from "@lucide/svelte/icons/ellipsis-vertical";
   import LinkIcon from "@lucide/svelte/icons/link";
@@ -8,12 +7,7 @@
   import ListTodoIcon from "@lucide/svelte/icons/list-todo";
   import LogOutIcon from "@lucide/svelte/icons/log-out";
   import PrinterIcon from "@lucide/svelte/icons/printer";
-  import SignalHighIcon from "@lucide/svelte/icons/signal-high";
-  import SignalLowIcon from "@lucide/svelte/icons/signal-low";
-  import SignalMediumIcon from "@lucide/svelte/icons/signal-medium";
-  import TagIcon from "@lucide/svelte/icons/tag";
   import Trash2Icon from "@lucide/svelte/icons/trash-2";
-  import UserIcon from "@lucide/svelte/icons/user";
   import {
     Message,
     MessageBubble,
@@ -24,21 +18,17 @@
   import * as ScrollArea from "@lapismd/design-core/shadcn/scroll-area";
   import type { Snippet } from "svelte";
 
-  import type { Task } from "../../model";
-  import { formatTaskScheduleLabel, getDueSummary } from "../../model";
+  import type { ApplicationTask, Task } from "../../model";
+  import { taskToApplicationTask } from "../../model";
   import ApplicationMarkdownPreview from "../../model/ReferenceMarkdownPreview.svelte";
+  import type { TaskListPickerOptionInput } from "../application-task-area-picker";
   import ApplicationTaskCheckbox from "../application-task-checkbox/ApplicationTaskCheckbox.svelte";
-
-  type ApplicationSummary = {
-    title: string;
-    subtitle?: string;
-    color?: string;
-  };
+  import ApplicationTaskMetadataActionBar from "../application-task-metadata-action-bar/ApplicationTaskMetadataActionBar.svelte";
 
   let {
     task,
-    application = null,
     creatorLabel = "Steve",
+    areaOptions = [],
     closeAction,
     documentModeAction,
     documentBody,
@@ -47,14 +37,14 @@
     messages,
     onToggleDone = () => {},
     onUpdateTitle = () => {},
+    onUpdateTask = () => {},
     onRemoveTask = () => {},
     onCopyLink = () => {},
     onMenuAction = () => {},
-    onOpenApplication,
   }: {
     task: Task;
-    application?: ApplicationSummary | null;
     creatorLabel?: string;
+    areaOptions?: TaskListPickerOptionInput[];
     closeAction?: Snippet;
     documentModeAction?: Snippet;
     documentBody?: Snippet;
@@ -63,9 +53,9 @@
     messages?: Snippet;
     onToggleDone?: (task: Task) => void;
     onUpdateTitle?: (task: Task, title: string) => void;
+    onUpdateTask?: (task: Task, patch: Partial<ApplicationTask>) => void;
     onRemoveTask?: (task: Task) => void;
     onCopyLink?: (task: Task) => void;
-    onOpenApplication?: (applicationId: string) => void;
     onMenuAction?: (
       action:
         | "unsubscribe"
@@ -80,24 +70,7 @@
   let menuOpen = $state(false);
   let titleEditor = $state<HTMLElement | null>(null);
 
-  const dueSummary = $derived(getDueSummary(task.dueAt, now));
-  const scheduleLabel = $derived.by(() => {
-    if (dueSummary) return dueSummary.shortDate;
-    return formatTaskScheduleLabel({
-      when: task.when,
-      planAt: task.planAt,
-      scheduledAt: task.scheduledAt ?? task.planDate,
-    });
-  });
-  const priorityLabel = $derived(
-    task.priority === "high"
-      ? "High"
-      : task.priority === "low"
-        ? "Low"
-        : task.priority === "medium"
-          ? "Medium"
-          : null,
-  );
+  const metadataTask = $derived(taskToApplicationTask(task));
   const createdRelative = $derived(formatCreatedRelative(task.createdAt));
   const statusTone = $derived(
     task.status === "done" ||
@@ -176,6 +149,31 @@
       if (titleEditor) titleEditor.textContent = task.title;
       titleEditor?.blur();
     }
+  }
+
+  function updateTaskMetadata(nextTask: ApplicationTask) {
+    onUpdateTask(task, {
+      status: nextTask.status,
+      done: nextTask.done,
+      completedAt: nextTask.completedAt,
+      priority: nextTask.priority,
+      dueAt: nextTask.dueAt,
+      scheduledAt: nextTask.scheduledAt,
+      when: nextTask.when,
+      start: nextTask.start,
+      planDate: nextTask.planDate,
+      planAt: nextTask.planAt,
+      areas: nextTask.areas,
+      listId: nextTask.listId,
+      repeat: nextTask.repeat,
+      unparsedRepeat: nextTask.unparsedRepeat,
+      tracking: nextTask.tracking,
+      effectiveOccurrenceDate: nextTask.effectiveOccurrenceDate,
+      effectiveOccurrenceState: nextTask.effectiveOccurrenceState,
+      effectiveForDate: nextTask.effectiveForDate,
+      deadline: nextTask.deadline,
+      inbox: nextTask.inbox,
+    });
   }
 </script>
 
@@ -323,65 +321,13 @@
       ></div>
     </div>
 
-    <div class="task-sidebar-detail__chips">
-      {#if application}
-        {#if onOpenApplication && task.applicationId}
-          {@const applicationId = task.applicationId}
-          <button
-            type="button"
-            class="task-sidebar-detail__chip task-sidebar-detail__chip--action"
-            aria-label={`Open ${application.title}`}
-            onclick={() => onOpenApplication(applicationId)}
-          >
-            <span class="task-sidebar-detail__chip-emoji" aria-hidden="true"
-              >💯</span
-            >
-            {application.title}
-          </button>
-        {:else}
-          <span class="task-sidebar-detail__chip">
-            <span class="task-sidebar-detail__chip-emoji" aria-hidden="true"
-              >💯</span
-            >
-            {application.title}
-          </span>
-        {/if}
-      {/if}
-      {#if scheduleLabel}
-        <span class="task-sidebar-detail__chip">
-          <CalendarIcon />
-          {scheduleLabel}
-        </span>
-      {/if}
-      <span class="task-sidebar-detail__chip task-sidebar-detail__chip--dashed">
-        <UserIcon />
-        Assignee
-      </span>
-      {#if priorityLabel}
-        <span class="task-sidebar-detail__chip">
-          {#if task.priority === "high"}
-            <SignalHighIcon />
-          {:else if task.priority === "low"}
-            <SignalLowIcon />
-          {:else}
-            <SignalMediumIcon />
-          {/if}
-          {priorityLabel}
-        </span>
-      {:else}
-        <span
-          class="task-sidebar-detail__chip task-sidebar-detail__chip--dashed"
-        >
-          <SignalMediumIcon />
-          Priority
-        </span>
-      {/if}
-      {#each task.areas as area (area)}
-        <span class="task-sidebar-detail__chip">
-          <TagIcon />
-          {area}
-        </span>
-      {/each}
+    <div class="task-sidebar-detail__metadata-actions">
+      <ApplicationTaskMetadataActionBar
+        task={metadataTask}
+        {areaOptions}
+        {now}
+        onChange={updateTaskMetadata}
+      />
     </div>
   </header>
 

@@ -22,6 +22,7 @@
     findListNavNode,
     buildTaskPlannerDaySnapshot,
     listTreeFromAreas,
+    type ApplicationTask,
     type JobApplication,
     type ListTreeDropTarget,
     type TaskListCreateInput,
@@ -51,6 +52,7 @@
     appendDetailColumn,
     unwindDetailColumns,
   } from "./detail-column-stack";
+  import { applyApplicationTaskPatch } from "../lib/application-task-planner-mode-helpers";
   import "./ApplicationTaskPlannerColumnCanvasStory.css";
 
   type ApplicationSummary = {
@@ -574,6 +576,12 @@
       title,
       updatedAt: (now ?? clock()).toISOString(),
     });
+  }
+
+  function updateActiveTaskMetadata(task: Task, patch: Partial<ApplicationTask>) {
+    onSaveTask(
+      applyApplicationTaskPatch(task, patch, (now ?? clock()).toISOString()),
+    );
   }
 
   function toggleActiveTaskDone(task: Task) {
@@ -1226,21 +1234,17 @@
               />
             </div>
           {:else if detailTask}
-            {@const detailApplication = detailTask.applicationId
-              ? (applicationSummaries[detailTask.applicationId] ?? null)
-              : null}
             <ApplicationTaskSidebarDetail
               task={detailTask}
-              application={detailApplication}
+              areaOptions={snapshot.areas}
               {now}
               documentBodyEnabled={Boolean(
                 app && repository && detailTask.sourcePath,
               )}
               onToggleDone={toggleActiveTaskDone}
               onUpdateTitle={updateActiveTaskTitle}
+              onUpdateTask={updateActiveTaskMetadata}
               onRemoveTask={(task) => removeActiveTask(task, detailIndex)}
-              onOpenApplication={(applicationId) =>
-                void handleOpenApplication(applicationId, detailIndex)}
             >
               {#snippet closeAction()}
                 <ColumnCanvas.Close

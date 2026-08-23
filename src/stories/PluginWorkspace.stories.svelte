@@ -248,6 +248,99 @@
     ).toBeVisible();
   }
 
+  async function assertTaskDetailMetadataActionRow(
+    canvasElement: HTMLElement,
+    canvas: ReturnType<typeof within>,
+  ) {
+    const taskTitle = await canvas.findByRole("button", {
+      name: "Tailor platform CV variant",
+      exact: true,
+    });
+    const taskRow = taskTitle.closest<HTMLElement>(
+      ".application-planner-task-row",
+    );
+    expect(taskRow).not.toBeNull();
+    await fireEvent.click(
+      within(taskRow!).getByRole("button", {
+        name: "Open task details for Tailor platform CV variant",
+        exact: true,
+      }),
+    );
+    let taskDetail: HTMLElement;
+    await waitFor(() => {
+      taskDetail = canvasElement.querySelector<HTMLElement>(
+        "[data-task-sidebar-detail]",
+      )!;
+      expect(taskDetail).toBeVisible();
+    });
+    const detailTitle = within(taskDetail!).getByRole("textbox", {
+      name: "Task title",
+    });
+    expect(detailTitle).toHaveTextContent("Tailor platform CV variant");
+    const metadataRow = taskDetail!.querySelector<HTMLElement>(
+      ".task-sidebar-detail__metadata-actions",
+    );
+    expect(metadataRow).not.toBeNull();
+    const metadataComponent = metadataRow!.querySelector<HTMLElement>(
+      "[data-task-metadata-action-bar]",
+    );
+    const metadataForm =
+      metadataRow!.querySelector<HTMLElement>(".cv-structured-form");
+    const metadataRenderers = Array.from(
+      metadataRow!.querySelectorAll<HTMLElement>(".cv-form-field-renderer"),
+    );
+    expect(metadataComponent).not.toBeNull();
+    expect(metadataForm).not.toBeNull();
+    expect(metadataRenderers.length).toBeGreaterThan(0);
+    expect(getComputedStyle(metadataRow!).display).toBe("flex");
+    expect(getComputedStyle(metadataRow!).flexWrap).toBe("wrap");
+    expect(getComputedStyle(metadataComponent!).display).toBe("contents");
+    expect(getComputedStyle(metadataForm!).display).toBe("contents");
+    expect(
+      metadataRenderers.every(
+        (renderer) => getComputedStyle(renderer).display === "contents",
+      ),
+    ).toBe(true);
+    expect(metadataRow!.getBoundingClientRect().top).toBeGreaterThanOrEqual(
+      detailTitle.getBoundingClientRect().bottom - 1,
+    );
+    const status = within(metadataRow!).getByRole("button", {
+      name: "Task status",
+    });
+    const priority = within(metadataRow!).getByRole("button", {
+      name: "Task priority",
+    });
+    const deadline = within(metadataRow!).getByRole("button", {
+      name: "Set due date",
+    });
+    expect(status).toBeVisible();
+    expect(priority).toBeVisible();
+    expect(deadline).toBeVisible();
+    expect(status.getBoundingClientRect().left).toBeLessThan(
+      priority.getBoundingClientRect().left,
+    );
+    expect(
+      Math.abs(
+        status.getBoundingClientRect().top -
+          priority.getBoundingClientRect().top,
+      ),
+    ).toBeLessThan(2);
+    const rowBox = metadataRow!.getBoundingClientRect();
+    for (const button of metadataRow!.querySelectorAll("button")) {
+      const buttonBox = button.getBoundingClientRect();
+      expect(buttonBox.left).toBeGreaterThanOrEqual(rowBox.left - 1);
+      expect(buttonBox.right).toBeLessThanOrEqual(rowBox.right + 1);
+    }
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Close detail column", exact: true }),
+    );
+    await waitFor(() => {
+      expect(
+        canvasElement.querySelector("[data-task-sidebar-detail]"),
+      ).not.toBeInTheDocument();
+    });
+  }
+
   async function assertPlannerViewTotals(
     canvasElement: HTMLElement,
     canvas: ReturnType<typeof within>,
@@ -1657,6 +1750,7 @@
     await exerciseTasksWorkspaceSettings(canvasElement, canvas, app);
     expect(await canvas.findByText("Tailor platform CV variant")).toBeVisible();
     expect(canvas.getByTestId("tasks-planner")).toBeVisible();
+    await assertTaskDetailMetadataActionRow(canvasElement, canvas);
     const collapsePlanner = canvas.getByRole("button", {
       name: "Collapse planner column",
       exact: true,

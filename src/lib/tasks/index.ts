@@ -10,6 +10,7 @@ export { default as ApplicationTaskAtFormField } from "./application-task-at-for
 export { default as ApplicationTaskAreaPicker } from "./application-task-area-picker/ApplicationTaskAreaPicker.svelte";
 export { default as ApplicationTaskAreaFormField } from "./application-task-area-form-field/ApplicationTaskAreaFormField.svelte";
 export { default as ApplicationTaskInlineOptionFormField } from "./application-task-inline-option-form-field/ApplicationTaskInlineOptionFormField.svelte";
+export { default as ApplicationTaskMetadataActionBar } from "./application-task-metadata-action-bar/ApplicationTaskMetadataActionBar.svelte";
 export { default as ApplicationTaskCheckbox } from "./application-task-checkbox/ApplicationTaskCheckbox.svelte";
 export { default as ApplicationTaskLine } from "./application-task-line/ApplicationTaskLine.svelte";
 export { default as ApplicationTaskPreviewRow } from "./application-task-preview-row/ApplicationTaskPreviewRow.svelte";
