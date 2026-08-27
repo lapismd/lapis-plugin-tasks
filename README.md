@@ -8,8 +8,8 @@ The runtime plugin ID is `tasks`.
 
 ## Development
 
-Colocated LapisMD checkouts link matching semver versions through pnpm. Package
-manifests contain no workspace or machine-specific dependency ranges.
+Published LapisMD dependencies resolve through npm semver ranges. Package
+manifests must stay portable and contain no machine-specific dependency ranges.
 
 ```sh
 pnpm install

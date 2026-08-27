@@ -34,7 +34,9 @@ This repository owns the first-party external Lapis plugin whose runtime ID is
 - Run `pnpm spec:check`, `pnpm check`, `pnpm test`, `pnpm build`, `pnpm
   publint`, and Storybook interaction, accessibility, and static-build checks
   when stories or presentation change.
-- Consume colocated siblings through `link:`-valued workspace-level overrides.
+- Consume published LapisMD dependencies through normal npm semver ranges.
+  Unpublished first-party Lapis host packages remain development-only until
+  their own publication plan is complete.
 - Treat visual status separately from functional validation. Never create or
   replace Visual Delta baselines without explicit approval.
 
