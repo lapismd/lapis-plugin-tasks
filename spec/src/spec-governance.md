@@ -23,3 +23,9 @@ list-navigation and catalog-list attach sources to
 `src/lib/tasks/**` sources to [Planner](plugins/tasks/planner.md). Leftover
 package, manifest, plugin, and Storybook contract sources stay on
 [Tasks](plugins/tasks/index.md).
+
+The shared `@lapismd/spec-validator` package is repository validation tooling,
+not a runtime sibling. Once published, it MUST resolve from npm through the root
+development dependency instead of a `link:`-valued workspace override; this
+exception does not weaken source-first validation for runtime Lapis, Design
+Core, or Mira siblings.

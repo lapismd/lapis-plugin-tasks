@@ -22,7 +22,6 @@ overrides:
   "@lapis-notes/workspace": "link:../lapis-notes/packages/workspace"
   "@lapismd/design-core": "link:../design-core"
   "@lapismd/mira": "link:../mira-mde/packages/mira"
-  "@lapismd/spec-validator": "link:../spec-validator"
   "@lezer/common": "1.5.2"
   "@lezer/highlight": "1.2.3"
   "@lezer/markdown": "1.7.2"
