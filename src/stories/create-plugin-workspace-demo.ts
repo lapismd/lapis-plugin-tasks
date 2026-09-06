@@ -3,6 +3,7 @@ import {
   installApplicationCompatibility,
   MemoryAppDatabase,
   MemoryVaultAdapter,
+  registerDefaultDailyDocumentProvider,
 } from "@lapis-notes/api";
 import { FileExplorerPlugin } from "@lapis-notes/file-explorer";
 import { MarkdownPlugin } from "@lapis-notes/markdown";
@@ -130,6 +131,7 @@ export async function bootPluginWorkspaceDemo(): Promise<{
     markdownRenderer: async () => {},
   });
   const disposeApplicationCompatibility = installApplicationCompatibility(app);
+  const dailyDocumentProvider = registerDefaultDailyDocumentProvider(app);
 
   app.plugins.registerCorePlugins([
     {
@@ -179,6 +181,7 @@ export async function bootPluginWorkspaceDemo(): Promise<{
       }
       await app.workspace.disposeWorkspaceHost();
       await app.appDatabase.close();
+      dailyDocumentProvider.dispose();
       disposeApplicationCompatibility();
     },
   };

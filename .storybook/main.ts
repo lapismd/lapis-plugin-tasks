@@ -41,6 +41,7 @@ const linkedAssetRoots = linkedSiblingRoots.flatMap((root) =>
 );
 const linkedSingletonPackages = [
   "svelte",
+  "@lapis-notes/api",
   "@codemirror/autocomplete",
   "@codemirror/commands",
   "@codemirror/lang-markdown",
@@ -74,13 +75,19 @@ const config: StorybookConfig = {
   viteFinal: async (viteConfig) =>
     mergeConfig(viteConfig, {
       plugins: [
-        svelte({
-          preprocess: vitePreprocess(),
-          compilerOptions: { runes: undefined },
-        }),
+        ...(process.env.NODE_ENV === "production" && !process.env.VITEST
+          ? [
+              svelte({
+                include: "**/*.svelte",
+                preprocess: vitePreprocess(),
+                compilerOptions: { runes: undefined },
+              }),
+            ]
+          : []),
         tailwindcss(),
       ],
       resolve: {
+        conditions: ["svelte", "module", "browser", "development"],
         dedupe: [...linkedSingletonPackages],
         alias: [
           {
@@ -103,13 +110,24 @@ const config: StorybookConfig = {
       },
       esbuild: { target: "esnext" },
       optimizeDeps: {
-        exclude: ["@storybook/svelte"],
+        noDiscovery: true,
+        exclude: ["@storybook/svelte", ...linkedSiblingPackages],
         esbuildOptions: { target: "esnext" },
         include: [
           "aria-query",
+          "storybook > @testing-library/dom",
           "react",
           "react-dom",
           "react-dom/client",
+          "@lapis-notes/api > @iconify/utils",
+          "@lapis-notes/api > @iconify/utils > debug",
+          "@lapis-notes/api > eventemitter3",
+          "@lapis-notes/api > svelte-sonner",
+          "@lapismd/mira > unified",
+          "@lapismd/mira > rehype-highlight > lowlight",
+          "@lapismd/mira > remark-frontmatter",
+          "@lapismd/mira > remark-emoji",
+          "@lapis-notes/markdown > @lapismd/mira-plugin-mermaid > mermaid",
           "@lucide/svelte/icons/calendar-days",
           "@lucide/svelte/icons/check",
           "@lucide/svelte/icons/arrow-left",

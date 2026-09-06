@@ -29,6 +29,12 @@ not a host movable-panel runtime.
 Selecting a list replaces only the planner body with the complete provider-
 mounted Markdown file; the Column Canvas title remains workspace chrome.
 
+Storybook development, static-build, and browser-test surfaces each apply a
+single Svelte transform. Browser tests rely on Storybook-owned project
+annotations. The app-shell fixture installs and disposes the host-owned default
+daily-document provider so locally resolved API packages run with the matching
+host lifecycle.
+
 This chapter is the package contract and the only normative MUST table. The
 following chapters describe the implemented model:
 
