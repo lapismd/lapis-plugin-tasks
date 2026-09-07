@@ -33,7 +33,7 @@
   }
 
   .task-line__status-icon--waiting {
-    color: var(--ui-tasks-warning);
+    color: var(--ui-tasks-warning-text);
   }
 
   .task-line__status-icon--done {
@@ -201,7 +201,7 @@
   }
 
   .task-line__status-chip--waiting {
-    color: var(--ui-tasks-warning);
+    color: var(--ui-tasks-warning-text);
   }
 
   .task-line__priority {
@@ -257,7 +257,7 @@
   .task-line__due--today,
   .task-line__due--today svg,
   .task-line__due--today .task-line__due-distance {
-    color: var(--ui-tasks-warning);
+    color: var(--ui-tasks-warning-text);
   }
 
   .task-line__due--upcoming,

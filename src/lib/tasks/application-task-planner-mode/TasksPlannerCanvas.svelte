@@ -578,7 +578,10 @@
     });
   }
 
-  function updateActiveTaskMetadata(task: Task, patch: Partial<ApplicationTask>) {
+  function updateActiveTaskMetadata(
+    task: Task,
+    patch: Partial<ApplicationTask>,
+  ) {
     onSaveTask(
       applyApplicationTaskPatch(task, patch, (now ?? clock()).toISOString()),
     );
@@ -1250,6 +1253,26 @@
                 <ColumnCanvas.Close
                   onclick={() => void closeDetailColumn(detailIndex)}
                 />
+              {/snippet}
+              {#snippet relatedActions()}
+                {#if showRelated && detailTask.applicationId}
+                  {@const summary =
+                    applicationSummaries[detailTask.applicationId]}
+                  {#if summary}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      type="button"
+                      onclick={() =>
+                        void handleOpenApplication(
+                          detailTask.applicationId!,
+                          detailIndex,
+                        )}
+                    >
+                      Open {summary.title}
+                    </Button>
+                  {/if}
+                {/if}
               {/snippet}
               {#snippet documentModeAction()}
                 {#if app && repository && detailTask.sourcePath}

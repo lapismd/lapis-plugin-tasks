@@ -279,12 +279,12 @@
       canvas.queryByRole("heading", { name: "Logbook", level: 1 }),
     ).not.toBeInTheDocument();
     const todayNavigation = canvas.getByRole("button", { name: "Today" });
-    expect(todayNavigation.querySelector("small")).toHaveTextContent("7");
+    expect(todayNavigation.querySelector("small")).toHaveTextContent("8");
     await userEvent.click(todayNavigation);
     await waitFor(() =>
       expect(
         plannerColumn.querySelectorAll("[data-planner-sortable-row]"),
-      ).toHaveLength(7),
+      ).toHaveLength(8),
     );
 
     const alignedTitle = await canvas.findByRole("button", {
@@ -765,10 +765,10 @@
         )!;
         expect(detailColumn).not.toBeNull();
         expect(plannerDetailHandle).not.toBeNull();
-        expect(detailColumn.getBoundingClientRect().right).toBeCloseTo(
-          canvasInnerRight,
-          1,
-        );
+        expect(
+          detailColumn.getBoundingClientRect().right,
+          "Opened detail column",
+        ).toBeCloseTo(canvasInnerRight, 1);
       },
       { timeout: 5_000 },
     );
@@ -812,10 +812,10 @@
       expect(collapsedPlanner).not.toHaveAttribute("data-responsive-stage");
       expect(tasksColumn).toHaveAttribute("data-responsive-stage", "pair");
       expect(detailColumn).toHaveAttribute("data-responsive-stage", "pair");
-      expect(detailColumn.getBoundingClientRect().right).toBeCloseTo(
-        canvasInnerRight,
-        1,
-      );
+      expect(
+        detailColumn.getBoundingClientRect().right,
+        "Detail after planner collapse",
+      ).toBeCloseTo(canvasInnerRight, 1);
     });
     await fireEvent.click(
       canvas.getByRole("button", { name: "Expand planner column" }),
@@ -839,9 +839,16 @@
       );
     });
 
-    await userEvent.click(
-      await canvas.findByRole("button", { name: "Open Nova Bank" }),
-    );
+    const openRelatedApplication = await canvas.findByRole("button", {
+      name: "Open Nova Bank",
+    });
+    expect(
+      openRelatedApplication.closest(".task-sidebar-detail__top-end"),
+    ).not.toBeNull();
+    expect(
+      openRelatedApplication.closest(".task-sidebar-detail__metadata-actions"),
+    ).toBeNull();
+    await userEvent.click(openRelatedApplication);
     let relatedColumn: HTMLElement;
     let detailRelatedHandle: HTMLElement;
     await waitFor(
@@ -857,10 +864,12 @@
         )!;
         expect(relatedColumn).not.toBeNull();
         expect(detailRelatedHandle).not.toBeNull();
-        expect(relatedColumn.getBoundingClientRect().right).toBeCloseTo(
-          canvasInnerRight,
-          1,
-        );
+        expect(detailColumn).toHaveAttribute("data-responsive-stage", "pair");
+        expect(relatedColumn).toHaveAttribute("data-responsive-stage", "pair");
+        expect(
+          relatedColumn.getBoundingClientRect().right,
+          "Opened related column",
+        ).toBeCloseTo(canvasInnerRight, 1);
       },
       { timeout: 5_000 },
     );
@@ -988,7 +997,7 @@
 
     const bucketLabels = [
       "Inbox — 1 task",
-      "Today — 7 tasks",
+      "Today — 8 tasks",
       "Review — 1 task",
       "Upcoming — 5 tasks",
       "Anytime — 2 tasks",
@@ -1021,7 +1030,7 @@
     await fireEvent.mouseLeave(navigationToggle);
 
     const todayButton = canvas.getByRole("button", {
-      name: "Today — 7 tasks",
+      name: "Today — 8 tasks",
     });
     expect(todayButton).toHaveAttribute("aria-pressed", "true");
     expect(
@@ -1032,7 +1041,7 @@
     await waitFor(() =>
       expect(todayButton).toHaveAttribute("data-state", "instant-open"),
     );
-    const todayCountChip = await tooltipCanvas.findByText("7");
+    const todayCountChip = await tooltipCanvas.findByText("8");
     expect(todayCountChip).toHaveClass(
       "task-column-canvas-story__collapsed-tooltip-count",
     );

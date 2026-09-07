@@ -128,7 +128,7 @@
   }
 
   .task-when-picker-content__quick-icon--star {
-    color: var(--ui-tasks-warning);
+    color: var(--ui-tasks-warning-text);
   }
 
   .task-when-picker-content__quick-icon--moon {
@@ -136,11 +136,11 @@
   }
 
   .task-when-picker-content__quick-icon--sunrise {
-    color: var(--ui-tasks-warning);
+    color: var(--ui-tasks-warning-text);
   }
 
   .task-when-picker-content__quick-icon--sun {
-    color: var(--ui-tasks-warning);
+    color: var(--ui-tasks-warning-text);
   }
 
   .task-when-picker-content__quick-check {

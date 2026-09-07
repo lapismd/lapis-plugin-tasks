@@ -57,7 +57,7 @@
 
 .task-at-picker__icon--sunrise,
 .task-at-picker__icon--sun {
-  color: var(--ui-tasks-warning, var(--warning));
+  color: var(--ui-tasks-warning-text, var(--warning));
 }
 
 .task-at-picker__icon--moon {

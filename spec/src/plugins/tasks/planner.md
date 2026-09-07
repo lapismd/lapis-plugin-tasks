@@ -77,6 +77,19 @@ and the resolver date. Classification, upcoming grouping, selected-day
 inclusion, and overdue decoration consume those effective fields. Paused and
 exhausted recurrence remains open in Anytime rather than surfacing a stale plan.
 
+Catalog Markdown fixtures resolve effective occurrences at their injected
+fixture date, including all three recurring morning/midday Tasks. The fixed
+Today agenda contains eight open rows, and expanded navigation, collapsed
+navigation, and tooltips all report that same total. Task detail accepts an
+optional host-owned related-actions snippet in its header chrome, separate from
+the under-title metadata controls; the catalog uses it to open the related
+application column without adding CV policy to canonical Tasks.
+
+Warning text and icons in deadline, waiting-status, and schedule controls use a
+foreground-mixed `--ui-tasks-warning-text` token so small text and non-text
+indicators meet WCAG AA in light and dark Default and Obsidian themes. Shell contrast acceptance covers all four theme
+and color-mode combinations.
+
 When Today selects a date before local today, the planner swaps its actionable
 day sections for occurrence history. The workspace queries disposable
 `tasks/occurrence` rows for that date and merges them with RRULE expectations;

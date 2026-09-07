@@ -58,7 +58,8 @@ describe("task-list Markdown contribution", () => {
     expect(source).toContain("Decoration.line");
     expect(source).toContain('"data-task-group-heading": "true"');
     expect(source).toContain("markRenderedTaskGroupHeadings");
-    expect(source).toContain('ctx.frontmatter?.type !== "task-list-navigation"');
+    expect(source).toContain("parseTaskDocument(source, ctx.sourcePath)");
+    expect(source).not.toContain("ctx.frontmatter?.type");
     expect(source).toContain(
       'onRevealSource:\n          ctx.mode === "live-preview"',
     );
@@ -75,7 +76,9 @@ describe("task-list Markdown contribution", () => {
       "src/lib/task-list-items-block/TaskListItemsBlock.css",
       "utf8",
     );
-    expect(styles).toContain(".task-list-items-block__header {\n  position: absolute;");
+    expect(styles).toContain(
+      ".task-list-items-block__header {\n  position: absolute;",
+    );
     expect(styles).toContain("inset-block-start: -2.9rem;");
     expect(styles).toContain("inset-inline-end: 0.5rem;");
     expect(styles).toContain(
@@ -99,9 +102,7 @@ describe("task-list Markdown contribution", () => {
 
     const globalStyles = readFileSync("src/lib/styles.css", "utf8");
     expect(globalStyles).toContain('[data-task-group-heading="true"]');
-    expect(globalStyles).toContain(
-      "var(--ui-tasks-day-morning)",
-    );
+    expect(globalStyles).toContain("var(--ui-tasks-day-morning)");
     expect(globalStyles).toContain(
       '.cm-editor .cm-line[data-task-group-heading="true"]',
     );
@@ -134,35 +135,33 @@ describe("task-list Markdown contribution", () => {
       entries: [{ label: "Two", target: "../tasks/two.md" }],
       expected: ["Two"],
     },
-  ])("transacts $mutation through the active editor without changing surrounding Markdown", ({
-    entries,
-    expected,
-  }) => {
-    const section = scanStructuralTaskRuns(
-      DOCUMENT,
-      "lists/applications.md",
-      resolve,
-    )[0]!;
-    const next = applyChange(
-      DOCUMENT,
-      structuralTaskRunEditorChange(
+  ])(
+    "transacts $mutation through the active editor without changing surrounding Markdown",
+    ({ entries, expected }) => {
+      const section = scanStructuralTaskRuns(
         DOCUMENT,
-        section,
-        entries,
-        "lists/applications.md",
-      ),
-    );
-
-    expect(next.slice(0, section.from)).toBe(DOCUMENT.slice(0, section.from));
-    expect(next).toContain("## Notes\n\nAfter\n");
-    expect(
-      scanStructuralTaskRuns(
-        next,
         "lists/applications.md",
         resolve,
-      )[0]!.entries.map(
-        (entry) => entry.label,
-      ),
-    ).toEqual(expected);
-  });
+      )[0]!;
+      const next = applyChange(
+        DOCUMENT,
+        structuralTaskRunEditorChange(
+          DOCUMENT,
+          section,
+          entries,
+          "lists/applications.md",
+        ),
+      );
+
+      expect(next.slice(0, section.from)).toBe(DOCUMENT.slice(0, section.from));
+      expect(next).toContain("## Notes\n\nAfter\n");
+      expect(
+        scanStructuralTaskRuns(
+          next,
+          "lists/applications.md",
+          resolve,
+        )[0]!.entries.map((entry) => entry.label),
+      ).toEqual(expected);
+    },
+  );
 });

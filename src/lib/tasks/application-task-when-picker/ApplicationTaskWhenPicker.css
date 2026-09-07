@@ -322,7 +322,7 @@
   .task-when-picker__footer-date,
 .task-when-picker__trigger--footer.task-when-picker__trigger--today
   .task-when-picker__footer-distance {
-  color: var(--ui-tasks-warning, var(--warning));
+  color: var(--ui-tasks-warning-text, var(--warning));
 }
 
 .task-when-picker__trigger--footer.task-when-picker__trigger--overdue,

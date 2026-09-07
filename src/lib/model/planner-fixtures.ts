@@ -1,4 +1,5 @@
 import { catalogTaskFromDocument } from "./catalog-adapter";
+import { taskDocumentToSummary } from "./task-queries";
 import { parseTaskDocument, type ParsedTaskFile } from "./task-document";
 import type { Task } from "./types";
 
@@ -599,9 +600,13 @@ export function catalogTasksFromPlannerFixtures(): Task[] {
     .filter((document) => document.kind === "task")
     .map((document) => {
       const task = catalogTaskFromDocument(document);
+      const summary = taskDocumentToSummary(document, PLANNER_FIXTURE_TODAY);
       const membership = listTitleForPath(document.path);
       return {
         ...task,
+        effectiveOccurrenceDate: summary.effectiveOccurrenceDate,
+        effectiveOccurrenceState: summary.effectiveOccurrenceState,
+        effectiveForDate: summary.effectiveForDate,
         applicationId: applicationIds.get(document.path),
         listId: membership?.listId,
         areas: membership ? [membership.title] : [],

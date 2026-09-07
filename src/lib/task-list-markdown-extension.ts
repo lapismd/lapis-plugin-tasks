@@ -10,6 +10,7 @@ import {
   StateEffect,
   StateField,
   type EditorState,
+  type Extension,
 } from "@codemirror/state";
 import {
   Decoration,
@@ -17,6 +18,7 @@ import {
   ViewPlugin,
   WidgetType,
   type DecorationSet,
+  type ViewUpdate,
 } from "@codemirror/view";
 import { mount, unmount } from "svelte";
 import type { TaskRepository } from "./model/task-repository";
@@ -32,6 +34,8 @@ import {
 } from "./model/task-list-items";
 import TaskListItemsBlock from "./task-list-items-block/TaskListItemsBlock.svelte";
 import { asTasksMarkdownSurfaceController } from "./task-list-surface";
+import { resolveTaskMarkdownTargets } from "./model/task-markdown-targets";
+import { parseTaskDocument } from "./model/task-document";
 
 type BlockProps = {
   app: App;
@@ -125,7 +129,10 @@ class TaskListItemsWidget extends WidgetType {
   }
 }
 
-function selectionTouchesSection(state: EditorState, section: StructuralTaskRun) {
+function selectionTouchesSection(
+  state: EditorState,
+  section: StructuralTaskRun,
+) {
   return state.selection.ranges.some(
     (range) => range.from <= section.to && range.to >= section.from,
   );
@@ -139,10 +146,10 @@ export function structuralTaskRunDecorations(
   repository: TaskRepository,
   sourcePath: string,
   surface: MarkdownSurfaceContext,
+  resolveTarget: StructuralTaskTargetResolver = createCachedTargetResolver(app),
 ): DecorationSet {
   const source = state.doc.toString();
   const controller = asTasksMarkdownSurfaceController(surface.context);
-  const resolveTarget = createCachedTargetResolver(app);
   const ranges = scanMarkdownTaskRuns(source, sourcePath, resolveTarget)
     .filter(
       (section) =>
@@ -185,7 +192,8 @@ export function createStructuralTaskRunCodeMirrorExtension(
   repository: TaskRepository,
   sourcePath: string,
   surface: MarkdownSurfaceContext,
-) {
+): Extension {
+  let resolveTarget = createCachedTargetResolver(app);
   const decorations = StateField.define<DecorationSet>({
     create: (state) =>
       structuralTaskRunDecorations(
@@ -194,6 +202,7 @@ export function createStructuralTaskRunCodeMirrorExtension(
         repository,
         sourcePath,
         surface,
+        resolveTarget,
       ),
     update: (current, transaction) =>
       transaction.docChanged ||
@@ -205,6 +214,7 @@ export function createStructuralTaskRunCodeMirrorExtension(
             repository,
             sourcePath,
             surface,
+            resolveTarget,
           )
         : current,
     provide: (field) => EditorView.decorations.from(field),
@@ -212,21 +222,50 @@ export function createStructuralTaskRunCodeMirrorExtension(
   const metadataRefresh = ViewPlugin.fromClass(
     class {
       private readonly cleanup: () => void;
+      private disposed = false;
+      private generation = 0;
 
       constructor(view: EditorView) {
         const changed = app.metadataCache.on("changed", () => {
-          view.dispatch({ effects: refreshStructuralTaskRuns.of(null) });
+          this.refresh(view);
         });
         const deleted = app.metadataCache.on("deleted", () => {
-          view.dispatch({ effects: refreshStructuralTaskRuns.of(null) });
+          this.refresh(view);
         });
         this.cleanup = () => {
           app.metadataCache.offref(changed);
           app.metadataCache.offref(deleted);
         };
+        this.refresh(view);
+      }
+
+      update(update: ViewUpdate): void {
+        if (update.docChanged) this.refresh(update.view);
+      }
+
+      private refresh(view: EditorView): void {
+        const generation = ++this.generation;
+        const source = view.state.doc.toString();
+        void resolveTaskMarkdownTargets(app, source, sourcePath)
+          .then((resolved) => {
+            if (
+              this.disposed ||
+              generation !== this.generation ||
+              view.state.doc.toString() !== source
+            )
+              return;
+            resolveTarget = resolved;
+            view.dispatch({ effects: refreshStructuralTaskRuns.of(null) });
+          })
+          .catch((cause) => {
+            if (!this.disposed && generation === this.generation) {
+              console.error("Unable to resolve Task Markdown targets", cause);
+            }
+          });
       }
 
       destroy() {
+        this.disposed = true;
         this.cleanup();
       }
     },
@@ -245,7 +284,11 @@ function matchingRenderedItems(
   const items = Array.from(list.children).filter(
     (child): child is HTMLLIElement => child instanceof HTMLLIElement,
   );
-  for (let start = 0; start <= items.length - sourceRun.entries.length; start += 1) {
+  for (
+    let start = 0;
+    start <= items.length - sourceRun.entries.length;
+    start += 1
+  ) {
     const segment = items.slice(start, start + sourceRun.entries.length);
     const matches = segment.every((item, index) => {
       if (item.hasAttribute("data-task-run-processed")) return false;
@@ -330,13 +373,9 @@ function markRenderedTaskGroupHeadings(
 
 function createPostProcessor(app: App, repository: TaskRepository) {
   return async (el: HTMLElement, ctx: MarkdownPostProcessorContext) => {
-    if (
-      ctx.frontmatter?.type !== "task-list" &&
-      ctx.frontmatter?.type !== "task" &&
-      ctx.frontmatter?.type !== "task-list-navigation"
-    ) {
-      return;
-    }
+    const file = app.vault.getFileByPath(ctx.sourcePath);
+    const source = file ? await app.vault.cachedRead(file) : "";
+    if (!parseTaskDocument(source, ctx.sourcePath)) return;
     const controller = asTasksMarkdownSurfaceController(ctx.surface?.context);
     if (
       el.tagName === "H1" &&
@@ -346,36 +385,39 @@ function createPostProcessor(app: App, repository: TaskRepository) {
       el.setAttribute("data-task-markdown-redundant-title", "true");
       return;
     }
-    const file = app.vault.getFileByPath(ctx.sourcePath);
-    const source = file ? await app.vault.cachedRead(file) : "";
-    const resolveTarget = createCachedTargetResolver(app);
+    const resolveTarget = await resolveTaskMarkdownTargets(
+      app,
+      source,
+      ctx.sourcePath,
+    );
     const sourceHeadings = source
       ? scanMarkdownTaskGroupHeadings(source, ctx.sourcePath, resolveTarget)
       : [];
     markRenderedTaskGroupHeadings(el, ctx, source, sourceHeadings);
     const sourceSections = source
-      ? scanMarkdownTaskRuns(
-          source,
-          ctx.sourcePath,
-          resolveTarget,
-        )
+      ? scanMarkdownTaskRuns(source, ctx.sourcePath, resolveTarget)
       : [];
     const lists = [
       ...(el.matches("ul") ? [el] : []),
       ...Array.from(el.querySelectorAll("ul")),
     ].filter(
       (list, index, all) =>
-        isRenderedBulletList(list) &&
-        all.indexOf(list) === index,
+        isRenderedBulletList(list) && all.indexOf(list) === index,
     ) as HTMLUListElement[];
 
     sourceSections.forEach((sourceRun) => {
       const match = lists
-        .map((list) => ({ list, items: matchingRenderedItems(list, sourceRun) }))
+        .map((list) => ({
+          list,
+          items: matchingRenderedItems(list, sourceRun),
+        }))
         .find((candidate) => candidate.items);
       if (!match?.items) return;
-      const replacesWholeList = match.items.length === match.list.children.length;
-      const container = document.createElement(replacesWholeList ? "div" : "li");
+      const replacesWholeList =
+        match.items.length === match.list.children.length;
+      const container = document.createElement(
+        replacesWholeList ? "div" : "li",
+      );
       container.setAttribute("data-task-run-processed", "true");
       if (replacesWholeList) {
         match.list.before(container);

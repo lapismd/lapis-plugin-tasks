@@ -32,6 +32,7 @@
     closeAction,
     documentModeAction,
     documentBody,
+    relatedActions,
     documentBodyEnabled = false,
     now = undefined,
     messages,
@@ -48,6 +49,8 @@
     closeAction?: Snippet;
     documentModeAction?: Snippet;
     documentBody?: Snippet;
+    /** Host-owned navigation to resources related to this Task. */
+    relatedActions?: Snippet;
     documentBodyEnabled?: boolean;
     now?: Date;
     messages?: Snippet;
@@ -191,6 +194,9 @@
         {/if}
       </div>
       <div class="task-sidebar-detail__top-end">
+        {#if relatedActions}
+          {@render relatedActions()}
+        {/if}
         {#if documentModeAction}
           {@render documentModeAction()}
         {/if}
@@ -271,7 +277,10 @@
                 <ListTodoIcon />
                 Mark all incomplete
               </button>
-              <div class="task-sidebar-detail__menu-separator" role="separator"></div>
+              <div
+                class="task-sidebar-detail__menu-separator"
+                role="separator"
+              ></div>
               <button
                 type="button"
                 class="task-sidebar-detail__menu-item task-sidebar-detail__menu-item--destructive"
@@ -291,18 +300,15 @@
       <ApplicationTaskCheckbox
         class="task-sidebar-detail__checkbox"
         size="md"
-        checked={
-          task.status === "done" ||
+        checked={task.status === "done" ||
           task.status === "completed" ||
           task.status === "canceled" ||
-          Boolean(task.completedAt)
-        }
+          Boolean(task.completedAt)}
         status={task.status === "canceled" ? "canceled" : undefined}
-        label={
-          task.status === "done" ||
-          task.status === "completed" ||
-          task.status === "canceled" ||
-          Boolean(task.completedAt)
+        label={task.status === "done" ||
+        task.status === "completed" ||
+        task.status === "canceled" ||
+        Boolean(task.completedAt)
           ? "Mark task incomplete"
           : "Mark task done"}
         onchange={() => onToggleDone(task)}

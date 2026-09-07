@@ -1,7 +1,5 @@
 import type { Preview } from "@storybook/svelte-vite";
 import { withThemeByDataAttribute } from "@storybook/addon-themes";
-import "@fontsource-variable/dm-sans";
-import "@fontsource-variable/source-code-pro";
 import "@lapismd/design-core/storybook.css";
 import "@lapismd/design-core/themes/lapis.css";
 import "@lapismd/design-core/forms/form.tokens.css";

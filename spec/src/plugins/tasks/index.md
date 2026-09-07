@@ -38,6 +38,23 @@ matching host lifecycle. The preview MUST apply its selected theme attribute
 synchronously before story play functions run so theme assertions cannot hide
 an otherwise ready workspace behind an interaction overlay.
 
+Package registration tests verify the package-owned workspace host and plugin
+contract without reading sibling application source. The real Shell story loads
+TasksPlugin and restores its planner through the public host lifecycle;
+production desktop and web registration acceptance belongs to those hosts.
+
+Rich Task Markdown resolves the source document's linked files asynchronously
+through the vault. A cold metadata hot cache does not remove Task/List rows.
+Reading processors classify the source YAML rather than requiring cached front
+matter, which may be absent from disposable index records.
+Live-preview resolution refreshes after document or metadata changes and
+discards results from obsolete documents or disposed editors. The CodeMirror
+factory exposes the standard `Extension` type so packaged declarations do not
+leak the private implementation of its view plugin.
+
+Shell acceptance scrolls the real CodeMirror owner to materialize virtualized
+ordinary headings before asserting their native heading and focus behavior.
+
 This chapter is the package contract and the only normative MUST table. The
 following chapters describe the implemented model:
 

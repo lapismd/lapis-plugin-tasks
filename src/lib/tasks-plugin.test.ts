@@ -5,10 +5,9 @@ import { describe, expect, it } from "vitest";
 
 const sourceRoot = resolve(fileURLToPath(new URL(".", import.meta.url)));
 const repoRoot = resolve(sourceRoot, "../..");
-const notesRoot = resolve(repoRoot, "../lapis-notes");
 
 describe("TasksPlugin", () => {
-  it("registers the planner view from onload and keeps hosts from registering it", () => {
+  it("registers the planner view from onload and keeps the workspace host from registering it", () => {
     const source = readFileSync(resolve(sourceRoot, "tasks-plugin.ts"), "utf8");
     const settingsTab = readFileSync(
       resolve(sourceRoot, "tasks-settings-tab.ts"),
@@ -18,15 +17,8 @@ describe("TasksPlugin", () => {
     const view = readFileSync(resolve(sourceRoot, "tasks-view.ts"), "utf8");
     const manifest = readFileSync(resolve(repoRoot, "manifest.json"), "utf8");
     const pkg = readFileSync(resolve(repoRoot, "package.json"), "utf8");
-    const desktop = readFileSync(
-      resolve(
-        notesRoot,
-        "packages/desktop-electron/src/DesktopWorkspaceSession.svelte",
-      ),
-      "utf8",
-    );
-    const web = readFileSync(
-      resolve(notesRoot, "packages/web/src/WebWorkspaceSession.svelte"),
+    const workspaceHost = readFileSync(
+      resolve(repoRoot, "src/stories/create-plugin-workspace-demo.ts"),
       "utf8",
     );
 
@@ -73,9 +65,11 @@ describe("TasksPlugin", () => {
       "@lapis-notes/markdown",
     );
     expect(pkg).not.toMatch(/"(?:workspace|link|file):/u);
-    expect(desktop).toContain("TasksPlugin");
-    expect(web).toContain("TasksPlugin");
-    expect(desktop).not.toContain("registerView");
-    expect(web).not.toContain("registerView");
+    expect(workspaceHost).toContain("plugin: TasksPlugin");
+    expect(workspaceHost).toContain("await app.plugins.loadPlugins(");
+    expect(workspaceHost).toContain("await app.workspace.loadLayout()");
+    expect(workspaceHost).not.toContain("registerView");
+    expect(workspaceHost).not.toContain("addCommand");
+    expect(workspaceHost).not.toContain("addRibbonIcon");
   });
 });

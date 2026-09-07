@@ -103,6 +103,14 @@
       },
       { timeout: 10_000 },
     );
+    expect(storyApp(canvasElement).markdownExtensions.getAll()).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          pluginId: "tasks",
+          id: "task-structure-runs",
+        }),
+      ]),
+    );
     return canvas;
   }
 
@@ -262,9 +270,15 @@
       name: "Task occurrence history",
     });
     expect(history).toBeVisible();
-    expect(within(history).getByText("Daily stand-up reflection")).toBeVisible();
-    expect(within(history).getByText("Prepare the morning brief")).toBeVisible();
-    expect(within(history).getByText("Review the midday handoff")).toBeVisible();
+    expect(
+      within(history).getByText("Daily stand-up reflection"),
+    ).toBeVisible();
+    expect(
+      within(history).getByText("Prepare the morning brief"),
+    ).toBeVisible();
+    expect(
+      within(history).getByText("Review the midday handoff"),
+    ).toBeVisible();
     expect(within(history).getByText("completed")).toBeVisible();
     expect(within(history).getByText("missed")).toBeVisible();
     expect(within(history).getByText("unrecorded")).toBeVisible();
@@ -316,8 +330,9 @@
     const metadataComponent = metadataRow!.querySelector<HTMLElement>(
       "[data-task-metadata-action-bar]",
     );
-    const metadataForm =
-      metadataRow!.querySelector<HTMLElement>(".cv-structured-form");
+    const metadataForm = metadataRow!.querySelector<HTMLElement>(
+      ".cv-structured-form",
+    );
     const metadataRenderers = Array.from(
       metadataRow!.querySelectorAll<HTMLElement>(".cv-form-field-renderer"),
     );
@@ -522,9 +537,16 @@
     }
 
     let { settingsCanvas } = await openTasksSettings();
-    expect(
-      settingsCanvas.getByRole("heading", { name: "Tasks", level: 1 }),
-    ).toBeVisible();
+    const settingsTitle = settingsCanvas.getByRole("heading", {
+      name: "Tasks",
+      level: 1,
+    });
+    expect(settingsTitle).toBeVisible();
+    expect(getComputedStyle(settingsTitle).fontFamily).toContain(
+      "DM Sans Variable",
+    );
+    expect(getComputedStyle(settingsTitle).fontSize).toBe("16px");
+    expect(getComputedStyle(settingsTitle).fontWeight).toBe("400");
     expect(
       settingsCanvas.getByLabelText<HTMLInputElement>("Afternoon starts at"),
     ).toHaveValue("12:00");
@@ -826,6 +848,17 @@
   }
 
   function expectPlannerMetadataChipContrast(canvasElement: HTMLElement) {
+    const todayDeadlines = visibleElements(
+      canvasElement,
+      ".task-line__due--today .task-line__due-distance",
+    );
+    expect(todayDeadlines.length).toBeGreaterThan(0);
+    todayDeadlines.forEach(expectTextContrast);
+    todayDeadlines.forEach((label) => {
+      label
+        .parentElement!.querySelectorAll<HTMLElement>("svg")
+        .forEach(expectNonTextContrast);
+    });
     const scheduleChips = visibleElements(
       canvasElement,
       ".application-planner-task-row__meta .task-when-picker__trigger--chip",
@@ -1353,10 +1386,26 @@
         ".task-list-items-widget [data-structural-task-run]",
       ),
     ).toBeVisible();
-    const notesLine = Array.from(
-      surface!.querySelectorAll<HTMLElement>(".cm-line"),
-    ).find((line) => line.textContent?.trim() === "## Notes");
-    expect(notesLine).toBeDefined();
+    await userEvent.click(surface!.querySelector<HTMLElement>(".cm-content")!);
+    await fireEvent.keyDown(
+      surface!.querySelector<HTMLElement>(".cm-content")!,
+      {
+        key: "End",
+        metaKey: /Mac/.test(navigator.platform),
+        ctrlKey: !/Mac/.test(navigator.platform),
+      },
+    );
+    let notesLine: HTMLElement | undefined;
+    await waitFor(() => {
+      notesLine = Array.from(
+        surface!.querySelectorAll<HTMLElement>(".cm-line"),
+      ).find((line) =>
+        Array.from(line.querySelectorAll(".cm-heading:not(.cm-meta)")).some(
+          (heading) => heading.textContent?.trim() === "Notes",
+        ),
+      );
+      expect(notesLine).toBeDefined();
+    });
     notesLine!.scrollIntoView({ block: "center" });
     await waitFor(() => expect(notesLine).toHaveClass("cm-header-2"));
     let notesClicked = false;
@@ -1364,11 +1413,12 @@
       once: true,
     });
     await userEvent.click(
-      notesLine!.querySelector<HTMLElement>(".cm-heading:not(.cm-meta)")!,
+      within(notesLine!).getByText("Notes", { exact: true }),
     );
     expect(notesClicked).toBe(true);
     expect(surface!.querySelector(".cm-content")).toHaveFocus();
     expect(notesLine).toHaveClass("cm-header-2");
+    expect(notesLine).not.toHaveAttribute("data-task-group-heading");
     await userEvent.click(
       canvas.getByRole("button", { name: "Edit task run source", exact: true }),
     );
@@ -2713,6 +2763,27 @@
       description: {
         story:
           "Guard the Default-light shell and daily agenda chips with explicit WCAG text and non-text contrast assertions.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    canvasElement.style.height = "100%";
+    canvasElement.style.maxHeight = "100%";
+    canvasElement.style.overflow = "hidden";
+    await exerciseLightThemeContrast(canvasElement);
+  }}
+/>
+
+<Story
+  name="Obsidian Light Contrast"
+  tags={["visual-pending", "test"]}
+  args={{ displayMode: "desktop" }}
+  globals={{ theme: "lapis", colorMode: "light" }}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          "Guard the Obsidian-light shell, deadline labels, and daily agenda chips with explicit WCAG contrast assertions.",
       },
     },
   }}

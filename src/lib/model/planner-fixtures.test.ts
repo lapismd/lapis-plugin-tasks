@@ -18,11 +18,32 @@ import { createMemoryTaskFileStore, TaskRepository } from "./task-repository";
 import { serializeTaskDocument } from "./task-document";
 import {
   buildTaskPlannerSnapshot,
+  buildTaskPlannerDaySnapshot,
   buildTaskPlannerSnapshotFromRepository,
   classifyTask,
 } from "./planner";
 
 describe("planner Markdown fixtures", () => {
+  it("includes recurring rows in the catalog agenda at the fixture date", () => {
+    const agenda = buildTaskPlannerDaySnapshot(
+      catalogTasksFromPlannerFixtures(),
+      PLANNER_FIXTURE_TODAY,
+    );
+    expect(agenda.morning.map((task) => task.id)).toEqual([
+      "story-task-daily-reflection",
+      "story-task-morning",
+    ]);
+    expect(agenda.afternoon.map((task) => task.id)).toEqual([
+      "story-task-afternoon-boundary",
+    ]);
+    expect([
+      ...agenda.anytime,
+      ...agenda.morning,
+      ...agenda.afternoon,
+      ...agenda.evening,
+    ]).toHaveLength(8);
+  });
+
   it("round-trips catalog fixtures through task documents", () => {
     const documents = parsePlannerFixtures();
     expect(documents.some((document) => document.kind === "task-list")).toBe(

@@ -34,6 +34,11 @@
     black
   );
   --ui-tasks-warning: var(--warning, var(--chart-4, #c99700));
+  --ui-tasks-warning-text: color-mix(
+    in srgb,
+    var(--ui-tasks-warning) 50%,
+    var(--ui-tasks-foreground)
+  );
   --ui-tasks-success: var(--success, var(--chart-2, #3d9a5f));
   --ui-tasks-info: var(--info, var(--chart-3, #4f7fd8));
   --ui-tasks-chip-foreground: color-mix(
