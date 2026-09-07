@@ -75,4 +75,4 @@
 ## Local dependency and Storybook evidence
 
 - LPT-SPEC-005: Package manifests and `pnpm-lock.yaml` resolve published LapisMD packages from npm. `.pnpmfile.cjs` conditionally snapshots the current local API, Lapis host, first-party plugin, and Design Core packages without rewriting peer ranges or importing source-checkout `node_modules`.
-- LPT-SPEC-006: `.storybook/main.ts` relies on the framework-owned Svelte plugin for development, while `vite.config.ts` owns the browser-test transform. Storybook 10.3+ owns project-annotation setup, so the browser project does not install the legacy per-file `setProjectAnnotations` bootstrap.
+- LPT-SPEC-006: `.storybook/main.ts` owns one `.svelte`-only transform for development and static builds, while `vite.config.ts` owns the browser-test transform and suppresses the Storybook transform through Vitest's environment marker. Storybook 10.3+ owns project-annotation setup, so the browser project does not install the legacy per-file `setProjectAnnotations` bootstrap. `.storybook/preview.ts` synchronously applies the selected theme attribute before rendering each story.

@@ -75,7 +75,7 @@ const config: StorybookConfig = {
   viteFinal: async (viteConfig) =>
     mergeConfig(viteConfig, {
       plugins: [
-        ...(process.env.NODE_ENV === "production" && !process.env.VITEST
+        ...(!process.env.VITEST
           ? [
               svelte({
                 include: "**/*.svelte",

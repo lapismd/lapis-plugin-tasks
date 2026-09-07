@@ -41,6 +41,10 @@ const preview: Preview = {
     }),
     (story, context) => {
       if (typeof document !== "undefined") {
+        document.documentElement.setAttribute(
+          "data-ui-theme",
+          String(context.globals.theme ?? "lapis"),
+        );
         document.documentElement.classList.toggle(
           "dark",
           context.globals.colorMode === "dark",
