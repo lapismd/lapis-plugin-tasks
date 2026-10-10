@@ -38,6 +38,10 @@ matching host lifecycle. The preview MUST apply its selected theme attribute
 synchronously before story play functions run so theme assertions cannot hide
 an otherwise ready workspace behind an interaction overlay.
 
+The populated inline-editor Shell demo MUST verify visible live-preview bullets
+under Focus in both Today and Applications while retaining title alignment.
+Its public API editor composition consumes the shared Markdown stylesheet.
+
 Package registration tests verify the package-owned workspace host and plugin
 contract without reading sibling application source. The real Shell story loads
 TasksPlugin and restores its planner through the public host lifecycle;

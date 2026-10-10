@@ -3562,6 +3562,20 @@
         }
       });
       expect(editor.closest(".markdown-live-preview-mode")).toBeInTheDocument();
+      await waitFor(() => {
+        const markers = editor.querySelectorAll<HTMLElement>(
+          ".cm-formatting-list-bullet > .cm-meta",
+        );
+        expect(markers).toHaveLength(2);
+        for (const marker of markers) {
+          const bullet = getComputedStyle(marker, "::after");
+          expect(bullet.content).toBe('""');
+          expect(parseFloat(bullet.width)).toBeGreaterThan(0);
+          expect(parseFloat(bullet.height)).toBeGreaterThan(0);
+          expect(bullet.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+          expect(getComputedStyle(marker).color).toBe("rgba(0, 0, 0, 0)");
+        }
+      });
       expect(
         within(editor)
           .getByText("reliability ownership", { exact: true })

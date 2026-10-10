@@ -85,6 +85,8 @@ formatting, and list content. `InlineEditorAlignment` MUST measure authored
 paragraph text against the title in Today and List rows, keep folding controls
 inside the row but before that text column, and retain the expanded editor for
 accessibility acceptance.
+It MUST also prove that both inactive Focus list markers have visible,
+non-zero bullet paint rather than displaying raw Markdown dashes.
 
 Planner action acceptance MUST visit all seven named destinations, keep page
 menus inside the owning Column Canvas header before its trailing collapse

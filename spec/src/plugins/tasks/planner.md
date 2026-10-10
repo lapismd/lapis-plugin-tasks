@@ -302,7 +302,9 @@ Full-document Markdown surfaces retain their normal layout.
 The shared `inbox/today-1.md` demo Task contains authored paragraphs, headings,
 bold text, and a list. `InlineEditorAlignment` opens it in Today and Applications,
 measures real paragraph text against the title's leading edge, and verifies that
-both folding controls sit wholly to the left without leaving the Task row.
+all three folding controls sit wholly to the left without leaving the Task row.
+The two inactive Focus list markers MUST paint visible bullets through the
+shared Markdown stylesheet in both destinations, matching full-document editing.
 
 The body fragment uses external persistence and has no whole-file attachment.
 Tasks retains guarded repository saves rather than letting the editor write

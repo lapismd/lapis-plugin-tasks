@@ -178,6 +178,44 @@ passed against the final Accordion source:
 Stories remain `visual-pending`; no screenshot comparisons or baselines were
 updated.
 
+## Inline Focus list bullets
+
+The populated `Tailor platform CV variant` fixture exposed raw dash markers in
+the inline editor while the full editor painted bullets. Both use the same
+App-registered Markdown stack. Mira's shipped list CSS required a Markdown
+wrapper around CodeMirror; the inline API editor puts those classes on the
+CodeMirror root. The source fix in Mira accepts both mount shapes with the
+same tokens and specificity. Tasks runtime and layout CSS remain unchanged.
+
+The exact consumer regression is:
+
+```sh
+pnpm exec vitest run --config scripts/vitest-storybook-batches.config.mjs \
+  --project storybook src/stories/PluginWorkspace.stories.svelte \
+  -t InlineEditorAlignment
+```
+
+It failed once before the source fix because the bullet pseudo-element had
+`content: none`. After rebuilding and packing Mira, refreshing the documented
+temporary consumer hook, and restarting Storybook, that exact story passes.
+It verifies both visible Focus bullets in Today and Applications alongside
+the original title alignment and folding-rail geometry.
+
+All 201 unit tests pass in 37 files. The complete fresh-process Storybook
+batches pass 59 stories (14 + 8 + 37) across 19 files with zero functional or
+enabled axe failures; four metadata-only files remain skipped. The live
+Applications editor paints two approximately 4.59px bullets and retains the
+original title-aligned body text. Spec and package checks/build pass.
+The final static Storybook build also passes. Check reports zero Svelte errors
+or warnings, and the public package passes publint.
+
+Review uses the local Mira tarball at
+`/tmp/lapis-mira-inline-bullets-review-2043/lapismd-mira-0.0.2.tgz` through
+`/tmp/lapis-tasks-mira-inline-bullets-pnpmfile.cjs`. Tracked dependency files
+retain their existing changes and registry declarations. A released Mira
+refresh remains pending the separate publication gate. No visual baselines
+were changed.
+
 ## Inline editor folding, checkbox layout, and alignment follow-up
 
 The inline editor reserves a 1rem folding rail and compensates with a negative
