@@ -109,8 +109,8 @@
     "@tailwindcss/vite": "4.1.12",
     "@tsconfig/svelte": "5.0.5",
     "@types/node": "^22.15.0",
-    "@vitest/browser": "4.1.8",
-    "@vitest/browser-playwright": "4.1.8",
+    "@vitest/browser": "4.1.10",
+    "@vitest/browser-playwright": "4.1.10",
     "aria-query": "5.3.2",
     "bits-ui": "2.18.1",
     "publint": "0.3.12",
@@ -121,7 +121,7 @@
     "svelte-check": "4.3.1",
     "tailwindcss": "4.1.12",
     "typescript": "~5.8.3",
-    "vite": "6.4.2",
-    "vitest": "4.1.8"
+    "vite": "6.4.3",
+    "vitest": "4.1.10"
   }
 }
