@@ -67,3 +67,9 @@ composer composition, stored timestamps, accessible comment actions, keyboard
 posting, failed-post draft restoration, and Accordion disclosure/icon state
 with draft retention through collapse. It MUST continue to exercise the
 existing edit-failure retry, resolution, reopen, and deletion boundaries.
+
+Inline Notes acceptance MUST verify the registered Markdown live-preview stack,
+rendered formatting, and a body-only editable buffer in both agenda and List
+rows. It MUST finish a successful guarded flush before isolating a subsequent
+save failure, preserve the failed draft, and verify persistence on retry and
+reopening. Accessibility acceptance MUST include the expanded live editor.

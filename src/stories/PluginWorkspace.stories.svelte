@@ -1,5 +1,6 @@
 <script lang="ts" module>
   import type { App } from "@lapis-notes/api";
+  import { EditorView } from "@codemirror/view";
   import { defineMeta } from "@storybook/addon-svelte-csf";
   import {
     expect,
@@ -12,6 +13,7 @@
 
   import PluginWorkspaceDemo from "./PluginWorkspaceDemo.svelte";
   import { TasksPlugin } from "../lib";
+  import { flushTaskFileSurfaces } from "../lib/task-file-surfaces";
   import { PluginWorkspaceExample } from "./PluginWorkspace.example-sources";
   import {
     computedContrastRatio,
@@ -3113,6 +3115,14 @@
     const path = "inbox/today-2.md";
     const file = app.vault.getFileByPath(path)!;
     const original = await app.vault.read(file);
+    const notesValue = (element: HTMLElement) =>
+      EditorView.findFromDOM(element)!.state.doc.toString();
+    const appendNotes = async (element: HTMLElement, text: string) => {
+      await userEvent.click(element);
+      const view = EditorView.findFromDOM(element)!;
+      view.dispatch({ selection: { anchor: view.state.doc.length } });
+      await userEvent.type(element, text, { skipClick: true });
+    };
     const title = await canvas.findByRole("button", {
       name: "Review interview notes",
       exact: true,
@@ -3121,18 +3131,30 @@
     await userEvent.dblClick(row);
     const editor = (await within(row).findByRole("textbox", {
       name: "Task notes",
-    })) as HTMLTextAreaElement;
-    expect(editor).toBeVisible();
-    expect(editor).not.toBeDisabled();
-    expect(editor.value).not.toContain("type: task");
-    expect(editor.value).not.toContain("# Review interview notes");
+    })) as HTMLElement;
+    await waitFor(() => expect(editor).toBeVisible());
+    expect(editor).toHaveAttribute("contenteditable", "true");
+    expect(editor.closest(".cm-editor")).toHaveClass(
+      "markdown-live-preview-mode",
+    );
+    expect(notesValue(editor)).not.toContain("type: task");
+    expect(notesValue(editor)).not.toContain("# Review interview notes");
+    expect(row.querySelector("textarea")).toBeNull();
     expect(row.querySelector("[data-task-markdown-surface]")).toBeNull();
     expect(
       within(row).queryByRole("button", { name: /^(Edit|Read) notes$/ }),
     ).not.toBeInTheDocument();
-    await userEvent.click(editor);
-    editor.setSelectionRange(editor.value.length, editor.value.length);
-    await userEvent.type(editor, "\n\nInline note saved from the planner.");
+    await appendNotes(
+      editor,
+      "\n\n## Inline live preview\n\n**Formatted inline note.**\n\nInline note saved from the planner.",
+    );
+    await waitFor(() =>
+      expect(
+        within(editor)
+          .getByText("Formatted inline note.", { exact: true })
+          .closest(".cm-strong"),
+      ).toBeVisible(),
+    );
     await userEvent.click(
       within(row).getByRole("textbox", { name: "Task title" }),
     );
@@ -3145,9 +3167,14 @@
     expect(saved).toContain("type: task");
     expect(saved).toContain("# Review interview notes");
     expect(saved.length).toBeGreaterThan(original.length);
-    await userEvent.click(editor);
-    editor.setSelectionRange(editor.value.length, editor.value.length);
-    await userEvent.type(editor, "\nRetained after a failed save.");
+    // Finish the first guarded save before injecting a failure for a new draft.
+    await flushTaskFileSurfaces(app, path);
+    expect(editor.isConnected).toBe(true);
+    await appendNotes(editor, "\nRetained after a failed save.");
+    expect(notesValue(editor)).toContain("Retained after a failed save.");
+    expect(await app.vault.read(file)).not.toContain(
+      "Retained after a failed save.",
+    );
     const failedFlush = spyOn(app.vault, "process").mockRejectedValue(
       new Error("Notes save unavailable"),
     );
@@ -3163,7 +3190,7 @@
         ).toBe(true),
       );
       expect(editor).toBeVisible();
-      expect(editor.value).toContain("Retained after a failed save.");
+      expect(notesValue(editor)).toContain("Retained after a failed save.");
       expect(await app.vault.read(file)).not.toContain(
         "Retained after a failed save.",
       );
@@ -3225,17 +3252,15 @@
     await userEvent.dblClick(listRow);
     const listEditor = (await within(listRow).findByRole("textbox", {
       name: "Task notes",
-    })) as HTMLTextAreaElement;
-    expect(listEditor).not.toBeDisabled();
-    expect(listEditor.value).toContain("Retained after a failed save.");
-    expect(listEditor.value).not.toContain("# Review interview notes");
-    expect(listRow.querySelector("[data-task-markdown-surface]")).toBeNull();
-    await userEvent.click(listEditor);
-    listEditor.setSelectionRange(
-      listEditor.value.length,
-      listEditor.value.length,
+    })) as HTMLElement;
+    expect(listEditor).toHaveAttribute("contenteditable", "true");
+    expect(listEditor.closest(".cm-editor")).toHaveClass(
+      "markdown-live-preview-mode",
     );
-    await userEvent.type(listEditor, "\nSaved from a List task run.");
+    expect(notesValue(listEditor)).toContain("Retained after a failed save.");
+    expect(notesValue(listEditor)).not.toContain("# Review interview notes");
+    expect(listRow.querySelector("[data-task-markdown-surface]")).toBeNull();
+    await appendNotes(listEditor, "\nSaved from a List task run.");
     await userEvent.dblClick(listRow);
     await waitFor(async () =>
       expect(await app.vault.read(file)).toContain(
@@ -3247,6 +3272,15 @@
         within(listRow).queryByRole("textbox", { name: "Task notes" }),
       ).not.toBeInTheDocument(),
     );
+    await userEvent.dblClick(listRow);
+    const reopened = (await within(listRow).findByRole("textbox", {
+      name: "Task notes",
+    })) as HTMLElement;
+    await waitFor(() => expect(reopened).toBeVisible());
+    expect(notesValue(reopened)).toContain("**Formatted inline note.**");
+    expect(
+      within(listRow).queryByRole("button", { name: "Expand properties" }),
+    ).not.toBeInTheDocument();
   }}
 />
 

@@ -267,14 +267,24 @@ Notes heading at the document end, the story MUST return to the document start
 before activating the task run's source control, including in short canvases.
 
 Double-click opens the compact inline editor immediately in both agenda and
-List task rows. Notes reuse the existing auto-sized field and row typography,
-loading only the authored Task body below the separately editable title. The
-Notes field has no Edit/Read toggle, front matter, properties panel, or duplicate
+List task rows. Notes mount the public API `Editor` with the App's complete
+registered Markdown live-preview extensions, loading only the authored Task
+body below the separately editable title. The editor grows with its content
+and uses the compact row's typography through public Mira tokens. It has no
+Edit/Read toggle, front matter, properties panel, or duplicate
 document title. The existing title and compact footer controls retain their
 styling. Notes save on blur and flush before collapse or navigation. Guarded
 source mutations preserve concurrent title/metadata changes, reject concurrent
 body changes, and keep failed drafts visible for retry. Full-document Markdown
 editing remains available from the column header. See LN-TASK-068.
+
+The body fragment uses external persistence and has no whole-file attachment.
+Tasks retains guarded repository saves rather than letting the editor write
+the fragment as a complete file. Blur reads the live buffer immediately;
+collapse and navigation await its flush. Source-path context resolves relative
+Markdown links. Configuration and plugin changes refresh the registered
+extension stack, and teardown destroys the editor and its listeners. If no
+Markdown editor provider is registered, the surface reports its unavailability.
 
 Runtime action capabilities govern all row controls. Local comments,
 duplication, supported browser printing, copyable Lapis URLs, direct-child bulk

@@ -14,7 +14,7 @@ services are omitted. Seven navigation destinations remain; Logbook adds outcome
 filters.
 
 Following review feedback, double-click immediately opens the existing compact
-inline editor. Notes use the styled auto-sized body field with no Edit/Read
+inline editor. Notes use a compact body-only Markdown live-preview editor with no Edit/Read
 toggle, properties, front matter, or duplicate title. The title and compact row
 footer retain their existing styling. Body saves preserve concurrent title and
 metadata changes, reject concurrent body changes, and retain failed drafts for
@@ -177,3 +177,43 @@ passed against the final Accordion source:
 
 Stories remain `visual-pending`; no screenshot comparisons or baselines were
 updated.
+
+## Inline Markdown live-preview follow-up
+
+Repository-backed inline Notes now mount the public API `Editor` with the App's
+complete registered Markdown live-preview extensions and the real source path.
+The existing row title and footer remain in place. Public Mira typography and
+file-margin tokens keep the body compact and growing with its content. The
+buffer contains only Notes below the authored title; external editor
+persistence leaves guarded complete-file writes with the Tasks repository.
+No Markdown or Mira runtime dependency was added to Tasks.
+
+The exact regression is:
+
+```sh
+pnpm exec vitest run --config scripts/vitest-storybook-batches.config.mjs \
+  --project storybook src/stories/PluginWorkspace.stories.svelte \
+  -t RuntimeInlineNotesAndOrder
+```
+
+It failed one story against the textarea because no Markdown live-preview
+editor existed. The initial integration also failed one story while the row
+was still animating; the visibility assertion now waits for the existing
+expansion. Subsequent integration runs failed the same story because a Task
+projection refresh after saving recreated the editor, leaving the next edit
+on a detached buffer. Deriving the stable source path prevents that lifecycle
+reset. The story now verifies that the buffer remains connected after a
+completed guarded save before isolating the failed-save phase.
+
+The exact story passes with zero functional or enabled axe failures. It verifies
+rendered bold Markdown, editable body-only buffers, blur persistence, failed
+draft retention and retry, daily ordering, List-row persistence, and reopening
+saved Markdown. The final expanded editor is included in axe acceptance.
+Final validation passed: `pnpm spec:check`, `pnpm check` (zero Svelte errors or
+warnings), all 201 unit tests in 37 files, `pnpm build`, and `pnpm publint`.
+The complete fresh-process Storybook batches passed all 56 stories (13 + 8 + 35)
+across 19 files with zero functional or enabled axe failures; four existing
+metadata-only files remained skipped. `pnpm build-storybook` passed in 51 seconds,
+and the documentation formatter check passed. Storybook was restarted on port
+7030 for review. The fresh automated runs provide cold lifecycle acceptance;
+manual visual review and visual baselines remain pending.

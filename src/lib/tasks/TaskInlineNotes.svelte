@@ -1,6 +1,7 @@
 <script lang="ts">
-  import type { App } from "@lapis-notes/api";
-  import { autosizeTextarea } from "@lapismd/design-core/forms";
+  import { Editor, type App } from "@lapis-notes/api";
+  import { Prec } from "@codemirror/state";
+  import { EditorView, placeholder } from "@codemirror/view";
   import { untrack } from "svelte";
   import { getTaskNotes, type Task, type TaskRepository } from "../model";
   import { registerTaskFileSurface } from "../task-file-surfaces";
@@ -10,28 +11,64 @@
     repository,
     task,
   }: { app: App; repository: TaskRepository; task: Task } = $props();
-  let notesDraft = $state("");
+  let container = $state<HTMLElement | null>(null);
   let loaded = $state(false);
   let error = $state<string | null>(null);
-  let flush: () => Promise<boolean> = async () => false;
+  // Task projections refresh after saves; only changing files replaces the buffer.
+  const sourcePath = $derived(task.sourcePath);
 
   $effect(() => {
-    const path = task.sourcePath;
+    const path = sourcePath;
     const ownerApp = app;
     const ownerRepository = repository;
-    if (!path) return;
+    const target = container;
+    if (!path || !target) return;
     return untrack(() => {
       let disposed = false;
       let savedNotes = "";
       let saving: Promise<boolean> | null = null;
+      let editor: Editor | null = null;
       loaded = false;
       error = null;
+
+      function extensions() {
+        const registered = ownerApp.editorExtensions("markdown", {
+          mode: "live-preview",
+          file: path,
+        });
+        if (!registered.length)
+          throw new Error("Enable the Markdown plugin to edit task notes.");
+        return [
+          ...registered,
+          Prec.highest(
+            EditorView.contentAttributes.of({ "aria-label": "Task notes" }),
+          ),
+          EditorView.lineWrapping,
+          placeholder("Notes"),
+          EditorView.theme({
+            "&": { height: "auto" },
+            "&.cm-focused": { outline: "none" },
+            "& > .cm-scroller": {
+              overflow: "visible",
+              scrollbarGutter: "auto",
+            },
+          }),
+          EditorView.domEventHandlers({ blur: () => void save() }),
+        ];
+      }
+
       const ready = ownerRepository
         .getTaskDocument(path)
         .then((document) => {
           if (disposed) return;
           savedNotes = getTaskNotes(document.body);
-          notesDraft = savedNotes;
+          // This buffer is a body fragment; Tasks owns complete-file persistence.
+          editor = new Editor(savedNotes, extensions(), ownerApp);
+          editor.persistence = "external";
+          const root = target.getRootNode();
+          if (root instanceof Document || root instanceof ShadowRoot)
+            editor.view.setRoot(root);
+          target.append(editor.view.dom);
           loaded = true;
         })
         .catch((cause) => {
@@ -42,10 +79,12 @@
         if (saving) return saving;
         saving = (async () => {
           await ready;
-          if (disposed || !loaded) return false;
+          if (disposed) return false;
+          if (!loaded || !editor) return true;
           try {
-            while (notesDraft !== savedNotes) {
-              const next = notesDraft;
+            await editor.flushChanges();
+            while (editor.getValue() !== savedNotes) {
+              const next = editor.getValue();
               await ownerRepository.setNotes(
                 path!,
                 next,
@@ -67,7 +106,26 @@
           saving = null;
         }
       }
-      flush = save;
+      function refreshExtensions() {
+        if (!editor || disposed) return;
+        try {
+          editor.updateExtensions(extensions());
+        } catch (cause) {
+          error = cause instanceof Error ? cause.message : String(cause);
+        }
+      }
+      const configurationChanged = ownerApp.configuration.on(
+        "updated",
+        refreshExtensions,
+      );
+      const pluginEnabled = ownerApp.plugins.on(
+        "plugin-enabled",
+        refreshExtensions,
+      );
+      const pluginDisabled = ownerApp.plugins.on(
+        "plugin-disabled",
+        refreshExtensions,
+      );
       const unregister = registerTaskFileSurface(ownerApp, path, {
         flush: save,
         exit: save,
@@ -75,21 +133,39 @@
       return () => {
         disposed = true;
         unregister();
+        ownerApp.configuration.offref(configurationChanged);
+        ownerApp.plugins.offref(pluginEnabled);
+        ownerApp.plugins.offref(pluginDisabled);
+        editor?.destroy();
+        target.replaceChildren();
       };
     });
   });
 </script>
 
-<div data-task-inline-notes>
-  <textarea
-    bind:value={notesDraft}
-    rows="1"
-    class="task-preview-row__notes-input"
-    placeholder="Notes"
-    aria-label="Task notes"
-    disabled={!loaded}
-    use:autosizeTextarea={notesDraft}
-    onblur={() => void flush()}
-  ></textarea>
+<div
+  class="task-inline-notes"
+  data-task-inline-notes
+  aria-busy={!loaded && !error}
+>
+  <div bind:this={container}></div>
   {#if error}<p role="alert">{error}</p>{/if}
 </div>
+
+<style>
+  .task-inline-notes {
+    --mira-font-size: 0.82rem;
+    --mira-line-height: 1.45;
+    --mira-editor-background: transparent;
+    --mira-foreground: var(--kanban-muted);
+    --file-margins-x: 0px;
+    --file-margins-y: 0px;
+    --file-line-width: 100%;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .task-inline-notes:focus-within {
+    --mira-foreground: var(--kanban-foreground);
+  }
+</style>
