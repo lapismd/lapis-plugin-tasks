@@ -10,8 +10,10 @@
 
   let {
     displayMode = "desktop",
+    navigationPath = "lists.md",
   }: {
     displayMode?: WorkspaceShellProps["displayMode"];
+    navigationPath?: string | null;
   } = $props();
 
   let app = $state<App | null>(null);
@@ -30,7 +32,7 @@
 
   onMount(() => {
     let cancelled = false;
-    const runtimePromise = bootPluginWorkspaceDemo();
+    const runtimePromise = bootPluginWorkspaceDemo(navigationPath);
     void runtimePromise
       .then((runtime) => {
         if (cancelled) return;
@@ -82,12 +84,12 @@
   }
 
   :global(
-      body.sb-main-fullscreen:has(#storybook-root .plugin-workspace-demo)
-        #storybook-root
-    ),
+    body.sb-main-fullscreen:has(#storybook-root .plugin-workspace-demo)
+      #storybook-root
+  ),
   :global(
-      body.sb-main-fullscreen #storybook-root:has(.plugin-workspace-demo) > *
-    ) {
+    body.sb-main-fullscreen #storybook-root:has(.plugin-workspace-demo) > *
+  ) {
     box-sizing: border-box;
     width: 100%;
     height: 100%;

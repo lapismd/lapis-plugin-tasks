@@ -3594,6 +3594,186 @@
 />
 
 <Story
+  name="Lists heading actions"
+  args={{ displayMode: "desktop" }}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          "Compact Lists actions align with the count chips and open the authoritative navigation Markdown directly for editing, including from the collapsed navigation popover.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    const canvas = await waitForReady(canvasElement);
+    const app = storyApp(canvasElement);
+    const plugin = app.plugins.plugins.get("tasks") as TasksPlugin;
+    const newList = canvas.getByRole("button", {
+      name: "New list",
+      exact: true,
+    });
+    const heading = newList.closest<HTMLElement>(".task-list-tree__heading")!;
+    const center = (element: HTMLElement) => {
+      const rect = element.getBoundingClientRect();
+      return rect.left + rect.width / 2;
+    };
+    const counts = await waitFor(() => {
+      const chips = canvasElement.querySelectorAll<HTMLElement>(
+        ".task-list-tree__count",
+      );
+      expect(chips.length).toBeGreaterThan(0);
+      return chips;
+    });
+    for (const count of counts) {
+      expect(Math.abs(center(newList) - center(count))).toBeLessThanOrEqual(1);
+    }
+    const edit = within(heading).getByRole("button", {
+      name: "Edit lists navigation",
+    });
+    expect(edit.getBoundingClientRect().right).toBeLessThanOrEqual(
+      newList.getBoundingClientRect().left,
+    );
+    for (const action of [edit, newList]) {
+      const background = getComputedStyle(action).backgroundColor;
+      action.focus();
+      expect(action).toHaveFocus();
+      await waitFor(() =>
+        expect(getComputedStyle(action).backgroundColor).not.toBe(background),
+      );
+      action.blur();
+    }
+    const source = await app.vault.read(app.vault.getFileByPath("lists.md")!);
+    await userEvent.click(edit);
+    await waitFor(() =>
+      expect(app.workspace.getActiveFile()?.path).toBe("lists.md"),
+    );
+    const editor = await waitFor(() => {
+      const content = canvasElement.querySelector<HTMLElement>(
+        '.cm-editor .cm-content[contenteditable="true"]',
+      );
+      expect(content).toBeVisible();
+      return content!;
+    });
+    expect(EditorView.findFromDOM(editor)!.state.doc.toString()).toBe(source);
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Tasks", exact: true }),
+    );
+    const listCount = (await plugin.repository.lists()).length;
+    await userEvent.click(
+      canvas.getByRole("button", { name: "New list", exact: true }),
+    );
+    await waitFor(async () =>
+      expect((await plugin.repository.lists()).length).toBe(listCount + 1),
+    );
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Collapse Tasks column" }),
+    );
+    await userEvent.click(canvas.getByRole("button", { name: /Lists —/ }));
+    const popover = await waitFor(() => {
+      const content = canvasElement.ownerDocument.querySelector<HTMLElement>(
+        '[data-ui-part="popover-content"].task-column-canvas-story__lists-popover',
+      );
+      expect(content).toBeVisible();
+      return content!;
+    });
+    const popoverEdit = within(popover).getByRole("button", {
+      name: "Edit lists navigation",
+    });
+    const popoverNew = within(popover).getByRole("button", {
+      name: "New list",
+      exact: true,
+    });
+    for (const count of popover.querySelectorAll<HTMLElement>(
+      ".task-list-tree__count",
+    )) {
+      expect(Math.abs(center(popoverNew) - center(count))).toBeLessThanOrEqual(
+        1,
+      );
+    }
+    await userEvent.click(popoverEdit);
+    await waitFor(() =>
+      expect(app.workspace.getActiveFile()?.path).toBe("lists.md"),
+    );
+    await waitFor(() => expect(popover).not.toBeInTheDocument());
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Tasks", exact: true }),
+    );
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Expand Tasks column", exact: true }),
+    );
+  }}
+/>
+
+<Story
+  name="Lists navigation source selection"
+  args={{ displayMode: "desktop", navigationPath: "navigation.md" }}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          "The edit action opens the authoritative navigation document at its actual path, including when it is not named lists.md.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    const canvas = await waitForReady(canvasElement);
+    const app = storyApp(canvasElement);
+    const plugin = app.plugins.plugins.get("tasks") as TasksPlugin;
+    await canvas.findByRole("button", { name: "Edit lists navigation" });
+    const file = app.vault.getFileByPath("navigation.md")!;
+    const source = await app.vault.read(file);
+    expect((await plugin.repository.navigation())?.path).toBe("navigation.md");
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Edit lists navigation" }),
+    );
+    await waitFor(() => {
+      expect(app.workspace.getActiveFile()?.path).toBe("navigation.md");
+      expect(
+        canvas.getByRole("textbox", { name: "Markdown editor" }),
+      ).toBeVisible();
+    });
+    expect(
+      EditorView.findFromDOM(
+        canvas.getByRole("textbox", { name: "Markdown editor" }),
+      )!.state.doc.toString(),
+    ).toBe(source);
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Tasks", exact: true }),
+    );
+  }}
+/>
+
+<Story
+  name="Lists without navigation document"
+  args={{ displayMode: "desktop", navigationPath: null }}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          "An absent navigation document omits the Edit action while unpinned Lists and New list remain available.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    const canvas = await waitForReady(canvasElement);
+    const app = storyApp(canvasElement);
+    const plugin = app.plugins.plugins.get("tasks") as TasksPlugin;
+    await canvas.findByText("All lists");
+    expect(await plugin.repository.navigation()).toBeNull();
+    expect(
+      canvas.queryByRole("button", { name: "Edit lists navigation" }),
+    ).not.toBeInTheDocument();
+    const listCount = (await plugin.repository.lists()).length;
+    await userEvent.click(
+      canvas.getByRole("button", { name: "New list", exact: true }),
+    );
+    await waitFor(async () =>
+      expect((await plugin.repository.lists()).length).toBe(listCount + 1),
+    );
+  }}
+/>
+
+<Story
   name="Runtime structure actions"
   args={{ displayMode: "desktop" }}
   parameters={{

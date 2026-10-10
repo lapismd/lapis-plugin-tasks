@@ -23,6 +23,12 @@ Host movable panels remain unspecified. The package registers one `tasks`
 main-area view; Storybook catalog compositions exercise the same public
 controllers and components without defining another runtime.
 
+Lists heading actions follow LN-TASK-027: Edit navigation precedes New list in
+the count-chip column, using compact Design Core buttons and sidebar hover/focus
+tokens. The owning workspace resolves the authoritative navigation file through
+the repository and opens it in the host Markdown live-preview editor after
+flushing pending edits. This also applies to the collapsed Lists popover.
+
 On a wide adaptive canvas, the active adjacent columns share the visible stage
 through Design Core's public pair-sizing contract. Tasks keeps its navigation
 column narrow and finite while Planner, Detail, and Related are unbounded

@@ -72,6 +72,16 @@ omitted. The tree uses Design Core Explorer guide tokens, supports inline
 rename and HTML5 drag with auto-expand, and does not mount
 `WorkspaceExplorer`.
 
+The Lists heading uses compact Design Core ghost actions. Edit navigation sits
+immediately before New list, whose icon center aligns with the tree count chips.
+Both actions use the sidebar's hover and keyboard-focus treatment. Edit
+navigation is available only when the repository resolves an authoritative
+navigation document. It opens that actual file, normally `lists.md`, in the
+host's Markdown live-preview editor after flushing pending Tasks edits. The
+same actions are available in the collapsed navigation's Lists popover, which
+closes when editing opens. An absent navigation document does not expose an
+inert Edit action; New list remains available.
+
 ## Markdown-native List page
 
 Selecting a List mounts its real `TFile`. All authored headings and rich

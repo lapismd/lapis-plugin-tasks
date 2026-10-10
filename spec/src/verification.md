@@ -85,5 +85,14 @@
 
 ## Local dependency and Storybook evidence
 
+LN-TASK-027: `ListsHeadingActions` verifies action order, count-chip alignment,
+keyboard focus feedback, editable navigation Markdown, New list persistence,
+and equivalent collapsed-popover actions. `ListsNavigationSourceSelection`
+boots with `navigation.md` and proves the actual source opens for editing.
+`ListsWithoutNavigationDocument` omits Edit while preserving New list. Their
+workspace seed varies only the navigation document path or presence; the default
+fixture is unchanged. Validation details are in
+`spec/records/2026-10-10-lists-heading-actions.md`.
+
 - LPT-SPEC-005: Package manifests and `pnpm-lock.yaml` resolve published LapisMD packages from npm. `.pnpmfile.cjs` conditionally snapshots the current local API, Lapis host, first-party plugin, and Design Core packages without rewriting peer ranges or importing source-checkout `node_modules`.
 - LPT-SPEC-006: `.storybook/main.ts` owns one `.svelte`-only transform for development and static builds, while `vite.config.ts` owns the browser-test transform and suppresses the Storybook transform through Vitest's environment marker. Storybook 10.3+ owns project-annotation setup, so the browser project does not install the legacy per-file `setProjectAnnotations` bootstrap. `.storybook/preview.ts` synchronously applies the selected theme attribute before rendering each story.

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { App } from "@lapis-notes/api";
+  import { findOpenFileLeaf, type App } from "@lapis-notes/api";
   import { onMount, untrack } from "svelte";
   import {
     applyCatalogTaskToRepository,
@@ -59,6 +59,7 @@
     listTree: { sections: [], unpinned: [], diagnostics: [] },
   });
   let loadError = $state<string | null>(null);
+  let navigationPath = $state<string | null>(null);
   let refreshQueue = $state(Promise.resolve());
   let checklistRefreshVersion = $state(0);
   let settings = $state<TasksPluginSettings>(
@@ -98,11 +99,12 @@
 
   async function refresh() {
     try {
-      const nextSnapshot = await buildTaskPlannerSnapshotFromRepository(
-        repository,
-        currentTime(),
-      );
+      const [nextSnapshot, navigation] = await Promise.all([
+        buildTaskPlannerSnapshotFromRepository(repository, currentTime()),
+        repository.navigation(),
+      ]);
       snapshot = nextSnapshot;
+      navigationPath = navigation?.path ?? null;
       const seen = new Set<string>();
       const nextTasks: Task[] = [];
       for (const group of [
@@ -298,6 +300,29 @@
     if (file) await app.openFile(file);
   }
 
+  async function editNavigation() {
+    try {
+      await flushTaskFileSurfaces(app, undefined, true);
+      const navigation = await repository.navigation();
+      const file = navigation && app.vault.getFileByPath(navigation.path);
+      if (!file)
+        throw new Error("The lists navigation document is unavailable.");
+      const leaf =
+        findOpenFileLeaf(app.workspace, file) ?? app.workspace.getLeaf("tab");
+      await leaf.openFile(file, {
+        state: {
+          type: app.workspace.determineViewTypeForPath(file.path) ?? "markdown",
+          state: { file: file.path, mode: "live-preview" },
+        },
+      });
+      app.workspace.activateLeaf(leaf, { operation: "edit-tasks-navigation" });
+      await app.workspace.revealLeaf(leaf);
+      loadError = null;
+    } catch (error) {
+      loadError = error instanceof Error ? error.message : String(error);
+    }
+  }
+
   async function createList(input: TaskListCreateInput) {
     await flushTaskFileSurfaces(app, undefined, true);
     const at = currentTime().toISOString();
@@ -400,6 +425,7 @@
   onRenameList={(path, title) => void renameList(path, title)}
   onRenameSection={(from, to) => void renameSection(from, to)}
   onOpenNote={(path) => void openNote(path)}
+  onEditNavigation={navigationPath ? () => void editNavigation() : undefined}
   onCreateList={(input) => void createList(input)}
   onUnpinList={(path) => void unpinList(path)}
   onArchiveList={(path) => void archiveList(path)}

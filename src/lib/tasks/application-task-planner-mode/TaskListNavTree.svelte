@@ -1,6 +1,7 @@
 <script lang="ts">
   import { Button } from "@lapismd/design-core/shadcn/button";
   import PlusIcon from "@lucide/svelte/icons/plus";
+  import PencilIcon from "@lucide/svelte/icons/pencil";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import FolderIcon from "@lucide/svelte/icons/folder";
   import FolderKanbanIcon from "@lucide/svelte/icons/folder-kanban";
@@ -27,6 +28,7 @@
     onRenameList,
     onRenameSection,
     onOpenNote,
+    onEditNavigation,
     onCreateList,
     onUnpinList,
     onArchiveList,
@@ -43,6 +45,7 @@
     onRenameList?: (path: string, title: string) => void;
     onRenameSection?: (from: string, to: string) => void;
     onOpenNote?: (path: string) => void;
+    onEditNavigation?: () => void;
     onCreateList?: (input: TaskListCreateInput) => void;
     onUnpinList?: (path: string) => void;
     onArchiveList?: (path: string) => void;
@@ -179,11 +182,11 @@
   const hasListMenu = $derived(
     Boolean(
       onOpenNote ||
-        onRenameList ||
-        onCreateList ||
-        onUnpinList ||
-        onArchiveList ||
-        onDeleteList,
+      onRenameList ||
+      onCreateList ||
+      onUnpinList ||
+      onArchiveList ||
+      onDeleteList,
     ),
   );
 
@@ -194,13 +197,28 @@
 
 <div class="task-list-tree__heading">
   <p class="task-column-canvas-story__section-label">Lists</p>
-  {#if onCreateList}<Button
-      variant="ghost"
-      size="icon"
-      aria-label="New list"
-      title="New list"
-      onclick={() => onCreateList?.({})}><PlusIcon /></Button
-    >{/if}
+  <div class="task-list-tree__heading-actions">
+    {#if onEditNavigation}
+      <Button
+        variant="ghost"
+        size="icon-xs"
+        class="task-list-tree__heading-action"
+        aria-label="Edit lists navigation"
+        title="Edit lists navigation"
+        onclick={onEditNavigation}><PencilIcon /></Button
+      >
+    {/if}
+    {#if onCreateList}
+      <Button
+        variant="ghost"
+        size="icon-xs"
+        class="task-list-tree__heading-action"
+        aria-label="New list"
+        title="New list"
+        onclick={() => onCreateList?.({})}><PlusIcon /></Button
+      >
+    {/if}
+  </div>
 </div>
 <ul class="task-list-tree" data-list-tree>
   {#each tree.sections as section (section.title)}
@@ -547,5 +565,29 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    /* Center the 24px action over the 20px count, whose trailing inset is 1rem. */
+    padding: 0.5rem 0.875rem 0.25rem 0.55rem;
+  }
+
+  .task-list-tree__heading .task-column-canvas-story__section-label {
+    padding: 0;
+  }
+
+  .task-list-tree__heading-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .task-list-tree__heading-actions :global(.task-list-tree__heading-action) {
+    color: var(--ui-tasks-muted);
+  }
+
+  .task-list-tree__heading-actions
+    :global(.task-list-tree__heading-action:hover),
+  .task-list-tree__heading-actions
+    :global(.task-list-tree__heading-action:focus-visible) {
+    background: var(--sidebar-accent, var(--ui-tasks-muted-surface));
+    color: var(--sidebar-accent-foreground, var(--ui-tasks-foreground));
   }
 </style>

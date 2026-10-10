@@ -113,6 +113,7 @@
     onRenameList,
     onRenameSection,
     onOpenNote,
+    onEditNavigation,
     onCreateList,
     onUnpinList,
     onArchiveList,
@@ -152,6 +153,7 @@
     onRenameList?: (path: string, title: string) => void;
     onRenameSection?: (from: string, to: string) => void;
     onOpenNote?: (path: string) => void;
+    onEditNavigation?: () => void;
     onCreateList?: (input: TaskListCreateInput) => void;
     onUnpinList?: (path: string) => void;
     onArchiveList?: (path: string) => void;
@@ -1079,6 +1081,12 @@
                       {onRenameList}
                       {onRenameSection}
                       {onOpenNote}
+                      onEditNavigation={onEditNavigation
+                        ? () => {
+                            listsPopoverOpen = false;
+                            onEditNavigation();
+                          }
+                        : undefined}
                       {onCreateList}
                       {onUnpinList}
                       {onArchiveList}
@@ -1151,6 +1159,7 @@
               {onRenameList}
               {onRenameSection}
               {onOpenNote}
+              {onEditNavigation}
               {onCreateList}
               {onUnpinList}
               {onArchiveList}

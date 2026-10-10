@@ -94,3 +94,11 @@ control, and prevent destination-specific actions from leaking to other pages.
 Logbook acceptance MUST exercise every status filter against both completed and
 canceled Tasks, verify the selected menu state, and cover standalone header
 composition.
+
+Lists heading acceptance MUST verify the New list icon's alignment with count
+chips, preceding Edit navigation action, keyboard focus feedback, editable
+authoritative Markdown source, and equivalent collapsed-popover controls.
+Alternate-path and absent-document scenarios MUST seed their navigation
+documents before metadata indexing in fresh Apps, preserving the default shared
+workspace fixture. Changes to this boot fixture MUST run the complete Shell
+interaction/accessibility suite, along with affected catalog stories.

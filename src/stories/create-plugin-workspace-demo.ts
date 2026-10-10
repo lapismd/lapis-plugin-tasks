@@ -92,7 +92,9 @@ function workspaceLayout() {
   };
 }
 
-export function createPluginWorkspaceSeed(): Record<string, string> {
+export function createPluginWorkspaceSeed(
+  navigationPath: string | null = "lists.md",
+): Record<string, string> {
   return {
     ".obsidian/app.json": JSON.stringify(
       {
@@ -106,22 +108,24 @@ export function createPluginWorkspaceSeed(): Record<string, string> {
     ),
     ".obsidian/workspace.json": JSON.stringify(workspaceLayout(), null, 2),
     ...Object.fromEntries(
-      plannerWorkspaceMarkdownFixtures.map((fixture) => [
-        fixture.path,
-        fixture.raw,
-      ]),
+      plannerWorkspaceMarkdownFixtures.flatMap((fixture) => {
+        if (fixture.path !== "lists.md") return [[fixture.path, fixture.raw]];
+        return navigationPath ? [[navigationPath, fixture.raw]] : [];
+      }),
     ),
   };
 }
 
-export async function bootPluginWorkspaceDemo(): Promise<{
+export async function bootPluginWorkspaceDemo(
+  navigationPath: string | null = "lists.md",
+): Promise<{
   app: App;
   dispose: () => Promise<void>;
 }> {
   const app = new App({
     version: "0.0.1-story",
     configPath: ".obsidian/app.json",
-    adapter: new MemoryVaultAdapter(createPluginWorkspaceSeed(), {
+    adapter: new MemoryVaultAdapter(createPluginWorkspaceSeed(navigationPath), {
       name: "Tasks Plugin Workspace",
       vaultId: "tasks-plugin-workspace",
       clock: 1_700_000_000_000,
@@ -161,7 +165,9 @@ export async function bootPluginWorkspaceDemo(): Promise<{
   });
   const tasksPlugin = app.plugins.plugins.get("tasks");
   if (!(tasksPlugin instanceof TasksPlugin)) {
-    throw new Error("The Tasks workspace fixture could not resolve TasksPlugin.");
+    throw new Error(
+      "The Tasks workspace fixture could not resolve TasksPlugin.",
+    );
   }
   tasksPlugin.clock = () => new Date(`${PLANNER_FIXTURE_TODAY}T12:00:00`);
   const stopWatchingMetadata = app.metadataTypeManager.trackChanges();
