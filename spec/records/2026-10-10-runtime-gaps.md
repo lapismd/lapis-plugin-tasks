@@ -178,6 +178,78 @@ passed against the final Accordion source:
 Stories remain `visual-pending`; no screenshot comparisons or baselines were
 updated.
 
+## Inline editor folding, checkbox layout, and alignment follow-up
+
+The inline editor reserves a 1rem folding rail and compensates with a negative
+leading margin and matching width. Body text aligns with the separately editable
+Task title, while the folding controls sit wholly to its left inside the row.
+The expanded body allows the rail to escape its local clipping boundary; the
+closing animation retains containment. The Notes container keeps the card's
+0.45rem radius and a transparent 1px border without extra surrounding padding.
+The expanded row, its backing surface, and resting checklist footer share the
+editor's document background. Hover feedback remains available on the footer.
+
+The shared `inbox/today-1.md` fixture now contains authored prose, two headings,
+bold text, and a list. `InlineEditorAlignment` opens the real document in Today
+and Applications, measures actual text against the title within 1px, and checks
+all three heading/list folding controls. It leaves the List editor expanded for
+accessibility and review.
+
+The exact final alignment regression command was:
+
+```sh
+pnpm exec vitest run --config scripts/vitest-storybook-batches.config.mjs \
+  --project storybook src/stories/PluginWorkspace.stories.svelte \
+  -t 'InlineEditorAlignment|RuntimeInlineNotesAndOrder'
+```
+
+Both stories failed before compensating the rail and now pass, with zero
+functional or enabled axe failures. Intermediate acceptance exposed a helper
+scope mistake and a fixture expectation that counted its two headings but
+omitted the collapsible list; both were repaired while retaining alignment and
+control containment assertions. Surface assertions wait for the existing
+background transition to settle and resolve transparent child surfaces through
+their painted ancestor.
+
+The original checkbox wrapping defect belongs to Mira. Its generic Markdown
+image selector treated CodeMirror's invisible cursor buffers as bordered block
+images when the inline editor was nested inside a rendered List. Mira now
+excludes those internal images upstream. The dedicated source regression failed
+one story before the fix and passes after building; Tasks acceptance also checks
+checkbox/label overlap in the reopened List editor. No consumer CSS repairs
+the cursor-buffer defect.
+
+Consumer acceptance uses the built Mira tarball through
+`/tmp/lapis-tasks-mira-inline-security-pnpmfile.cjs`, which composes the existing local
+host-package hook. The refresh command is:
+
+```sh
+pnpm install --lockfile=false --force \
+  --config.pnpmfile=/tmp/lapis-tasks-mira-inline-security-pnpmfile.cjs
+```
+
+This temporary setup validates the source package's public exports. The
+pre-existing Tasks manifest and lockfile changes remain excluded; registry
+publication and released-version consumer refresh are pending. The temporary
+hook also selects patched KaTeX 0.18.10 and DOMPurify 3.4.16 for all occurrences;
+`pnpm why` confirms only those versions in the consumer's installed graph.
+Mira's source validation and its repair from 19 dependency advisories to zero
+are recorded in
+`mira-mde/spec/records/2026-10-10-embedded-editor-images.md` in the sibling
+repository. No visual baseline was updated.
+
+Final acceptance against the refreshed packed editor passed both exact stories,
+all 201 unit tests in 37 files, package check/build/publint, and specification
+checks. The complete fresh-process interaction/accessibility lane passed all
+59 stories (14 + 8 + 37), across 19 files; four existing metadata-only files
+remain skipped. Zero functional or enabled axe failures remain in these lanes.
+The final `pnpm build-storybook` passed, with the production preview built in
+1 minute 20 seconds.
+The fresh review story opens the populated document in Applications with three
+folding controls; live measurement places the prose within 1px of the title and
+confirms matching white row/editor surfaces. The saved review image is
+`tasks-inline-content-alignment.png` in the current Codex visualization directory.
+
 ## Inline Markdown live-preview follow-up
 
 Repository-backed inline Notes now mount the public API `Editor` with the App's

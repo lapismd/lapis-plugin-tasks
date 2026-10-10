@@ -54,8 +54,9 @@
             },
             "&.cm-focused": { outline: "none" },
             ".cm-gutters": { display: "none" },
-            "& > .cm-scroller": {
+            "&.markdown-editor-surface > .cm-scroller": {
               overflow: "visible",
+              paddingInlineStart: "1rem",
               scrollbarGutter: "auto",
             },
           }),
@@ -162,10 +163,14 @@
   .task-inline-notes {
     --mira-font-size: 0.82rem;
     --mira-line-height: 1.45;
-    --mira-editor-background: transparent;
+    --mira-editor-background: var(--task-row-surface, var(--background));
     --mira-foreground: var(--kanban-muted);
+    box-sizing: border-box;
+    border: 1px solid transparent;
+    border-radius: 0.45rem;
+    margin-inline-start: -1rem;
     min-width: 0;
-    width: 100%;
+    width: calc(100% + 1rem);
   }
 
   .task-inline-notes:focus-within {

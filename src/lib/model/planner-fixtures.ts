@@ -196,6 +196,20 @@ task:
   deadline: 2026-08-19
 ---
 # Tailor platform CV variant
+
+Capture the platform leadership examples before editing the CV.
+
+## Focus
+
+Lead with **reliability ownership** and the decisions behind the multi-region rollout.
+
+- Describe the incident response and the changes to the runbook.
+- Keep the mentoring example concrete and show the outcome for the team.
+
+## Draft
+
+Connect the platform work to product delivery, then trim the tooling details
+so the strongest evidence stays easy to scan.
 `,
   },
   {
@@ -574,14 +588,16 @@ export function parsePlannerFixtures(): ParsedTaskFile[] {
   });
 }
 
-function listTitleForPath(path: string): { listId: string; title: string } | null {
+function listTitleForPath(
+  path: string,
+): { listId: string; title: string } | null {
   const documents = parsePlannerFixtures();
   for (const document of documents) {
     if (document.kind !== "task-list") continue;
     if (
       document.structuralLinks.some(
         (link) =>
-          (link.href === path || link.href.endsWith(`/${path.split("/").pop()}`)),
+          link.href === path || link.href.endsWith(`/${path.split("/").pop()}`),
       )
     ) {
       return { listId: document.id, title: document.title };

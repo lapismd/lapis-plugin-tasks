@@ -288,9 +288,21 @@ body changes, and keep failed drafts visible for retry. Full-document Markdown
 editing remains available from the column header. See LN-TASK-068.
 
 Inline Notes set the public file-width and file-margin tokens on the actual
-Markdown editor host. Its body fills the compact row width, starts at the
-leading edge, and omits document gutters and centered readable-column padding.
+Markdown editor host. Its body fills the compact row width and aligns with the
+Task title. A 1rem folding rail sits to the left through a compensated negative
+leading margin; the expanded body allows those controls to remain visible while
+its closing animation retains containment. The editor omits document gutters and centered
+readable-column padding. The container retains the card's 0.45rem corner radius
+and a 1px transparent border without extra surrounding padding. The expanded
+row, its backing surface, and resting checklist footer use the editor's theme
+background as one uniform surface. Checklist labels remain beside their checkboxes when
+the editor is nested inside a rendered Markdown List.
 Full-document Markdown surfaces retain their normal layout.
+
+The shared `inbox/today-1.md` demo Task contains authored paragraphs, headings,
+bold text, and a list. `InlineEditorAlignment` opens it in Today and Applications,
+measures real paragraph text against the title's leading edge, and verifies that
+both folding controls sit wholly to the left without leaving the Task row.
 
 The body fragment uses external persistence and has no whole-file attachment.
 Tasks retains guarded repository saves rather than letting the editor write

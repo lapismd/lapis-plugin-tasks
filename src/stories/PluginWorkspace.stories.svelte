@@ -3219,29 +3219,105 @@
     const original = await app.vault.read(file);
     const notesValue = (element: HTMLElement) =>
       EditorView.findFromDOM(element)!.state.doc.toString();
-    const expectInlineAlignment = (element: HTMLElement) => {
-      const host = element.closest<HTMLElement>(".cm-editor")!;
-      const scroller = host.querySelector<HTMLElement>(".cm-scroller")!;
-      const style = getComputedStyle(scroller);
-      expect(style.paddingLeft).toBe("0px");
-      expect(style.paddingRight).toBe("0px");
-      expect(style.paddingTop).toBe("0px");
-      expect(style.paddingBottom).toBe("0px");
-      expect(
-        getComputedStyle(host).getPropertyValue("--file-line-width").trim(),
-      ).toBe("100%");
-      expect(
-        Math.abs(
-          element.getBoundingClientRect().left -
+    const expectInlineAlignment = async (element: HTMLElement) => {
+      await waitFor(() => {
+        const host = element.closest<HTMLElement>(".cm-editor")!;
+        const scroller = host.querySelector<HTMLElement>(".cm-scroller")!;
+        const style = getComputedStyle(scroller);
+        const foldInset = parseFloat(
+          getComputedStyle(element.ownerDocument.documentElement).fontSize,
+        );
+        const container = element.closest<HTMLElement>(".task-inline-notes")!;
+        const containerStyle = getComputedStyle(container);
+        for (const padding of [
+          containerStyle.paddingTop,
+          containerStyle.paddingRight,
+          containerStyle.paddingBottom,
+          containerStyle.paddingLeft,
+        ]) {
+          expect(parseFloat(padding)).toBe(0);
+        }
+        expect(containerStyle.borderTopWidth).toBe("1px");
+        expect(containerStyle.borderTopStyle).toBe("solid");
+        expect(containerStyle.borderTopColor).toBe("rgba(0, 0, 0, 0)");
+        expect(parseFloat(containerStyle.borderTopLeftRadius)).toBeCloseTo(
+          foldInset * 0.45,
+          1,
+        );
+        const row = element.closest<HTMLElement>(
+          ".application-planner-task-row",
+        )!;
+        const title = within(row).getByRole("textbox", { name: "Task title" });
+        expect(
+          Math.abs(
+            element.getBoundingClientRect().left -
+              title.getBoundingClientRect().left,
+          ),
+        ).toBeLessThanOrEqual(1);
+        const surface = getComputedStyle(host).backgroundColor;
+        expect(surface).not.toBe("rgba(0, 0, 0, 0)");
+        const paintedBackground = (target: HTMLElement) => {
+          for (
+            let current: HTMLElement | null = target;
+            current;
+            current = current.parentElement
+          ) {
+            const background = getComputedStyle(current).backgroundColor;
+            if (background !== "rgba(0, 0, 0, 0)") return background;
+          }
+          return "rgba(0, 0, 0, 0)";
+        };
+        expect(paintedBackground(scroller)).toBe(surface);
+        expect(getComputedStyle(row).backgroundColor).toBe(surface);
+        expect(
+          getComputedStyle(
+            row.querySelector<HTMLElement>(
+              ".application-planner-task-row__columns",
+            )!,
+          ).backgroundColor,
+        ).toBe(surface);
+        const footer = row.querySelector<HTMLElement>(
+          "[data-task-checklist-progress]",
+        );
+        if (footer && !footer.matches(":hover, :focus-within")) {
+          expect(getComputedStyle(footer).backgroundColor).toBe(surface);
+        }
+        expect(
+          getComputedStyle(
+            element.closest<HTMLElement>(".task-preview-row")!,
+            "::before",
+          ).backgroundColor,
+        ).toBe(surface);
+        expect(parseFloat(style.paddingLeft)).toBe(foldInset);
+        expect(style.paddingRight).toBe("0px");
+        expect(style.paddingTop).toBe("0px");
+        expect(style.paddingBottom).toBe("0px");
+        expect(
+          getComputedStyle(host).getPropertyValue("--file-line-width").trim(),
+        ).toBe("100%");
+        expect(
+          Math.abs(
+            element.getBoundingClientRect().left -
+              host.getBoundingClientRect().left -
+              foldInset,
+          ),
+        ).toBeLessThanOrEqual(1);
+        const folds = element.querySelectorAll<HTMLElement>(
+          ".collapse-indicator",
+        );
+        expect(folds.length).toBeGreaterThan(0);
+        for (const fold of folds) {
+          expect(fold.getBoundingClientRect().left).toBeGreaterThanOrEqual(
             host.getBoundingClientRect().left,
-        ),
-      ).toBeLessThanOrEqual(1);
-      expect(
-        Math.abs(
-          element.getBoundingClientRect().right -
-            host.getBoundingClientRect().right,
-        ),
-      ).toBeLessThanOrEqual(1);
+          );
+        }
+        expect(
+          Math.abs(
+            element.getBoundingClientRect().right -
+              host.getBoundingClientRect().right,
+          ),
+        ).toBeLessThanOrEqual(1);
+      });
     };
     const appendNotes = async (element: HTMLElement, text: string) => {
       await userEvent.click(element);
@@ -3259,7 +3335,7 @@
       name: "Task notes",
     })) as HTMLElement;
     await waitFor(() => expect(editor).toBeVisible());
-    expectInlineAlignment(editor);
+    await expectInlineAlignment(editor);
     expect(editor).toHaveAttribute("contenteditable", "true");
     expect(editor.closest(".cm-editor")).toHaveClass(
       "markdown-live-preview-mode",
@@ -3404,11 +3480,102 @@
       name: "Task notes",
     })) as HTMLElement;
     await waitFor(() => expect(reopened).toBeVisible());
-    expectInlineAlignment(reopened);
+    await expectInlineAlignment(reopened);
+    const checklistLines =
+      reopened.querySelectorAll<HTMLElement>(".cm-task-line");
+    expect(checklistLines.length).toBeGreaterThan(0);
+    for (const line of checklistLines) {
+      const checkbox = line.querySelector<HTMLInputElement>(
+        "input[type=checkbox]",
+      )!;
+      const label = line.querySelector<HTMLElement>(".cm-list-1")!;
+      const checkboxRect = checkbox.getBoundingClientRect();
+      const labelRect = label.getClientRects()[0];
+      expect(labelRect.top).toBeLessThan(checkboxRect.bottom);
+      expect(labelRect.bottom).toBeGreaterThan(checkboxRect.top);
+      expect(labelRect.left).toBeGreaterThanOrEqual(checkboxRect.right);
+    }
     expect(notesValue(reopened)).toContain("**Formatted inline note.**");
     expect(
       within(listRow).queryByRole("button", { name: "Expand properties" }),
     ).not.toBeInTheDocument();
+  }}
+/>
+
+<Story
+  name="Inline editor alignment"
+  args={{ displayMode: "desktop" }}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          "Real Markdown notes align with the Task title while folding controls sit in the leading rail, in both Today and a List.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    const canvas = await waitForReady(canvasElement);
+    for (const destination of ["Today", "Applications"]) {
+      if (destination === "Applications") {
+        await userEvent.click(
+          canvas.getByRole("button", { name: destination, exact: true }),
+        );
+      }
+      const title = await canvas.findByRole("button", {
+        name: "Tailor platform CV variant",
+        exact: true,
+      });
+      const row = title.closest<HTMLElement>(".application-planner-task-row")!;
+      await userEvent.dblClick(row);
+      const editor = await within(row).findByRole("textbox", {
+        name: "Task notes",
+      });
+      const titleInput = within(row).getByRole("textbox", {
+        name: "Task title",
+      });
+      await waitFor(() => {
+        const line = Array.from(
+          editor.querySelectorAll<HTMLElement>(".cm-line"),
+        ).find(
+          (candidate) =>
+            candidate.textContent ===
+            "Capture the platform leadership examples before editing the CV.",
+        );
+        expect(line).toBeVisible();
+        const range = document.createRange();
+        range.selectNodeContents(line!);
+        const titleLeft = titleInput.getBoundingClientRect().left;
+        expect(
+          Math.abs(range.getClientRects()[0].left - titleLeft),
+        ).toBeLessThanOrEqual(1);
+        const folds = editor.querySelectorAll<HTMLElement>(
+          ".collapse-indicator",
+        );
+        expect(folds).toHaveLength(3);
+        for (const fold of folds) {
+          expect(fold.getBoundingClientRect().left).toBeGreaterThanOrEqual(
+            row.getBoundingClientRect().left,
+          );
+          expect(fold.getBoundingClientRect().right).toBeLessThanOrEqual(
+            titleLeft + 1,
+          );
+        }
+      });
+      expect(editor.closest(".markdown-live-preview-mode")).toBeInTheDocument();
+      expect(
+        within(editor)
+          .getByText("reliability ownership", { exact: true })
+          .closest(".cm-strong"),
+      ).toBeVisible();
+      if (destination === "Today") {
+        await userEvent.dblClick(row);
+        await waitFor(() =>
+          expect(
+            within(row).queryByRole("textbox", { name: "Task notes" }),
+          ).not.toBeInTheDocument(),
+        );
+      }
+    }
   }}
 />
 

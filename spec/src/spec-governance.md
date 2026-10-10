@@ -73,8 +73,18 @@ rendered formatting, and a body-only editable buffer in both agenda and List
 rows. It MUST finish a successful guarded flush before isolating a subsequent
 save failure, preserve the failed draft, and verify persistence on retry and
 reopening. Accessibility acceptance MUST include the expanded live editor.
-It MUST also verify edge-aligned, full-width body geometry in agenda and List
-inline editors without document padding.
+It MUST also verify full-width body geometry in agenda and List inline editors
+with title-aligned body text and a visible folding rail to its left, no centered
+document padding, a uniform expanded-row/editor background with card-matched
+rounding and a transparent border without extra container padding, and
+checklist labels beside their checkboxes in a rendered
+Markdown List.
+
+The shared demo MUST include a real Task document body with prose, headings,
+formatting, and list content. `InlineEditorAlignment` MUST measure authored
+paragraph text against the title in Today and List rows, keep folding controls
+inside the row but before that text column, and retain the expanded editor for
+accessibility acceptance.
 
 Planner action acceptance MUST visit all seven named destinations, keep page
 menus inside the owning Column Canvas header before its trailing collapse

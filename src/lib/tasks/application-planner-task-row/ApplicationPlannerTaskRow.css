@@ -39,6 +39,28 @@
       );
   }
 
+  .application-planner-task-row--expanded:has([data-task-inline-notes]) {
+    --task-row-surface: var(
+      --task-list-document-background,
+      var(--background-primary, var(--background))
+    );
+  }
+
+  .application-planner-task-row--expanded:has([data-task-inline-notes])
+    .task-preview-row::before {
+    background: var(--task-row-surface);
+  }
+
+  .application-planner-task-row--expanded:has([data-task-inline-notes])
+    .task-preview-row__expanded:not(.task-preview-row__expanded--closing) {
+    overflow: visible;
+  }
+
+  .application-planner-task-row--expanded:has([data-task-inline-notes])
+    > [data-task-checklist-progress]:not(:hover):not(:focus-within) {
+    --task-checklist-footer-surface: var(--task-row-surface);
+  }
+
   .application-planner-task-row__columns {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
