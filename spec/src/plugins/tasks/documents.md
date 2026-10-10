@@ -100,17 +100,17 @@ See [Lists](./lists.md).
 Only an unordered list item whose complete direct content is one local Markdown
 link is a structural candidate. The target document decides its final kind.
 
-| Authored Markdown | Result |
-| --- | --- |
-| `- &#91;Parser&#93;(./parser.md)` targeting `type: task` | `task-entry` |
-| `* &#91;Website&#93;(./website.md)` targeting `type: task-list` | `list-entry` |
-| `- &#91;Missing&#93;(./missing.md)` | Ordinary Markdown plus unresolved diagnostic |
-| `- &#91;Reference&#93;(./note.md)` targeting an ordinary note | Ordinary reference plus unsupported-target diagnostic |
-| `- See &#91;Parser&#93;(./parser.md)` | Ordinary rich list item |
-| `1. &#91;Parser&#93;(./parser.md)` | Ordinary ordered list item |
-| `- &#91;External&#93;(https://example.com)` | Ordinary external link |
-| `- &#91;Section&#93;(#development)` | Ordinary fragment link |
-| `- [ ] Draft migration notes` | Lightweight checklist item in a Task; ordinary Markdown in a List |
+| Authored Markdown                                               | Result                                                            |
+| --------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `- &#91;Parser&#93;(./parser.md)` targeting `type: task`        | `task-entry`                                                      |
+| `* &#91;Website&#93;(./website.md)` targeting `type: task-list` | `list-entry`                                                      |
+| `- &#91;Missing&#93;(./missing.md)`                             | Ordinary Markdown plus unresolved diagnostic                      |
+| `- &#91;Reference&#93;(./note.md)` targeting an ordinary note   | Ordinary reference plus unsupported-target diagnostic             |
+| `- See &#91;Parser&#93;(./parser.md)`                           | Ordinary rich list item                                           |
+| `1. &#91;Parser&#93;(./parser.md)`                              | Ordinary ordered list item                                        |
+| `- &#91;External&#93;(https://example.com)`                     | Ordinary external link                                            |
+| `- &#91;Section&#93;(#development)`                             | Ordinary fragment link                                            |
+| `- [ ] Draft migration notes`                                   | Lightweight checklist item in a Task; ordinary Markdown in a List |
 
 Indentation does not change classification. A supported nested unordered list
 item can become a structural entry at its own `listDepth`; its parent list item
@@ -277,13 +277,15 @@ lightweight checkbox markers in that Task.
 
 The model combines ideas rather than cloning one product:
 
-| Influence | Retained concept | Deliberate Tasks interpretation |
-| --- | --- | --- |
-| Things | Projects as rich documents and headings as meaningful task groups | Any H2–H6 can group entries; source headings remain ordinary Markdown |
-| Superlist | Tasks and Lists may nest recursively and appear together | Typed target documents determine `task-entry` versus `list-entry`; ownership stays singular |
-| Tiimo | A selected-day agenda with friendly day-part buckets | Day-part boundaries are plugin settings and remain separate from document hierarchy |
-| Obsidian/Lapis Markdown | Files, links, headings, and live preview stay user-authored | CST ranges and host link resolution preserve source and compose rich widgets without replacing Markdown |
+| Influence               | Retained concept                                                  | Deliberate Tasks interpretation                                                                         |
+| ----------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Things                  | Projects as rich documents and headings as meaningful task groups | Any H2–H6 can group entries; source headings remain ordinary Markdown                                   |
+| Superlist               | Tasks and Lists may nest recursively and appear together          | Typed target documents determine `task-entry` versus `list-entry`; ownership stays singular             |
+| Tiimo                   | A selected-day agenda with friendly day-part buckets              | Day-part boundaries are plugin settings and remain separate from document hierarchy                     |
+| Obsidian/Lapis Markdown | Files, links, headings, and live preview stay user-authored       | CST ranges and host link resolution preserve source and compose rich widgets without replacing Markdown |
 
 The current implementation is authoritative where it differs from an
 inspiration application. In particular, structural order is Markdown order,
 TaskRun is the only safe sort boundary, and the derived database is disposable.
+
+Optional `task.priority` stores low, medium, or high; absence means no priority. Invalid authored priority is preserved during unrelated metadata mutations. Local comments use the existing task-owned comment schema; no identity or subscription model is implied.

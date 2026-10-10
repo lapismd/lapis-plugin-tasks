@@ -265,3 +265,23 @@ Real workspace acceptance MUST materialize each virtualized editor target throug
 native document navigation before querying or activating it. After verifying the
 Notes heading at the document end, the story MUST return to the document start
 before activating the task run's source control, including in short canvases.
+
+Double-click opens the compact inline editor immediately in both agenda and
+List task rows. Notes reuse the existing auto-sized field and row typography,
+loading only the authored Task body below the separately editable title. The
+Notes field has no Edit/Read toggle, front matter, properties panel, or duplicate
+document title. The existing title and compact footer controls retain their
+styling. Notes save on blur and flush before collapse or navigation. Guarded
+source mutations preserve concurrent title/metadata changes, reject concurrent
+body changes, and keep failed drafts visible for retry. Full-document Markdown
+editing remains available from the column header. See LN-TASK-068.
+
+Runtime action capabilities govern all row controls. Local comments,
+duplication, supported browser printing, copyable Lapis URLs, direct-child bulk
+actions, recurrence skip, and bounded tracked history are owned by Tasks.
+Logbook retains seven navigation destinations and adds All, Completed, and
+Canceled filters.
+
+The standalone Column Canvas catalog fixture has no vault-backed List mutation
+callbacks. It omits those actions and verifies selection, popover navigation,
+and task editing. Vault-backed List actions are exercised in the real App shell.

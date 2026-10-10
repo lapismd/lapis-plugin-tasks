@@ -724,15 +724,20 @@
     const applications = canvas.getByRole("button", { name: "Applications" });
     await userEvent.pointer({ keys: "[MouseRight]", target: applications });
     const menu = within(context.canvasElement.ownerDocument.body);
+    for (const name of [
+      "Open note",
+      "Rename",
+      "New nested list",
+      "Archive",
+      "Delete",
+    ]) {
+      expect(
+        menu.queryByRole("menuitem", { name, exact: true }),
+      ).not.toBeInTheDocument();
+    }
     expect(
-      await menu.findByRole("menuitem", { name: "Open note" }),
-    ).toBeVisible();
-    expect(menu.getByRole("menuitem", { name: "Rename" })).toBeVisible();
-    expect(
-      menu.getByRole("menuitem", { name: "New nested list" }),
-    ).toBeVisible();
-    expect(menu.getByRole("menuitem", { name: "Archive" })).toBeVisible();
-    expect(menu.getByRole("menuitem", { name: "Delete" })).toBeVisible();
+      canvas.queryByRole("button", { name: "New list", exact: true }),
+    ).not.toBeInTheDocument();
     await userEvent.keyboard("{Escape}");
     await waitFor(() => {
       expect(
@@ -1080,19 +1085,16 @@
       name: "Applications",
     });
     await fireEvent.contextMenu(applications);
-    let listActions: HTMLElement | null = null;
-    await waitFor(() => {
-      listActions = portalElement<HTMLElement>(
+    expect(
+      portalElement<HTMLElement>(
         '[role="menu"][aria-label="Applications list actions"]',
-      );
-      expect(listActions).toBeVisible();
-    });
-    await userEvent.click(within(listActions!).getByText("Rename"));
-    expect(listsPopover!).toBeVisible();
-    const renameInput = within(listsPopover!).getByRole("textbox", {
-      name: "Rename Applications",
-    });
-    await userEvent.type(renameInput, "{Enter}");
+      ),
+    ).not.toBeInTheDocument();
+    expect(
+      within(listsPopover!).queryByRole("textbox", {
+        name: "Rename Applications",
+      }),
+    ).not.toBeInTheDocument();
     expect(listsPopover!).toBeVisible();
 
     await userEvent.click(

@@ -13,6 +13,16 @@ export function createVaultTaskFileStore(app: App): TaskFileStore {
       if (!file) throw new Error(`Missing task file: ${path}`);
       return app.vault.cachedRead(file);
     },
+    async create(path, content) {
+      const folder = parentFolder(path);
+      if (folder) await app.vault.mkpath(folder);
+      await app.vault.create(path, content);
+    },
+    async process(path, mutate) {
+      const file = app.vault.getFileByPath(path);
+      if (!file) throw new Error(`Missing task file: ${path}`);
+      return app.vault.process(file, mutate);
+    },
     async write(path, content) {
       const file = app.vault.getFileByPath(path);
       if (file) {

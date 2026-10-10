@@ -34,6 +34,8 @@
   import TaskListItemsListRow from "./TaskListItemsListRow.svelte";
   import TaskRunBlock from "./TaskListItemsBlock.svelte";
   import "./TaskListItemsBlock.css";
+  import TaskInlineNotes from "../tasks/TaskInlineNotes.svelte";
+  import { flushTaskFileSurfaces } from "../task-file-surfaces";
 
   type ResolvedEntry = {
     entry: StructuralTaskRunEntry;
@@ -63,7 +65,9 @@
     ) => void | Promise<void>;
   } = $props();
 
-  const controller = $derived(asTasksMarkdownSurfaceController(surface.context));
+  const controller = $derived(
+    asTasksMarkdownSurfaceController(surface.context),
+  );
   let rows = $state<ResolvedEntry[]>([]);
   let error = $state<string | null>(null);
   let creating = $state(false);
@@ -122,7 +126,13 @@
       ) {
         return;
       }
-      expandedTaskId = null;
+      void flushTaskFileSurfaces(
+        app,
+        rows.find((row) => row.task?.id === openTaskId)?.path ?? undefined,
+        true,
+      )
+        .then(() => (expandedTaskId = null))
+        .catch((cause) => (error = String(cause)));
     };
     document.addEventListener("pointerdown", closeOutside, true);
     document.addEventListener("focusin", closeOutside, true);
@@ -137,7 +147,10 @@
     try {
       const nextRows = await Promise.all(
         section.entries.map(async (entry): Promise<ResolvedEntry> => {
-          const summary = await repository.resolveTaskListItem(sourcePath, entry.target);
+          const summary = await repository.resolveTaskListItem(
+            sourcePath,
+            entry.target,
+          );
           if (!summary) {
             return {
               entry,
@@ -149,7 +162,8 @@
           }
           return {
             entry,
-            task: summary.kind === "task" ? catalogTaskFromSummary(summary) : null,
+            task:
+              summary.kind === "task" ? catalogTaskFromSummary(summary) : null,
             kind: summary.kind === "task-list" ? "task-list" : "task",
             path: summary.path,
             title: summary.title,
@@ -157,13 +171,26 @@
         }),
       );
       if (revision !== loadRevision) return;
-      rows = nextRows;
+      rows = controller?.hideCompleted
+        ? nextRows.filter(
+            (row) =>
+              row.task?.status !== "completed" && row.task?.status !== "done",
+          )
+        : nextRows;
       selectedTaskIds = selectedTaskIds.filter((taskId) =>
         nextRows.some((row) => row.task?.id === taskId),
       );
       error = null;
     } catch (cause) {
       if (revision !== loadRevision) return;
+      error = cause instanceof Error ? cause.message : String(cause);
+    }
+  }
+
+  async function runAction(action: () => Promise<unknown>) {
+    try {
+      await action();
+    } catch (cause) {
       error = cause instanceof Error ? cause.message : String(cause);
     }
   }
@@ -180,13 +207,24 @@
 
   async function toggleDone(task: Task) {
     const path = task.sourcePath ?? task.id;
-    if (task.status === "completed" || task.status === "done") {
-      await repository.reopen(path, new Date().toISOString());
+    if (controller?.readonly) return;
+    if (
+      task.status === "completed" ||
+      task.status === "done" ||
+      task.status === "canceled"
+    ) {
+      await repository.reopen(
+        path,
+        (controller?.clock?.() ?? repository.now()).toISOString(),
+      );
     } else if (task.tracking && task.tracking.type !== "boolean") {
       pendingTrackingCompletion = task;
       return;
     } else {
-      await repository.complete(path, new Date().toISOString());
+      await repository.complete(
+        path,
+        (controller?.clock?.() ?? repository.now()).toISOString(),
+      );
     }
     await controller?.onRefresh?.();
     await load();
@@ -202,7 +240,7 @@
     if (!task) return;
     await repository.complete(
       task.sourcePath ?? task.id,
-      new Date().toISOString(),
+      (controller?.clock?.() ?? repository.now()).toISOString(),
       value,
     );
     pendingTrackingCompletion = null;
@@ -211,7 +249,8 @@
   }
 
   async function loadChecklist(task: Task): Promise<ChecklistItem[]> {
-    return (await repository.getTaskDocument(task.sourcePath ?? task.id)).checklist;
+    return (await repository.getTaskDocument(task.sourcePath ?? task.id))
+      .checklist;
   }
 
   async function toggleChecklist(
@@ -219,6 +258,7 @@
     item: ChecklistItem,
     checked: boolean,
   ): Promise<ChecklistItem[]> {
+    if (controller?.readonly) return loadChecklist(task);
     const document = await repository.setChecklistItemChecked(
       task.sourcePath ?? task.id,
       item.position,
@@ -285,10 +325,14 @@
   }
 
   async function updateTask(task: Task, patch: Partial<ApplicationTask>) {
-    if (!controller?.onSaveTask) return;
+    if (!controller?.onSaveTask || controller.readonly) return;
     const mutationTask = taskForTasksMarkdownMutation(task, controller.tasks);
     await controller.onSaveTask(
-      applyApplicationTaskPatch(mutationTask, patch, new Date().toISOString()),
+      applyApplicationTaskPatch(
+        mutationTask,
+        patch,
+        (controller?.clock?.() ?? repository.now()).toISOString(),
+      ),
     );
     await load();
   }
@@ -307,6 +351,12 @@
       }
       return;
     }
+    if (expandedTaskId)
+      await flushTaskFileSurfaces(
+        app,
+        rows.find((row) => row.task?.id === expandedTaskId)?.path ?? undefined,
+        true,
+      );
     expandedTaskId = expandedTaskId === task.id ? null : task.id;
   }
 
@@ -420,7 +470,10 @@
     const targetIndex = findEntryIndex(targetRow.entry);
     if (sourceIndex < 0 || targetIndex < 0) return;
     const next = [...section.entries];
-    [next[sourceIndex], next[targetIndex]] = [next[targetIndex]!, next[sourceIndex]!];
+    [next[sourceIndex], next[targetIndex]] = [
+      next[targetIndex]!,
+      next[sourceIndex]!,
+    ];
     await replaceEntries(next);
   }
 
@@ -458,6 +511,11 @@
         candidate.target === entry.target,
     );
   }
+
+  $effect(() => {
+    controller?.hideCompleted;
+    void load();
+  });
 
   onMount(() => {
     void load();
@@ -497,11 +555,13 @@
   <div class="task-list-items-block__rows" role="list">
     {#each rows as row, index (row.entry.from + row.entry.target)}
       {#if row.task}
-        {@const taskIndex = taskRows.findIndex((task) => task.id === row.task!.id)}
+        {@const taskIndex = taskRows.findIndex(
+          (task) => task.id === row.task!.id,
+        )}
         <div
           class="task-list-items-block__task"
           role="listitem"
-          draggable={Boolean(controller)}
+          draggable={Boolean(controller?.onMoveEntry) && !controller?.readonly}
           ondragstart={(event) => startDrag(event, index)}
           ondragover={(event) => controller && event.preventDefault()}
           ondrop={(event) => void dropAt(index, event)}
@@ -518,25 +578,39 @@
               taskIndex,
             )}
             expanded={expandedTaskId === row.task.id}
-            reorderable={Boolean(controller)}
+            reorderable={Boolean(controller?.onReorderSection) &&
+              !controller?.readonly}
+            editable={Boolean(controller?.onSaveTask) && !controller?.readonly}
+            deletable={Boolean(controller?.onDeleteTask) &&
+              !controller?.readonly}
+            now={controller?.clock?.() ?? repository.now()}
             selectOnSurfaceClick={false}
-            areaOptions={[]}
+            areaOptions={controller?.listOptions ?? []}
             onSelectTask={selectTask}
             onRequestOpen={(_taskId, source) =>
-              void requestOpenTask(row.task!, source)}
-            onToggleDone={(task) => void toggleDone(task)}
-            onUpdateTask={(task, patch) => void updateTask(task, patch)}
-            onRemoveTask={(task) => void removeTask(task)}
+              void runAction(() => requestOpenTask(row.task!, source))}
+            onToggleDone={(task) => void runAction(() => toggleDone(task))}
+            onUpdateTask={(task, patch) =>
+              void runAction(() => updateTask(task, patch))}
+            onRemoveTask={(task) => void runAction(() => removeTask(task))}
             onLoadChecklist={loadChecklist}
             onToggleChecklistItem={toggleChecklist}
             onMoveTask={(task, direction) => void moveTask(task, direction)}
-          />
+          >
+            {#snippet notesContent()}
+              {#if controller && !controller.readonly}<TaskInlineNotes
+                  {app}
+                  {repository}
+                  task={row.task!}
+                />{/if}
+            {/snippet}
+          </ApplicationPlannerTaskRow>
         </div>
       {:else if row.kind === "task-list"}
         <div
           class="task-list-items-block__list"
           role="listitem"
-          draggable={Boolean(controller)}
+          draggable={Boolean(controller?.onMoveEntry) && !controller?.readonly}
           ondragstart={(event) => startDrag(event, index)}
           ondragover={(event) => controller && event.preventDefault()}
           ondrop={(event) => void dropAt(index, event)}
@@ -554,7 +628,10 @@
             onDelete={() => removeList(row)}
           />
           {#if row.path && expandedListPaths.includes(row.path)}
-            <div class="task-list-items-block__nested" data-task-list-nested-runs>
+            <div
+              class="task-list-items-block__nested"
+              data-task-list-nested-runs
+            >
               {#each nestedRuns[row.path] ?? [] as nestedRun (nestedRun.id)}
                 <TaskRunBlock
                   {app}

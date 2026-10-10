@@ -56,3 +56,8 @@ The temporary batch runner MUST apply its one-worker bound and disabled file
 parallelism to the nested Storybook project through a batch-only configuration.
 It MUST reuse the package's existing Vite/Storybook setup and leave the normal
 unbatched configuration available for diagnosis.
+
+Runtime-gap acceptance records exact before/after regression counts, exercises
+the repository-backed Shell, and runs the complete interaction/axe suite through
+the documented fresh-process batches. Temporary local package snapshots retain
+registry ranges in publishable manifests; visual review remains pending.

@@ -1,11 +1,15 @@
 import { MemoryAppDatabase } from "@lapis-notes/api/app-database";
 import { describe, expect, it } from "vitest";
-import { applyCatalogTaskToRepository, createCatalogTaskInRepository } from "./apply-catalog-task";
+import {
+  applyCatalogTaskToRepository,
+  createCatalogTaskInRepository,
+} from "./apply-catalog-task";
 import { catalogTaskFromSummary } from "./catalog-adapter";
 import { parseTaskDocument } from "./task-document";
 import { indexTaskDocument } from "./task-index";
 import { createMemoryTaskFileStore, TaskRepository } from "./task-repository";
 import { taskForTasksMarkdownMutation } from "../task-list-surface";
+import { applyApplicationTaskPatch } from "../tasks/lib/application-task-planner-mode-helpers";
 
 const FILES: Record<string, string> = {
   "lists/home.md": `---
@@ -54,6 +58,52 @@ async function openRepository() {
 }
 
 describe("applyCatalogTaskToRepository", () => {
+  it("persists tracking through the expanded-row patch path", async () => {
+    const { repository, files } = await openRepository();
+    const previous = catalogTaskFromSummary((await repository.get("t_buy"))!);
+    const next = applyApplicationTaskPatch(
+      previous,
+      {
+        repeat: {
+          start: "2026-08-20",
+          rrule: "FREQ=DAILY",
+          anchor: "schedule",
+          missed: "carry",
+        },
+        tracking: { type: "count", unit: "sessions", target: 3 },
+      },
+      "2026-08-20T12:00:00Z",
+    );
+    await applyCatalogTaskToRepository(repository, next, previous);
+    expect(await files.read("buy.md")).toContain("unit: sessions");
+    expect((await repository.get("t_buy"))?.tracking).toEqual({
+      type: "count",
+      unit: "sessions",
+      target: 3,
+    });
+  });
+
+  it("explicitly removes opaque recurrence through the expanded-row patch path", async () => {
+    const { repository, files } = await openRepository();
+    await files.write(
+      "buy.md",
+      FILES["buy.md"].replace(
+        "  start: anytime",
+        "  start: anytime\n  repeat:\n    legacy: true",
+      ),
+    );
+    const previous = {
+      ...catalogTaskFromSummary((await repository.get("t_buy"))!),
+      unparsedRepeat: { legacy: true },
+    };
+    const next = applyApplicationTaskPatch(
+      previous,
+      { repeat: undefined, unparsedRepeat: undefined },
+      "2026-08-20T12:00:00Z",
+    );
+    await applyCatalogTaskToRepository(repository, next, previous);
+    expect(await files.read("buy.md")).not.toContain("legacy:");
+  });
   it("does not remove a list link when a rich Items row edits a child field", async () => {
     const { repository, files } = await openRepository();
     const projected = catalogTaskFromSummary((await repository.get("t_buy"))!);
@@ -128,7 +178,9 @@ describe("applyCatalogTaskToRepository", () => {
     );
     expect(await files.read("buy.md")).toContain("at: 14:45");
 
-    const beforeRepeat = catalogTaskFromSummary((await repository.get("t_buy"))!);
+    const beforeRepeat = catalogTaskFromSummary(
+      (await repository.get("t_buy"))!,
+    );
     await applyCatalogTaskToRepository(
       repository,
       {
@@ -197,13 +249,18 @@ describe("applyCatalogTaskToRepository", () => {
         area: "list_home",
         order: 1024,
       },
-      { existingPaths: ["buy.md", "lists/home.md"], now: new Date("2026-08-20T14:00:00Z") },
+      {
+        existingPaths: ["buy.md", "lists/home.md"],
+        now: new Date("2026-08-20T14:00:00Z"),
+      },
     );
     expect(created.sourcePath).toBe("inbox/write-notes.md");
     const createdRaw = await files.read("inbox/write-notes.md");
     expect(createdRaw).toContain("# Write notes");
     expect(createdRaw).toContain("date: 2026-08-20");
-    expect(await files.read("lists/home.md")).toContain("../inbox/write-notes.md");
+    expect(await files.read("lists/home.md")).toContain(
+      "../inbox/write-notes.md",
+    );
 
     const assigned = await createCatalogTaskInRepository(
       repository,

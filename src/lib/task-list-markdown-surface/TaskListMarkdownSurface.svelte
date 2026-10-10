@@ -9,6 +9,7 @@
   import type { TaskRepository } from "../model/task-repository";
   import type { TasksMarkdownSurfaceController } from "../task-list-surface";
   import "./TaskListMarkdownSurface.css";
+  import { registerTaskFileSurface } from "../task-file-surfaces";
 
   let {
     app,
@@ -49,6 +50,7 @@
       const surfaceRepository = repository;
       const surfaceController = controller;
       const hasSurfaceProvider = surfaceApp.markdownFileSurfaces.available;
+      let unregister: (() => void) | null = null;
       let disposed = false;
       let handle: MarkdownFileSurfaceHandle | null = null;
       let fallbackOwner: FallbackRenderOwner | null = null;
@@ -74,6 +76,11 @@
               await handle.dispose();
               return;
             }
+            unregister = registerTaskFileSurface(
+              surfaceApp,
+              sourcePath,
+              handle,
+            );
             surfaceHandle = handle;
             return;
           }
@@ -98,6 +105,7 @@
 
       return () => {
         disposed = true;
+        unregister?.();
         if (surfaceHandle === handle) surfaceHandle = null;
         if (handle) void handle.dispose();
         fallbackOwner?.unload();
@@ -123,6 +131,10 @@
     surfaceHandle?.enter();
   }
 
+  export async function flush(): Promise<boolean> {
+    return surfaceHandle ? surfaceHandle.flush() : true;
+  }
+
   export async function exit(): Promise<boolean> {
     if (!surfaceHandle) return true;
     const exited = await surfaceHandle.exit();
@@ -135,6 +147,7 @@
   class="task-list-markdown-surface"
   class:task-list-markdown-surface--editing={editing}
   data-task-markdown-surface
+  data-hide-completed={(controller.hideCompleted && !editing) || undefined}
   data-editing={editing}
 >
   {#if !providerAvailable}

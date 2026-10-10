@@ -12,16 +12,16 @@ See LN-TASK-018 and LN-TASK-028–032.
 views. `classifyTask` in `src/lib/model/planner.ts` places a catalog Task into
 one navigation bucket.
 
-| View | Match |
-| --- | --- |
-| Inbox | Open task with `inbox: true` |
-| Today | Open task whose plan date or deadline is today or earlier |
-| Review | Open task whose plan date is before today |
-| Upcoming | Open task with a future start, plan date, or deadline |
-| Anytime | Open task with an actionable start and no plan date |
-| Someday | Open task whose start is `someday` |
-| Completed | Completed task only |
-| Logbook | Completed or canceled task |
+| View      | Match                                                     |
+| --------- | --------------------------------------------------------- |
+| Inbox     | Open task with `inbox: true`                              |
+| Today     | Open task whose plan date or deadline is today or earlier |
+| Review    | Open task whose plan date is before today                 |
+| Upcoming  | Open task with a future start, plan date, or deadline     |
+| Anytime   | Open task with an actionable start and no plan date       |
+| Someday   | Open task whose start is `someday`                        |
+| Completed | Completed task only                                       |
+| Logbook   | Completed or canceled task                                |
 
 Upcoming day rows use the plan date, or the deadline when no plan exists. A
 deadline-only task is not undated Anytime. An overdue plan remains in Review
@@ -81,13 +81,13 @@ render the legacy tab directly.
 
 Every selected date renders these sections in order:
 
-| Section | Routing rule | Initial disclosure | Color role |
-| --- | --- | --- | --- |
-| Anytime | `plan.at: anytime`, absent, or invalid | Expanded | Neutral |
-| Morning | Explicit `morning`, or a clock before `afternoonStartsAt` | Expanded | Warning |
-| Afternoon | Explicit `afternoon`, or a clock from `afternoonStartsAt` until `eveningStartsAt` | Expanded | Info |
-| Evening | Explicit `evening`, legacy `when: this-evening`, or a clock from `eveningStartsAt` | Expanded | Accent |
-| Done | Completed on the selected date | Collapsed | Success |
+| Section   | Routing rule                                                                       | Initial disclosure | Color role |
+| --------- | ---------------------------------------------------------------------------------- | ------------------ | ---------- |
+| Anytime   | `plan.at: anytime`, absent, or invalid                                             | Expanded           | Neutral    |
+| Morning   | Explicit `morning`, or a clock before `afternoonStartsAt`                          | Expanded           | Warning    |
+| Afternoon | Explicit `afternoon`, or a clock from `afternoonStartsAt` until `eveningStartsAt`  | Expanded           | Info       |
+| Evening   | Explicit `evening`, legacy `when: this-evening`, or a clock from `eveningStartsAt` | Expanded           | Accent     |
+| Done      | Completed on the selected date                                                     | Collapsed          | Success    |
 
 Explicit day parts do not depend on settings. Clock-valued tasks use the
 configured boundaries, which default to `12:00` and `17:00`; each boundary
@@ -138,3 +138,10 @@ The leading navigation column exposes the same planner drop-host data as the
 App Shell sidebar. Dropping on a named bucket updates planning state; dropping
 on a List creates or moves the structural membership link rather than storing a
 List id on the child Task.
+
+Manual selected-day order is stored in the canonical daily note as
+`tasks.agendaOrder`, an array of stable Task ids. The first reorder may create
+that note; changing dates or viewing an agenda never does. Section placement
+remains derived. Hidden ids retain their position, stale ids are ignored, and
+unlisted tasks use the existing deterministic ordering. This does not reorder
+TaskRun membership links or create habit observations.

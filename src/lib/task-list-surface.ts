@@ -1,3 +1,4 @@
+import type { TaskListPickerOptionInput } from "./tasks/application-task-area-picker";
 import type { Task, TaskQuickCreateInput } from "./model/types";
 import type {
   StructuralTaskRun,
@@ -6,20 +7,19 @@ import type {
 
 export type TasksMarkdownSurfaceController = {
   kind: "tasks-markdown";
+  clock?: () => Date;
+  listOptions?: TaskListPickerOptionInput[];
+  hideCompleted?: boolean;
+  readonly?: boolean;
   onActiveTaskChange?: (taskId: string | null) => void | Promise<void>;
   onActiveListChange?: (path: string | null) => void | Promise<void>;
   onOpenList?: (path: string, title: string) => void | Promise<void>;
   onSaveTask?: (task: Task) => void | Promise<void>;
   onDeleteTask?: (task: Task) => void | Promise<void>;
-  onDeleteList?: (
-    path: string,
-    parentPath: string,
-  ) => void | Promise<void>;
+  onDeleteList?: (path: string, parentPath: string) => void | Promise<void>;
   onRefresh?: () => void | Promise<void>;
   onOpenNote?: (path: string) => void | Promise<void>;
-  onRevealSource?: (
-    section: StructuralTaskRun,
-  ) => void | Promise<void>;
+  onRevealSource?: (section: StructuralTaskRun) => void | Promise<void>;
   onCreateInSection?: (
     section: StructuralTaskRun,
     input: TaskQuickCreateInput,

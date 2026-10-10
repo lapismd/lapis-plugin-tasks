@@ -1,5 +1,5 @@
 <script lang="ts">
-	import './ApplicationPlannerTaskRow.css';
+  import "./ApplicationPlannerTaskRow.css";
   import CircleAlertIcon from "@lucide/svelte/icons/circle-alert";
   import ArrowRightIcon from "@lucide/svelte/icons/arrow-right";
   import BriefcaseBusinessIcon from "@lucide/svelte/icons/briefcase-business";
@@ -14,7 +14,8 @@
     type Task,
   } from "../../model";
 
-  import type { ApplicationTask } from '../../model';
+  import type { Snippet } from "svelte";
+  import type { ApplicationTask } from "../../model";
   import ApplicationTaskAreaPicker from "../application-task-area-picker/ApplicationTaskAreaPicker.svelte";
   import type { TaskListPickerOptionInput } from "../application-task-area-picker";
   import ApplicationTaskChecklistProgress from "../application-task-checklist-progress/ApplicationTaskChecklistProgress.svelte";
@@ -43,6 +44,9 @@
     closing = false,
     dragPreview = false,
     reorderable = true,
+    editable = true,
+    deletable = true,
+    notesContent,
     /**
      * When true, plain clicks on the preview surface/title select the row
      * instead of starting title edit (used while a host detail panel is open).
@@ -76,6 +80,9 @@
     closing?: boolean;
     dragPreview?: boolean;
     reorderable?: boolean;
+    editable?: boolean;
+    deletable?: boolean;
+    notesContent?: Snippet;
     selectOnSurfaceClick?: boolean;
     areaOptions?: TaskListPickerOptionInput[];
     onRequestOpen?: (
@@ -105,7 +112,7 @@
   const showSelectedSurface = $derived(selected && !openSurface);
   const showScheduleChip = $derived(
     Boolean(
-        applicationTask.scheduledAt ||
+      applicationTask.scheduledAt ||
         applicationTask.planDate ||
         applicationTask.when === "today" ||
         applicationTask.when === "this-evening",
@@ -123,7 +130,8 @@
         task.listId,
     ),
   );
-  const showRowSwipe = $derived(!openSurface && !dragPreview);
+  const showRowControls = $derived(!openSurface && !dragPreview);
+  const showRowSwipe = $derived(!openSurface && !dragPreview && deletable);
   const swipeEnabled = $derived(showRowSwipe && !dragging);
   let swipeOpen = $state<SwipeItemOpen>(null);
 
@@ -279,7 +287,7 @@
       : undefined}
   data-planner-selection-position={dragPreview
     ? undefined
-    : selectionPosition ?? undefined}
+    : (selectionPosition ?? undefined)}
   style={application?.color
     ? `--card-color: ${application.color}; --task-application-color: ${application.color};`
     : ""}
@@ -291,28 +299,30 @@
   tabindex={0}
 >
   <div class="application-planner-task-row__columns">
-    {#if showRowSwipe}
+    {#if showRowControls}
       <SwipeItem.Root
         class="application-planner-task-row__swipe application-planner-task-row__primary"
         bind:open={swipeOpen}
         disabled={!swipeEnabled}
       >
-        <SwipeItem.Actions
-          side="end"
-          aria-label="Task delete actions"
-          onFullSwipe={removeTask}
-        >
-          <SwipeItem.Action
-            variant="destructive"
-            size="icon"
-            class="application-planner-task-row__swipe-delete"
-            aria-label={`Remove task ${task.title}`}
-            title={`Remove task ${task.title}`}
-            onclick={removeTask}
+        {#if deletable}
+          <SwipeItem.Actions
+            side="end"
+            aria-label="Task delete actions"
+            onFullSwipe={removeTask}
           >
-            <Trash2Icon />
-          </SwipeItem.Action>
-        </SwipeItem.Actions>
+            <SwipeItem.Action
+              variant="destructive"
+              size="icon"
+              class="application-planner-task-row__swipe-delete"
+              aria-label={`Remove task ${task.title}`}
+              title={`Remove task ${task.title}`}
+              onclick={removeTask}
+            >
+              <Trash2Icon />
+            </SwipeItem.Action>
+          </SwipeItem.Actions>
+        {/if}
 
         <SwipeItem.Content class="application-planner-task-row__swipe-content">
           {@render primaryColumn()}
@@ -379,6 +389,8 @@
       {sortableGroup}
       {dragging}
       {reorderable}
+      {editable}
+      {notesContent}
       isExpanded={expanded}
       isClosing={closing}
       {areaOptions}
@@ -397,7 +409,7 @@
       onMoveTask={(_, direction) => onMoveTask(task, direction)}
     />
   </div>
-  {#if showMeta}
+  {#if showMeta && editable}
     <div
       class="application-planner-task-row__meta"
       data-swipe-item-gesture-ignore

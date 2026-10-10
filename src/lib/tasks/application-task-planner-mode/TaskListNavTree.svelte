@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { Button } from "@lapismd/design-core/shadcn/button";
+  import PlusIcon from "@lucide/svelte/icons/plus";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import FolderIcon from "@lucide/svelte/icons/folder";
   import FolderKanbanIcon from "@lucide/svelte/icons/folder-kanban";
@@ -190,7 +192,16 @@
   }
 </script>
 
-<p class="task-column-canvas-story__section-label">Lists</p>
+<div class="task-list-tree__heading">
+  <p class="task-column-canvas-story__section-label">Lists</p>
+  {#if onCreateList}<Button
+      variant="ghost"
+      size="icon"
+      aria-label="New list"
+      title="New list"
+      onclick={() => onCreateList?.({})}><PlusIcon /></Button
+    >{/if}
+</div>
 <ul class="task-list-tree" data-list-tree>
   {#each tree.sections as section (section.title)}
     {@render sectionFolder(section.title, section.lists, false)}
@@ -530,3 +541,11 @@
     {/if}
   </li>
 {/snippet}
+
+<style>
+  .task-list-tree__heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+</style>

@@ -12,10 +12,7 @@ import {
 	type TaskPlannerMovePatch,
 	type TaskPlannerQuickPlacement
 } from '../../model';
-import {
-	DEFAULT_TASKS_PLUGIN_SETTINGS,
-	type TasksPluginSettings
-} from '../../tasks-settings';
+import { DEFAULT_TASKS_PLUGIN_SETTINGS, type TasksPluginSettings } from '../../tasks-settings';
 
 import type { ApplicationTask } from '../../model';
 
@@ -92,14 +89,12 @@ export function applyApplicationTaskPatch(
 	patch: Partial<ApplicationTask>,
 	updatedAt: string
 ): Task {
-	const has = (key: keyof ApplicationTask) =>
-		Object.prototype.hasOwnProperty.call(patch, key);
+	const has = (key: keyof ApplicationTask) => Object.prototype.hasOwnProperty.call(patch, key);
 	return {
 		...task,
 		title: patch.body ?? task.title,
 		status:
-			patch.status ??
-			(patch.done === undefined ? task.status : patch.done ? 'completed' : 'open'),
+			patch.status ?? (patch.done === undefined ? task.status : patch.done ? 'completed' : 'open'),
 		priority: has('priority') ? patch.priority : task.priority,
 		linkedTo: has('linkedTo') ? patch.linkedTo : task.linkedTo,
 		dueAt: has('dueAt') ? patch.dueAt : task.dueAt,
@@ -109,6 +104,8 @@ export function applyApplicationTaskPatch(
 		planDate: has('planDate') ? patch.planDate : task.planDate,
 		planAt: has('planAt') ? patch.planAt : task.planAt,
 		repeat: has('repeat') ? patch.repeat : task.repeat,
+		unparsedRepeat: has('unparsedRepeat') ? patch.unparsedRepeat : task.unparsedRepeat,
+		tracking: has('tracking') ? patch.tracking : task.tracking,
 		deadline: has('deadline') ? patch.deadline : task.deadline,
 		inbox: has('inbox') ? patch.inbox : task.inbox,
 		listId: has('listId') ? patch.listId : task.listId,
@@ -286,10 +283,7 @@ export function buildPlannerDragLayout(
 		return { someday: snapshot.someday.map((task) => task.id) };
 	}
 	return Object.fromEntries(
-		snapshot.logbook.map((group) => [
-			`logbook:${group.date}`,
-			group.tasks.map((task) => task.id)
-		])
+		snapshot.logbook.map((group) => [`logbook:${group.date}`, group.tasks.map((task) => task.id)])
 	);
 }
 
@@ -299,9 +293,7 @@ export function normalizePlannerDragLayout(
 	sourceTaskId: string
 ): PlannerDragLayout {
 	const movingIds = new Set(movingTaskIds);
-	const sourceEntry = Object.entries(layout).find(([, taskIds]) =>
-		taskIds.includes(sourceTaskId)
-	);
+	const sourceEntry = Object.entries(layout).find(([, taskIds]) => taskIds.includes(sourceTaskId));
 	if (!sourceEntry || !movingIds.has(sourceTaskId)) return layout;
 
 	const [targetListId, targetTaskIds] = sourceEntry;
@@ -419,9 +411,7 @@ export function orderTaskIdsByVisiblePosition(
 		settings
 	).map((task) => task.id);
 	const uniqueIds = [...new Set(taskIds)];
-	return uniqueIds.sort(
-		(left, right) => visibleIds.indexOf(left) - visibleIds.indexOf(right)
-	);
+	return uniqueIds.sort((left, right) => visibleIds.indexOf(left) - visibleIds.indexOf(right));
 }
 
 export function resolvePlannerTaskSelection(
@@ -464,9 +454,7 @@ export function resolvePlannerTaskSelection(
 		} else {
 			selectedTaskIdSet.add(targetTaskId);
 		}
-		const taskIds = uniqueVisibleTaskIds.filter((taskId) =>
-			selectedTaskIdSet.has(taskId)
-		);
+		const taskIds = uniqueVisibleTaskIds.filter((taskId) => selectedTaskIdSet.has(taskId));
 		return {
 			taskIds,
 			anchorTaskId:
@@ -518,10 +506,7 @@ export function changedPlannerPlacementTaskIds(before: Task[], after: Task[]) {
 	return after
 		.filter((task) => {
 			const previous = beforeById.get(task.id);
-			return (
-				!previous ||
-				plannerPlacementKeys.some((key) => previous[key] !== task[key])
-			);
+			return !previous || plannerPlacementKeys.some((key) => previous[key] !== task[key]);
 		})
 		.map((task) => task.id);
 }
@@ -531,17 +516,11 @@ export function plannerPlacementsMatch(left: Task[], right: Task[]) {
 	const rightById = new Map(right.map((task) => [task.id, task] as const));
 	return left.every((task) => {
 		const other = rightById.get(task.id);
-		return (
-			Boolean(other) &&
-			plannerPlacementKeys.every((key) => task[key] === other?.[key])
-		);
+		return Boolean(other) && plannerPlacementKeys.every((key) => task[key] === other?.[key]);
 	});
 }
 
-export function buildPlannerPlacementPatch(
-	task: Task,
-	placement: TaskPlannerQuickPlacement
-) {
+export function buildPlannerPlacementPatch(task: Task, placement: TaskPlannerQuickPlacement) {
 	if (placement === 'this-evening') {
 		return {
 			...buildTaskPlannerMovePatch(task, { bucket: 'today' }),
@@ -588,8 +567,7 @@ export function getPlannerExternalDropTargetAt(
 	const parsed = plannerDropDataFromElement(dropElement);
 	if (
 		!parsed ||
-		(parsed.data.type !== 'planner-sidebar-bucket' &&
-			parsed.data.type !== 'planner-sidebar-list')
+		(parsed.data.type !== 'planner-sidebar-bucket' && parsed.data.type !== 'planner-sidebar-list')
 	) {
 		return null;
 	}

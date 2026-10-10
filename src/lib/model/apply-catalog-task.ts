@@ -36,11 +36,7 @@ function catalogStart(task: Task): TaskStart {
   if (task.start === "someday" || task.when === "someday") {
     return { kind: "someday" };
   }
-  if (
-    task.start &&
-    task.start !== "anytime" &&
-    task.start !== "someday"
-  ) {
+  if (task.start && task.start !== "anytime" && task.start !== "someday") {
     return { kind: "date", date: task.start };
   }
   return { kind: "anytime" };
@@ -69,7 +65,9 @@ function catalogPlan(task: Task): TaskPlan | undefined {
 
 function startsEqual(left: TaskStart, right: TaskStart): boolean {
   if (left.kind !== right.kind) return false;
-  return left.kind !== "date" || left.date === (right as { date?: string }).date;
+  return (
+    left.kind !== "date" || left.date === (right as { date?: string }).date
+  );
 }
 
 function plansEqual(
@@ -79,9 +77,7 @@ function plansEqual(
   if (!left && !right) return true;
   if (!left || !right) return false;
   return (
-    left.date === right.date &&
-    left.at === right.at &&
-    left.time === right.time
+    left.date === right.date && left.at === right.at && left.time === right.time
   );
 }
 
@@ -121,7 +117,10 @@ function uniquePath(
   return path;
 }
 
-function uniqueInboxPath(existingPaths: Iterable<string>, title: string): string {
+function uniqueInboxPath(
+  existingPaths: Iterable<string>,
+  title: string,
+): string {
   return uniquePath(existingPaths, "inbox", title, "task");
 }
 
@@ -151,13 +150,18 @@ export async function applyCatalogTaskToRepository(
   const canceled = isCanceled(next) && (!previous || !isCanceled(previous));
   const completed = isCompleted(next) && (!previous || !isCompleted(previous));
   const reopened =
-    isOpen(next) && Boolean(previous && (isCompleted(previous) || isCanceled(previous)));
+    isOpen(next) &&
+    Boolean(previous && (isCompleted(previous) || isCanceled(previous)));
   if (canceled) {
     await repository.cancel(path, at);
   } else if (completed) {
     await repository.complete(path, next.completedAt ?? at);
   } else if (reopened) {
     await repository.reopen(path, at);
+  }
+
+  if (next.priority !== previous?.priority) {
+    await repository.setPriority(path, next.priority, at);
   }
 
   if (next.title !== previous?.title) {
@@ -188,7 +192,11 @@ export async function applyCatalogTaskToRepository(
     await repository.setDeadline(path, deadline, at);
   }
 
-  if (!repeatsEqual(next.repeat, previous?.repeat)) {
+  if (
+    !repeatsEqual(next.repeat, previous?.repeat) ||
+    (previous?.unparsedRepeat !== undefined &&
+      next.unparsedRepeat === undefined)
+  ) {
     await repository.setRepeat(path, next.repeat, at);
   }
   if (!trackingEqual(next.tracking, previous?.tracking)) {
@@ -235,12 +243,14 @@ export async function createCatalogTaskInRepository(
   const created = await repository.create({
     path,
     title: input.title,
+    id: crypto.randomUUID(),
     at,
     inbox: input.view === "inbox",
   });
   const previous = catalogTaskFromSummary(created);
   const next: Task = {
     ...previous,
+    priority: input.priority,
     when,
     start: when === "someday" ? "someday" : "anytime",
     planDate:
@@ -263,7 +273,11 @@ export async function createCatalogTaskInRepository(
   await applyCatalogTaskToRepository(repository, next, previous);
   const summary = await repository.get(created.id);
   return summary
-    ? { ...catalogTaskFromSummary(summary), listId: next.listId, areas: next.areas }
+    ? {
+        ...catalogTaskFromSummary(summary),
+        listId: next.listId,
+        areas: next.areas,
+      }
     : next;
 }
 

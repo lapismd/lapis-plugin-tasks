@@ -3,6 +3,7 @@
   import { onMount, untrack } from "svelte";
   import {
     applyCatalogTaskToRepository,
+    createAppTaskAgendaRepository,
     buildTaskPlannerSnapshotFromRepository,
     createCatalogTaskInRepository,
     deleteCatalogTaskFromRepository,
@@ -28,6 +29,7 @@
   } from "./tasks-settings";
   import type { TasksSettingsSource } from "./tasks-view";
   import TasksPlannerCanvas from "./tasks/application-task-planner-mode/TasksPlannerCanvas.svelte";
+  import { flushTaskFileSurfaces } from "./task-file-surfaces";
   import TaskTrackingCompletionPrompt from "./tasks/task-tracking-completion-prompt/TaskTrackingCompletionPrompt.svelte";
 
   let {
@@ -66,6 +68,27 @@
   let selectedDate = $state("");
   let historyRows = $state<TaskOccurrenceHistoryRow[]>([]);
   let historyRevision = 0;
+  let agendaOrder = $state<string[]>([]);
+  let agendaRevision = 0;
+  const agenda = $derived(createAppTaskAgendaRepository(app));
+  const orderedTasks = $derived(
+    tasks.map((task) => ({
+      ...task,
+      order: agendaOrder.includes(task.id)
+        ? agendaOrder.indexOf(task.id) * 1024
+        : undefined,
+    })),
+  );
+
+  async function loadAgenda(date: string) {
+    const revision = ++agendaRevision;
+    const order = await agenda.order(date);
+    if (revision === agendaRevision) agendaOrder = order;
+  }
+  async function saveAgendaOrder(date: string, ids: string[]) {
+    await flushTaskFileSurfaces(app);
+    agendaOrder = await agenda.reorder(date, ids);
+  }
 
   const currentTime = () => clock();
 
@@ -127,6 +150,8 @@
 
   $effect(() => {
     const date = selectedDate;
+    if (date)
+      void loadAgenda(date).catch((error) => (loadError = String(error)));
     void loadHistory(date).catch((error) => {
       loadError = error instanceof Error ? error.message : String(error);
     });
@@ -143,6 +168,7 @@
       pendingTrackingCompletion = task;
       return;
     }
+    await flushTaskFileSurfaces(app, task.sourcePath, true);
     await applyCatalogTaskToRepository(repository, task, previous);
     await queueRefresh();
   }
@@ -195,6 +221,8 @@
   }
 
   async function deleteTask(task: Task) {
+    await flushTaskFileSurfaces(app);
+    await flushTaskFileSurfaces(app, task.sourcePath, true);
     await deleteCatalogTaskFromRepository(repository, task);
     await queueRefresh();
   }
@@ -271,6 +299,7 @@
   }
 
   async function createList(input: TaskListCreateInput) {
+    await flushTaskFileSurfaces(app, undefined, true);
     const at = currentTime().toISOString();
     const title = "Untitled list";
     const path = uniqueListPath(
@@ -280,6 +309,7 @@
     await repository.createList({
       path,
       title,
+      id: crypto.randomUUID(),
       at,
       pin:
         input.section && input.section !== "All lists"
@@ -344,40 +374,40 @@
 
 {#if loadError}
   <div class="tasks-workspace-error" role="alert">{loadError}</div>
-{:else}
-  <TasksPlannerCanvas
-    variant="workspace"
-    {tasks}
-    {clock}
-    {settings}
-    {snapshot}
-    {app}
-    {repository}
-    bind:selectedDate
-    {historyRows}
-    applications={[]}
-    applicationSummaries={{}}
-    showRelated={false}
-    onSaveTask={saveTask}
-    onCreateTask={(input) => void createTask(input)}
-    onDeleteTask={(task) => void deleteTask(task)}
-    onLoadChecklist={loadChecklist}
-    onToggleChecklistItem={toggleChecklistItem}
-    {checklistRefreshVersion}
-    onExpandList={(id) => void expandList(id)}
-    onDropList={(sourcePath, target) => void dropList(sourcePath, target)}
-    onRenameList={(path, title) => void renameList(path, title)}
-    onRenameSection={(from, to) => void renameSection(from, to)}
-    onOpenNote={(path) => void openNote(path)}
-    onCreateList={(input) => void createList(input)}
-    onUnpinList={(path) => void unpinList(path)}
-    onArchiveList={(path) => void archiveList(path)}
-    onDeleteList={(path) => void deleteList(path)}
-    onUpdateSettings={updateSettings}
-    onRefreshWorkspace={queueRefresh}
-    onCreateTaskListItem={createTaskListItem}
-  />
 {/if}
+<TasksPlannerCanvas
+  variant="workspace"
+  tasks={orderedTasks}
+  onSaveAgendaOrder={saveAgendaOrder}
+  {clock}
+  {settings}
+  {snapshot}
+  {app}
+  {repository}
+  bind:selectedDate
+  {historyRows}
+  applications={[]}
+  applicationSummaries={{}}
+  showRelated={false}
+  onSaveTask={saveTask}
+  onCreateTask={createTask}
+  onDeleteTask={deleteTask}
+  onLoadChecklist={loadChecklist}
+  onToggleChecklistItem={toggleChecklistItem}
+  {checklistRefreshVersion}
+  onExpandList={(id) => void expandList(id)}
+  onDropList={(sourcePath, target) => void dropList(sourcePath, target)}
+  onRenameList={(path, title) => void renameList(path, title)}
+  onRenameSection={(from, to) => void renameSection(from, to)}
+  onOpenNote={(path) => void openNote(path)}
+  onCreateList={(input) => void createList(input)}
+  onUnpinList={(path) => void unpinList(path)}
+  onArchiveList={(path) => void archiveList(path)}
+  onDeleteList={(path) => void deleteList(path)}
+  onUpdateSettings={updateSettings}
+  onRefreshWorkspace={queueRefresh}
+  onCreateTaskListItem={createTaskListItem}
+/>
 
 {#if pendingTrackingCompletion}
   <TaskTrackingCompletionPrompt

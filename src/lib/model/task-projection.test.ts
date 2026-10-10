@@ -33,7 +33,7 @@ task:
     if (!document) throw new Error("expected task document");
     const row = projectTask(document, "2026-08-20");
 
-    expect(row.projectionVersion).toBe(3);
+    expect(row.projectionVersion).toBe(4);
     expect(row.repeat).toMatchObject({
       rrule: "FREQ=DAILY",
       anchor: "schedule",

@@ -185,3 +185,15 @@ See LN-TASK-019. `TaskRepository.cancel` writes `task.status: canceled`.
 - Deleting a linked sublist after its active-parent link transaction removes the
   child file and other parent/navigation references while explicitly skipping a
   duplicate repository rewrite of that editor-owned parent.
+
+Metadata mutations preserve explicit tracking patches and distinguish removal of opaque recurrence from an unchanged field. Priority and comments persist in Task Markdown; all date-sensitive actions use the repository clock. Deletion cleans structural parent entries before trashing while retaining descendants and prose references.
+
+Heading actions reject a changed source at the vault transaction boundary.
+Navigation and deletion flush open Task file surfaces before closing them.
+Deleting a child Task retains its owning List's active editor after flushing its
+transaction. Detail history and comments landmarks identify the owning Task.
+Preview hiding recognizes semantic checkbox controls inside the host's direct
+paragraph or label wrapper, without hiding an unchecked ancestor item merely
+because a nested item is complete.
+Quantitative history totals and averages are omitted when observations use
+incompatible units; completion rates and streaks remain available.

@@ -54,6 +54,23 @@ function observation(
 }
 
 describe("task occurrence history", () => {
+  it("omits quantitative totals when observations have different units", () => {
+    const rows = buildTaskOccurrenceHistory(
+      [recurring()],
+      [
+        observation("2026-08-01", "completed", 10),
+        { ...observation("2026-08-02", "completed", 20), unit: "chapters" },
+      ],
+      "2026-08-01",
+      "2026-08-02",
+      "2026-08-03",
+    );
+    const statistics = deriveTaskOccurrenceStatistics(rows, "2026-08-03");
+    expect(statistics.completed).toBe(2);
+    expect(statistics).not.toHaveProperty("total");
+    expect(statistics).not.toHaveProperty("average");
+  });
+
   it("derives RFC expectations while excluding EXDATE and inclusive pause ranges", () => {
     const task = recurring({
       repeat: {
@@ -65,12 +82,9 @@ describe("task occurrence history", () => {
         pauseRanges: [{ start: "2026-08-05", end: "2026-08-06" }],
       },
     });
-    expect(expectedTaskOccurrenceDates(task, "2026-08-01", "2026-08-07")).toEqual([
-      "2026-08-01",
-      "2026-08-02",
-      "2026-08-04",
-      "2026-08-07",
-    ]);
+    expect(
+      expectedTaskOccurrenceDates(task, "2026-08-01", "2026-08-07"),
+    ).toEqual(["2026-08-01", "2026-08-02", "2026-08-04", "2026-08-07"]);
   });
 
   it("distinguishes completed, missed, unrecorded, and overdue carry pending", () => {
@@ -97,7 +111,10 @@ describe("task occurrence history", () => {
   });
 
   it("derives streaks, completion rate, totals, averages, and latest completion", () => {
-    const task = recurring({ effectiveOccurrenceDate: "2026-08-06", effectiveOccurrenceState: "current" });
+    const task = recurring({
+      effectiveOccurrenceDate: "2026-08-06",
+      effectiveOccurrenceState: "current",
+    });
     const rows = buildTaskOccurrenceHistory(
       [task],
       [
@@ -137,12 +154,19 @@ describe("task occurrence history", () => {
     });
     const rows = buildTaskOccurrenceHistory(
       [task],
-      [observation("2026-08-01", "completed", 10), observation("2026-08-02", "completed", 20)],
+      [
+        observation("2026-08-01", "completed", 10),
+        observation("2026-08-02", "completed", 20),
+      ],
       "2026-08-01",
       "2026-08-02",
       "2026-08-03",
     );
-    expect(rows[1]).toMatchObject({ occurrenceDate: "2026-08-02", expected: false, outcome: "completed" });
+    expect(rows[1]).toMatchObject({
+      occurrenceDate: "2026-08-02",
+      expected: false,
+      outcome: "completed",
+    });
     expect(deriveTaskOccurrenceStatistics(rows, "2026-08-03")).toMatchObject({
       completed: 1,
       expected: 1,

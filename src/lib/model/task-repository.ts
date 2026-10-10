@@ -20,6 +20,8 @@ import {
   type TaskDocument,
   type TaskListDocument,
   type TaskPlan,
+  type TaskComment,
+  resetChecklistItems,
   type TaskStart,
 } from "./task-document";
 import {
@@ -87,6 +89,8 @@ export type TaskFileStore = {
   read(path: string): Promise<string>;
   write(path: string, content: string): Promise<void>;
   remove?(path: string): Promise<void>;
+  create?(path: string, content: string): Promise<void>;
+  process?(path: string, mutate: (raw: string) => string): Promise<string>;
 };
 
 export function createMemoryTaskFileStore(
@@ -100,6 +104,10 @@ export function createMemoryTaskFileStore(
       return raw;
     },
     async write(path, content) {
+      store.set(path, content);
+    },
+    async create(path, content) {
+      if (store.has(path)) throw new Error("The destination already exists.");
       store.set(path, content);
     },
     async remove(path) {
@@ -116,6 +124,21 @@ export function replaceTitleHeading(body: string, title: string): string {
   return trimmed ? `# ${title}\n\n${trimmed}` : `# ${title}\n`;
 }
 
+function splitTaskNotes(body: string): { title: string; notes: string } {
+  const heading = /^(?:[ \t]*\r?\n)*# [^\r\n]*(?:\r?\n|$)(?:[ \t]*\r?\n)*/.exec(
+    body,
+  );
+  return {
+    title: heading?.[0] ?? "",
+    notes: body.slice(heading?.[0].length ?? 0),
+  };
+}
+
+/** The compact row edits the body below its separately editable Task title. */
+export function getTaskNotes(body: string): string {
+  return splitTaskNotes(body).notes;
+}
+
 export function taskRowToSummary(row: AppDatabaseTaskRecord): TaskSummary {
   const repeatValue =
     row.repeat && typeof row.repeat === "object"
@@ -124,7 +147,8 @@ export function taskRowToSummary(row: AppDatabaseTaskRecord): TaskSummary {
   const repeat =
     repeatValue &&
     typeof repeatValue.rrule === "string" &&
-    (repeatValue.anchor === "schedule" || repeatValue.anchor === "completion") &&
+    (repeatValue.anchor === "schedule" ||
+      repeatValue.anchor === "completion") &&
     (repeatValue.missed === "carry" || repeatValue.missed === "skip")
       ? (repeatValue as TaskSummary["repeat"])
       : undefined;
@@ -134,6 +158,7 @@ export function taskRowToSummary(row: AppDatabaseTaskRecord): TaskSummary {
     title: row.title,
     kind: row.kind as TaskSummary["kind"],
     status: row.status,
+    priority: row.priority ?? undefined,
     inbox: row.inbox,
     startKind: row.startKind,
     startDate: row.startDate ?? undefined,
@@ -147,7 +172,7 @@ export function taskRowToSummary(row: AppDatabaseTaskRecord): TaskSummary {
     checklistCompleted: row.checklistCompleted,
     commentCount: row.commentCount,
     repeat,
-    unparsedRepeat: repeat ? undefined : repeatValue ?? undefined,
+    unparsedRepeat: repeat ? undefined : (repeatValue ?? undefined),
     tracking:
       row.tracking && typeof row.tracking === "object"
         ? (row.tracking as TaskSummary["tracking"])
@@ -165,7 +190,9 @@ export class TaskRepository {
     date: string;
     generation: number;
   } | null = null;
-  private effectiveVerificationResetTimer: ReturnType<typeof setTimeout> | null = null;
+  private effectiveVerificationResetTimer: ReturnType<
+    typeof setTimeout
+  > | null = null;
   private readonly effectiveRefreshListeners = new Set<
     (today: string) => void
   >();
@@ -193,7 +220,9 @@ export class TaskRepository {
     return () => this.effectiveRefreshListeners.delete(listener);
   }
 
-  async refreshEffectiveOccurrences(today = todayDateOnly(this.clock())): Promise<void> {
+  async refreshEffectiveOccurrences(
+    today = todayDateOnly(this.clock()),
+  ): Promise<void> {
     const generation = this.effectiveProjectionGeneration;
     if (
       !this.files ||
@@ -211,10 +240,11 @@ export class TaskRepository {
         ) {
           return;
         }
-        const projected = await this.database.queryProjection<AppDatabaseTaskRecord>(
-          PUBLIC_TASKS_PROJECTION_ID,
-          taskQueryToIndexQuery({ kind: "task" }),
-        );
+        const projected =
+          await this.database.queryProjection<AppDatabaseTaskRecord>(
+            PUBLIC_TASKS_PROJECTION_ID,
+            taskQueryToIndexQuery({ kind: "task" }),
+          );
         const staleRows = projected.rows.filter(
           (row) => row.repeat && row.effectiveForDate !== today,
         );
@@ -242,7 +272,8 @@ export class TaskRepository {
           this.effectiveVerificationResetTimer = null;
         }, 0);
         if (staleRows.length) {
-          for (const listener of this.effectiveRefreshListeners) listener(today);
+          for (const listener of this.effectiveRefreshListeners)
+            listener(today);
         }
       });
     this.effectiveRefreshQueue = refresh;
@@ -305,10 +336,20 @@ export class TaskRepository {
     const nextRaw = replaceTaskRunSource(raw, expected, entries, path);
     const reparsed = parseTaskDocument(nextRaw, path);
     if (!reparsed || !["task", "task-list"].includes(reparsed.kind)) {
-      throw new Error(`Task run mutation produced an invalid document: ${path}`);
+      throw new Error(
+        `Task run mutation produced an invalid document: ${path}`,
+      );
     }
-    await this.files.write(path, nextRaw);
-    const next = { ...reparsed, raw: nextRaw } as TaskDocument | TaskListDocument;
+    if (this.files.process)
+      await this.files.process(path, (current) => {
+        if (current !== raw)
+          throw new Error("The structural source changed before saving.");
+        return nextRaw;
+      });
+    else await this.files.write(path, nextRaw);
+    const next = { ...reparsed, raw: nextRaw } as
+      | TaskDocument
+      | TaskListDocument;
     await indexTaskDocument(
       this.database,
       next,
@@ -378,7 +419,11 @@ export class TaskRepository {
     const path = await this.resolvePath(idOrPath);
     if (!path) throw new Error(`Missing task document: ${idOrPath}`);
     const raw = await this.files!.read(path);
-    await this.writeRawDocument(path, renameHeadingSource(raw, headingPath, nextText));
+    await this.writeRawDocument(
+      path,
+      renameHeadingSource(raw, headingPath, nextText),
+      raw,
+    );
   }
 
   async createHeading(
@@ -389,7 +434,11 @@ export class TaskRepository {
     const path = await this.resolvePath(idOrPath);
     if (!path) throw new Error(`Missing task document: ${idOrPath}`);
     const raw = await this.files!.read(path);
-    await this.writeRawDocument(path, createHeadingSource(raw, text, level));
+    await this.writeRawDocument(
+      path,
+      createHeadingSource(raw, text, level),
+      raw,
+    );
   }
 
   async addStructuralEntryUnderHeading(
@@ -403,6 +452,7 @@ export class TaskRepository {
     await this.writeRawDocument(
       path,
       addEntryUnderHeadingSource(raw, headingPath, entry),
+      raw,
     );
   }
 
@@ -430,7 +480,7 @@ export class TaskRepository {
             `${value.slice(0, change.from)}${change.insert}${value.slice(change.to)}`,
           source,
         );
-      await this.writeRawDocument(sourcePath, next);
+      await this.writeRawDocument(sourcePath, next, source);
       return;
     }
 
@@ -460,8 +510,8 @@ export class TaskRepository {
     if (!parseTaskDocument(nextTarget, targetPath)) {
       throw new Error("Structural move produced an invalid target document.");
     }
-    await this.writeRawDocument(sourcePath, nextSource);
-    await this.writeRawDocument(targetPath, nextTarget);
+    await this.writeRawDocument(sourcePath, nextSource, source);
+    await this.writeRawDocument(targetPath, nextTarget, target);
   }
 
   async setChecklistItemChecked(
@@ -492,7 +542,13 @@ export class TaskRepository {
     if (!reparsed || reparsed.kind !== "task") {
       throw new Error(`Checklist mutation produced an invalid task: ${path}`);
     }
-    await this.files.write(path, nextRaw);
+    if (this.files.process)
+      await this.files.process(path, (current) => {
+        if (current !== raw)
+          throw new Error("The structural source changed before saving.");
+        return nextRaw;
+      });
+    else await this.files.write(path, nextRaw);
     await indexTaskDocument(
       this.database,
       { ...reparsed, raw: nextRaw },
@@ -558,10 +614,7 @@ export class TaskRepository {
       this.database.queryProjection<AppDatabaseTaskOccurrenceRecord>(
         PUBLIC_TASK_OCCURRENCES_PROJECTION_ID,
         {
-          where: and(
-            gte("occurrenceDate", start),
-            lte("occurrenceDate", end),
-          ),
+          where: and(gte("occurrenceDate", start), lte("occurrenceDate", end)),
           orderBy: [{ field: "occurrenceDate", direction: "asc" }],
         },
       ),
@@ -600,10 +653,11 @@ export class TaskRepository {
 
   async validateStructuralGraph(): Promise<TaskStructureDiagnostic[]> {
     if (!this.files) return [];
-    const projected = await this.database.queryProjection<AppDatabaseTaskRecord>(
-      PUBLIC_TASKS_PROJECTION_ID,
-      {},
-    );
+    const projected =
+      await this.database.queryProjection<AppDatabaseTaskRecord>(
+        PUBLIC_TASKS_PROJECTION_ID,
+        {},
+      );
     const loaded = await Promise.all(
       projected.rows.map(async (row) => {
         try {
@@ -685,7 +739,9 @@ export class TaskRepository {
     if (!rows.length) return null;
     return (
       rows.find((row) => row.path === TASK_LIST_NAVIGATION_PATH) ??
-      rows.slice().sort((left, right) => left.path.localeCompare(right.path))[0] ??
+      rows
+        .slice()
+        .sort((left, right) => left.path.localeCompare(right.path))[0] ??
       null
     );
   }
@@ -771,8 +827,12 @@ export class TaskRepository {
   }
 
   async unpinnedRoots(): Promise<TaskSummary[]> {
-    const lists = (await this.lists()).filter((list) => list.status === "active");
-    const pinned = new Set((await this.pinnedRoots()).map((pin) => pin.list.id));
+    const lists = (await this.lists()).filter(
+      (list) => list.status === "active",
+    );
+    const pinned = new Set(
+      (await this.pinnedRoots()).map((pin) => pin.list.id),
+    );
     const roots: TaskSummary[] = [];
     for (const list of lists) {
       if (pinned.has(list.id)) continue;
@@ -800,7 +860,11 @@ export class TaskRepository {
     return false;
   }
 
-  async complete(path: string, at: string, trackedValue?: number): Promise<TaskSummary> {
+  async complete(
+    path: string,
+    at: string,
+    trackedValue?: number,
+  ): Promise<TaskSummary> {
     const localDate = todayDateOnly(this.clock()) as LocalDateString;
     const current = await this.loadDocument(path);
     const next = completeTaskDocument(current, at, localDate);
@@ -811,8 +875,13 @@ export class TaskRepository {
       current.task.tracking
     ) {
       const establishedRepeat =
-        current.task.repeat.anchor === "completion" && !current.task.repeat.start
-          ? { ...current.task.repeat, start: localDate, missed: "carry" as const }
+        current.task.repeat.anchor === "completion" &&
+        !current.task.repeat.start
+          ? {
+              ...current.task.repeat,
+              start: localDate,
+              missed: "carry" as const,
+            }
           : current.task.repeat;
       const occurrence = resolveEffectiveOccurrence(
         establishedRepeat,
@@ -820,7 +889,9 @@ export class TaskRepository {
         localDate,
       );
       if (!occurrence.date) {
-        throw new Error("Recurring completion has no effective occurrence date.");
+        throw new Error(
+          "Recurring completion has no effective occurrence date.",
+        );
       }
       await this.occurrences.complete(
         current,
@@ -854,6 +925,24 @@ export class TaskRepository {
       updated: at,
       body: replaceTitleHeading(document.body, title),
     }));
+  }
+
+  async setNotes(
+    path: string,
+    notes: string,
+    expectedNotes: string,
+    at: string,
+  ): Promise<TaskSummary> {
+    return this.mutate(path, (document) => {
+      if (document.kind !== "task")
+        throw new Error(`Not a task document: ${path}`);
+      const current = splitTaskNotes(document.body);
+      if (current.notes !== expectedNotes && current.notes !== notes)
+        throw new Error(
+          "The Task notes changed before saving. Your edits have been retained.",
+        );
+      return { ...document, updated: at, body: current.title + notes };
+    });
   }
 
   async renameList(
@@ -940,7 +1029,7 @@ export class TaskRepository {
       await this.replaceListItem(parent.path, path, null, at);
     }
     await this.unpinList(path, at);
-    await this.remove(path);
+    await this.remove(path, options);
   }
 
   async renameNavigationSection(
@@ -971,11 +1060,13 @@ export class TaskRepository {
   }): Promise<TaskSummary> {
     const id =
       input.id ??
-      `task-${input.title
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "") || "untitled"}-${input.at.slice(0, 10)}`;
+      `task-${
+        input.title
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-|-$/g, "") || "untitled"
+      }-${input.at.slice(0, 10)}`;
     const document: ParsedTaskFile = {
       path: input.path,
       raw: "",
@@ -1036,9 +1127,263 @@ export class TaskRepository {
     return taskRowToSummary(projectTask(document, todayDateOnly(this.clock())));
   }
 
-  async remove(path: string): Promise<void> {
+  /** The repository owns timestamps for every presentation surface. */
+  now(): Date {
+    return this.clock();
+  }
+
+  async setPriority(
+    path: string,
+    priority: TaskDocument["task"]["priority"],
+    at: string,
+  ): Promise<TaskSummary> {
+    return this.mutate(path, (document) => {
+      if (document.kind !== "task")
+        throw new Error("Priority requires a Task.");
+      return {
+        ...document,
+        updated: at,
+        task: { ...document.task, priority, unparsedPriority: undefined },
+      };
+    });
+  }
+
+  async addComment(
+    path: string,
+    text: string,
+    at = this.clock().toISOString(),
+  ): Promise<TaskComment> {
+    const value = text.trim();
+    if (!value) throw new Error("A comment needs text.");
+    const comment: TaskComment = { id: crypto.randomUUID(), at, text: value };
+    await this.mutate(path, (document) => {
+      if (document.kind !== "task") throw new Error("Comments require a Task.");
+      return {
+        ...document,
+        updated: at,
+        task: {
+          ...document.task,
+          comments: [...document.task.comments, comment],
+        },
+      };
+    });
+    return comment;
+  }
+
+  async updateComment(
+    path: string,
+    id: string,
+    patch: { text?: string; resolved?: boolean },
+    expected: TaskComment,
+  ): Promise<void> {
+    await this.mutate(path, (document) => {
+      if (document.kind !== "task") throw new Error("Comments require a Task.");
+      const current = document.task.comments.find(
+        (comment) => comment.id === id,
+      );
+      if (!current || JSON.stringify(current) !== JSON.stringify(expected))
+        throw new Error("This comment changed. Reload before saving.");
+      if (patch.text !== undefined && !patch.text.trim())
+        throw new Error("A comment needs text.");
+      const at = this.clock().toISOString();
+      return {
+        ...document,
+        updated: at,
+        task: {
+          ...document.task,
+          comments: document.task.comments.map((comment) =>
+            comment.id === id
+              ? {
+                  ...comment,
+                  ...patch,
+                  ...(patch.text !== undefined
+                    ? { text: patch.text.trim(), editedAt: at }
+                    : {}),
+                }
+              : comment,
+          ),
+        },
+      };
+    });
+  }
+
+  async removeComment(path: string, expected: TaskComment): Promise<void> {
+    await this.mutate(path, (document) => {
+      if (document.kind !== "task") throw new Error("Comments require a Task.");
+      const current = document.task.comments.find(
+        (comment) => comment.id === expected.id,
+      );
+      if (!current || JSON.stringify(current) !== JSON.stringify(expected))
+        throw new Error("This comment changed. Reload before deleting.");
+      return {
+        ...document,
+        updated: this.clock().toISOString(),
+        task: {
+          ...document.task,
+          comments: document.task.comments.filter(
+            (comment) => comment.id !== expected.id,
+          ),
+        },
+      };
+    });
+  }
+
+  async markDocumentIncomplete(path: string): Promise<void> {
+    const children = await this.children(path);
+    await this.mutate(path, (document) => {
+      if (document.kind !== "task")
+        throw new Error("Checklist reset requires a Task.");
+      return {
+        ...document,
+        updated: this.clock().toISOString(),
+        body: resetChecklistItems(document.body, true),
+      };
+    });
+    for (const child of children) {
+      if (child.status === "completed")
+        await this.reopen(child.path, this.clock().toISOString());
+    }
+  }
+
+  async duplicate(path: string, targetPath: string): Promise<TaskSummary> {
+    if (await this.getByPath(targetPath))
+      throw new Error("The duplicate destination already exists.");
+    const original = await this.getTaskDocument(path);
+    const parents = await this.taskParents(path);
+    if (parents.length > 1)
+      throw new Error(
+        "A Task with multiple parents cannot be duplicated safely.",
+      );
+    const title = `${original.title} (copy)`;
+    let body = resetChecklistItems(original.body, true);
+    const bodyStructure = await resolveTaskDocumentStructure(
+      body,
+      {
+        documentId: original.id,
+        documentPath: original.path,
+        documentKind: "task",
+      },
+      (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
+    );
+    for (const entry of [...bodyStructure.entries].sort(
+      (a, b) => b.sourceStart - a.sourceStart,
+    )) {
+      const source = body.slice(entry.sourceStart, entry.sourceEnd);
+      body =
+        body.slice(0, entry.sourceStart) +
+        source.replace(/^(\s*[-*+]\s+)/, "$1Reference: ") +
+        body.slice(entry.sourceEnd);
+    }
+    // Rewrite all local links when the duplicate lives in another folder.
+    body = body.replace(
+      /(\]\()([^\s)]+)(\))/g,
+      (match, before: string, href: string, after: string) =>
+        /^(?:[a-z]+:|#)/i.test(href)
+          ? match
+          : `${before}${navigationPinHref(targetPath, resolveTaskHref(path, href))}${after}`,
+    );
+    body = replaceTitleHeading(body, title);
+    const at = this.clock().toISOString();
+    const repeat = original.task.repeat
+      ? {
+          ...original.task.repeat,
+          lastCompletedAt: undefined,
+          completionCount: undefined,
+        }
+      : undefined;
+    const next: TaskDocument = {
+      ...original,
+      path: targetPath,
+      id: crypto.randomUUID(),
+      title,
+      created: at,
+      updated: at,
+      raw: "",
+      body,
+      task: {
+        ...original.task,
+        status: "open",
+        completedAt: undefined,
+        inbox: true,
+        comments: [],
+        repeat,
+      },
+    };
+    const raw = serializeTaskDocument({ ...next, raw: original.raw });
+    if (!this.files?.create)
+      throw new Error("Task duplication requires a create-capable file store.");
+    await this.files.create(targetPath, raw);
+    await indexTaskDocument(
+      this.database,
+      parseTaskDocument(raw, targetPath)!,
+      (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
+      todayDateOnly(this.clock()),
+    );
+    if (parents[0]) {
+      const parent = parents[0];
+      const run = (await this.getStructuralTaskRuns(parent.path)).find(
+        (candidate) =>
+          candidate.entries.some((entry) => entry.targetPath === path),
+      );
+      if (!run)
+        throw new Error(
+          "The original parent entry changed before duplication.",
+        );
+      const entries: StructuralTaskRunEntryInput[] = [...run.entries];
+      const index = entries.findIndex(
+        (entry) => "targetPath" in entry && entry.targetPath === path,
+      );
+      entries.splice(index + 1, 0, {
+        label: title,
+        target: navigationPinHref(parent.path, targetPath),
+      });
+      await this.replaceStructuralTaskRun(parent.path, run, entries);
+      await this.setInbox(targetPath, false, at);
+    }
+    return (await this.getByPath(targetPath))!;
+  }
+
+  async taskParents(idOrPath: string): Promise<TaskSummary[]> {
+    const path = await this.resolvePath(idOrPath);
+    if (!path) return [];
+    const projected =
+      await this.database.queryProjection<AppDatabaseTaskRecord>(
+        PUBLIC_TASKS_PROJECTION_ID,
+        {},
+      );
+    const parents: TaskSummary[] = [];
+    for (const row of projected.rows) {
+      if (
+        row.documentPath === path ||
+        row.kind === ("task-list-navigation" as AppDatabaseTaskRecord["kind"])
+      )
+        continue;
+      const runs = await this.getStructuralTaskRuns(row.documentPath);
+      if (
+        runs.some((run) =>
+          run.entries.some((entry) => entry.targetPath === path),
+        )
+      )
+        parents.push(taskRowToSummary(row));
+    }
+    return parents;
+  }
+
+  async remove(
+    path: string,
+    options: { skipParentPaths?: readonly string[] } = {},
+  ): Promise<void> {
     if (!this.files?.remove) {
       throw new Error("TaskRepository deletions require a file store remove.");
+    }
+    for (const parent of await this.taskParents(path)) {
+      if (options.skipParentPaths?.includes(parent.path)) continue;
+      await this.replaceListItem(
+        parent.path,
+        path,
+        null,
+        this.clock().toISOString(),
+      );
     }
     await this.files.remove(path);
     await this.database.deleteProjectionSource(
@@ -1058,7 +1403,8 @@ export class TaskRepository {
         current.task.plan?.date as LocalDateString | undefined,
         localDate,
       );
-      if (occurrence.date) await this.occurrences.ensure(current, occurrence.date);
+      if (occurrence.date)
+        await this.occurrences.ensure(current, occurrence.date);
     }
     await this.writeDocument(next);
     return taskRowToSummary(projectTask(next, localDate));
@@ -1069,7 +1415,9 @@ export class TaskRepository {
     plan: TaskPlan | undefined,
     at: string,
   ): Promise<TaskSummary> {
-    return this.mutate(path, (document) => planTaskDocument(document, plan, at));
+    return this.mutate(path, (document) =>
+      planTaskDocument(document, plan, at),
+    );
   }
 
   async setStart(
@@ -1321,8 +1669,7 @@ export class TaskRepository {
         listPath,
         run,
         run.entries.filter(
-          (entry) =>
-            !this.linkTargetsPath(listPath, entry.target, childPath),
+          (entry) => !this.linkTargetsPath(listPath, entry.target, childPath),
         ),
       );
     }
@@ -1352,8 +1699,8 @@ export class TaskRepository {
             ),
           )
         : -1;
-      if (beforeIndex < 0) entries.push(entry as typeof entries[number]);
-      else entries.splice(beforeIndex, 0, entry as typeof entries[number]);
+      if (beforeIndex < 0) entries.push(entry as (typeof entries)[number]);
+      else entries.splice(beforeIndex, 0, entry as (typeof entries)[number]);
       await this.replaceStructuralTaskRun(listPath, targetRun, entries);
       return;
     }
@@ -1449,8 +1796,25 @@ export class TaskRepository {
     path: string,
     mutate: (document: ParsedTaskFile) => ParsedTaskFile,
   ): Promise<TaskSummary> {
-    const next = mutate(await this.loadDocument(path));
-    await this.writeDocument(next);
+    let next: ParsedTaskFile;
+    if (this.files?.process) {
+      const raw = await this.files.process(path, (current) => {
+        const parsed = parseTaskDocument(current, path);
+        if (!parsed) throw new Error(`Not a task document: ${path}`);
+        return serializeTaskDocument(mutate(parsed));
+      });
+      next = parseTaskDocument(raw, path)!;
+      this.invalidateEffectiveOccurrences();
+      await indexTaskDocument(
+        this.database,
+        next,
+        (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
+        todayDateOnly(this.clock()),
+      );
+    } else {
+      next = mutate(await this.loadDocument(path));
+      await this.writeDocument(next);
+    }
     return taskRowToSummary(projectTask(next, todayDateOnly(this.clock())));
   }
 
@@ -1470,7 +1834,17 @@ export class TaskRepository {
     }
     const serialized = serializeTaskDocument(document);
     const next = parseTaskDocument(serialized, document.path) ?? document;
-    await this.files.write(document.path, serialized);
+    if (this.files.process && document.raw) {
+      await this.files.process(document.path, (raw) => {
+        if (raw !== document.raw)
+          throw new Error(
+            "The Task document changed before saving. Your edits have been retained.",
+          );
+        return serialized;
+      });
+    } else if (!document.raw && this.files.create)
+      await this.files.create(document.path, serialized);
+    else await this.files.write(document.path, serialized);
     this.invalidateEffectiveOccurrences();
     await indexTaskDocument(
       this.database,
@@ -1480,15 +1854,35 @@ export class TaskRepository {
     );
   }
 
-  private async writeRawDocument(path: string, raw: string): Promise<void> {
+  private async writeRawDocument(
+    path: string,
+    raw: string,
+    expected: string,
+  ): Promise<void> {
     if (!this.files) {
       throw new Error("TaskRepository mutations require a file store.");
     }
     const parsed = parseTaskDocument(raw, path);
     if (!parsed || parsed.kind === "task-list-navigation") {
-      throw new Error(`Structural mutation produced an invalid task document: ${path}`);
+      throw new Error(
+        `Structural mutation produced an invalid task document: ${path}`,
+      );
     }
-    await this.files.write(path, raw);
+    if (this.files.process)
+      await this.files.process(path, (current) => {
+        if (current !== expected)
+          throw new Error(
+            "The Task document changed before saving. Your edits have been retained.",
+          );
+        return raw;
+      });
+    else {
+      if ((await this.files.read(path)) !== expected)
+        throw new Error(
+          "The Task document changed before saving. Your edits have been retained.",
+        );
+      await this.files.write(path, raw);
+    }
     this.invalidateEffectiveOccurrences();
     await indexTaskDocument(
       this.database,
@@ -1510,7 +1904,8 @@ export class TaskRepository {
           id: targetPath,
           path: targetPath,
           kind: "unsupported" as const,
-          title: targetPath.split("/").pop()?.replace(/\.md$/i, "") ?? targetPath,
+          title:
+            targetPath.split("/").pop()?.replace(/\.md$/i, "") ?? targetPath,
         };
       }
       return {

@@ -78,3 +78,10 @@
   margin: 0.75rem;
   color: var(--ui-destructive, #b42318);
 }
+
+.task-list-markdown-surface[data-hide-completed="true"]
+  li:has(> input[type="checkbox"]:checked),
+.task-list-markdown-surface[data-hide-completed="true"]
+  li:has(> :is(p, span) > input[type="checkbox"]:checked) {
+  display: none;
+}

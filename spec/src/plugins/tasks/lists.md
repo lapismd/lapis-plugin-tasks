@@ -99,17 +99,17 @@ aligned with the active Markdown theme's blockquote and embedded-file accent.
 
 ## Tree and structural actions
 
-| Action | Source effect |
-| --- | --- |
-| Pin or move between sidebar sections | Rewrite navigation Markdown only |
-| Nest or unnest | Remove/insert the exact structural list item and usually update its pin |
-| Sort siblings | Reorder only one contiguous TaskRun |
-| Move between headings/runs | Explicitly remove and insert exact item ranges; recompute relative href across documents |
-| Rename List | Update its front matter title when present, its H1, and exact incoming structural labels |
-| Rename/create grouping heading | Rewrite or append an ordinary H2–H6 Markdown heading |
-| Create List | Write a new `task-list` document without inventing a reserved section |
-| Archive | Set `list.status: archived` and remove its pin |
-| Delete | Unlink structural/navigation parents, remove only the List file, retain children |
+| Action                               | Source effect                                                                            |
+| ------------------------------------ | ---------------------------------------------------------------------------------------- |
+| Pin or move between sidebar sections | Rewrite navigation Markdown only                                                         |
+| Nest or unnest                       | Remove/insert the exact structural list item and usually update its pin                  |
+| Sort siblings                        | Reorder only one contiguous TaskRun                                                      |
+| Move between headings/runs           | Explicitly remove and insert exact item ranges; recompute relative href across documents |
+| Rename List                          | Update its front matter title when present, its H1, and exact incoming structural labels |
+| Rename/create grouping heading       | Rewrite or append an ordinary H2–H6 Markdown heading                                     |
+| Create List                          | Write a new `task-list` document without inventing a reserved section                    |
+| Archive                              | Set `list.status: archived` and remove its pin                                           |
+| Delete                               | Unlink structural/navigation parents, remove only the List file, retain children         |
 
 The list-row context menu offers Open note, Rename, New nested list, Unpin for a
 pinned root, Archive, and Delete. Navigation folders offer Rename except All
@@ -126,3 +126,9 @@ repository resolves that value against existing List ids and display titles
 before it attaches the Task through a structural entry. It never mints a
 duplicate identifier such as `list-list-applications`. Planning, time, and
 recurrence changes do not alter structural parenthood.
+
+Expanded-row patches preserve tracking and explicit legacy-repeat removal. Task duplication inserts beside its original structural entry; copied child links become ordinary references. Empty List navigation exposes New list, and document actions expose heading and chosen-heading child creation.
+
+Document structure actions MUST use a compact icon in the owning column header,
+beside Edit and Close. Main Lists, linked Lists, and Task details MUST keep these
+actions out of the Markdown content flow.

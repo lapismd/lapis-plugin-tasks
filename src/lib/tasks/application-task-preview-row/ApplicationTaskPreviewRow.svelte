@@ -1,5 +1,5 @@
 <script lang="ts">
-	import './ApplicationTaskPreviewRow.css';
+  import "./ApplicationTaskPreviewRow.css";
   import ArrowDownIcon from "@lucide/svelte/icons/arrow-down";
   import ArrowRightIcon from "@lucide/svelte/icons/arrow-right";
   import ArrowUpIcon from "@lucide/svelte/icons/arrow-up";
@@ -9,18 +9,18 @@
   import { autosizeTextarea } from "@lapismd/design-core/forms";
   import * as SwipeItem from "@lapismd/design-core/shadcn/swipe-item";
   import type { SwipeItemOpen } from "@lapismd/design-core/shadcn/swipe-item";
-  import { tick } from "svelte";
+  import { tick, type Snippet } from "svelte";
 
   import type {
     ApplicationTask,
     ApplicationTaskPriority,
     ChecklistItem,
-  } from '../../model';
+  } from "../../model";
   import {
     formatCompletedTimestamp,
     getDueSummary,
     taskBodyExcerpt,
-  } from '../../model';
+  } from "../../model";
   import ApplicationMarkdownPreview from "../../model/ReferenceMarkdownPreview.svelte";
   import { asSnippet } from "../../as-snippet";
   import ApplicationTaskLine from "../application-task-line/ApplicationTaskLine.svelte";
@@ -37,6 +37,8 @@
     isExpanded = false,
     isClosing = false,
     readonly = false,
+    editable = true,
+    notesContent,
     embedded = false,
     reorderable = true,
     showFooterActions = true,
@@ -77,6 +79,8 @@
     isExpanded?: boolean;
     isClosing?: boolean;
     readonly?: boolean;
+    editable?: boolean;
+    notesContent?: Snippet;
     embedded?: boolean;
     reorderable?: boolean;
     showFooterActions?: boolean;
@@ -157,6 +161,7 @@
     if (!wasExpanded) {
       titleDraft = task.body;
       notesDraft = task.notes ?? "";
+      notesEditing = editable;
       void tick().then(() => {
         titleInput?.focus();
         const end = titleInput?.value.length ?? 0;
@@ -226,9 +231,7 @@
     if (selectOnSurfaceClick) return true;
     return (
       target instanceof Element &&
-      Boolean(
-        target.closest('[data-planner-select-on-surface="true"]'),
-      )
+      Boolean(target.closest('[data-planner-select-on-surface="true"]'))
     );
   }
 
@@ -237,7 +240,7 @@
       event.preventDefault();
       return;
     }
-    if (readonly || isOpenSurface) return;
+    if (readonly || !editable || isOpenSurface) return;
     if (prefersSurfaceSelection(event.target)) {
       // Prefer row selection while a host detail panel is open.
       return;
@@ -257,7 +260,7 @@
   }
 
   function handleTitleDoubleClick(event: MouseEvent) {
-    if (readonly || isOpenSurface) return;
+    if (readonly || !editable || isOpenSurface) return;
     event.preventDefault();
     event.stopPropagation();
     if (titleEditing) {
@@ -308,7 +311,6 @@
   }
 
   function saveNotes() {
-    notesEditing = false;
     const nextNotes = notesDraft.trim();
     const currentNotes = task.notes?.trim() ?? "";
     if (nextNotes === currentNotes) return;
@@ -545,7 +547,7 @@
           {task}
           showCheckbox
           {isOpenSurface}
-          titleMode="inline-edit"
+          titleMode={editable ? "inline-edit" : "text"}
           {titleEditing}
           {showDueIndicator}
           {now}
@@ -582,7 +584,9 @@
     onpointerdown={(event) => event.stopPropagation()}
   >
     <div class="task-preview-row__notes">
-      {#if notesEditing}
+      {#if notesContent}
+        {@render notesContent()}
+      {:else if notesEditing}
         <textarea
           bind:this={notesInput}
           bind:value={notesDraft}
@@ -596,10 +600,10 @@
             if (event.key === "Escape") {
               event.preventDefault();
               notesDraft = task.notes ?? "";
-              notesEditing = false;
               notesInput?.blur();
             }
-          }}></textarea>
+          }}
+        ></textarea>
       {:else if task.notes?.trim()}
         <button
           type="button"
@@ -619,50 +623,52 @@
       {/if}
     </div>
 
-    <footer class="task-preview-row__footer">
-      <div class="task-preview-row__footer-meta">
-        <ApplicationTaskMetadataActionBar
-          {task}
-          {areaOptions}
-          {now}
-          onChange={updateFooterTask}
-        />
-        {#if task.done && task.completedAt}
-          <span class="task-preview-row__completed">
-            Completed {formatCompletedTimestamp(task.completedAt)}
-          </span>
-        {/if}
-      </div>
-
-      {#if showFooterActions}
-        <div class="task-preview-row__footer-actions">
-          {#if reorderable}
-            <button
-              type="button"
-              aria-label="Move task up"
-              disabled={!canMoveUp}
-              onclick={() => onMoveTask(task.id, -1)}
-            >
-              <ArrowUpIcon />
-            </button>
-            <button
-              type="button"
-              aria-label="Move task down"
-              disabled={!canMoveDown}
-              onclick={() => onMoveTask(task.id, 1)}
-            >
-              <ArrowDownIcon />
-            </button>
+    {#if editable}
+      <footer class="task-preview-row__footer">
+        <div class="task-preview-row__footer-meta">
+          <ApplicationTaskMetadataActionBar
+            {task}
+            {areaOptions}
+            {now}
+            onChange={updateFooterTask}
+          />
+          {#if task.done && task.completedAt}
+            <span class="task-preview-row__completed">
+              Completed {formatCompletedTimestamp(task.completedAt)}
+            </span>
           {/if}
-          <button
-            type="button"
-            aria-label={`Remove task ${titleExcerpt}`}
-            onclick={() => onRemoveTask(task.id)}
-          >
-            <Trash2Icon />
-          </button>
         </div>
-      {/if}
-    </footer>
+
+        {#if showFooterActions}
+          <div class="task-preview-row__footer-actions">
+            {#if reorderable}
+              <button
+                type="button"
+                aria-label="Move task up"
+                disabled={!canMoveUp}
+                onclick={() => onMoveTask(task.id, -1)}
+              >
+                <ArrowUpIcon />
+              </button>
+              <button
+                type="button"
+                aria-label="Move task down"
+                disabled={!canMoveDown}
+                onclick={() => onMoveTask(task.id, 1)}
+              >
+                <ArrowDownIcon />
+              </button>
+            {/if}
+            <button
+              type="button"
+              aria-label={`Remove task ${titleExcerpt}`}
+              onclick={() => onRemoveTask(task.id)}
+            >
+              <Trash2Icon />
+            </button>
+          </div>
+        {/if}
+      </footer>
+    {/if}
   </div>
 {/snippet}

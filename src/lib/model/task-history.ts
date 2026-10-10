@@ -49,7 +49,10 @@ export function expectedTaskOccurrenceDates(
   end: LocalDateString,
 ): LocalDateString[] {
   const repeat = task.repeat;
-  if (!repeat?.start || analyzeRecurrenceRule(repeat.rrule).status !== "supported") {
+  if (
+    !repeat?.start ||
+    analyzeRecurrenceRule(repeat.rrule).status !== "supported"
+  ) {
     return [];
   }
   const engine = new RecurrenceEngine({
@@ -63,10 +66,7 @@ export function expectedTaskOccurrenceDates(
     .filter((date) => !isPausedOccurrenceDate(repeat, date));
 }
 
-function isActiveOccurrence(
-  task: TaskSummary,
-  date: LocalDateString,
-): boolean {
+function isActiveOccurrence(task: TaskSummary, date: LocalDateString): boolean {
   return (
     task.effectiveOccurrenceDate === date &&
     (task.effectiveOccurrenceState === "current" ||
@@ -99,7 +99,10 @@ export function buildTaskOccurrenceHistory(
   end: LocalDateString,
   today: LocalDateString,
 ): TaskOccurrenceHistoryRow[] {
-  const observationsByTask = new Map<string, AppDatabaseTaskOccurrenceRecord[]>();
+  const observationsByTask = new Map<
+    string,
+    AppDatabaseTaskOccurrenceRecord[]
+  >();
   for (const observation of observations) {
     const bucket = observationsByTask.get(observation.taskId) ?? [];
     bucket.push(observation);
@@ -111,7 +114,9 @@ export function buildTaskOccurrenceHistory(
   for (const task of tasks) {
     if (!task.repeat) continue;
     knownTaskIds.add(task.id);
-    const expectedDates = new Set(expectedTaskOccurrenceDates(task, start, end));
+    const expectedDates = new Set(
+      expectedTaskOccurrenceDates(task, start, end),
+    );
     const observed = observationsByTask.get(task.id) ?? [];
     const observedByDate = new Map<string, AppDatabaseTaskOccurrenceRecord>();
     for (const observation of observed) {
@@ -164,7 +169,9 @@ export function buildTaskOccurrenceHistory(
       id: observation.observationId,
       taskId: observation.taskId,
       taskPath: observation.taskPath,
-      title: observation.taskPath.split("/").at(-1)?.replace(/\.md$/i, "") ?? observation.taskId,
+      title:
+        observation.taskPath.split("/").at(-1)?.replace(/\.md$/i, "") ??
+        observation.taskId,
       occurrenceDate: observation.occurrenceDate as LocalDateString,
       outcome: observation.outcome === "completed" ? "completed" : "missed",
       expected: false,
@@ -204,7 +211,9 @@ export function deriveTaskOccurrenceStatistics(
 ): TaskOccurrenceStatistics {
   const expected = rows
     .filter((row) => row.expected && row.occurrenceDate <= today)
-    .sort((left, right) => left.occurrenceDate.localeCompare(right.occurrenceDate));
+    .sort((left, right) =>
+      left.occurrenceDate.localeCompare(right.occurrenceDate),
+    );
   const terminal = expected.filter((row) => row.outcome !== "pending");
   const completed = terminal.filter((row) => row.outcome === "completed");
 
@@ -227,17 +236,27 @@ export function deriveTaskOccurrenceStatistics(
     currentStreak += 1;
   }
 
-  const quantitative = completed.flatMap((row) => {
-    if (row.durationMinutes != null) return [row.durationMinutes];
-    if (row.value != null) return [row.value];
+  const quantities = completed.flatMap((row) => {
+    if (row.durationMinutes != null)
+      return [
+        { value: row.durationMinutes, unit: "minutes", kind: "duration" },
+      ];
+    if (row.value != null)
+      return [{ value: row.value, unit: row.unit, kind: "value" }];
     return [];
   });
+  const compatible =
+    new Set(
+      quantities.map((quantity) => `${quantity.kind}:${quantity.unit ?? ""}`),
+    ).size === 1;
+  const quantitative = compatible
+    ? quantities.map((quantity) => quantity.value)
+    : [];
   const total = quantitative.length
     ? quantitative.reduce((sum, value) => sum + value, 0)
     : undefined;
   const lastCompletedDate = completed.at(-1)?.occurrenceDate;
-  const unit = completed.find((row) => row.unit)?.unit ??
-    (completed.some((row) => row.durationMinutes != null) ? "minutes" : undefined);
+  const unit = compatible ? quantities[0]?.unit : undefined;
 
   return {
     currentStreak,

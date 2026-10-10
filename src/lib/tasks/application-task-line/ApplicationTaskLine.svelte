@@ -1,5 +1,5 @@
 <script lang="ts">
-	import './ApplicationTaskLine.css';
+  import "./ApplicationTaskLine.css";
   import CheckCircle2Icon from "@lucide/svelte/icons/check-circle-2";
   import CircleIcon from "@lucide/svelte/icons/circle";
   import CircleXIcon from "@lucide/svelte/icons/circle-x";
@@ -7,8 +7,8 @@
   import HourglassIcon from "@lucide/svelte/icons/hourglass";
   import * as Tooltip from "@lapismd/design-core/shadcn/tooltip";
   import type { Snippet } from "svelte";
-  import type { ApplicationTask } from '../../model';
-  import { getDueSummary, taskBodyExcerpt } from '../../model';
+  import type { ApplicationTask } from "../../model";
+  import { getDueSummary, taskBodyExcerpt } from "../../model";
   import ApplicationTaskCheckbox from "../application-task-checkbox/ApplicationTaskCheckbox.svelte";
 
   let {
@@ -67,11 +67,7 @@
           : "todo",
   );
   const checkboxStatus = $derived(
-    task.status === "canceled"
-      ? "canceled"
-      : task.done
-        ? "completed"
-        : "open",
+    task.status === "canceled" ? "canceled" : task.done ? "completed" : "open",
   );
   const showPriority = $derived(task.priority && task.priority !== "medium");
 </script>
@@ -179,47 +175,47 @@
       {/if}
 
       {#if !isOpenSurface}
-      <div class="task-line__meta">
-        {#if optionAction}
-          <span class="task-line__option-action">{optionAction}</span>
-        {/if}
-        {#if effectiveStatus === "waiting"}
-          <span class="task-line__status-chip task-line__status-chip--waiting">
-            <HourglassIcon />
-            <span>Waiting</span>
-          </span>
-        {/if}
-        {#if showPriority}
-          <span
-            class="task-line__priority"
-            class:task-line__priority--high={task.priority === "high"}
-            class:task-line__priority--low={task.priority === "low"}
-            aria-label={`${task.priority} priority`}
-          ></span>
-        {/if}
-        {#if showDueIndicator && dueSummary && !task.done}
-          <Tooltip.Provider delayDuration={250}>
-            <Tooltip.Root>
-              <Tooltip.Trigger
-                type="button"
-                class={`task-line__due task-line__due--${dueSummary.tone}`}
-                aria-label={`Due ${dueSummary.shortDate}, ${dueSummary.distance}`}
-              >
-                <FlagIcon />
-                <span class="task-line__due-distance">
-                  {dueSummary.distance}
-                </span>
-              </Tooltip.Trigger>
-              <Tooltip.Content
-                sideOffset={6}
-                class="task-line__due-tooltip"
-              >
-                Due {dueSummary.fullDate}
-              </Tooltip.Content>
-            </Tooltip.Root>
-          </Tooltip.Provider>
-        {/if}
-      </div>
+        <div class="task-line__meta">
+          {#if optionAction}
+            <span class="task-line__option-action">{optionAction}</span>
+          {/if}
+          {#if effectiveStatus === "waiting"}
+            <span
+              class="task-line__status-chip task-line__status-chip--waiting"
+            >
+              <HourglassIcon />
+              <span>Waiting</span>
+            </span>
+          {/if}
+          {#if showPriority}
+            <span
+              class="task-line__priority"
+              class:task-line__priority--high={task.priority === "high"}
+              class:task-line__priority--low={task.priority === "low"}
+              role="img"
+              aria-label={`${task.priority} priority`}
+            ></span>
+          {/if}
+          {#if showDueIndicator && dueSummary && !task.done}
+            <Tooltip.Provider delayDuration={250}>
+              <Tooltip.Root>
+                <Tooltip.Trigger
+                  type="button"
+                  class={`task-line__due task-line__due--${dueSummary.tone}`}
+                  aria-label={`Due ${dueSummary.shortDate}, ${dueSummary.distance}`}
+                >
+                  <FlagIcon />
+                  <span class="task-line__due-distance">
+                    {dueSummary.distance}
+                  </span>
+                </Tooltip.Trigger>
+                <Tooltip.Content sideOffset={6} class="task-line__due-tooltip">
+                  Due {dueSummary.fullDate}
+                </Tooltip.Content>
+              </Tooltip.Root>
+            </Tooltip.Provider>
+          {/if}
+        </div>
       {/if}
     </div>
 

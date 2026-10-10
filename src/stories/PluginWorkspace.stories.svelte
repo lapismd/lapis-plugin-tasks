@@ -4,6 +4,7 @@
   import {
     expect,
     fireEvent,
+    spyOn,
     userEvent,
     waitFor,
     within,
@@ -732,10 +733,9 @@
       (candidate) =>
         candidate.getClientRects().length > 0 &&
         (!title ||
-          within(candidate).queryByRole("button", {
-            name: title,
-            exact: true,
-          })),
+          Array.from(
+            candidate.querySelectorAll<HTMLElement>(".task-line__title"),
+          ).some((element) => element.textContent?.trim() === title)),
     );
     expect(run).toBeDefined();
     return run!;
@@ -797,12 +797,11 @@
   }
 
   function visibleTaskRunTitle(run: HTMLElement, title: string) {
-    const titleButton = within(run).getByRole("button", {
-      name: title,
-      exact: true,
-    });
-    expect(titleButton).toHaveClass("task-line__title");
-    return titleButton;
+    const titleElement = Array.from(
+      run.querySelectorAll<HTMLElement>(".task-line__title"),
+    ).find((element) => element.textContent?.trim() === title);
+    expect(titleElement).toBeVisible();
+    return titleElement!;
   }
 
   function expectTaskRunTitleTypography(
@@ -1118,6 +1117,11 @@
     );
     expect(intro).toBeVisible();
     expect(
+      canvas
+        .getByRole("button", { name: "Document structure actions" })
+        .closest('[data-ui-part="column-header-actions"]'),
+    ).not.toBeNull();
+    expect(
       canvas.getByText(
         "Keep interview preparation and follow-up context beneath the live task list.",
       ),
@@ -1249,7 +1253,7 @@
     await fireEvent.dblClick(taskRow!);
 
     await fireEvent.click(
-      canvas.getByRole("button", {
+      await canvas.findByRole("button", {
         name: "Open task details for Review interview notes",
         exact: true,
       }),
@@ -2275,6 +2279,14 @@
           ".task-column-canvas-story__linked-list-column",
         ),
       ).toBeVisible();
+      const linkedColumn = canvasElement.querySelector<HTMLElement>(
+        ".task-column-canvas-story__linked-list-column",
+      )!;
+      expect(
+        within(linkedColumn)
+          .getByRole("button", { name: "Document structure actions" })
+          .closest('[data-ui-part="column-header-actions"]'),
+      ).not.toBeNull();
     });
     await collapseLapisLeftSidebar(canvas);
   }}
@@ -2684,6 +2696,16 @@
     expect(
       run.querySelector("[data-task-drag-handle]"),
     ).not.toBeInTheDocument();
+    expect(
+      within(run).queryByRole("button", {
+        name: /Show delete action|Remove task|Move task (up|down)/,
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(run).getByRole("button", {
+        name: "Open task details for Explore conference talks",
+      }),
+    ).toBeVisible();
     await expectDedicatedMarkdownCheckbox(run, "Explore conference talks");
 
     await openMarkdownFixture(
@@ -2847,5 +2869,661 @@
     canvasElement.style.maxHeight = "100%";
     canvasElement.style.overflow = "hidden";
     await exerciseDarkThemeContrast(canvasElement);
+  }}
+/>
+
+<Story
+  name="Runtime detail actions"
+  args={{ displayMode: "desktop" }}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          "Persist priority and local comments through the real workspace, reopen the detail, and duplicate one Task without copying its child ownership.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    const canvas = await waitForReady(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const app = storyApp(canvasElement);
+    const plugin = app.plugins.plugins.get("tasks") as TasksPlugin;
+    const path = "inbox/today-1.md";
+    const open = async () => {
+      const title = await canvas.findByRole("button", {
+        name: "Tailor platform CV variant",
+        exact: true,
+      });
+      await userEvent.click(
+        within(
+          title.closest<HTMLElement>(".application-planner-task-row")!,
+        ).getByRole("button", {
+          name: "Open task details for Tailor platform CV variant",
+        }),
+      );
+      await waitFor(() =>
+        expect(
+          canvasElement.querySelector("[data-task-sidebar-detail]"),
+        ).toBeVisible(),
+      );
+      return within(
+        canvasElement.querySelector<HTMLElement>("[data-task-sidebar-detail]")!,
+      );
+    };
+    let detail = await open();
+    await userEvent.click(
+      detail.getByRole("button", { name: "Task priority" }),
+    );
+    await userEvent.click(
+      page.getByRole("option", { name: "High", exact: true }),
+    );
+    await waitFor(async () =>
+      expect(
+        (await plugin.repository.getTaskDocument(path)).task.priority,
+      ).toBe("high"),
+    );
+    await userEvent.type(
+      detail.getByRole("textbox", { name: "Local comment" }),
+      "Keep the interview examples concise.",
+    );
+    await userEvent.click(detail.getByRole("button", { name: "Post comment" }));
+    await waitFor(async () =>
+      expect(
+        (await plugin.repository.getTaskDocument(path)).task.comments[0]?.text,
+      ).toBe("Keep the interview examples concise."),
+    );
+    await userEvent.click(
+      detail.getByRole("button", { name: "Resolve comment" }),
+    );
+    await waitFor(async () =>
+      expect(
+        (await plugin.repository.getTaskDocument(path)).task.comments[0]
+          ?.resolved,
+      ).toBe(true),
+    );
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Close detail column", exact: true }),
+    );
+    detail = await open();
+    expect(
+      detail.getByText("Keep the interview examples concise."),
+    ).toBeVisible();
+    expect(
+      detail
+        .getByRole("button", { name: "Document structure actions" })
+        .closest("header"),
+    ).not.toBeNull();
+    await userEvent.click(
+      detail.getByRole("button", { name: "Edit comment", exact: true }),
+    );
+    await userEvent.clear(
+      detail.getByRole("textbox", { name: "Edit comment" }),
+    );
+    await userEvent.type(
+      detail.getByRole("textbox", { name: "Edit comment" }),
+      "Updated local comment.",
+    );
+    const failedWrite = spyOn(app.vault, "process").mockRejectedValueOnce(
+      new Error("Comment save unavailable"),
+    );
+    await userEvent.click(detail.getByRole("button", { name: "Save comment" }));
+    await waitFor(() =>
+      expect(detail.getByRole("alert")).toHaveTextContent(
+        "Comment save unavailable",
+      ),
+    );
+    expect(detail.getByRole("textbox", { name: "Edit comment" })).toHaveValue(
+      "Updated local comment.",
+    );
+    failedWrite.mockRestore();
+    await userEvent.click(detail.getByRole("button", { name: "Save comment" }));
+    await waitFor(async () =>
+      expect(
+        (await plugin.repository.getTaskDocument(path)).task.comments[0]?.text,
+      ).toBe("Updated local comment."),
+    );
+    await userEvent.click(
+      await detail.findByRole("button", { name: "Delete comment" }),
+    );
+    await waitFor(async () =>
+      expect(
+        (await plugin.repository.getTaskDocument(path)).task.comments,
+      ).toEqual([]),
+    );
+    await userEvent.click(detail.getByRole("button", { name: "Task actions" }));
+    expect(
+      page.queryByRole("menuitem", { name: "Unsubscribe" }),
+    ).not.toBeInTheDocument();
+    await userEvent.click(
+      page.getByRole("menuitem", { name: "Duplicate task" }),
+    );
+    await waitFor(async () => {
+      const duplicate = await plugin.repository.getTaskDocument(
+        "inbox/today-1-copy.md",
+      );
+      expect(duplicate.task.priority).toBe("high");
+      expect(duplicate.task.comments).toEqual([]);
+      expect(duplicate.task.status).toBe("open");
+      expect(duplicate.id).not.toBe(
+        (await plugin.repository.getTaskDocument(path)).id,
+      );
+      expect(
+        canvas.getByRole("textbox", { name: "Task title" }),
+      ).toHaveTextContent("Tailor platform CV variant (copy)");
+    });
+  }}
+/>
+
+<Story
+  name="Runtime inline notes and order"
+  args={{ displayMode: "desktop" }}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          "Save real Markdown from an expanded inline row and persist manual daily ordering without changing its parent List links.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    const canvas = await waitForReady(canvasElement);
+    const app = storyApp(canvasElement);
+    const plugin = app.plugins.plugins.get("tasks") as TasksPlugin;
+    const path = "inbox/today-2.md";
+    const file = app.vault.getFileByPath(path)!;
+    const original = await app.vault.read(file);
+    const title = await canvas.findByRole("button", {
+      name: "Review interview notes",
+      exact: true,
+    });
+    const row = title.closest<HTMLElement>(".application-planner-task-row")!;
+    await userEvent.dblClick(row);
+    const editor = (await within(row).findByRole("textbox", {
+      name: "Task notes",
+    })) as HTMLTextAreaElement;
+    expect(editor).toBeVisible();
+    expect(editor).not.toBeDisabled();
+    expect(editor.value).not.toContain("type: task");
+    expect(editor.value).not.toContain("# Review interview notes");
+    expect(row.querySelector("[data-task-markdown-surface]")).toBeNull();
+    expect(
+      within(row).queryByRole("button", { name: /^(Edit|Read) notes$/ }),
+    ).not.toBeInTheDocument();
+    await userEvent.click(editor);
+    editor.setSelectionRange(editor.value.length, editor.value.length);
+    await userEvent.type(editor, "\n\nInline note saved from the planner.");
+    await userEvent.click(
+      within(row).getByRole("textbox", { name: "Task title" }),
+    );
+    await waitFor(async () =>
+      expect(await app.vault.read(file)).toContain(
+        "Inline note saved from the planner.",
+      ),
+    );
+    const saved = await app.vault.read(file);
+    expect(saved).toContain("type: task");
+    expect(saved).toContain("# Review interview notes");
+    expect(saved.length).toBeGreaterThan(original.length);
+    await userEvent.click(editor);
+    editor.setSelectionRange(editor.value.length, editor.value.length);
+    await userEvent.type(editor, "\nRetained after a failed save.");
+    const failedFlush = spyOn(app.vault, "process").mockRejectedValue(
+      new Error("Notes save unavailable"),
+    );
+    try {
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Wed 2026-08-19, today" }),
+      );
+      await waitFor(() =>
+        expect(
+          canvas
+            .getAllByRole("alert")
+            .some((alert) => alert.textContent?.includes("could not be saved")),
+        ).toBe(true),
+      );
+      expect(editor).toBeVisible();
+      expect(editor.value).toContain("Retained after a failed save.");
+      expect(await app.vault.read(file)).not.toContain(
+        "Retained after a failed save.",
+      );
+    } finally {
+      failedFlush.mockRestore();
+    }
+    // Navigation retries the same dirty buffer before closing the compact editor.
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Today", exact: true }),
+    );
+    await waitFor(() =>
+      expect(
+        canvasElement.querySelector(
+          '[data-task-preview-state="expanded"], [data-task-preview-state="closing"]',
+        ),
+      ).toBeNull(),
+    );
+    const list = app.vault.getFileByPath("lists/applications.md")!;
+    const listBefore = await app.vault.read(list);
+    const first = canvasElement.querySelector<HTMLElement>(
+      '[data-day-section="anytime"] [data-planner-task-id]',
+    )!;
+    const movedId = first.getAttribute("data-planner-task-id")!;
+    const moveDown = within(first).getByRole("button", {
+      name: "Move task down",
+    });
+    moveDown.focus();
+    expect(moveDown).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await waitFor(async () => {
+      const daily = await app.dailyDocumentProviders
+        .resolve()
+        .locate("2026-08-19");
+      expect(daily).not.toBeNull();
+      const raw = await app.vault.read(daily!);
+      expect(raw).toContain("agendaOrder:");
+      expect(raw).toContain(movedId);
+    });
+    expect(await app.vault.read(list)).toBe(listBefore);
+    expect(await app.vault.read(file)).toContain(
+      "Inline note saved from the planner.",
+    );
+    expect((await plugin.repository.getTaskDocument(path)).task.status).toBe(
+      "open",
+    );
+    expect(await app.vault.read(file)).toContain(
+      "Retained after a failed save.",
+    );
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Applications", exact: true }),
+    );
+    const listTitle = await canvas.findByRole("button", {
+      name: "Review interview notes",
+      exact: true,
+    });
+    const listRow = listTitle.closest<HTMLElement>(
+      ".application-planner-task-row",
+    )!;
+    await userEvent.dblClick(listRow);
+    const listEditor = (await within(listRow).findByRole("textbox", {
+      name: "Task notes",
+    })) as HTMLTextAreaElement;
+    expect(listEditor).not.toBeDisabled();
+    expect(listEditor.value).toContain("Retained after a failed save.");
+    expect(listEditor.value).not.toContain("# Review interview notes");
+    expect(listRow.querySelector("[data-task-markdown-surface]")).toBeNull();
+    await userEvent.click(listEditor);
+    listEditor.setSelectionRange(
+      listEditor.value.length,
+      listEditor.value.length,
+    );
+    await userEvent.type(listEditor, "\nSaved from a List task run.");
+    await userEvent.dblClick(listRow);
+    await waitFor(async () =>
+      expect(await app.vault.read(file)).toContain(
+        "Saved from a List task run.",
+      ),
+    );
+    await waitFor(() =>
+      expect(
+        within(listRow).queryByRole("textbox", { name: "Task notes" }),
+      ).not.toBeInTheDocument(),
+    );
+  }}
+/>
+
+<Story
+  name="Runtime structure actions"
+  args={{ displayMode: "desktop" }}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          "Use compact column-header actions to create and rename headings, then add a Task and nested List at the selected Markdown heading.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    const canvas = await waitForReady(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const app = storyApp(canvasElement);
+    const plugin = app.plugins.plugins.get("tasks") as TasksPlugin;
+    await userEvent.click(
+      await canvas.findByRole("button", { name: "Applications", exact: true }),
+    );
+    const headerAction = () =>
+      canvas.getByRole("button", { name: "Document structure actions" });
+    expect(
+      headerAction().closest('[data-ui-part="column-header-actions"]'),
+    ).not.toBeNull();
+    const apply = async (action: string, title: string, heading?: string) => {
+      await userEvent.click(headerAction());
+      await userEvent.click(
+        page.getByRole("button", { name: "Document action" }),
+      );
+      await userEvent.click(
+        page.getByRole("option", { name: action, exact: true }),
+      );
+      if (heading) {
+        await userEvent.click(
+          page.getByRole("button", { name: "Choose heading" }),
+        );
+        await userEvent.click(
+          await page.findByRole("option", { name: heading, exact: true }),
+        );
+      }
+      await userEvent.type(
+        page.getByRole("textbox", { name: "Title", exact: true }),
+        title,
+      );
+      await userEvent.click(
+        page.getByRole("button", { name: "Apply", exact: true }),
+      );
+      await waitFor(() =>
+        expect(
+          page.queryByRole("button", { name: "Apply", exact: true }),
+        ).not.toBeInTheDocument(),
+      );
+    };
+    await apply("New heading", "Review queue");
+    await waitFor(async () =>
+      expect(
+        (await plugin.repository.getTaskListDocument("lists/applications.md"))
+          .body,
+      ).toContain("## Review queue"),
+    );
+    await apply("Rename heading", "Next actions", "Review queue");
+    await apply("Add task", "Header-created task", "Next actions");
+    await apply("Add nested list", "Header-created list", "Next actions");
+    const document = await plugin.repository.getTaskListDocument(
+      "lists/applications.md",
+    );
+    expect(document.body).toContain("## Next actions");
+    expect(document.body).not.toContain("## Review queue");
+    const runs = await plugin.repository.getStructuralTaskRuns(document.path);
+    expect(
+      runs
+        .filter((run) => run.headingText === "Next actions")
+        .flatMap((run) => run.entries.map((entry) => entry.label)),
+    ).toEqual(["Header-created task", "Header-created list"]);
+    expect(
+      (await plugin.repository.getTaskDocument("inbox/header-created-task.md"))
+        .task.inbox,
+    ).toBe(false);
+    expect(
+      await canvas.findByRole("button", { name: "New list", exact: true }),
+    ).toBeVisible();
+  }}
+/>
+
+<Story
+  name="Runtime history and skip"
+  args={{ displayMode: "desktop" }}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          "Read tracked History and range statistics, then explicitly skip an occurrence through the Task menu and prove the daily observation and next plan persist.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    const canvas = await waitForReady(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const app = storyApp(canvasElement);
+    const plugin = app.plugins.plugins.get("tasks") as TasksPlugin;
+    const title = await canvas.findByRole("button", {
+      name: "Daily stand-up reflection",
+      exact: true,
+    });
+    await userEvent.click(
+      within(
+        title.closest<HTMLElement>(".application-planner-task-row")!,
+      ).getByRole("button", {
+        name: "Open task details for Daily stand-up reflection",
+      }),
+    );
+    const detailElement = await waitFor(() => {
+      const element = canvasElement.querySelector<HTMLElement>(
+        "[data-task-sidebar-detail]",
+      )!;
+      expect(element).toBeVisible();
+      return element;
+    });
+    const detail = within(detailElement);
+    await userEvent.click(await detail.findByText("History", { exact: true }));
+    expect(detail.getByText("Statistics for the last 30 days")).toBeVisible();
+    await userEvent.click(detail.getByRole("radio", { name: "7 days" }));
+    expect(detail.getByText("Statistics for the last 7 days")).toBeVisible();
+    await userEvent.click(
+      detail.getByRole("radio", { name: "Missed", exact: true }),
+    );
+    await userEvent.click(detail.getByRole("button", { name: "Task actions" }));
+    await userEvent.click(
+      page.getByRole("menuitem", { name: "Skip current occurrence" }),
+    );
+    await waitFor(async () => {
+      const document = await plugin.repository.getTaskDocument(
+        "inbox/daily-reflection.md",
+      );
+      expect(document.task.plan?.date).toBe("2026-08-20");
+      expect(document.task.status).toBe("open");
+      const daily = await app.dailyDocumentProviders
+        .resolve()
+        .locate("2026-08-19");
+      expect(daily).not.toBeNull();
+      expect(await app.vault.read(daily!)).toContain(
+        "story-task-daily-reflection",
+      );
+    });
+    await waitFor(() =>
+      expect(detail.getByText("2026-08-19", { exact: true })).toBeVisible(),
+    );
+    expect(detail.getByText("Comments", { exact: true })).toBeVisible();
+  }}
+/>
+
+<Story
+  name="Runtime link and print"
+  args={{ displayMode: "desktop" }}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          "Copy a public Lapis file URL with failure recovery and render a disposable browser print document through the real Markdown API.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    const canvas = await waitForReady(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const app = storyApp(canvasElement);
+    const title = await canvas.findByRole("button", {
+      name: "Tailor platform CV variant",
+      exact: true,
+    });
+    await userEvent.click(
+      within(
+        title.closest<HTMLElement>(".application-planner-task-row")!,
+      ).getByRole("button", {
+        name: "Open task details for Tailor platform CV variant",
+      }),
+    );
+    const detail = within(
+      await waitFor(() => {
+        const element = canvasElement.querySelector<HTMLElement>(
+          "[data-task-sidebar-detail]",
+        )!;
+        expect(element).toBeVisible();
+        return element;
+      }),
+    );
+    const openMenu = async () => {
+      const trigger = detail.getByRole("button", { name: "Task actions" });
+      await waitFor(() =>
+        expect(getComputedStyle(trigger).pointerEvents).not.toBe("none"),
+      );
+      await userEvent.click(trigger);
+    };
+    const clipboard = spyOn(navigator.clipboard, "writeText")
+      .mockRejectedValueOnce(new Error("Clipboard unavailable"))
+      .mockResolvedValue(undefined);
+    try {
+      await openMenu();
+      await userEvent.click(
+        page.getByRole("menuitem", { name: "Copy link", exact: true }),
+      );
+      await waitFor(() =>
+        expect(canvas.getByRole("alert")).toHaveTextContent(
+          "Clipboard unavailable",
+        ),
+      );
+      await openMenu();
+      await userEvent.click(
+        page.getByRole("menuitem", { name: "Copy link", exact: true }),
+      );
+      await waitFor(() =>
+        expect(canvas.getByRole("status")).toHaveTextContent(
+          "Task link copied.",
+        ),
+      );
+      const copied = clipboard.mock.calls.at(-1)![0];
+      expect(app.urls.parse(copied)).toMatchObject({
+        scheme: "lapis",
+        action: "open",
+        params: { file: "inbox/today-1.md", vault: app.appDatabase.vaultId },
+      });
+    } finally {
+      clipboard.mockRestore();
+    }
+    const append = canvasElement.ownerDocument.body.append.bind(
+      canvasElement.ownerDocument.body,
+    );
+    let printed = false;
+    const frameAppend = spyOn(
+      canvasElement.ownerDocument.body,
+      "append",
+    ).mockImplementation((...nodes) => {
+      append(...nodes);
+      for (const node of nodes) {
+        if (
+          node instanceof HTMLIFrameElement &&
+          node.title === "Task print document"
+        ) {
+          spyOn(node.contentWindow!, "print").mockImplementation(() => {
+            printed = true;
+            const printDocument = node.contentDocument!;
+            expect(printDocument.querySelectorAll("h1")).toHaveLength(1);
+            expect(printDocument.body).toHaveTextContent(
+              "Tailor platform CV variant",
+            );
+            expect(printDocument.body.inert).toBe(true);
+            expect(
+              printDocument.querySelector(".task-print-metadata"),
+            ).toHaveTextContent("open");
+          });
+        }
+      }
+    });
+    try {
+      await openMenu();
+      await userEvent.click(page.getByRole("menuitem", { name: "Print task" }));
+      await waitFor(
+        () => {
+          const frame =
+            canvasElement.ownerDocument.querySelector<HTMLIFrameElement>(
+              'iframe[title="Task print document"]',
+            );
+          expect({
+            printed,
+            alert: canvas.queryByRole("alert")?.textContent ?? "",
+            frame: Boolean(frame),
+            inert: frame?.contentDocument?.body.inert,
+            fonts: frame?.contentDocument?.fonts.status,
+          }).toMatchObject({ printed: true, alert: "" });
+        },
+        { timeout: 10_000 },
+      );
+      await waitFor(() =>
+        expect(
+          canvasElement.ownerDocument.querySelector(
+            'iframe[title="Task print document"]',
+          ),
+        ).not.toBeInTheDocument(),
+      );
+    } finally {
+      frameAppend.mockRestore();
+    }
+  }}
+/>
+
+<Story
+  name="Runtime detail bulk actions"
+  args={{ displayMode: "desktop" }}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          "Hide and show completed checklist items without writing Markdown, then reopen the detail's checklist through the canonical bulk action.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    const canvas = await waitForReady(canvasElement);
+    const page = within(canvasElement.ownerDocument.body);
+    const app = storyApp(canvasElement);
+    const title = await canvas.findByRole("button", {
+      name: "Review interview notes",
+      exact: true,
+    });
+    await userEvent.click(
+      within(
+        title.closest<HTMLElement>(".application-planner-task-row")!,
+      ).getByRole("button", {
+        name: "Open task details for Review interview notes",
+      }),
+    );
+    const detailElement = await waitFor(() => {
+      const element = canvasElement.querySelector<HTMLElement>(
+        "[data-task-sidebar-detail]",
+      )!;
+      expect(element).toBeVisible();
+      return element;
+    });
+    const detail = within(detailElement);
+    const file = app.vault.getFileByPath("inbox/today-2.md")!;
+    const original = await app.vault.read(file);
+    const checkboxes = await detail.findAllByRole<HTMLInputElement>(
+      "checkbox",
+      { name: "Toggle task", exact: true },
+    );
+    expect(checkboxes).toHaveLength(3);
+    expect(checkboxes[0]).toBeChecked();
+    const completedItem = checkboxes[0].closest("li")!;
+    expect(completedItem).toBeVisible();
+    const chooseAction = async (name: string) => {
+      const trigger = detail.getByRole("button", { name: "Task actions" });
+      await waitFor(() =>
+        expect(getComputedStyle(trigger).pointerEvents).not.toBe("none"),
+      );
+      await userEvent.click(trigger);
+      await userEvent.click(page.getByRole("menuitem", { name, exact: true }));
+    };
+    await chooseAction("Hide completed tasks");
+    await waitFor(() => expect(completedItem).not.toBeVisible());
+    expect(await app.vault.read(file)).toBe(original);
+    expect(checkboxes[1]).toBeVisible();
+    await chooseAction("Show completed tasks");
+    await waitFor(() => expect(completedItem).toBeVisible());
+    await chooseAction("Mark all incomplete");
+    await waitFor(async () => {
+      expect(await app.vault.read(file)).not.toContain(
+        "- [x] Pull the incident timeline",
+      );
+      const current = detail.getAllByRole<HTMLInputElement>("checkbox", {
+        name: "Toggle task",
+        exact: true,
+      });
+      expect(current).toHaveLength(3);
+      for (const checkbox of current) expect(checkbox).not.toBeChecked();
+    });
+    expect(await app.vault.read(file)).toContain("## Atlas AI loop");
   }}
 />

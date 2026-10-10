@@ -74,6 +74,14 @@
     const state = () =>
       JSON.parse(canvas.getByTestId("task-preview-state").textContent ?? "{}") as Record<string, unknown>;
 
+    const notes = canvas.getByRole("textbox", { name: "Task notes" });
+    await waitFor(() => expect(notes).toBeVisible());
+    await userEvent.clear(notes);
+    await userEvent.type(notes, "Compact inline notes.");
+    await userEvent.click(canvas.getByRole("textbox", { name: "Task title" }));
+    await waitFor(() => expect(state().notes).toBe("Compact inline notes."));
+    expect(notes).toBeVisible();
+
     await userEvent.click(canvas.getByRole("button", { name: "Task priority" }));
     await userEvent.click(page.getByRole("option", { name: "High" }));
     await waitFor(() => expect(state().priority).toBe("high"));

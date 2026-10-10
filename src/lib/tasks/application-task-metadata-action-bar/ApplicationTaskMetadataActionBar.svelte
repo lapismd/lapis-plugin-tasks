@@ -11,10 +11,7 @@
     StructuredForm,
   } from "@lapismd/design-core/forms";
   import type { InlineOptionPickerOption } from "@lapismd/design-core/forms";
-  import type {
-    ApplicationTask,
-    ApplicationTaskPriority,
-  } from "../../model";
+  import type { ApplicationTask, ApplicationTaskPriority } from "../../model";
   import type { TaskListPickerOptionInput } from "../application-task-area-picker";
   import ApplicationTaskAreaFormField from "../application-task-area-form-field/ApplicationTaskAreaFormField.svelte";
   import ApplicationTaskInlineOptionFormField from "../application-task-inline-option-form-field/ApplicationTaskInlineOptionFormField.svelte";
@@ -60,6 +57,12 @@
 
   const priorityOptions: InlineOptionPickerOption[] = [
     {
+      value: "none",
+      label: "None",
+      icon: CircleIcon,
+      accent: "var(--muted-foreground)",
+    },
+    {
       value: "low",
       label: "Low",
       icon: SignalLowIcon,
@@ -101,7 +104,7 @@
               status: status as ApplicationTask["status"],
               done: completed,
               completedAt: completed
-                ? (value.completedAt ?? new Date().toISOString())
+                ? (value.completedAt ?? (now ?? new Date()).toISOString())
                 : undefined,
             };
           },
@@ -119,10 +122,13 @@
         customField<ApplicationTask, undefined, string>({
           id: "task-metadata-priority",
           label: "Priority",
-          get: (value) => value.priority ?? "medium",
+          get: (value) => value.priority ?? "none",
           set: (value, priority) => ({
             ...value,
-            priority: priority as ApplicationTaskPriority,
+            priority:
+              priority === "none"
+                ? undefined
+                : (priority as ApplicationTaskPriority),
           }),
           renderers: {
             edit: {

@@ -27,6 +27,7 @@ export type TaskSummary = {
   title: string;
   kind: "task" | "task-list" | "task-list-navigation";
   status: CanonicalTaskStatus | "active" | "archived";
+  priority?: "low" | "medium" | "high";
   inbox: boolean;
   startKind: "anytime" | "someday" | "date";
   startDate?: string;
@@ -47,7 +48,9 @@ export type TaskSummary = {
   effectiveForDate?: string;
 };
 
-export function isTaskDocument(document: ParsedTaskFile): document is TaskDocument {
+export function isTaskDocument(
+  document: ParsedTaskFile,
+): document is TaskDocument {
   return document.kind === "task";
 }
 
@@ -97,10 +100,13 @@ export function taskDocumentToSummary(
     title: document.title,
     kind: "task",
     status: document.task.status,
+    priority: document.task.priority,
     inbox: document.task.inbox,
     startKind: document.task.start.kind,
     startDate:
-      document.task.start.kind === "date" ? document.task.start.date : undefined,
+      document.task.start.kind === "date"
+        ? document.task.start.date
+        : undefined,
     planDate: document.task.plan?.date,
     planKind: document.task.plan?.at,
     planTime: document.task.plan?.time,
@@ -108,7 +114,8 @@ export function taskDocumentToSummary(
     deadline: document.task.deadline,
     completedAt: document.task.completedAt,
     checklistTotal: document.checklist.length,
-    checklistCompleted: document.checklist.filter((item) => item.checked).length,
+    checklistCompleted: document.checklist.filter((item) => item.checked)
+      .length,
     commentCount: document.task.comments.length,
     repeat: document.task.repeat,
     unparsedRepeat: document.task.unparsedRepeat,

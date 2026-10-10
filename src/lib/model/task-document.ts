@@ -7,7 +7,7 @@ import {
 } from "./recurrence-engine";
 
 export const TASK_DOCUMENT_SCHEMA = "tasks/v1";
-export const TASK_PROJECTION_VERSION = 3;
+export const TASK_PROJECTION_VERSION = 4;
 
 export type TaskDocumentKind = "task" | "task-list" | "task-list-navigation";
 export type CanonicalTaskStatus = "open" | "completed" | "canceled";
@@ -81,6 +81,8 @@ export type TaskComment = {
 
 export type TaskFrontMatter = {
   status: CanonicalTaskStatus;
+  priority?: "low" | "medium" | "high";
+  unparsedPriority?: unknown;
   completedAt?: string;
   inbox: boolean;
   start: TaskStart;
@@ -174,7 +176,9 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const TIME_RE = /^\d{2}:\d{2}$/;
 const DURATION_RE = /^(?:(\d+)h)?(?:(\d+)m)?$/i;
 
-export function parseDurationMinutes(value: string | undefined): number | undefined {
+export function parseDurationMinutes(
+  value: string | undefined,
+): number | undefined {
   if (!value?.trim()) return undefined;
   const match = DURATION_RE.exec(value.trim());
   if (!match || (!match[1] && !match[2])) return undefined;
@@ -184,7 +188,9 @@ export function parseDurationMinutes(value: string | undefined): number | undefi
   return total > 0 ? total : undefined;
 }
 
-export function formatDuration(minutes: number | undefined): string | undefined {
+export function formatDuration(
+  minutes: number | undefined,
+): string | undefined {
   if (!minutes || minutes <= 0) return undefined;
   const hours = Math.floor(minutes / 60);
   const rest = minutes % 60;
@@ -236,10 +242,7 @@ function titleFromPath(path: string): string {
 export function formatTaskListIdTitle(
   value: string | null | undefined,
 ): string | undefined {
-  const normalized = value
-    ?.trim()
-    .replace(/[-_]+/g, " ")
-    .replace(/\s+/g, " ");
+  const normalized = value?.trim().replace(/[-_]+/g, " ").replace(/\s+/g, " ");
   if (!normalized) return undefined;
   return normalized
     .split(" ")
@@ -259,7 +262,9 @@ function parseNavigationBodyStructure(body: string): StructuralLink[] {
       heading = headingMatch[1]!.trim();
       continue;
     }
-    const markdownLink = line.match(/^\s*[-*]\s+(?:!\[[^\]]*\]\([^)]+\)|\[([^\]]+)\]\(([^)]+)\))\s*$/);
+    const markdownLink = line.match(
+      /^\s*[-*]\s+(?:!\[[^\]]*\]\([^)]+\)|\[([^\]]+)\]\(([^)]+)\))\s*$/,
+    );
     if (markdownLink?.[1] && markdownLink[2]) {
       structuralLinks.push({
         title: markdownLink[1],
@@ -292,7 +297,8 @@ function parsePlan(
   value: unknown,
   diagnostics: TaskDiagnostic[],
 ): TaskPlan | undefined {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+  if (!value || typeof value !== "object" || Array.isArray(value))
+    return undefined;
   const record = value as Record<string, unknown>;
   const date = asString(record.date);
   if (!date || !DATE_RE.test(date)) {
@@ -320,7 +326,8 @@ function parsePlan(
     diagnostics.push({
       code: "invalid-plan-at",
       field: "task.plan.at",
-      message: "plan.at must be anytime, morning, afternoon, evening, or HH:mm.",
+      message:
+        "plan.at must be anytime, morning, afternoon, evening, or HH:mm.",
     });
   }
   const duration = asString(record.duration);
@@ -329,7 +336,8 @@ function parsePlan(
     diagnostics.push({
       code: "invalid-duration",
       field: "task.plan.duration",
-      message: "plan.duration must be a positive duration such as 45m or 1h30m.",
+      message:
+        "plan.duration must be a positive duration such as 45m or 1h30m.",
     });
   }
   return { date, at, time, duration, durationMinutes };
@@ -351,22 +359,19 @@ function invalidTaskField<T>(
   return { unparsed: value };
 }
 
-function parseDateList(
-  value: unknown,
-): LocalDateString[] | undefined | null {
+function parseDateList(value: unknown): LocalDateString[] | undefined | null {
   if (value == null) return undefined;
   if (!Array.isArray(value) || !value.every(isLocalDateString)) return null;
   return [...new Set(value)] as LocalDateString[];
 }
 
-function parsePauseRanges(
-  value: unknown,
-): TaskRepeat["pauseRanges"] | null {
+function parsePauseRanges(value: unknown): TaskRepeat["pauseRanges"] | null {
   if (value == null) return undefined;
   if (!Array.isArray(value)) return null;
   const ranges: NonNullable<TaskRepeat["pauseRanges"]> = [];
   for (const entry of value) {
-    if (!entry || typeof entry !== "object" || Array.isArray(entry)) return null;
+    if (!entry || typeof entry !== "object" || Array.isArray(entry))
+      return null;
     const range = entry as Record<string, unknown>;
     if (
       !isLocalDateString(range.start) ||
@@ -450,7 +455,8 @@ function parseRepeat(
     (record.paused != null && typeof record.paused !== "boolean") ||
     (record.paused === true && !isLocalDateString(record.pausedSince)) ||
     (record.paused !== true && record.pausedSince != null) ||
-    (lastCompletedAt != null && !Number.isFinite(Date.parse(lastCompletedAt))) ||
+    (lastCompletedAt != null &&
+      !Number.isFinite(Date.parse(lastCompletedAt))) ||
     (completionCount != null &&
       (!Number.isInteger(completionCount) || (completionCount as number) < 0));
   if (invalid) {
@@ -635,6 +641,14 @@ function parseTaskFrontMatter(
   );
   return {
     status,
+    priority: ["low", "medium", "high"].includes(String(record.priority))
+      ? (record.priority as TaskFrontMatter["priority"])
+      : undefined,
+    unparsedPriority:
+      record.priority != null &&
+      !["low", "medium", "high"].includes(String(record.priority))
+        ? record.priority
+        : undefined,
     completedAt: asString(record.completedAt),
     inbox: record.inbox === true,
     start,
@@ -679,7 +693,11 @@ export function parseTaskDocument(
 ): ParsedTaskFile | null {
   const { frontMatter, body } = splitFrontMatter(raw);
   const type = asString(frontMatter.type);
-  if (type !== "task" && type !== "task-list" && type !== "task-list-navigation") {
+  if (
+    type !== "task" &&
+    type !== "task-list" &&
+    type !== "task-list-navigation"
+  ) {
     return null;
   }
   const diagnostics: TaskDiagnostic[] = [];
@@ -694,11 +712,11 @@ export function parseTaskDocument(
   const frontMatterTitle = asString(frontMatter.title);
   const title =
     type === "task-list"
-      ? frontMatterTitle ??
+      ? (frontMatterTitle ??
         firstHeading(body) ??
         formatTaskListIdTitle(id) ??
-        titleFromPath(path)
-      : firstHeading(body) ?? titleFromPath(path);
+        titleFromPath(path))
+      : (firstHeading(body) ?? titleFromPath(path));
   const navigationLinks = parseNavigationBodyStructure(body);
   if (type === "task-list-navigation") {
     return {
@@ -761,7 +779,9 @@ export function parseTaskDocument(
     updated: asString(frontMatter.updated),
     task: parseTaskFrontMatter(frontMatter.task, diagnostics),
     body,
-    checklist: structure.checklist.map(({ heading: _heading, ...item }) => item),
+    checklist: structure.checklist.map(
+      ({ heading: _heading, ...item }) => item,
+    ),
     structuralLinks: structure.candidates.map((entry, ordinal) => ({
       title: entry.authoredLabel,
       href: entry.authoredHref,
@@ -815,6 +835,11 @@ export function serializeTaskDocument(document: ParsedTaskFile): string {
       : undefined;
     common.task = {
       status: document.task.status,
+      ...(document.task.priority
+        ? { priority: document.task.priority }
+        : document.task.unparsedPriority !== undefined
+          ? { priority: document.task.unparsedPriority }
+          : {}),
       inbox: document.task.inbox,
       start,
       ...(document.task.completedAt
@@ -837,15 +862,61 @@ export function serializeTaskDocument(document: ParsedTaskFile): string {
         : {}),
     };
   }
-  const yaml = stringifyYaml(common, { lineWidth: 0 }).trimEnd();
+  const originalMatch = /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(
+    document.raw,
+  );
+  const original = originalMatch
+    ? (parseYaml(originalMatch[1]) as Record<string, unknown>)
+    : {};
+  const retained =
+    original && typeof original === "object" ? { ...original } : {};
+  for (const key of [
+    "type",
+    "id",
+    "tags",
+    "created",
+    "updated",
+    "title",
+    "task",
+    "list",
+  ]) {
+    if (key !== "task" && key !== "list") delete retained[key];
+  }
+  for (const key of ["task", "list"]) {
+    const before = retained[key];
+    const after = common[key];
+    if (!after || typeof after !== "object") continue;
+    const merged =
+      before && typeof before === "object"
+        ? { ...(before as Record<string, unknown>) }
+        : {};
+    const known =
+      key === "task"
+        ? [
+            "status",
+            "priority",
+            "completedAt",
+            "inbox",
+            "start",
+            "plan",
+            "deadline",
+            "repeat",
+            "tracking",
+            "comments",
+          ]
+        : ["status", "role"];
+    for (const field of known) delete merged[field];
+    common[key] = { ...merged, ...after };
+  }
+  const yaml = stringifyYaml(
+    { ...retained, ...common },
+    { lineWidth: 0 },
+  ).trimEnd();
   const body = document.body.replace(/^\n+/, "");
   return `---\n${yaml}\n---\n${body.startsWith("\n") ? body : `\n${body}`}`;
 }
 
-export function resetChecklistItems(
-  body: string,
-  reset: boolean,
-): string {
+export function resetChecklistItems(body: string, reset: boolean): string {
   if (!reset) return body;
   const items = scanTaskStructure(body, {
     documentId: "checklist-reset",

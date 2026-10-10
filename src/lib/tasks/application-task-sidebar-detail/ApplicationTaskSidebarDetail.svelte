@@ -5,7 +5,7 @@
   import LinkIcon from "@lucide/svelte/icons/link";
   import ListChecksIcon from "@lucide/svelte/icons/list-checks";
   import ListTodoIcon from "@lucide/svelte/icons/list-todo";
-  import LogOutIcon from "@lucide/svelte/icons/log-out";
+  import * as DropdownMenu from "@lapismd/design-core/shadcn/dropdown-menu";
   import PrinterIcon from "@lucide/svelte/icons/printer";
   import Trash2Icon from "@lucide/svelte/icons/trash-2";
   import {
@@ -27,7 +27,10 @@
 
   let {
     task,
-    creatorLabel = "Steve",
+    creatorLabel,
+    extras,
+    availableMenuActions = [],
+    hideCompleted = false,
     areaOptions = [],
     closeAction,
     documentModeAction,
@@ -40,11 +43,14 @@
     onUpdateTitle = () => {},
     onUpdateTask = () => {},
     onRemoveTask = () => {},
-    onCopyLink = () => {},
-    onMenuAction = () => {},
+    onCopyLink,
+    onMenuAction,
   }: {
     task: Task;
     creatorLabel?: string;
+    extras?: Snippet;
+    availableMenuActions?: string[];
+    hideCompleted?: boolean;
     areaOptions?: TaskListPickerOptionInput[];
     closeAction?: Snippet;
     documentModeAction?: Snippet;
@@ -61,7 +67,7 @@
     onCopyLink?: (task: Task) => void;
     onMenuAction?: (
       action:
-        | "unsubscribe"
+        | "skip"
         | "print"
         | "duplicate"
         | "hide-completed"
@@ -91,7 +97,10 @@
     if (Number.isNaN(created.getTime())) return "recently";
     const days = Math.max(
       0,
-      Math.round((Date.now() - created.getTime()) / (24 * 60 * 60 * 1000)),
+      Math.round(
+        ((now ?? new Date()).getTime() - created.getTime()) /
+          (24 * 60 * 60 * 1000),
+      ),
     );
     if (days === 0) return "today";
     if (days === 1) return "1 day ago";
@@ -100,22 +109,18 @@
 
   function copyLink() {
     menuOpen = false;
-    onCopyLink(task);
-    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-      void navigator.clipboard.writeText(`task://${task.id}`);
-    }
+    onCopyLink?.(task);
   }
-
   function runMenu(
     action:
-      | "unsubscribe"
       | "print"
       | "duplicate"
       | "hide-completed"
-      | "mark-all-incomplete",
+      | "mark-all-incomplete"
+      | "skip",
   ) {
     menuOpen = false;
-    onMenuAction(action, task);
+    onMenuAction?.(action, task);
   }
 
   function removeTask() {
@@ -201,97 +206,53 @@
           {@render documentModeAction()}
         {/if}
         <div class="task-sidebar-detail__menu-wrap">
-          <Button
-            type="button"
-            variant="outline"
-            size="icon-sm"
-            class="task-sidebar-detail__icon-button"
-            aria-label="Task actions"
-            title="Task actions"
-            aria-expanded={menuOpen}
-            aria-haspopup="menu"
-            onclick={(event) => {
-              event.stopPropagation();
-              menuOpen = !menuOpen;
-            }}
-          >
-            <EllipsisVerticalIcon />
-          </Button>
-          {#if menuOpen}
-            <div
-              class="task-sidebar-detail__menu"
-              role="menu"
-              aria-label="Task actions"
-            >
-              <button
-                type="button"
-                class="task-sidebar-detail__menu-item"
-                role="menuitem"
-                onclick={() => runMenu("unsubscribe")}
+          <DropdownMenu.Root bind:open={menuOpen}>
+            <DropdownMenu.Trigger>
+              {#snippet child({ props })}<Button
+                  {...props}
+                  variant="ghost"
+                  size="icon"
+                  class="task-sidebar-detail__icon-button"
+                  aria-label="Task actions"
+                  title="Task actions"><EllipsisVerticalIcon /></Button
+                >{/snippet}
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content aria-label="Task actions">
+              <DropdownMenu.Group>
+                {#if availableMenuActions.includes("print")}<DropdownMenu.Item
+                    onclick={() => runMenu("print")}
+                    ><PrinterIcon />Print task</DropdownMenu.Item
+                  >{/if}
+                {#if onCopyLink}<DropdownMenu.Item onclick={copyLink}
+                    ><LinkIcon />Copy link</DropdownMenu.Item
+                  >{/if}
+                {#if availableMenuActions.includes("duplicate")}<DropdownMenu.Item
+                    onclick={() => runMenu("duplicate")}
+                    ><CopyPlusIcon />Duplicate task</DropdownMenu.Item
+                  >{/if}
+                {#if availableMenuActions.includes("hide-completed")}<DropdownMenu.Item
+                    onclick={() => runMenu("hide-completed")}
+                    ><ListChecksIcon />{hideCompleted
+                      ? "Show completed tasks"
+                      : "Hide completed tasks"}</DropdownMenu.Item
+                  >{/if}
+                {#if availableMenuActions.includes("mark-all-incomplete")}<DropdownMenu.Item
+                    onclick={() => runMenu("mark-all-incomplete")}
+                    ><ListTodoIcon />Mark all incomplete</DropdownMenu.Item
+                  >{/if}
+                {#if availableMenuActions.includes("skip")}<DropdownMenu.Item
+                    onclick={() => runMenu("skip")}
+                    >Skip current occurrence</DropdownMenu.Item
+                  >{/if}
+              </DropdownMenu.Group>
+              <DropdownMenu.Separator />
+              <DropdownMenu.Group
+                ><DropdownMenu.Item onclick={removeTask}
+                  ><Trash2Icon />Delete task</DropdownMenu.Item
+                ></DropdownMenu.Group
               >
-                <LogOutIcon />
-                Unsubscribe
-              </button>
-              <button
-                type="button"
-                class="task-sidebar-detail__menu-item"
-                role="menuitem"
-                onclick={() => runMenu("print")}
-              >
-                <PrinterIcon />
-                Print task
-              </button>
-              <button
-                type="button"
-                class="task-sidebar-detail__menu-item"
-                role="menuitem"
-                onclick={copyLink}
-              >
-                <LinkIcon />
-                Copy link
-              </button>
-              <button
-                type="button"
-                class="task-sidebar-detail__menu-item"
-                role="menuitem"
-                onclick={() => runMenu("duplicate")}
-              >
-                <CopyPlusIcon />
-                Duplicate task
-              </button>
-              <button
-                type="button"
-                class="task-sidebar-detail__menu-item"
-                role="menuitem"
-                onclick={() => runMenu("hide-completed")}
-              >
-                <ListChecksIcon />
-                Hide completed tasks
-              </button>
-              <button
-                type="button"
-                class="task-sidebar-detail__menu-item"
-                role="menuitem"
-                onclick={() => runMenu("mark-all-incomplete")}
-              >
-                <ListTodoIcon />
-                Mark all incomplete
-              </button>
-              <div
-                class="task-sidebar-detail__menu-separator"
-                role="separator"
-              ></div>
-              <button
-                type="button"
-                class="task-sidebar-detail__menu-item task-sidebar-detail__menu-item--destructive"
-                role="menuitem"
-                onclick={removeTask}
-              >
-                <Trash2Icon />
-                Delete task
-              </button>
-            </div>
-          {/if}
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
         </div>
       </div>
     </div>
@@ -354,32 +315,14 @@
             {/if}
           </div>
           <p class="task-sidebar-detail__created">
-            Created by {creatorLabel} • {createdRelative}
+            {#if creatorLabel}Created by {creatorLabel} •
+            {/if}{createdRelative}
           </p>
 
           <div class="task-sidebar-detail__messages">
             <MessageList density="compact" aria-label="Task messages">
               {#if messages}
                 {@render messages()}
-              {:else}
-                <Message sender="user">
-                  {#snippet name()}Alex{/snippet}
-                  <MessageBubble>
-                    Can we land this before Friday?
-                    {#snippet metadata()}
-                      <MessageMetadata timestamp="2d" />
-                    {/snippet}
-                  </MessageBubble>
-                </Message>
-                <Message sender="user">
-                  {#snippet name()}Steve{/snippet}
-                  <MessageBubble>
-                    Yes — wrapping the remaining polish today.
-                    {#snippet metadata()}
-                      <MessageMetadata timestamp="1d" />
-                    {/snippet}
-                  </MessageBubble>
-                </Message>
               {/if}
             </MessageList>
           </div>
@@ -388,12 +331,5 @@
     {/if}
   </section>
 
-  <footer class="task-sidebar-detail__footer">
-    <input
-      type="text"
-      class="task-sidebar-detail__message"
-      placeholder="Leave a message..."
-      aria-label="Leave a message"
-    />
-  </footer>
+  {#if extras}{@render extras()}{/if}
 </div>

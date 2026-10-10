@@ -1,4 +1,5 @@
 <script lang="ts">
+	import * as ToggleGroup from '@lapismd/design-core/shadcn/toggle-group';
 	import { onDestroy, tick, type Snippet } from 'svelte';
 	import { move } from '@dnd-kit/helpers';
 	import type { DragDropEventHandlers } from '@dnd-kit/svelte';
@@ -19,10 +20,7 @@
 		type TaskQuickCreateInput,
 		type ChecklistItem
 	} from '../../model';
-	import {
-		DEFAULT_TASKS_PLUGIN_SETTINGS,
-		type TasksPluginSettings
-	} from '../../tasks-settings';
+	import { DEFAULT_TASKS_PLUGIN_SETTINGS, type TasksPluginSettings } from '../../tasks-settings';
 	import { getDueSummary, taskPreviewCloseAnimationMs } from '../../model';
 	import type { ApplicationTask, JobApplication } from '../../model';
 	import ApplicationPlannerTaskRow from '../application-planner-task-row/ApplicationPlannerTaskRow.svelte';
@@ -51,18 +49,10 @@
 	} from '../lib/application-task-planner-mode-helpers';
 	import { providePlannerDragController } from '../lib/planner-drag-context';
 
-	type PlannerDragStartEvent = Parameters<
-		NonNullable<DragDropEventHandlers['onDragStart']>
-	>[0];
-	type PlannerDragMoveEvent = Parameters<
-		NonNullable<DragDropEventHandlers['onDragMove']>
-	>[0];
-	type PlannerDragOverEvent = Parameters<
-		NonNullable<DragDropEventHandlers['onDragOver']>
-	>[0];
-	type PlannerDragEndEvent = Parameters<
-		NonNullable<DragDropEventHandlers['onDragEnd']>
-	>[0];
+	type PlannerDragStartEvent = Parameters<NonNullable<DragDropEventHandlers['onDragStart']>>[0];
+	type PlannerDragMoveEvent = Parameters<NonNullable<DragDropEventHandlers['onDragMove']>>[0];
+	type PlannerDragOverEvent = Parameters<NonNullable<DragDropEventHandlers['onDragOver']>>[0];
+	type PlannerDragEndEvent = Parameters<NonNullable<DragDropEventHandlers['onDragEnd']>>[0];
 
 	type ApplicationSummary = {
 		title: string;
@@ -95,6 +85,9 @@
 		onOpenApplication = () => {},
 		onDragTargetChange = () => {},
 		reviewContent,
+		inlineNotes,
+		onBeforeCloseInline,
+		onSaveAgendaOrder,
 		historyRows = []
 	}: {
 		tasks?: Task[];
@@ -131,6 +124,9 @@
 		onOpenApplication?: (applicationId: string) => void | Promise<void>;
 		onDragTargetChange?: (targetId: string | null) => void;
 		reviewContent?: Snippet;
+		inlineNotes?: Snippet<[Task]>;
+		onBeforeCloseInline?: () => Promise<void>;
+		onSaveAgendaOrder?: (date: string, ids: string[]) => Promise<void>;
 		historyRows?: TaskOccurrenceHistoryRow[];
 	} = $props();
 
@@ -169,13 +165,17 @@
 	} | null>(null);
 	let closeAnimationTimer: ReturnType<typeof setTimeout> | null = null;
 
-	const displayTasks = $derived(pointerProjectedTasks ?? optimisticTasks ?? tasks);
+	let logbookFilter = $state('all');
+	let actionError = $state<string | null>(null);
+	const displayTasks = $derived(
+		(pointerProjectedTasks ?? optimisticTasks ?? tasks).filter(
+			(task) => view !== 'logbook' || logbookFilter === 'all' || task.status === logbookFilter
+		)
+	);
 	const actualToday = $derived(todayDateOnly(now ?? clock()));
 	const currentTime = () => now ?? clock();
 	const dragPreviewTask = $derived.by(() =>
-		draggedTaskIds[0]
-			? (displayTasks.find((task) => task.id === draggedTaskIds[0]) ?? null)
-			: null
+		draggedTaskIds[0] ? (displayTasks.find((task) => task.id === draggedTaskIds[0]) ?? null) : null
 	);
 	const dragPreviewDueLabel = $derived.by(() => {
 		const summary = getDueSummary(dragPreviewTask?.dueAt, currentTime());
@@ -235,10 +235,7 @@
 		pendingExpandedTaskId = null;
 	}
 
-	function requestOpenTask(
-		task: Task,
-		source: 'details-button' | 'inline' = 'inline'
-	) {
+	async function requestOpenTask(task: Task, source: 'details-button' | 'inline' = 'inline') {
 		// Host panel: open-details opens/toggles externally. While a host panel
 		// is already active, replace-selection syncs via selectTask.
 		// Double-click and other inline gestures keep row expand.
@@ -247,6 +244,12 @@
 			return;
 		}
 
+		try {
+			if (expandedTaskId) await onBeforeCloseInline?.();
+		} catch (error) {
+			actionError = String(error);
+			return;
+		}
 		const taskKey = plannerTaskKey(task);
 		if (expandedTaskId === taskKey) {
 			startClosingTask(null);
@@ -308,7 +311,13 @@
 		void focusTaskById(activeTaskId, detailsPresentation === 'inline');
 	});
 
-	function requestDismissTask() {
+	async function requestDismissTask() {
+		try {
+			await onBeforeCloseInline?.();
+		} catch (error) {
+			actionError = String(error);
+			return;
+		}
 		if (expandedTaskId) {
 			startClosingTask(null);
 			if (detailsPresentation !== 'external') void onActiveTaskChange(null);
@@ -318,7 +327,9 @@
 	}
 
 	function shouldKeepTaskOpen(target: Element) {
-		if (target.closest('[data-task-preview-state="expanded"], [data-task-preview-state="closing"]')) {
+		if (
+			target.closest('[data-task-preview-state="expanded"], [data-task-preview-state="closing"]')
+		) {
 			return true;
 		}
 
@@ -380,21 +391,26 @@
 	});
 
 	async function saveTaskPatch(task: Task, patch: Partial<ApplicationTask>) {
-		const updatedAt = currentTime().toISOString();
-		if (!task.applicationId) {
-			await onSaveTask(applyApplicationTaskPatch(task, patch, updatedAt));
-			return;
-		}
+		try {
+			const updatedAt = currentTime().toISOString();
+			if (!task.applicationId) {
+				await onSaveTask(applyApplicationTaskPatch(task, patch, updatedAt));
+				return;
+			}
 
-		const application = applications.find((entry) => entry.id === task.applicationId);
-		const currentTask = application?.tasks?.find((entry) => entry.id === task.id);
-		const nextTask: ApplicationTask = {
-			...taskToApplicationTask(task),
-			...currentTask,
-			...patch,
-			updatedAt: patch.updatedAt ?? updatedAt
-		};
-		await onSaveTask(applicationTaskToTask(task.applicationId, nextTask, task));
+			const application = applications.find((entry) => entry.id === task.applicationId);
+			const currentTask = application?.tasks?.find((entry) => entry.id === task.id);
+			const nextTask: ApplicationTask = {
+				...taskToApplicationTask(task),
+				...currentTask,
+				...patch,
+				updatedAt: patch.updatedAt ?? updatedAt
+			};
+			await onSaveTask(applicationTaskToTask(task.applicationId, nextTask, task));
+		} catch (error) {
+			actionError = error instanceof Error ? error.message : String(error);
+			optimisticTasks = null;
+		}
 	}
 
 	function saveMovePatch(task: Task, patch: TaskPlannerMovePatch) {
@@ -450,25 +466,29 @@
 		});
 	}
 
-	function removeTask(task: Task) {
-		if (expandedTaskId === plannerTaskKey(task)) clearExpansion();
-		if (activeTaskId === task.id) void onActiveTaskChange(null);
-		if (!task.applicationId) {
-			void onDeleteTask(task);
-			return;
+	async function removeTask(task: Task) {
+		try {
+			await onBeforeCloseInline?.();
+			if (!task.applicationId) {
+				await onDeleteTask(task);
+			} else {
+				const application = applications.find((entry) => entry.id === task.applicationId);
+				if (!application) await onDeleteTask(task);
+				else {
+					const nextTasks = (application.tasks ?? []).filter((entry) => entry.id !== task.id);
+					await onSaveApplication({
+						...application,
+						tasks: nextTasks.length ? nextTasks : undefined,
+						steps: nextTasks.length ? taskProgressFor(nextTasks) : undefined,
+						updatedAt: currentTime().toISOString()
+					});
+				}
+			}
+			if (expandedTaskId === plannerTaskKey(task)) clearExpansion();
+			if (activeTaskId === task.id) void onActiveTaskChange(null);
+		} catch (error) {
+			actionError = error instanceof Error ? error.message : String(error);
 		}
-		const application = applications.find((entry) => entry.id === task.applicationId);
-		if (!application) {
-			void onDeleteTask(task);
-			return;
-		}
-		const nextTasks = (application.tasks ?? []).filter((entry) => entry.id !== task.id);
-		void onSaveApplication({
-			...application,
-			tasks: nextTasks.length ? nextTasks : undefined,
-			steps: nextTasks.length ? taskProgressFor(nextTasks) : undefined,
-			updatedAt: currentTime().toISOString()
-		});
 	}
 
 	function resolveDragTaskIds(sourceTaskId: string, sourceTasks = displayTasks) {
@@ -544,16 +564,28 @@
 	}
 
 	async function commitTaskProjection(before: Task[], after: Task[]) {
-		optimisticTasks = after;
-		const changedIds = new Set(changedPlannerPlacementTaskIds(before, after));
-		const beforeById = new Map(before.map((task) => [task.id, task] as const));
-		await Promise.all(
-			after
-				.filter((task) => changedIds.has(task.id))
-				.map((task) =>
-					saveTaskPatch(beforeById.get(task.id) ?? task, projectedTaskPatch(task))
-				)
-		);
+		try {
+			optimisticTasks = after;
+			const changedIds = new Set(changedPlannerPlacementTaskIds(before, after));
+			const beforeById = new Map(before.map((task) => [task.id, task] as const));
+			if (view === 'today' && onSaveAgendaOrder) {
+				await onSaveAgendaOrder(
+					selectedDate,
+					[...after]
+						.filter((task) => task.order !== undefined)
+						.sort((a, b) => a.order! - b.order!)
+						.map((task) => task.id)
+				);
+			}
+			await Promise.all(
+				after
+					.filter((task) => changedIds.has(task.id))
+					.map((task) => saveTaskPatch(beforeById.get(task.id) ?? task, projectedTaskPatch(task)))
+			);
+		} catch (error) {
+			actionError = String(error);
+			optimisticTasks = null;
+		}
 	}
 
 	function saveTaskOrder(nextTasks: Task[]) {
@@ -622,22 +654,12 @@
 		const layout = pointerDragLayout;
 		const sourceTaskId = pointerDragSourceTaskId;
 		const baseTasks = pointerDragBaseTasks;
-		if (
-			!pointerDragActive ||
-			dragPreviewOverSidebar ||
-			!layout ||
-			!sourceTaskId ||
-			!baseTasks
-		) {
+		if (!pointerDragActive || dragPreviewOverSidebar || !layout || !sourceTaskId || !baseTasks) {
 			return;
 		}
 
 		const movedLayout = move(layout, event) as PlannerDragLayout;
-		const normalizedLayout = normalizePlannerDragLayout(
-			movedLayout,
-			draggedTaskIds,
-			sourceTaskId
-		);
+		const normalizedLayout = normalizePlannerDragLayout(movedLayout, draggedTaskIds, sourceTaskId);
 		pointerDragLayout = normalizedLayout;
 		pointerProjectedTasks = projectPlannerDragLayout(
 			baseTasks,
@@ -700,7 +722,12 @@
 				openScheduleDropDialog(movedIds);
 				return;
 			}
-			if (bucket === 'today' || bucket === 'anytime' || bucket === 'someday' || bucket === 'logbook') {
+			if (
+				bucket === 'today' ||
+				bucket === 'anytime' ||
+				bucket === 'someday' ||
+				bucket === 'logbook'
+			) {
 				savePlannerDropPatches(movingTasks, { bucket }, saveMovePatch);
 			}
 			return;
@@ -708,9 +735,7 @@
 		if (target.type === 'planner-sidebar-list') {
 			const listId = typeof target.listId === 'string' ? target.listId : '';
 			const title =
-				typeof target.title === 'string' && target.title.trim()
-					? target.title.trim()
-					: listId;
+				typeof target.title === 'string' && target.title.trim() ? target.title.trim() : listId;
 			if (!listId) return;
 			for (const task of movingTasks) {
 				void saveTaskPatch(task, {
@@ -719,7 +744,6 @@
 				});
 			}
 		}
-
 	}
 
 	function openScheduleDropDialog(movedIds: string[]) {
@@ -748,30 +772,37 @@
 	function applyScheduleDropPlacement(placement: TaskPlannerQuickPlacement) {
 		const movingTasks = tasksByIds(scheduleDropTaskIds);
 		closeScheduleDropDialog();
-		for (const task of movingTasks) saveMovePatch(task, buildPlannerPlacementPatch(task, placement));
+		for (const task of movingTasks)
+			saveMovePatch(task, buildPlannerPlacementPatch(task, placement));
 	}
 
 	function clearScheduleDrop() {
 		const movingTasks = tasksByIds(scheduleDropTaskIds);
 		closeScheduleDropDialog();
 		for (const task of movingTasks) {
-				saveMovePatch(task, {
-					...resolveTaskPlannerPlacement('clear'),
-					updatedAt: currentTime().toISOString()
-				});
+			saveMovePatch(task, {
+				...resolveTaskPlannerPlacement('clear'),
+				updatedAt: currentTime().toISOString()
+			});
 		}
 	}
 
 	async function createPlannerTask(input: TaskQuickCreateInput) {
 		pendingCreatedTaskIds = new Set(tasks.map((task) => task.id));
-		await onCreateTask(input);
+		try {
+			await onCreateTask(input);
+		} catch (error) {
+			pendingCreatedTaskIds = null;
+			actionError = error instanceof Error ? error.message : String(error);
+		}
 	}
 </script>
 
 {#snippet plannerTaskRow(task: Task, context: TaskPlannerRowContext)}
 	{@const application = task.applicationId ? applicationSummaries[task.applicationId] : null}
 	{@const taskKey = plannerTaskKey(task)}
-		<ApplicationPlannerTaskRow
+	{#snippet rowNotes()}{#if inlineNotes}{@render inlineNotes(task)}{/if}{/snippet}
+	<ApplicationPlannerTaskRow
 		{task}
 		{application}
 		areaOptions={taskAreas}
@@ -785,8 +816,8 @@
 		selectionPosition={context.selectionPosition ?? null}
 		expanded={expandedTaskId === taskKey}
 		closing={closingTaskId === taskKey}
-		selectOnSurfaceClick={selectOnSurfaceClick}
-		onRequestOpen={(_taskId, source) => requestOpenTask(task, source)}
+		{selectOnSurfaceClick}
+		onRequestOpen={(_taskId, source) => void requestOpenTask(task, source)}
 		onStartTitleEdit={clearTaskSelection}
 		onSelectTask={selectTask}
 		onToggleDone={toggleTaskDone}
@@ -796,7 +827,8 @@
 		{onToggleChecklistItem}
 		{checklistRefreshVersion}
 		onMoveTask={(updatedTask, direction) => moveTask(updatedTask, direction, context)}
-		onOpenApplication={onOpenApplication}
+		{onOpenApplication}
+		notesContent={inlineNotes ? rowNotes : undefined}
 	/>
 {/snippet}
 
@@ -815,6 +847,21 @@
 	/>
 {/snippet}
 
+{#if actionError}<p role="alert">{actionError}</p>{/if}
+{#if view === 'logbook'}
+	<ToggleGroup.Root
+		type="single"
+		value={logbookFilter}
+		onValueChange={(value) => {
+			if (value) logbookFilter = value;
+		}}
+		aria-label="Logbook status"
+	>
+		<ToggleGroup.Item value="all">All</ToggleGroup.Item><ToggleGroup.Item value="completed"
+			>Completed</ToggleGroup.Item
+		><ToggleGroup.Item value="canceled">Canceled</ToggleGroup.Item>
+	</ToggleGroup.Root>
+{/if}
 {#if reviewContent}
 	{@render reviewContent()}
 {/if}
@@ -841,12 +888,12 @@
 	{scheduleDropValue}
 	{scheduleDropWhen}
 	{scheduleDropPlanAt}
-	dragPreviewTask={dragPreviewTask}
-	dragPreviewPointer={dragPreviewPointer}
+	{dragPreviewTask}
+	{dragPreviewPointer}
 	dragPreviewRow={asSnippet(plannerDragPreviewRow)}
-	dragPreviewOverSidebar={dragPreviewOverSidebar}
-	dragPreviewDueLabel={dragPreviewDueLabel}
-	onOpenApplication={onOpenApplication}
+	{dragPreviewOverSidebar}
+	{dragPreviewDueLabel}
+	{onOpenApplication}
 	onCloseScheduleDrop={closeScheduleDropDialog}
 	onClearScheduleDrop={clearScheduleDrop}
 	onSelectScheduleDate={applyScheduleDropDate}

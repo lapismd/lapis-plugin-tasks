@@ -1,8 +1,5 @@
 import type { AppDatabaseTaskRecord } from "@lapis-notes/api/app-database";
-import {
-  TASK_PROJECTION_VERSION,
-  type ParsedTaskFile,
-} from "./task-document";
+import { TASK_PROJECTION_VERSION, type ParsedTaskFile } from "./task-document";
 import { resolveEffectiveOccurrence } from "./effective-occurrence";
 import { todayDateOnly } from "./task-dates";
 import type { LocalDateString } from "./recurrence-engine";
@@ -60,6 +57,7 @@ export function projectTask(
     kind: "task",
     title: document.title,
     status: document.task.status,
+    priority: document.task.priority ?? null,
     inbox: document.task.inbox,
     startKind: document.task.start.kind,
     startDate:
@@ -78,7 +76,8 @@ export function projectTask(
     effectiveOccurrenceState: effective?.state ?? null,
     effectiveForDate: effective?.effectiveForDate ?? null,
     checklistTotal: document.checklist.length,
-    checklistCompleted: document.checklist.filter((item) => item.checked).length,
+    checklistCompleted: document.checklist.filter((item) => item.checked)
+      .length,
     commentCount: document.task.comments.length,
     projectionVersion: TASK_PROJECTION_VERSION,
   };

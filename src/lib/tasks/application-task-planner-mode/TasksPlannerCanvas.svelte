@@ -36,12 +36,22 @@
     type TaskRepository,
     type TaskOccurrenceHistoryRow,
     todayDateOnly,
+    navigationPinHref,
   } from "../../model";
   import {
     DEFAULT_TASKS_PLUGIN_SETTINGS,
     type TasksPluginSettings,
     type TasksPluginSettingsPatch,
   } from "../../tasks-settings";
+  import TaskDetailExtras from "../TaskDetailExtras.svelte";
+  import TaskInlineNotes from "../TaskInlineNotes.svelte";
+  import TaskDocumentStructureActions from "../TaskDocumentStructureActions.svelte";
+  import {
+    taskFileUrl,
+    printTaskDocument,
+    supportsTaskPrinting,
+  } from "../task-document-actions";
+  import { flushTaskFileSurfaces } from "../../task-file-surfaces";
   import ApplicationTaskSidebarDetail from "../application-task-sidebar-detail/ApplicationTaskSidebarDetail.svelte";
   import ApplicationTaskPlannerMode from "./ApplicationTaskPlannerMode.svelte";
   import TaskListNavTree from "./TaskListNavTree.svelte";
@@ -113,6 +123,7 @@
     onCreateTaskListItem,
     selectedDate = $bindable(""),
     historyRows = [],
+    onSaveAgendaOrder,
   }: {
     tasks: Task[];
     now?: Date;
@@ -124,8 +135,8 @@
     showRelated?: boolean;
     variant?: "story" | "workspace";
     onSaveTask: (task: Task) => void | Promise<void>;
-    onCreateTask: (input: TaskQuickCreateInput) => void;
-    onDeleteTask: (task: Task) => void;
+    onCreateTask: (input: TaskQuickCreateInput) => void | Promise<void>;
+    onDeleteTask: (task: Task) => void | Promise<void>;
     onLoadChecklist?: (task: Task) => Promise<ChecklistItem[]>;
     onToggleChecklistItem?: (
       task: Task,
@@ -152,6 +163,7 @@
     onRefreshWorkspace?: () => void | Promise<void>;
     selectedDate?: string;
     historyRows?: TaskOccurrenceHistoryRow[];
+    onSaveAgendaOrder?: (date: string, ids: string[]) => Promise<void>;
     onCreateTaskListItem?: (
       listPath: string,
       section: StructuralTaskRun,
@@ -161,6 +173,65 @@
       | void
       | Promise<StructuralTaskRunEntryInput | void>;
   } = $props();
+
+  let actionError = $state<string | null>(null);
+  let actionMessage = $state<string | null>(null);
+  let hiddenDetailCompleted = $state(new Set<string>());
+  async function runAction(action: () => Promise<void>) {
+    actionError = null;
+    actionMessage = null;
+    try {
+      await action();
+    } catch (error) {
+      actionError = error instanceof Error ? error.message : String(error);
+    }
+  }
+  async function menuAction(
+    action: string,
+    task: Task,
+    detail: DetailColumnEntry,
+    index: number,
+  ) {
+    if (!app || !repository || !task.sourcePath) return;
+    if (action === "hide-completed") {
+      const hidden = new Set(hiddenDetailCompleted);
+      if (hidden.has(detail.columnId)) hidden.delete(detail.columnId);
+      else hidden.add(detail.columnId);
+      hiddenDetailCompleted = hidden;
+      return;
+    }
+    await flushTaskFileSurfaces(app, undefined, true);
+    if (action === "mark-all-incomplete")
+      await repository.markDocumentIncomplete(task.sourcePath);
+    if (action === "skip")
+      await repository.skip(task.sourcePath, clock().toISOString());
+    if (action === "print")
+      await printTaskDocument(
+        app,
+        await repository.getTaskDocument(task.sourcePath),
+      );
+    if (action === "duplicate") {
+      const original = task.sourcePath.replace(/\.md$/i, "");
+      const existing = new Set(
+        app.vault.getMarkdownFiles().map((file) => file.path),
+      );
+      let path = `${original}-copy.md`;
+      let suffix = 2;
+      while (existing.has(path)) path = `${original}-copy-${suffix++}.md`;
+      const copy = await repository.duplicate(task.sourcePath, path);
+      await onRefreshWorkspace?.();
+      await handleActiveTaskChange(index - 1, copy.id);
+      return;
+    }
+    await onRefreshWorkspace?.();
+  }
+  async function copyTaskLink(task: Task) {
+    if (!app || !task.sourcePath) throw new Error("The task has no file link.");
+    if (!navigator.clipboard?.writeText)
+      throw new Error("Clipboard access is unavailable.");
+    await navigator.clipboard.writeText(taskFileUrl(app, task.sourcePath));
+    actionMessage = "Task link copied.";
+  }
 
   const listTree = $derived(
     snapshot.listTree ?? listTreeFromAreas(snapshot.areas),
@@ -353,7 +424,14 @@
     return plannerBucketIds.has(id);
   }
 
-  function showNav(id: string) {
+  async function showNav(id: string) {
+    try {
+      if (app) await flushTaskFileSurfaces(app, undefined, true);
+      actionError = null;
+    } catch (error) {
+      actionError = error instanceof Error ? error.message : String(error);
+      return;
+    }
     listsPopoverOpen = false;
     canvas.dismissPreview("tasks");
     if (isBucket(id)) {
@@ -571,10 +649,12 @@
   }
 
   function updateActiveTaskTitle(task: Task, title: string) {
-    onSaveTask({
-      ...task,
-      title,
-      updatedAt: (now ?? clock()).toISOString(),
+    void runAction(async () => {
+      await onSaveTask({
+        ...task,
+        title,
+        updatedAt: (now ?? clock()).toISOString(),
+      });
     });
   }
 
@@ -582,20 +662,27 @@
     task: Task,
     patch: Partial<ApplicationTask>,
   ) {
-    onSaveTask(
-      applyApplicationTaskPatch(task, patch, (now ?? clock()).toISOString()),
-    );
+    void runAction(async () => {
+      await onSaveTask(
+        applyApplicationTaskPatch(task, patch, (now ?? clock()).toISOString()),
+      );
+    });
   }
 
   function toggleActiveTaskDone(task: Task) {
-    const done = task.status !== "done" && task.status !== "completed";
-    onSaveTask({
-      ...task,
-      status: done ? "completed" : "open",
-      completedAt: done
-        ? (task.completedAt ?? (now ?? clock()).toISOString())
-        : undefined,
-      updatedAt: (now ?? clock()).toISOString(),
+    const done =
+      task.status !== "done" &&
+      task.status !== "completed" &&
+      task.status !== "canceled";
+    void runAction(async () => {
+      await onSaveTask({
+        ...task,
+        status: done ? "completed" : "open",
+        completedAt: done
+          ? (task.completedAt ?? (now ?? clock()).toISOString())
+          : undefined,
+        updatedAt: (now ?? clock()).toISOString(),
+      });
     });
   }
 
@@ -622,9 +709,9 @@
     await onUpdateSettings({ dailyAgenda: { hideOverdueTasks } });
   }
 
-  function removeActiveTask(task: Task, detailIndex: number) {
-    onDeleteTask(task);
-    void closeDetailColumn(detailIndex);
+  async function removeActiveTask(task: Task, detailIndex: number) {
+    await onDeleteTask(task);
+    await closeDetailColumn(detailIndex);
   }
 
   async function moveStructuralEntry(
@@ -654,6 +741,10 @@
 
   const listSurfaceController: TasksMarkdownSurfaceController = {
     kind: "tasks-markdown",
+    clock: () => clock(),
+    get listOptions() {
+      return snapshot.areas;
+    },
     get tasks() {
       return tasks;
     },
@@ -709,6 +800,13 @@
       );
     const controller: TasksMarkdownSurfaceController = {
       kind: "tasks-markdown",
+      clock: () => clock(),
+      get listOptions() {
+        return snapshot.areas;
+      },
+      get hideCompleted() {
+        return hiddenDetailCompleted.has(entry.columnId);
+      },
       get tasks() {
         return tasks;
       },
@@ -728,7 +826,7 @@
       onOpenList: (path, title) => handleOpenList(sourceIndex(), path, title),
       onSaveTask: (task) => onSaveTask(task),
       onDeleteTask: async (task) => {
-        onDeleteTask(task);
+        await onDeleteTask(task);
         const child = childEntry(sourceIndex());
         if (child?.kind === "task" && child.taskId === task.id) {
           await closeDetailColumn(sourceIndex() + 1);
@@ -826,6 +924,13 @@
     }
   }
 </script>
+
+{#snippet inlineTaskNotes(task: Task)}
+  {#if app && repository}<TaskInlineNotes {app} {repository} {task} />{/if}
+{/snippet}
+
+{#if actionError}<p role="alert">{actionError}</p>{/if}
+{#if actionMessage}<p role="status">{actionMessage}</p>{/if}
 
 <div
   class="task-column-canvas-story"
@@ -1084,6 +1189,12 @@
             </ColumnCanvas.Title>
           </div>
           <ColumnCanvas.HeaderActions>
+            {#if taskArea && selectedListNode && app && repository}<TaskDocumentStructureActions
+                {app}
+                {repository}
+                path={selectedListNode.path}
+                onRefresh={() => onRefreshWorkspace?.()}
+              />{/if}
             {#if showTodayShortcut}
               <button
                 type="button"
@@ -1159,16 +1270,21 @@
               onActiveTaskChange={(taskId) =>
                 void handleActiveTaskChange(-1, taskId)}
               {onSaveTask}
+              {onSaveAgendaOrder}
+              onBeforeCloseInline={app
+                ? () => flushTaskFileSurfaces(app!, undefined, true)
+                : undefined}
               {onCreateTask}
               {onDeleteTask}
               {onLoadChecklist}
               {onToggleChecklistItem}
               {checklistRefreshVersion}
               {onSaveApplication}
+              inlineNotes={app && repository ? inlineTaskNotes : undefined}
               onOpenApplication={(applicationId) =>
                 void handleOpenApplication(applicationId, -1)}
               onDragTargetChange={(targetId) => (activeDropTargetId = targetId)}
-            />
+            ></ApplicationTaskPlannerMode>
           {/if}
         </div>
       </ColumnCanvas.Column>
@@ -1203,6 +1319,12 @@
                 </ColumnCanvas.Title>
               </div>
               <ColumnCanvas.HeaderActions>
+                <TaskDocumentStructureActions
+                  {app}
+                  {repository}
+                  path={detail.path}
+                  onRefresh={() => onRefreshWorkspace?.()}
+                />
                 <button
                   type="button"
                   class="task-column-canvas-story__markdown-mode"
@@ -1240,14 +1362,37 @@
             <ApplicationTaskSidebarDetail
               task={detailTask}
               areaOptions={snapshot.areas}
-              {now}
+              now={now ?? clock()}
               documentBodyEnabled={Boolean(
                 app && repository && detailTask.sourcePath,
               )}
               onToggleDone={toggleActiveTaskDone}
               onUpdateTitle={updateActiveTaskTitle}
               onUpdateTask={updateActiveTaskMetadata}
-              onRemoveTask={(task) => removeActiveTask(task, detailIndex)}
+              onRemoveTask={(task) =>
+                void runAction(() => removeActiveTask(task, detailIndex))}
+              onCopyLink={app && repository
+                ? (task) => void runAction(() => copyTaskLink(task))
+                : undefined}
+              hideCompleted={hiddenDetailCompleted.has(detail.columnId)}
+              availableMenuActions={repository
+                ? [
+                    "duplicate",
+                    "hide-completed",
+                    "mark-all-incomplete",
+                    ...(supportsTaskPrinting() ? ["print"] : []),
+                    ...(detailTask.repeat &&
+                    !["paused", "exhausted", "unsupported"].includes(
+                      detailTask.effectiveOccurrenceState ?? "",
+                    )
+                      ? ["skip"]
+                      : []),
+                  ]
+                : []}
+              onMenuAction={(action, task) =>
+                void runAction(() =>
+                  menuAction(action, task, detail, detailIndex),
+                )}
             >
               {#snippet closeAction()}
                 <ColumnCanvas.Close
@@ -1274,7 +1419,23 @@
                   {/if}
                 {/if}
               {/snippet}
+              {#snippet extras()}
+                {#if app && repository}<TaskDetailExtras
+                    task={detailTask}
+                    {repository}
+                    revision={checklistRefreshVersion}
+                    onBeforeMutation={() =>
+                      flushTaskFileSurfaces(app!, detailTask.sourcePath, true)}
+                    onRefresh={() => onRefreshWorkspace?.()}
+                  />{/if}
+              {/snippet}
               {#snippet documentModeAction()}
+                {#if app && repository && detailTask.sourcePath}<TaskDocumentStructureActions
+                    {app}
+                    {repository}
+                    path={detailTask.sourcePath}
+                    onRefresh={() => onRefreshWorkspace?.()}
+                  />{/if}
                 {#if app && repository && detailTask.sourcePath}
                   <button
                     type="button"

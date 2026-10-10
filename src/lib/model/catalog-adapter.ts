@@ -26,12 +26,15 @@ export function catalogTaskFromSummary(summary: TaskSummary): Task {
     id: summary.id,
     title: summary.title,
     status: catalogStatus(summary.status),
+    priority: summary.priority,
     inbox: summary.inbox,
     start: summary.startKind === "date" ? summary.startDate : summary.startKind,
     planDate: summary.planDate,
     planAt: summary.planKind === "time" ? summary.planTime : summary.planKind,
     planDuration:
-      summary.durationMinutes != null ? `${summary.durationMinutes}m` : undefined,
+      summary.durationMinutes != null
+        ? `${summary.durationMinutes}m`
+        : undefined,
     deadline: summary.deadline,
     dueAt: summary.deadline,
     scheduledAt: summary.planDate,
@@ -69,6 +72,7 @@ export function catalogTaskFromDocument(document: ParsedTaskFile): Task {
     id: document.id,
     title: document.title,
     status: catalogStatus(document.task.status),
+    priority: document.task.priority,
     inbox: document.task.inbox,
     start:
       document.task.start.kind === "date"
@@ -92,7 +96,8 @@ export function catalogTaskFromDocument(document: ParsedTaskFile): Task {
     completedAt: document.task.completedAt,
     sourcePath: document.path,
     checklistTotal: document.checklist.length,
-    checklistCompleted: document.checklist.filter((item) => item.checked).length,
+    checklistCompleted: document.checklist.filter((item) => item.checked)
+      .length,
     notes: document.body,
     repeat: document.task.repeat,
     unparsedRepeat: document.task.unparsedRepeat,

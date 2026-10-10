@@ -4,7 +4,9 @@
   --task-sidebar-fg: var(--kanban-foreground, var(--foreground));
   --task-sidebar-muted: var(--kanban-muted, var(--muted-foreground));
   --task-sidebar-border: var(--kanban-border, var(--border));
-  --task-sidebar-radius: calc(var(--kanban-radius, var(--radius, 0.625rem)) + 0.2rem);
+  --task-sidebar-radius: calc(
+    var(--kanban-radius, var(--radius, 0.625rem)) + 0.2rem
+  );
 
   box-sizing: border-box;
   display: flex;
@@ -118,11 +120,7 @@
 .task-sidebar-detail__title:focus-visible {
   border-radius: 0.35rem;
   outline: 2px solid
-    color-mix(
-      in srgb,
-      var(--kanban-primary, var(--primary)) 35%,
-      transparent
-    );
+    color-mix(in srgb, var(--kanban-primary, var(--primary)) 35%, transparent);
   outline-offset: 2px;
 }
 
@@ -320,4 +318,12 @@
   height: 1px;
   margin: 0.2rem 0.35rem;
   background: var(--task-sidebar-border);
+}
+
+.task-sidebar-detail > .task-detail-extras {
+  max-height: 18rem;
+  flex: none;
+  overflow: auto;
+  background: var(--task-sidebar-surface);
+  border-top: 1px solid var(--task-sidebar-border);
 }
