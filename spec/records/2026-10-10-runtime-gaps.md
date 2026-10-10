@@ -217,3 +217,67 @@ metadata-only files remained skipped. `pnpm build-storybook` passed in 51 second
 and the documentation formatter check passed. Storybook was restarted on port
 7030 for review. The fresh automated runs provide cold lifecycle acceptance;
 manual visual review and visual baselines remain pending.
+
+## Planner header actions and inline alignment follow-up
+
+The seven named planner destinations were audited against the established
+Column Canvas header layout. Logbook's All/Completed/Canceled toggle group was
+a sibling of the planner body, which placed it in a separate strip. It now
+uses a compact shadcn radio menu in the owning header, before collapse, with
+the same styling as Today. Standalone Planner Mode places it in its own
+planner header. The other named pages already placed their page-level actions
+correctly; date, occurrence-history, and row controls keep their local context.
+
+Inline Notes now apply public file-width and margin tokens on the actual
+Markdown editor host, where the registered defaults were previously winning
+over inherited wrapper values. The body fills the compact row and aligns to
+its leading edge, without document gutters or readable-column padding. Full
+Markdown document surfaces keep their ordinary layout.
+
+The exact initial regression command was:
+
+```sh
+pnpm exec vitest run --config scripts/vitest-storybook-batches.config.mjs \
+  --project storybook src/stories/PluginWorkspace.stories.svelte \
+  -t 'RuntimePlannerHeaderActions|RuntimeInlineNotesAndOrder'
+```
+
+Both stories failed before the changes: Logbook had no action in its column
+header, and the inline editor retained centered document padding. The first
+menu integration exposed a test-scope error because dropdown content portals
+outside the canvas, followed by an interaction error when clicking the header
+while the radio menu was still open. Acceptance now queries the document for
+portal items, waits for the normal close transition after selecting a radio
+item, and reopens the menu to verify its retained checked state before closing
+with Escape. Assertions on placement, every status filter, and inline geometry
+remain intact. Both original targets now pass, and standalone Logbook header
+acceptance also passes (three stories, zero functional or enabled axe failures).
+Fresh manual review identified the shared item padding overlapping the radio
+checkmark and label; a separate regression guards that spacing.
+The exact `RuntimePlannerHeaderActions` spacing regression failed once before
+reserving the shadcn radio-indicator space. A concurrent intermediate full
+batch run reproduced that failure and two follow-on pointer-lock failures in
+`RuntimeInlineNotesAndOrder` and `RuntimeStructureActions` after the failed
+assertion left a dropdown open. The new story now closes its portal menu in a
+`finally` block, preserving its assertions and avoiding that contamination.
+
+The final focused run passes all three stories with zero functional or enabled
+axe failures. Final validation against the corrected radio spacing passed:
+
+- `pnpm spec:check` and `pnpm check`: specification, App ownership, native CSS,
+  and types passed; zero Svelte errors or warnings.
+- `pnpm test`: all 201 tests passed in 37 files.
+- `pnpm build` and `pnpm publint`: passed against refreshed public exports.
+- `node scripts/test-storybook-batches.mjs`: all 58 stories passed
+  (14 + 8 + 36) across 19 files; four existing metadata-only files remained
+  skipped. Zero functional or enabled axe failures, including all three
+  previously failing stories in the intermediate batch.
+- `pnpm build-storybook`: passed in 2 minutes 59 seconds.
+- Fresh Storybook on port 7030 completed the planner-header acceptance story.
+  Manual review confirmed the Logbook menu beside collapse and its separated
+  selected checkmark. The inline acceptance story reopened its saved List-row
+  editor; live geometry measured zero leading/trailing inset, zero document
+  padding, and `--file-line-width: 100%` on the actual editor host.
+
+Stories remain `visual-pending`; no screenshot comparisons or baselines were
+updated.

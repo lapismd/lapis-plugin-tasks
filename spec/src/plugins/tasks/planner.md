@@ -103,6 +103,15 @@ the planner-column header. The label, icon, navigation count, rendered rows,
 and empty state all come from the same selected bucket rather than separate
 view-specific headers.
 
+Page-level controls belong in the owning planner-column header actions, before
+the far-right collapse control. Logbook uses the same compact shadcn actions
+menu appearance as Today, with mutually exclusive All, Completed, and Canceled
+status filters. The filter remains session-local and affects only Logbook rows.
+It does not render beside the planner body or remain on another destination.
+Standalone Planner Mode mounts put that menu in their own planner header.
+The Today calendar and occurrence-history section controls retain their
+existing content-specific placement.
+
 The leading navigation column has three durable presentation states. Expanded
 shows the complete named-view and List tree. Collapsed retains a narrow rail
 with an explicit expand action, the seven named-view icons, and a Lists action;
@@ -277,6 +286,11 @@ styling. Notes save on blur and flush before collapse or navigation. Guarded
 source mutations preserve concurrent title/metadata changes, reject concurrent
 body changes, and keep failed drafts visible for retry. Full-document Markdown
 editing remains available from the column header. See LN-TASK-068.
+
+Inline Notes set the public file-width and file-margin tokens on the actual
+Markdown editor host. Its body fills the compact row width, starts at the
+leading edge, and omits document gutters and centered readable-column padding.
+Full-document Markdown surfaces retain their normal layout.
 
 The body fragment uses external persistence and has no whole-file attachment.
 Tasks retains guarded repository saves rather than letting the editor write

@@ -47,7 +47,13 @@
           placeholder("Notes"),
           EditorView.theme({
             "&": { height: "auto" },
+            "&.markdown-editor-surface": {
+              "--file-line-width": "100%",
+              "--file-margins-x": "0px",
+              "--file-margins-y": "0px",
+            },
             "&.cm-focused": { outline: "none" },
+            ".cm-gutters": { display: "none" },
             "& > .cm-scroller": {
               overflow: "visible",
               scrollbarGutter: "auto",
@@ -158,9 +164,6 @@
     --mira-line-height: 1.45;
     --mira-editor-background: transparent;
     --mira-foreground: var(--kanban-muted);
-    --file-margins-x: 0px;
-    --file-margins-y: 0px;
-    --file-line-width: 100%;
     min-width: 0;
     width: 100%;
   }

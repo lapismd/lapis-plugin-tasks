@@ -57,6 +57,7 @@
   import TaskListNavTree from "./TaskListNavTree.svelte";
   import TaskMarkdownSurface from "../../task-list-markdown-surface/TaskListMarkdownSurface.svelte";
   import TaskTodayActionsMenu from "../task-planner/TaskTodayActionsMenu.svelte";
+  import TaskLogbookActionsMenu from "../task-planner/TaskLogbookActionsMenu.svelte";
   import type { TasksMarkdownSurfaceController } from "../../task-list-surface";
   import {
     appendDetailColumn,
@@ -341,6 +342,7 @@
     exit: () => Promise<boolean>;
   } | null>(null);
   let hideCompletedTasks = $state(false);
+  let logbookFilter = $state("all");
   let markAllIncompletePending = $state(false);
   let previousTaskArea: string | null | undefined;
   let relatedApplicationId = $state<string | null>(null);
@@ -1189,6 +1191,9 @@
             </ColumnCanvas.Title>
           </div>
           <ColumnCanvas.HeaderActions>
+            {#if taskView === "logbook" && !taskArea}
+              <TaskLogbookActionsMenu bind:value={logbookFilter} />
+            {/if}
             {#if taskArea && selectedListNode && app && repository}<TaskDocumentStructureActions
                 {app}
                 {repository}
@@ -1262,6 +1267,8 @@
               {historyRows}
               {applications}
               view={taskView}
+              bind:logbookFilter
+              showHeaderActions={false}
               area={taskArea}
               activeTaskId={plannerActiveTaskId}
               detailsPresentation="external"

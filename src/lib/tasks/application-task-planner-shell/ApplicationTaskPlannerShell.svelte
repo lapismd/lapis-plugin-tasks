@@ -44,6 +44,7 @@
     view = "today",
     area = null,
     taskRow,
+    headerActions,
     applicationSummaries = {},
     selectedTaskIds = [],
     draggedTaskIds = [],
@@ -77,6 +78,7 @@
     view?: TaskBucket;
     area?: string | null;
     taskRow?: Snippet<[Task, TaskPlannerRowContext]>;
+    headerActions?: Snippet;
     applicationSummaries?: Record<string, ApplicationSummary>;
     selectedTaskIds?: string[];
     draggedTaskIds?: string[];
@@ -142,6 +144,7 @@
     {view}
     {area}
     {taskRow}
+    {headerActions}
     {applicationSummaries}
     {selectedTaskIds}
     draggedTaskIds={draggedTaskIds}

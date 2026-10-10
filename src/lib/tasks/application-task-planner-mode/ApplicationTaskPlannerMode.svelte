@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as ToggleGroup from '@lapismd/design-core/shadcn/toggle-group';
+	import TaskLogbookActionsMenu from '../task-planner/TaskLogbookActionsMenu.svelte';
 	import { onDestroy, tick, type Snippet } from 'svelte';
 	import { move } from '@dnd-kit/helpers';
 	import type { DragDropEventHandlers } from '@dnd-kit/svelte';
@@ -69,6 +69,8 @@
 		selectedDate = $bindable(todayDateOnly(now ?? clock())),
 		applications = [],
 		view = 'today',
+		logbookFilter = $bindable('all'),
+		showHeaderActions = true,
 		area = null,
 		activeTaskId = null,
 		detailsPresentation = 'inline',
@@ -98,6 +100,8 @@
 		selectedDate?: string;
 		applications?: JobApplication[];
 		view?: TaskBucket;
+		logbookFilter?: string;
+		showHeaderActions?: boolean;
 		area?: string | null;
 		activeTaskId?: string | null;
 		/**
@@ -165,7 +169,6 @@
 	} | null>(null);
 	let closeAnimationTimer: ReturnType<typeof setTimeout> | null = null;
 
-	let logbookFilter = $state('all');
 	let actionError = $state<string | null>(null);
 	const displayTasks = $derived(
 		(pointerProjectedTasks ?? optimisticTasks ?? tasks).filter(
@@ -848,20 +851,9 @@
 {/snippet}
 
 {#if actionError}<p role="alert">{actionError}</p>{/if}
-{#if view === 'logbook'}
-	<ToggleGroup.Root
-		type="single"
-		value={logbookFilter}
-		onValueChange={(value) => {
-			if (value) logbookFilter = value;
-		}}
-		aria-label="Logbook status"
-	>
-		<ToggleGroup.Item value="all">All</ToggleGroup.Item><ToggleGroup.Item value="completed"
-			>Completed</ToggleGroup.Item
-		><ToggleGroup.Item value="canceled">Canceled</ToggleGroup.Item>
-	</ToggleGroup.Root>
-{/if}
+{#snippet plannerHeaderActions()}
+	<TaskLogbookActionsMenu bind:value={logbookFilter} />
+{/snippet}
 {#if reviewContent}
 	{@render reviewContent()}
 {/if}
@@ -877,6 +869,9 @@
 	{actualToday}
 	{view}
 	{area}
+	headerActions={showHeaderActions && view === 'logbook' && !area
+		? plannerHeaderActions
+		: undefined}
 	taskRow={asSnippet(plannerTaskRow)}
 	{applicationSummaries}
 	onCreateTask={createPlannerTask}

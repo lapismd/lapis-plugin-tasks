@@ -5,6 +5,7 @@
   import ApplicationTaskPlannerMode from "./ApplicationTaskPlannerMode.svelte";
   import ApplicationTaskPlannerModeStory from "./ApplicationTaskPlannerModeStory.svelte";
   import ApplicationTaskPlannerSortableStory from "./ApplicationTaskPlannerSortableStory.svelte";
+  import { catalogTasksFromPlannerFixtures } from "../../model/planner-fixtures";
   import { playTitleClickStartsInlineEdit } from "../planner-title-edit-selection.story-play";
 
   const { Story } = defineMeta({
@@ -24,6 +25,56 @@
     },
   });
 </script>
+
+<Story
+  name="Logbook header actions"
+  tags={["visual-pending", "test"]}
+  parameters={{
+    a11y: {
+      test: "error",
+      config: { rules: [{ id: "nested-interactive", enabled: false }] },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const actions = canvas.getByRole("button", { name: "Logbook actions" });
+    expect(actions.closest(".tasks-planner__header")).not.toBeNull();
+    expect(
+      canvasElement.querySelectorAll("[data-planner-sortable-row]"),
+    ).toHaveLength(3);
+    await userEvent.click(actions);
+    const screen = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      await screen.findByRole("menuitemradio", {
+        name: "Canceled",
+        exact: true,
+      }),
+    );
+    await waitFor(() =>
+      expect(
+        canvasElement.querySelectorAll("[data-planner-sortable-row]"),
+      ).toHaveLength(1),
+    );
+    expect(
+      canvas.getByRole("button", {
+        name: "Cancel the duplicate reminder",
+        exact: true,
+      }),
+    ).toBeVisible();
+  }}
+>
+  {#snippet template()}
+    <div class="task-story-shell-stage">
+      <div class="task-story-shell-stage__surface">
+        <ApplicationTaskPlannerMode
+          tasks={catalogTasksFromPlannerFixtures()}
+          now={new Date("2026-08-19T12:00:00")}
+          view="logbook"
+        />
+      </div>
+    </div>
+  {/snippet}
+</Story>
 
 <Story name="Today view" tags={["visual-pending", "skip-test", "!test"]} parameters={{ docs: { description: { story: "Planner mode showing the today board." } } }}>
   {#snippet template()}

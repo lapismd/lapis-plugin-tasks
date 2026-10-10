@@ -73,3 +73,12 @@ rendered formatting, and a body-only editable buffer in both agenda and List
 rows. It MUST finish a successful guarded flush before isolating a subsequent
 save failure, preserve the failed draft, and verify persistence on retry and
 reopening. Accessibility acceptance MUST include the expanded live editor.
+It MUST also verify edge-aligned, full-width body geometry in agenda and List
+inline editors without document padding.
+
+Planner action acceptance MUST visit all seven named destinations, keep page
+menus inside the owning Column Canvas header before its trailing collapse
+control, and prevent destination-specific actions from leaking to other pages.
+Logbook acceptance MUST exercise every status filter against both completed and
+canceled Tasks, verify the selected menu state, and cover standalone header
+composition.

@@ -1,0 +1,4 @@
+.tasks-logbook-actions__item[data-ui-component="dropdown-menu"] {
+  /* Reserve the standard shadcn radio-indicator space ahead of the label. */
+  padding-inline-start: 2rem;
+}

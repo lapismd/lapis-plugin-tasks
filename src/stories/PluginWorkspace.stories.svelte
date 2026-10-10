@@ -3098,6 +3098,108 @@
 />
 
 <Story
+  name="Runtime planner header actions"
+  args={{ displayMode: "desktop" }}
+  play={async ({ canvasElement }) => {
+    const canvas = await waitForReady(canvasElement);
+    const plannerColumn = canvasElement.querySelector<HTMLElement>(
+      '[data-column-id="planner"][data-ui-part="column"]',
+    )!;
+    const planner = within(plannerColumn);
+    for (const name of [
+      "Inbox",
+      "Today",
+      "Review",
+      "Upcoming",
+      "Anytime",
+      "Someday",
+      "Logbook",
+    ]) {
+      await userEvent.click(canvas.getByRole("button", { name, exact: true }));
+      await waitFor(() => expect(plannerColumn).toHaveAccessibleName(name));
+      const collapse = planner.getByRole("button", {
+        name: "Collapse planner column",
+        exact: true,
+      });
+      const actions = collapse.closest(
+        '[data-ui-part="column-header-actions"]',
+      );
+      expect(actions).not.toBeNull();
+      expect(actions!.lastElementChild).toContainElement(collapse);
+      if (name === "Today" || name === "Logbook") {
+        const menu = planner.getByRole("button", {
+          name: `${name} actions`,
+          exact: true,
+        });
+        expect(actions).toContainElement(menu);
+        expect(menu.getBoundingClientRect().right).toBeLessThanOrEqual(
+          collapse.getBoundingClientRect().left,
+        );
+      } else {
+        expect(
+          planner.queryByRole("button", { name: /^(Today|Logbook) actions$/ }),
+        ).toBeNull();
+      }
+      expect(
+        planner.queryByRole("group", { name: "Logbook status" }),
+      ).toBeNull();
+    }
+    const screen = within(canvasElement.ownerDocument.body);
+    const logbookActions = planner.getByRole("button", {
+      name: "Logbook actions",
+    });
+    const waitForMenuClosed = async () => {
+      await waitFor(() => {
+        expect(
+          screen.queryByRole("menu", { name: "Logbook actions" }),
+        ).toBeNull();
+        expect(getComputedStyle(logbookActions).pointerEvents).not.toBe("none");
+      });
+    };
+    // The vault fixture includes two completed Tasks and one canceled Task.
+    for (const [name, total] of [
+      ["Completed", 2],
+      ["Canceled", 1],
+      ["All", 3],
+    ] as const) {
+      await userEvent.click(
+        planner.getByRole("button", { name: "Logbook actions" }),
+      );
+      try {
+        const item = await screen.findByRole("menuitemradio", {
+          name,
+          exact: true,
+        });
+        await userEvent.click(item);
+        await waitFor(() =>
+          expect(
+            plannerColumn.querySelectorAll("[data-planner-sortable-row]"),
+          ).toHaveLength(total),
+        );
+        await waitForMenuClosed();
+        await userEvent.click(logbookActions);
+        const selectedItem = await screen.findByRole("menuitemradio", {
+          name,
+          exact: true,
+        });
+        expect(selectedItem).toHaveAttribute("aria-checked", "true");
+        const indicator = selectedItem.querySelector<HTMLElement>(
+          '[data-ui-part="dropdown-menu-radio-item-indicator"]',
+        )!;
+        const label = within(selectedItem).getByText(name, { exact: true });
+        expect(indicator.getBoundingClientRect().right).toBeLessThanOrEqual(
+          label.getBoundingClientRect().left,
+        );
+      } finally {
+        // Close portal chrome even if an assertion fails, before the next story.
+        await userEvent.keyboard("{Escape}");
+        await waitForMenuClosed();
+      }
+    }
+  }}
+/>
+
+<Story
   name="Runtime inline notes and order"
   args={{ displayMode: "desktop" }}
   parameters={{
@@ -3117,6 +3219,30 @@
     const original = await app.vault.read(file);
     const notesValue = (element: HTMLElement) =>
       EditorView.findFromDOM(element)!.state.doc.toString();
+    const expectInlineAlignment = (element: HTMLElement) => {
+      const host = element.closest<HTMLElement>(".cm-editor")!;
+      const scroller = host.querySelector<HTMLElement>(".cm-scroller")!;
+      const style = getComputedStyle(scroller);
+      expect(style.paddingLeft).toBe("0px");
+      expect(style.paddingRight).toBe("0px");
+      expect(style.paddingTop).toBe("0px");
+      expect(style.paddingBottom).toBe("0px");
+      expect(
+        getComputedStyle(host).getPropertyValue("--file-line-width").trim(),
+      ).toBe("100%");
+      expect(
+        Math.abs(
+          element.getBoundingClientRect().left -
+            host.getBoundingClientRect().left,
+        ),
+      ).toBeLessThanOrEqual(1);
+      expect(
+        Math.abs(
+          element.getBoundingClientRect().right -
+            host.getBoundingClientRect().right,
+        ),
+      ).toBeLessThanOrEqual(1);
+    };
     const appendNotes = async (element: HTMLElement, text: string) => {
       await userEvent.click(element);
       const view = EditorView.findFromDOM(element)!;
@@ -3133,6 +3259,7 @@
       name: "Task notes",
     })) as HTMLElement;
     await waitFor(() => expect(editor).toBeVisible());
+    expectInlineAlignment(editor);
     expect(editor).toHaveAttribute("contenteditable", "true");
     expect(editor.closest(".cm-editor")).toHaveClass(
       "markdown-live-preview-mode",
@@ -3277,6 +3404,7 @@
       name: "Task notes",
     })) as HTMLElement;
     await waitFor(() => expect(reopened).toBeVisible());
+    expectInlineAlignment(reopened);
     expect(notesValue(reopened)).toContain("**Formatted inline note.**");
     expect(
       within(listRow).queryByRole("button", { name: "Expand properties" }),

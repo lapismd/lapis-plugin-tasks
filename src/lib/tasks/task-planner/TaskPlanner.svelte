@@ -93,6 +93,7 @@
     view = "today",
     area = null,
     taskRow,
+    headerActions,
     applicationSummaries = {},
     onOpenApplication = () => {},
     selectedTaskIds = [],
@@ -111,6 +112,7 @@
     view?: PlannerView;
     area?: string | null;
     taskRow?: Snippet<[Task, TaskPlannerRowContext]>;
+    headerActions?: Snippet;
     applicationSummaries?: Record<string, ApplicationSummary>;
     onOpenApplication?: (applicationId: string) => void | Promise<void>;
     selectedTaskIds?: string[];
@@ -890,6 +892,7 @@
           </h1>
         </div>
         <span class="tasks-planner__count">{headingCount}</span>
+        {@render headerActions?.()}
       </header>
     {/if}
 
