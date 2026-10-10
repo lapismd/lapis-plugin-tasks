@@ -51,3 +51,8 @@ original unbatched diagnostic lane.
 The preview MUST inherit sans and monospace families from Design Core's public
 stylesheet, matching the main Lapis hosts. The real Tasks settings acceptance
 MUST verify DM Sans plus the shared compact heading tokens (16px, weight 400).
+
+The temporary batch runner MUST apply its one-worker bound and disabled file
+parallelism to the nested Storybook project through a batch-only configuration.
+It MUST reuse the package's existing Vite/Storybook setup and leave the normal
+unbatched configuration available for diagnosis.

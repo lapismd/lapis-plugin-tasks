@@ -1419,8 +1419,21 @@
     expect(surface!.querySelector(".cm-content")).toHaveFocus();
     expect(notesLine).toHaveClass("cm-header-2");
     expect(notesLine).not.toHaveAttribute("data-task-group-heading");
+    // Returning from the document end must materialize the task run again in
+    // short canvases, where CodeMirror has virtualized it out of the DOM.
+    await fireEvent.keyDown(
+      surface!.querySelector<HTMLElement>(".cm-content")!,
+      {
+        key: "Home",
+        metaKey: /Mac/.test(navigator.platform),
+        ctrlKey: !/Mac/.test(navigator.platform),
+      },
+    );
     await userEvent.click(
-      canvas.getByRole("button", { name: "Edit task run source", exact: true }),
+      await canvas.findByRole("button", {
+        name: "Edit task run source",
+        exact: true,
+      }),
     );
     await waitFor(() => {
       expect(

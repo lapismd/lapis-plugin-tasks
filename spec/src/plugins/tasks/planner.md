@@ -260,3 +260,8 @@ recurrence](./documents/recurrence.md).
 Canonical planner types use the Markdown-first schema. CV-only
 `applicationId`, `linkedTo`, and `JobApplication` shapes stay in catalog
 fixtures and must not become document types. See LN-TASK-011.
+
+Real workspace acceptance MUST materialize each virtualized editor target through
+native document navigation before querying or activating it. After verifying the
+Notes heading at the document end, the story MUST return to the document start
+before activating the task run's source control, including in short canvases.

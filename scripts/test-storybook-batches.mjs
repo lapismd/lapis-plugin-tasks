@@ -15,6 +15,8 @@ for (let batch = 1; batch <= batches; batch += 1) {
     [
       cli,
       "run",
+      "--config",
+      "scripts/vitest-storybook-batches.config.mjs",
       "--project",
       "storybook",
       "--maxWorkers=1",
