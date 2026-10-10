@@ -61,3 +61,9 @@ Runtime-gap acceptance records exact before/after regression counts, exercises
 the repository-backed Shell, and runs the complete interaction/axe suite through
 the documented fresh-process batches. Temporary local package snapshots retain
 registry ranges in publishable manifests; visual review remains pending.
+
+Shell comment acceptance MUST verify the public Design Core chat transcript and
+composer composition, stored timestamps, accessible comment actions, keyboard
+posting, failed-post draft restoration, and Accordion disclosure/icon state
+with draft retention through collapse. It MUST continue to exercise the
+existing edit-failure retry, resolution, reopen, and deletion boundaries.

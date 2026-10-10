@@ -2911,6 +2911,34 @@
       );
     };
     let detail = await open();
+    const commentsToggle = detail.getByRole("button", {
+      name: "Comments",
+      exact: true,
+    });
+    expect(commentsToggle).toHaveAttribute("data-ui-part", "accordion-trigger");
+    expect(commentsToggle.parentElement).toHaveAttribute("aria-level", "2");
+    expect(commentsToggle).toHaveAttribute("aria-expanded", "true");
+    expect(
+      commentsToggle.querySelector('[data-ui-part="accordion-expanded-icon"]'),
+    ).toBeVisible();
+    await userEvent.type(
+      detail.getByRole("combobox", { name: "Local comment" }),
+      "Draft retained through collapse.",
+    );
+    await userEvent.click(commentsToggle);
+    expect(commentsToggle).toHaveAttribute("aria-expanded", "false");
+    expect(
+      commentsToggle.querySelector('[data-ui-part="accordion-collapsed-icon"]'),
+    ).toBeVisible();
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() =>
+      expect(
+        detail.getByRole("combobox", { name: "Local comment" }),
+      ).toHaveTextContent("Draft retained through collapse."),
+    );
+    await userEvent.clear(
+      detail.getByRole("combobox", { name: "Local comment" }),
+    );
     await userEvent.click(
       detail.getByRole("button", { name: "Task priority" }),
     );
@@ -2922,16 +2950,68 @@
         (await plugin.repository.getTaskDocument(path)).task.priority,
       ).toBe("high"),
     );
+    const commentComposer = canvasElement.querySelector(
+      '[data-task-sidebar-detail] [data-ui-component="ai-chat-composer"]',
+    );
+    expect(commentComposer).toBeVisible();
+    expect(detail.getByRole("button", { name: "Send message" })).toBeDisabled();
     await userEvent.type(
-      detail.getByRole("textbox", { name: "Local comment" }),
+      detail.getByRole("combobox", { name: "Local comment" }),
       "Keep the interview examples concise.",
     );
-    await userEvent.click(detail.getByRole("button", { name: "Post comment" }));
+    const failedPost = spyOn(app.vault, "process").mockRejectedValueOnce(
+      new Error("Comment post unavailable"),
+    );
+    try {
+      await userEvent.click(
+        detail.getByRole("button", { name: "Send message" }),
+      );
+      await waitFor(() =>
+        expect(detail.getByRole("alert")).toHaveTextContent(
+          "Comment post unavailable",
+        ),
+      );
+      expect(
+        detail.getByRole("combobox", { name: "Local comment" }),
+      ).toHaveTextContent("Keep the interview examples concise.");
+      expect(
+        (await plugin.repository.getTaskDocument(path)).task.comments,
+      ).toEqual([]);
+    } finally {
+      failedPost.mockRestore();
+    }
+    await userEvent.click(
+      detail.getByRole("combobox", { name: "Local comment" }),
+    );
+    await userEvent.keyboard("{Enter}");
     await waitFor(async () =>
       expect(
         (await plugin.repository.getTaskDocument(path)).task.comments[0]?.text,
       ).toBe("Keep the interview examples concise."),
     );
+    const comment = await detail.findByRole("article", {
+      name: "Local comment",
+    });
+    expect(comment).toHaveAttribute("data-ui-component", "ai-chat-message");
+    expect(
+      comment.closest('[data-ui-component="ai-chat-message-list"]'),
+    ).not.toBeNull();
+    expect(
+      comment.querySelector(
+        '[data-ui-component="ai-chat-message-bubble"][data-sender="user"]',
+      ),
+    ).toHaveTextContent("Keep the interview examples concise.");
+    expect(
+      comment.querySelector(
+        '[data-ui-component="ai-chat-message-metadata"] time',
+      ),
+    ).toHaveAttribute(
+      "datetime",
+      (await plugin.repository.getTaskDocument(path)).task.comments[0].at,
+    );
+    expect(
+      detail.getByRole("combobox", { name: "Local comment" }),
+    ).toBeEmptyDOMElement();
     await userEvent.click(
       detail.getByRole("button", { name: "Resolve comment" }),
     );
@@ -2948,6 +3028,7 @@
     expect(
       detail.getByText("Keep the interview examples concise."),
     ).toBeVisible();
+    expect(detail.getByText("Resolved", { exact: true })).toBeVisible();
     expect(
       detail
         .getByRole("button", { name: "Document structure actions" })
@@ -3288,7 +3369,21 @@
       return element;
     });
     const detail = within(detailElement);
-    await userEvent.click(await detail.findByText("History", { exact: true }));
+    const historyToggle = await detail.findByRole("button", {
+      name: "History",
+      exact: true,
+    });
+    expect(historyToggle).toHaveAttribute("data-ui-part", "accordion-trigger");
+    expect(historyToggle.parentElement).toHaveAttribute("aria-level", "2");
+    expect(historyToggle).toHaveAttribute("aria-expanded", "false");
+    expect(
+      historyToggle.querySelector('[data-ui-part="accordion-collapsed-icon"]'),
+    ).toBeVisible();
+    await userEvent.click(historyToggle);
+    expect(historyToggle).toHaveAttribute("aria-expanded", "true");
+    expect(
+      historyToggle.querySelector('[data-ui-part="accordion-expanded-icon"]'),
+    ).toBeVisible();
     expect(detail.getByText("Statistics for the last 30 days")).toBeVisible();
     await userEvent.click(detail.getByRole("radio", { name: "7 days" }));
     expect(detail.getByText("Statistics for the last 7 days")).toBeVisible();

@@ -285,3 +285,21 @@ Canceled filters.
 The standalone Column Canvas catalog fixture has no vault-backed List mutation
 callbacks. It omits those actions and verifies selection, popover navigation,
 and task editing. Vault-backed List actions are exercised in the real App shell.
+
+Task comments use Design Core `MessageList`, `Message`, `MessageBubble`,
+`MessageMetadata`, `TokenizedText`, and `Composer` from the public
+`@lapismd/design-core/ai/chat` entry point, matching Lapis AI's transcript
+composition. Local comments use user-message alignment and shared bubble and
+composer tokens. Timestamps retain their authored `datetime`; edited/resolved
+state and compact accessible action controls appear in the message metadata.
+Posting by the Send control or Enter persists through the existing guarded
+repository lifecycle. A failed post restores the draft for retry; editing,
+resolution, reopening, and deletion keep their existing semantics. See
+LN-TASK-061.
+
+Comments and History use the public Design Core shadcn Accordion family with
+its leading right/down disclosure chevrons. Comments start open and History
+starts closed; both sections can be open independently. The shared trigger owns
+keyboard handling, `aria-expanded`, focus treatment, and icon state. Collapsing
+and reopening Comments retains an unsent draft. These section headings use
+level two beneath the Task title.

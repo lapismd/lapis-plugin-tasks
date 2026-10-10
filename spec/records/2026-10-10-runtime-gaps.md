@@ -9,8 +9,8 @@ original review and accepted runner mitigation remain in
 Task priority and local comments persist in canonical Task Markdown. Details
 support comment editing, deletion and resolution, Duplicate, Copy link, browser
 Print, direct-child bulk reopen, preview hiding, explicit recurrence skip, and
-tracked History with 7/30/90-day statistics. Unsubscribe and the fabricated chat
-composer are omitted. Seven navigation destinations remain; Logbook adds outcome
+tracked History with 7/30/90-day statistics. Unsubscribe and unsupported chat
+services are omitted. Seven navigation destinations remain; Logbook adds outcome
 filters.
 
 Following review feedback, double-click immediately opens the existing compact
@@ -109,3 +109,71 @@ commit. Generated Deno lockfile churn was restored. Registry publication, native
 Print, and native packaged interactive qualification were not performed. The
 existing five-plugin profile's browser/packaged qualification remains explicitly
 pending in Lapis Notes verification.
+
+## Design Core comment presentation follow-up
+
+Task comments now compose the same public Design Core chat primitives used by
+Lapis AI: `MessageList`, user `Message`/`MessageBubble`, `TokenizedText`,
+`MessageMetadata`, and `Composer`/`ComposerInput`. Shared tokens own bubble
+colours, spacing, typography, and composer styling. Stored timestamps,
+edited/resolved state, and compact labelled edit/resolve/reopen/delete controls
+remain visible. Comment persistence and mutation guards stay in Tasks. No
+Design Core or AI implementation was changed.
+
+The exact `RuntimeDetailActions` command shown below reported one failure before
+the change because the custom comment form had no shared chat composer. It now
+passes, checking transcript composition, timestamp source, Enter-to-post,
+failed-post draft restoration, resolution, reopening the detail, editing,
+failed-edit retry, and deletion.
+
+```sh
+pnpm exec vitest run --config scripts/vitest-storybook-batches.config.mjs \
+  --project storybook src/stories/PluginWorkspace.stories.svelte \
+  -t RuntimeDetailActions
+```
+
+Comments and History now use the public Design Core shadcn Accordion controls
+with leading right/down chevrons. Comments start open, History starts closed,
+and the sections can open independently. Unsent drafts survive collapse and
+keyboard reopening.
+
+The exact disclosure regression command was:
+
+```sh
+pnpm exec vitest run --config scripts/vitest-storybook-batches.config.mjs \
+  --project storybook src/stories/PluginWorkspace.stories.svelte \
+  -t 'RuntimeDetailActions|RuntimeHistoryAndSkip'
+```
+
+Both stories failed against the native summaries, which did not expose the
+shared button/icon contract. The initial Accordion integration passed its
+interactions but produced two axe heading-order failures: its default level
+three skipped a level below the Task title. Setting the public trigger's
+`level` to two repaired both. The exact target now passes two stories with zero
+functional or axe failures, including keyboard reopening and draft retention.
+
+The first specification gate also reported one missing governance chapter
+update. The canonical Shell comment acceptance scope was added alongside
+LN-TASK-061, and the exact gate then passed. Final package, full batched
+interaction/accessibility, static-build, specification, and cold review checks
+passed against the final Accordion source:
+
+- `pnpm check`: zero Svelte errors or warnings; type, specification, App
+  ownership, and native-CSS audits passed.
+- `pnpm test`: 201 tests passed in 37 files.
+- `pnpm build` and `pnpm publint`: passed with the refreshed public `dist`
+  exports.
+- `node scripts/test-storybook-batches.mjs`: all 56 stories passed
+  (13 + 8 + 35), across 19 files; four existing metadata-only files remained
+  skipped. Zero functional or enabled axe failures.
+- `pnpm build-storybook`: passed; production preview built in 3 minutes
+  36 seconds.
+- Final `pnpm spec:check` and documentation formatter check: passed.
+- Fresh Storybook on port 7030 completed the Desktop Workspace play. Live
+  review posted, resolved, and deleted local demo comments, checked collapsed
+  and expanded shared chevrons, and reopened Comments using Enter. The shared
+  bubble, stored timestamp, resolved state, labelled actions, and composer were
+  reviewed together.
+
+Stories remain `visual-pending`; no screenshot comparisons or baselines were
+updated.
