@@ -10,26 +10,26 @@ const internationalizedDate = path.resolve(
   packageDir,
   "node_modules/@internationalized/date",
 );
-const bitsUi = path.resolve(packageDir, "node_modules/bits-ui");
 
 const linkedSingletonPackages = [
   "svelte",
   "@lapis-notes/api",
   "@internationalized/date",
-  "bits-ui",
 ] as const;
 
 export default defineConfig({
   resolve: {
     alias: {
       "@internationalized/date": internationalizedDate,
-      "bits-ui": bitsUi,
     },
     dedupe: [...linkedSingletonPackages],
   },
   optimizeDeps: {
     include: [
       "aria-query",
+      "bits-ui",
+      "@lapismd/design-core > bits-ui",
+      "@internationalized/date",
       "react",
       "react-dom",
       "react-dom/client",
@@ -55,14 +55,17 @@ export default defineConfig({
           alias: {
             $lib: path.resolve(packageDir, "src/lib"),
             "@internationalized/date": internationalizedDate,
-            "bits-ui": bitsUi,
           },
           dedupe: [...linkedSingletonPackages],
         },
         test: {
           name: "unit",
           environment: "node",
-          include: ["src/**/*.test.ts", "src/**/*.spec.ts", "scripts/**/*.test.mjs"],
+          include: [
+            "src/**/*.test.ts",
+            "src/**/*.spec.ts",
+            "scripts/**/*.test.mjs",
+          ],
         },
       },
       {
@@ -82,7 +85,9 @@ export default defineConfig({
             enabled: true,
             headless: true,
             provider: playwright({}),
-            instances: [{ browser: "chromium", viewport: { width: 1280, height: 800 } }],
+            instances: [
+              { browser: "chromium", viewport: { width: 1280, height: 800 } },
+            ],
           },
         },
       },

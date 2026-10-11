@@ -10,10 +10,7 @@ describe("local package pnpm hook", () => {
   it("uses available local package artifacts without changing peer ranges", () => {
     const root = "/workspace/lapis-plugin-tasks";
     const available = new Set([
-      path.resolve(
-        root,
-        "../design-core",
-      ),
+      path.resolve(root, "../lapis-notes/packages/api"),
     ]);
     const manifest = {
       dependencies: {
@@ -30,11 +27,11 @@ describe("local package pnpm hook", () => {
       fileExists: (candidate) => available.has(candidate),
     }).hooks.readPackage(manifest);
 
+    assert.equal(result.dependencies["@lapismd/design-core"], "^0.1.0");
     assert.equal(
-      result.dependencies["@lapismd/design-core"],
+      result.dependencies["@lapis-notes/api"],
       `file:${[...available][0]}`,
     );
-    assert.equal(result.dependencies["@lapis-notes/api"], "^0.1.0");
     assert.equal(result.peerDependencies["@lapismd/design-core"], "^0.1.0");
   });
 
@@ -53,4 +50,36 @@ describe("local package pnpm hook", () => {
 
     assert.deepEqual(result, manifest);
   });
+});
+
+it("keeps published foundations on npm when sibling checkouts exist", () => {
+  const root = "/workspace/lapis-plugin-tasks";
+  const ranges = {
+    "@lapismd/design-core": "^0.3.1",
+    "@lapismd/mira": "~0.0.3",
+    "@lapismd/spec-validator": "^0.1.4",
+  };
+  const manifest = {
+    dependencies: { ...ranges, "@lapis-notes/api": "^0.1.0" },
+    devDependencies: { ...ranges },
+    optionalDependencies: { ...ranges },
+    peerDependencies: { ...ranges },
+  };
+  const result = createHooks({
+    root,
+    fileExists: () => true,
+  }).hooks.readPackage(manifest);
+  for (const field of [
+    "dependencies",
+    "devDependencies",
+    "optionalDependencies",
+    "peerDependencies",
+  ]) {
+    for (const [name, range] of Object.entries(ranges))
+      assert.equal(result[field][name], range);
+  }
+  assert.equal(
+    result.dependencies["@lapis-notes/api"],
+    `file:${path.resolve(root, "../lapis-notes/packages/api")}`,
+  );
 });

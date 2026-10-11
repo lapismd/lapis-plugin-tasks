@@ -347,3 +347,8 @@ starts closed; both sections can be open independently. The shared trigger owns
 keyboard handling, `aria-expanded`, focus treatment, and icon state. Collapsing
 and reopening Comments retains an unsent draft. These section headings use
 level two beneath the Task title.
+
+Navigation acceptance scopes the collapsed Today count to its visible tooltip.
+The same number may remain in the open planner, so the story MUST verify the
+label and count inside the visible public tooltip content rather than use a document-wide
+number query.

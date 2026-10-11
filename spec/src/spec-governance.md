@@ -1,5 +1,9 @@
 # Specification Governance
 
+Dependency acceptance now uses published Design Core `0.3.1` and Mira `0.0.3` through portable npm ranges. Source ownership and public contracts remain
+unchanged; local overrides for these released packages are retired.
+Shared specification tooling resolves `@lapismd/spec-validator@0.1.4` from npm.
+
 ## Requirements
 
 | ID           | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
@@ -102,3 +106,16 @@ Alternate-path and absent-document scenarios MUST seed their navigation
 documents before metadata indexing in fresh Apps, preserving the default shared
 workspace fixture. Changes to this boot fixture MUST run the complete Shell
 interaction/accessibility suite, along with affected catalog stories.
+
+Published Design Core resolves its own declared Bits UI range. Consumer
+Storybook and test configuration MUST NOT force its internal components onto
+the older consumer Bits UI installation; both declared versions are
+pre-optimized for cold browser acceptance.
+
+Cold browser acceptance pre-optimizes the shared `@internationalized/date`
+entry point alongside both Bits UI installations, preserving calendar value
+identity across consumer and Design Core surfaces.
+
+The local package hook retains development host snapshots and has no Design
+Core source mapping. Its mixed-manifest regression verifies that all requested
+foundations retain npm ranges even when sibling checkouts exist.

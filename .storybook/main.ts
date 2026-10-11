@@ -56,7 +56,6 @@ const linkedSingletonPackages = [
   "@lezer/markdown",
   "@lezer/lr",
   "@internationalized/date",
-  "bits-ui",
 ] as const;
 
 const config: StorybookConfig = {
@@ -100,11 +99,10 @@ const config: StorybookConfig = {
           },
           {
             find: "@internationalized/date",
-            replacement: path.join(repoRoot, "node_modules/@internationalized/date"),
-          },
-          {
-            find: "bits-ui",
-            replacement: path.join(repoRoot, "node_modules/bits-ui"),
+            replacement: path.join(
+              repoRoot,
+              "node_modules/@internationalized/date",
+            ),
           },
         ],
       },
@@ -115,6 +113,9 @@ const config: StorybookConfig = {
         esbuildOptions: { target: "esnext" },
         include: [
           "aria-query",
+          "bits-ui",
+          "@lapismd/design-core > bits-ui",
+          "@internationalized/date",
           "storybook > @testing-library/dom",
           "react",
           "react-dom",

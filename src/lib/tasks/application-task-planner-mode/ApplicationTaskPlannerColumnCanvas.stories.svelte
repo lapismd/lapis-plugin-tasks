@@ -978,7 +978,6 @@
   }}
   play={async (context) => {
     const canvas = within(context.canvasElement);
-    const tooltipCanvas = within(document.body);
     const ownerDocument = context.canvasElement.ownerDocument;
     function portalElement<T extends Element>(selector: string): T | null {
       return (
@@ -1046,7 +1045,14 @@
     await waitFor(() =>
       expect(todayButton).toHaveAttribute("data-state", "instant-open"),
     );
-    const todayCountChip = await tooltipCanvas.findByText("8");
+    let todayTooltip: HTMLElement | null = null;
+    await waitFor(() => {
+      todayTooltip = portalElement<HTMLElement>(
+        '[data-ui-part="tooltip-content"]',
+      );
+      expect(todayTooltip).toBeVisible();
+    });
+    const todayCountChip = within(todayTooltip!).getByText("8");
     expect(todayCountChip).toHaveClass(
       "task-column-canvas-story__collapsed-tooltip-count",
     );

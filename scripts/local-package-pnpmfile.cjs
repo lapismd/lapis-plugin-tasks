@@ -26,10 +26,6 @@ const localPackages = new Map([
     "@lapis-notes/workspace",
     { protocol: "file:", path: "../lapis-notes/packages/workspace" },
   ],
-  [
-    "@lapismd/design-core",
-    { protocol: "file:", path: "../design-core" },
-  ],
 ]);
 
 function createHooks({
