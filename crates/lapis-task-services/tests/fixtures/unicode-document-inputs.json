@@ -1,0 +1,92 @@
+[
+  {
+    "name": "JSON quoted NEL",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"ab\", \"task\": {\"status\": \"open\", \"custom\": \"ab\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"ab\"}]}}\n---\n\n# Metadata\n",
+    "path": "tasks/Metadata.md"
+  },
+  {
+    "name": "YAML quoted NEL after retained serialization",
+    "raw": "---\nextra: \"ab\"\ntask:\n  custom: \"ab\"\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: \"ab\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+    "path": "tasks/Metadata.md"
+  },
+  {
+    "name": "NEL / double",
+    "path": "tasks/Unicode.md",
+    "raw": "---\ntype: task\nid: unicode\ntask:\n  comments:\n    - id: unicode\n      at: explicit\n      text: \"beforeafter\"\n---\n\n# Unicode\n"
+  },
+  {
+    "name": "NEL / single",
+    "path": "tasks/Unicode.md",
+    "raw": "---\ntype: task\nid: unicode\ntask:\n  comments:\n    - id: unicode\n      at: explicit\n      text: 'beforeafter'\n---\n\n# Unicode\n"
+  },
+  {
+    "name": "NEL / plain",
+    "path": "tasks/Unicode.md",
+    "raw": "---\ntype: task\nid: unicode\ntask:\n  comments:\n    - id: unicode\n      at: explicit\n      text: beforeafter\n---\n\n# Unicode\n"
+  },
+  {
+    "name": "NEL / literal",
+    "path": "tasks/Unicode.md",
+    "raw": "---\ntype: task\nid: unicode\ntask:\n  comments:\n    - id: unicode\n      at: explicit\n      text: |\n      beforeafter\n---\n\n# Unicode\n"
+  },
+  {
+    "name": "line separator / double",
+    "path": "tasks/Unicode.md",
+    "raw": "---\ntype: task\nid: unicode\ntask:\n  comments:\n    - id: unicode\n      at: explicit\n      text: \"before after\"\n---\n\n# Unicode\n"
+  },
+  {
+    "name": "line separator / single",
+    "path": "tasks/Unicode.md",
+    "raw": "---\ntype: task\nid: unicode\ntask:\n  comments:\n    - id: unicode\n      at: explicit\n      text: 'before after'\n---\n\n# Unicode\n"
+  },
+  {
+    "name": "line separator / plain",
+    "path": "tasks/Unicode.md",
+    "raw": "---\ntype: task\nid: unicode\ntask:\n  comments:\n    - id: unicode\n      at: explicit\n      text: before after\n---\n\n# Unicode\n"
+  },
+  {
+    "name": "line separator / literal",
+    "path": "tasks/Unicode.md",
+    "raw": "---\ntype: task\nid: unicode\ntask:\n  comments:\n    - id: unicode\n      at: explicit\n      text: |\n      before after\n---\n\n# Unicode\n"
+  },
+  {
+    "name": "paragraph separator / double",
+    "path": "tasks/Unicode.md",
+    "raw": "---\ntype: task\nid: unicode\ntask:\n  comments:\n    - id: unicode\n      at: explicit\n      text: \"before after\"\n---\n\n# Unicode\n"
+  },
+  {
+    "name": "paragraph separator / single",
+    "path": "tasks/Unicode.md",
+    "raw": "---\ntype: task\nid: unicode\ntask:\n  comments:\n    - id: unicode\n      at: explicit\n      text: 'before after'\n---\n\n# Unicode\n"
+  },
+  {
+    "name": "paragraph separator / plain",
+    "path": "tasks/Unicode.md",
+    "raw": "---\ntype: task\nid: unicode\ntask:\n  comments:\n    - id: unicode\n      at: explicit\n      text: before after\n---\n\n# Unicode\n"
+  },
+  {
+    "name": "paragraph separator / literal",
+    "path": "tasks/Unicode.md",
+    "raw": "---\ntype: task\nid: unicode\ntask:\n  comments:\n    - id: unicode\n      at: explicit\n      text: |\n      before after\n---\n\n# Unicode\n"
+  },
+  {
+    "name": "yes-no",
+    "path": "tasks/Extra.md",
+    "raw": "---\ntype: task\nid: extra\nyes: yes\nno: no\non: on\noff: off\n---\n\n# Extra\n"
+  },
+  {
+    "name": "numeric",
+    "path": "tasks/Extra.md",
+    "raw": "---\ntype: task\nid: extra\nnumeric: 1e3\nnan: .nan\ninf: .inf\n---\n\n# Extra\n"
+  },
+  {
+    "name": "alias",
+    "path": "tasks/Extra.md",
+    "raw": "---\ntype: task\nid: extra\nvalue: &value keep\nalias: *value\n---\n\n# Extra\n"
+  },
+  {
+    "name": "duplicate",
+    "path": "tasks/Extra.md",
+    "raw": "---\ntype: task\nid: extra\nid: duplicate\n---\n\n# Extra\n"
+  }
+]

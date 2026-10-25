@@ -8,6 +8,20 @@ does not replace the source document.
 
 See LN-TASK-014–017 and LN-TASK-034–042.
 
+## Native YAML scalar fidelity
+
+| ID | Requirement |
+| --- | --- |
+| LN-TASK-090 | The native Task metadata reader MUST preserve the retained YAML 1.2/JSON scalar values, including U+0085, U+2028 and U+2029 inside authored quoted, plain and block values. It MUST retain aliases, reject duplicate keys, preserve mapping order, and treat legacy YAML 1.1 boolean spellings and merge keys according to the retained YAML 1.2 parser. Reader repairs MUST retain the existing complete read-only corpora and record source acceptance separately from application adoption. |
+
+The native reader uses pinned `saphyr` values and a private source-owned
+conversion to ordered metadata. YAML 1.1 boolean inference and merge expansion
+are absent. No include, interpolation, filesystem or application capability is
+enabled. This source prerequisite
+corrects the old libyaml normalization of authored Unicode into spaces before
+new transformation code is adopted. Original failure outputs and the complete
+unchanged-TypeScript Unicode oracle are retained in the source record.
+
 ## Document kinds
 
 ### Task

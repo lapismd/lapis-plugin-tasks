@@ -1,0 +1,94 @@
+{
+  "run": "lapis-task-mutations-6a004113-0bb6-4dfb-89f3-e17c14c0754d",
+  "revision": "2d1c993c5770f70c05e8ac3753acff0e26d172a5",
+  "cases": 21,
+  "failedCases": 2,
+  "exactDifferences": [
+    {
+      "actual": {
+        "body": "\n# Scalar\n",
+        "checklist": [],
+        "diagnostics": [],
+        "id": "scalar",
+        "kind": "task",
+        "path": "tasks/Scalar.md",
+        "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: tRuE\n---\n\n# Scalar\n",
+        "structuralLinks": [],
+        "tags": [],
+        "task": {
+          "comments": [],
+          "inbox": true,
+          "start": {
+            "kind": "anytime"
+          },
+          "status": "open"
+        },
+        "title": "Scalar"
+      },
+      "expected": {
+        "body": "\n# Scalar\n",
+        "checklist": [],
+        "diagnostics": [],
+        "id": "scalar",
+        "kind": "task",
+        "path": "tasks/Scalar.md",
+        "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: tRuE\n---\n\n# Scalar\n",
+        "structuralLinks": [],
+        "tags": [],
+        "task": {
+          "comments": [],
+          "inbox": false,
+          "start": {
+            "kind": "anytime"
+          },
+          "status": "open"
+        },
+        "title": "Scalar"
+      },
+      "name": "inbox scalar tRuE"
+    },
+    {
+      "actual": {
+        "body": "\n# Scalar\n",
+        "checklist": [],
+        "diagnostics": [],
+        "id": "scalar",
+        "kind": "task",
+        "path": "tasks/Scalar.md",
+        "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: TrUe\n---\n\n# Scalar\n",
+        "structuralLinks": [],
+        "tags": [],
+        "task": {
+          "comments": [],
+          "inbox": true,
+          "start": {
+            "kind": "anytime"
+          },
+          "status": "open"
+        },
+        "title": "Scalar"
+      },
+      "expected": {
+        "body": "\n# Scalar\n",
+        "checklist": [],
+        "diagnostics": [],
+        "id": "scalar",
+        "kind": "task",
+        "path": "tasks/Scalar.md",
+        "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: TrUe\n---\n\n# Scalar\n",
+        "structuralLinks": [],
+        "tags": [],
+        "task": {
+          "comments": [],
+          "inbox": false,
+          "start": {
+            "kind": "anytime"
+          },
+          "status": "open"
+        },
+        "title": "Scalar"
+      },
+      "name": "inbox scalar TrUe"
+    }
+  ]
+}

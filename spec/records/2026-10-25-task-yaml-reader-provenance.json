@@ -1,0 +1,124 @@
+{
+  "status": "Source qualified; consumer adoption separate",
+  "updatedAt": "2026-10-25T23:24:00Z",
+  "baseline": "fcb2a8b514d68464034173e2aed886133d2a2e99",
+  "reader": {
+    "name": "saphyr",
+    "version": "0.3.0",
+    "defaultFeatures": false
+  },
+  "captures": {
+    "unicode": "397d2002-d6e6-49e7-86c9-00ad87fa7793",
+    "coreScalars": "877a6122-06c4-4ae6-ab62-6a8e697fa2a9"
+  },
+  "before": {
+    "originalUnicodeFailures": 7,
+    "discardedCandidateScalarFailures": 2
+  },
+  "qualification": {
+    "run": "lapis-task-mutations-65bb5f88-a3f4-4253-84bc-ef1d948ebbbc",
+    "revision": "13f8a63398bfbfc2dd58ca6d7a421ed8de8d3f6d",
+    "exactSnapshots": 114,
+    "retainedTypeScriptCases": 39,
+    "nativeTests": 16,
+    "unitTests": 1074,
+    "catalogCases": 62,
+    "failures": 0,
+    "resources": {
+      "slot": 3,
+      "cpus": 4,
+      "memoryGiB": 12,
+      "shmGiB": 2
+    },
+    "image": "sha256:32c745d2c3bd24816b49548c72888ce5b4a09f5cdbb6bb03eeeba06fd750bfe3"
+  },
+  "sha256": {
+    "crates/lapis-task-services/tests/fixtures/documents.json": "6b76ac09053be6e367efc816fb2222f989904a8347ce98d0f5fdd156e42af8bf",
+    "crates/lapis-task-services/tests/fixtures/unicode-documents.json": "f014cc5a7bf7e009a0edcd6ab0849b246de1892720180e7ffc343b25000b05d7",
+    "crates/lapis-task-services/tests/fixtures/yaml-scalars.json": "cde53fdcfa3b1e0dbc72da2e34fabaaf32871c04caf53e94928cae8a848f52e6",
+    "src/lib/model/task-document.ts": "5d95b0ab02ca07102d12ef0543372db023eece8013595940bfab3f943cca2fc9",
+    "src/lib/model/task-mutations.ts": "d2ae074bec4b0cafcf48b1927023ad97d923cb8e863a707de4b85da11f3d173d"
+  },
+  "archives": [
+    {
+      "name": "@lapis-notes/api",
+      "version": "0.1.4",
+      "sha256": "cc164da81823285086876e0a1948b801031c795808999faa1218f68f38ee5393"
+    },
+    {
+      "name": "@lapis-notes/ui",
+      "version": "0.1.3",
+      "sha256": "349ad6b2400837c6c6c90dd0d6b5f1798d540a50faf1efa4efa13d6e56652093"
+    },
+    {
+      "name": "@lapis-notes/workspace",
+      "version": "0.2.1",
+      "sha256": "8dc7c3687a77e1f8d6e830ef8b0a613e0e96f353920a5412521584bdf8562bd4"
+    },
+    {
+      "name": "@lapis-notes/file-explorer",
+      "version": "0.1.2",
+      "sha256": "4986e61768dcc4fe25b1be864257e8341bf69794419b961316be29dd9085bb47"
+    },
+    {
+      "name": "@lapis-notes/language-service",
+      "version": "0.1.1",
+      "sha256": "b7887e713c0a7d8d77c4d86cfb4cf6a70926c5e681357a456678b5d8c9b0ba11"
+    },
+    {
+      "name": "@lapismd/mira-editor",
+      "version": "0.0.3",
+      "sha256": "6701b115869bf977cb0d640cabbeb3a2d21259fe3af812c8350c8bde6aa24b4e"
+    },
+    {
+      "name": "@lapismd/mira-plugin-ai",
+      "version": "0.0.3",
+      "sha256": "3485795c48403a44ab3ecef40baf0f912fdea9bcac01a5ae810fb5dad31ce70d"
+    },
+    {
+      "name": "@lapismd/mira-plugin-mermaid",
+      "version": "0.0.3",
+      "sha256": "3bef4e48184999fbec876e8e562d24dba709b62332035642b5228b9f2fa6031c"
+    },
+    {
+      "name": "@lapismd/mira",
+      "version": "0.1.1",
+      "sha256": "85d80be38df1ddf358b2d6793e4fc9be211b6ac2545073a978a52fe808d555d3"
+    },
+    {
+      "name": "@lapis-notes/source-editor",
+      "version": "0.1.2",
+      "sha256": "faeadec898f3c6bbe71af01e50f7baa4a831523eeab1d023308d4cb8cd6ae9e1"
+    },
+    {
+      "name": "@lapis-notes/markdown",
+      "version": "0.1.6",
+      "sha256": "56f9ffc731301ca670518ac7bf90283536ec2662557d36c8cabf582b9f7b451a"
+    },
+    {
+      "name": "@lapis-notes/search",
+      "version": "0.1.3",
+      "sha256": "39baabc1cbb2cf29738ed58571a8502901ce40f5dd0b4fb58725bf11488ba1db"
+    },
+    {
+      "name": "@lapismd/design-core",
+      "version": "0.6.0",
+      "sha256": "c77a3a83391b9fafd42c7f99f695af03b29941c1022a5a8bbacb3964d45e55c7"
+    },
+    {
+      "name": "@lapismd/agent-ui",
+      "version": "0.1.0",
+      "sha256": "b6d8a4283d8007d83d7f786458a2712d2796df8e8031c1a48e9692ebe7135f3d"
+    },
+    {
+      "name": "@lapis-notes/ai",
+      "version": "0.1.5",
+      "sha256": "04efc90fedf0669e703239410bc479b7e6fc0cb4e6b3e00a19b024f455a9d565"
+    },
+    {
+      "name": "bits-ui",
+      "version": "2.20.2",
+      "sha256": "7b0fea714ddc489a57340ba649276b9f23bbd91ffac38d62244e44d24b7a5109"
+    }
+  ]
+}

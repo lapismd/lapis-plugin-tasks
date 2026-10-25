@@ -1,0 +1,514 @@
+[
+  {
+    "name": "inbox scalar true",
+    "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: true\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: true\n---\n\n# Scalar\n",
+      "id": "scalar",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": true,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "inbox scalar True",
+    "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: True\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: True\n---\n\n# Scalar\n",
+      "id": "scalar",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": true,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "inbox scalar TRUE",
+    "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: TRUE\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: TRUE\n---\n\n# Scalar\n",
+      "id": "scalar",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": true,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "inbox scalar tRuE",
+    "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: tRuE\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: tRuE\n---\n\n# Scalar\n",
+      "id": "scalar",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "inbox scalar TrUe",
+    "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: TrUe\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: TrUe\n---\n\n# Scalar\n",
+      "id": "scalar",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "inbox scalar false",
+    "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: false\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: false\n---\n\n# Scalar\n",
+      "id": "scalar",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "inbox scalar False",
+    "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: False\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: False\n---\n\n# Scalar\n",
+      "id": "scalar",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "inbox scalar FALSE",
+    "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: FALSE\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: FALSE\n---\n\n# Scalar\n",
+      "id": "scalar",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "inbox scalar fAlSe",
+    "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: fAlSe\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: fAlSe\n---\n\n# Scalar\n",
+      "id": "scalar",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "inbox scalar yes",
+    "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: yes\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: yes\n---\n\n# Scalar\n",
+      "id": "scalar",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "inbox scalar Yes",
+    "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: Yes\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: Yes\n---\n\n# Scalar\n",
+      "id": "scalar",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "inbox scalar YES",
+    "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: YES\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: YES\n---\n\n# Scalar\n",
+      "id": "scalar",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "inbox scalar on",
+    "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: on\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: on\n---\n\n# Scalar\n",
+      "id": "scalar",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "inbox scalar ON",
+    "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: ON\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: ON\n---\n\n# Scalar\n",
+      "id": "scalar",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "inbox scalar off",
+    "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: off\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: off\n---\n\n# Scalar\n",
+      "id": "scalar",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "inbox scalar no",
+    "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: no\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nid: scalar\ntask:\n  inbox: no\n---\n\n# Scalar\n",
+      "id": "scalar",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "id scalar yes",
+    "raw": "---\ntype: task\nid: yes\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nid: yes\n---\n\n# Scalar\n",
+      "id": "yes",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "id scalar no",
+    "raw": "---\ntype: task\nid: no\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nid: no\n---\n\n# Scalar\n",
+      "id": "no",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "ordinary merge key",
+    "raw": "---\ntype: task\nbase: &base {id: inherited}\n<<: *base\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nbase: &base {id: inherited}\n<<: *base\n---\n\n# Scalar\n",
+      "id": "",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "missing-id",
+          "field": "id",
+          "message": "Task, task-list, and navigation files must have a stable id."
+        }
+      ]
+    }
+  },
+  {
+    "name": "scalar alias",
+    "raw": "---\ntype: task\nid: &identity aliased\ntitle: *identity\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": {
+      "path": "tasks/Scalar.md",
+      "raw": "---\ntype: task\nid: &identity aliased\ntitle: *identity\n---\n\n# Scalar\n",
+      "id": "aliased",
+      "kind": "task",
+      "title": "Scalar",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n# Scalar\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "duplicate known id",
+    "raw": "---\ntype: task\nid: first\nid: second\n---\n\n# Scalar\n",
+    "path": "tasks/Scalar.md",
+    "expected": null
+  }
+]

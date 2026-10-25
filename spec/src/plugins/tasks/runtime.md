@@ -338,3 +338,11 @@ paragraph or label wrapper, without hiding an unchecked ancestor item merely
 because a nested item is complete.
 Quantitative history totals and averages are omitted when observations use
 incompatible units; completion rates and streaks remain available.
+
+## YAML metadata reader prerequisite
+
+LN-TASK-090 requires native metadata decoding to preserve retained YAML 1.2
+Unicode scalar semantics before mutation serialization can qualify. The owning
+reader repair is separate from pure transformations and host persistence. See
+[Document scalar fidelity](./documents.md#native-yaml-scalar-fidelity) and
+[the source record](../../../records/2026-10-25-task-yaml-reader.md).

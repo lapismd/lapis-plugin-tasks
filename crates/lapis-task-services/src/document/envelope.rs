@@ -26,7 +26,7 @@ pub(super) fn split(raw: &str) -> (Map<String, Value>, &str) {
     let Some(captures) = ENVELOPE.captures(raw) else {
         return (Map::new(), raw);
     };
-    let parsed = serde_yaml::from_str::<serde_yaml::Value>(&captures[1])
+    let parsed = super::yaml::parse(&captures[1])
         .ok()
         .and_then(|value| serde_json::to_value(value).ok())
         .and_then(|value| value.as_object().cloned())

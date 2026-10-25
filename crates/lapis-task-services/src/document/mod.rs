@@ -7,6 +7,7 @@ mod repeat;
 pub(crate) mod rule;
 mod tracking;
 mod value;
+pub(crate) mod yaml;
 
 pub use records::{
     ChecklistItem, ParsedTaskDocument, StructuralLink, TaskDiagnostic, TaskDocumentKind,
