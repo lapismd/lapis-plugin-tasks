@@ -15,7 +15,11 @@ pub use records::{
 
 /// Parse authored Markdown without resolving links, publishing projections or writing files.
 pub fn parse_task_document(raw: &str, path: &str) -> Option<ParsedTaskDocument> {
-    let (metadata, body) = envelope::split(raw);
+    let envelope::Envelope {
+        metadata,
+        body,
+        nonfinite_priority,
+    } = envelope::split(raw);
     let kind = match envelope::string(metadata.get("type")?)?.as_str() {
         "task" => TaskDocumentKind::Task,
         "task-list" => TaskDocumentKind::TaskList,
@@ -48,8 +52,8 @@ pub fn parse_task_document(raw: &str, path: &str) -> Option<ParsedTaskDocument> 
         let (links, checklist) = markdown::structure(raw, body);
         (links, (kind == TaskDocumentKind::Task).then_some(checklist))
     };
-    let task =
-        (kind == TaskDocumentKind::Task).then(|| fields::task(get("task"), &mut diagnostics));
+    let task = (kind == TaskDocumentKind::Task)
+        .then(|| fields::task(get("task"), nonfinite_priority, &mut diagnostics));
     let list = (kind == TaskDocumentKind::TaskList).then(|| fields::list(get("list")));
     Some(ParsedTaskDocument {
         path: path.to_owned(),

@@ -22,16 +22,37 @@ pub(crate) fn body(raw: &str) -> &str {
         .map_or(raw, |captures| &raw[captures.get(0).unwrap().end()..])
 }
 
-pub(super) fn split(raw: &str) -> (Map<String, Value>, &str) {
+pub(super) struct Envelope<'a> {
+    pub metadata: Map<String, Value>,
+    pub body: &'a str,
+    pub nonfinite_priority: bool,
+}
+
+pub(super) fn split(raw: &str) -> Envelope<'_> {
     let Some(captures) = ENVELOPE.captures(raw) else {
-        return (Map::new(), raw);
+        return Envelope {
+            metadata: Map::new(),
+            body: raw,
+            nonfinite_priority: false,
+        };
     };
-    let parsed = super::yaml::parse(&captures[1])
-        .ok()
+    let parsed = super::yaml::parse(&captures[1]).ok();
+    // JSON represents nonfinite numbers as null. Retain this presence before
+    // conversion so invalid authored priority remains distinct from null/absence.
+    let nonfinite_priority = parsed.as_ref().is_some_and(|value| {
+        value["task"]["priority"]
+            .as_f64()
+            .is_some_and(|number| !number.is_finite())
+    });
+    let metadata = parsed
         .and_then(|value| serde_json::to_value(value).ok())
         .and_then(|value| value.as_object().cloned())
         .unwrap_or_default();
-    (parsed, &raw[captures.get(0).unwrap().end()..])
+    Envelope {
+        metadata,
+        body: &raw[captures.get(0).unwrap().end()..],
+        nonfinite_priority,
+    }
 }
 
 pub(super) fn string(value: &Value) -> Option<String> {

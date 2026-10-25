@@ -1,0 +1,134 @@
+[
+  {
+    "actual": {
+      "body": "\n# Priority\n",
+      "checklist": [],
+      "diagnostics": [],
+      "id": "priority",
+      "kind": "task",
+      "path": "tasks/Priority.md",
+      "raw": "---\ntype: task\nid: priority\ntask:\n  status: open\n  priority: .nan\n---\n\n# Priority\n",
+      "structuralLinks": [],
+      "tags": [],
+      "task": {
+        "comments": [],
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "status": "open"
+      },
+      "title": "Priority"
+    },
+    "expected": {
+      "body": "\n# Priority\n",
+      "checklist": [],
+      "diagnostics": [],
+      "id": "priority",
+      "kind": "task",
+      "path": "tasks/Priority.md",
+      "raw": "---\ntype: task\nid: priority\ntask:\n  status: open\n  priority: .nan\n---\n\n# Priority\n",
+      "structuralLinks": [],
+      "tags": [],
+      "task": {
+        "comments": [],
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "status": "open",
+        "unparsedPriority": null
+      },
+      "title": "Priority"
+    },
+    "name": "priority presence / .nan"
+  },
+  {
+    "actual": {
+      "body": "\n# Priority\n",
+      "checklist": [],
+      "diagnostics": [],
+      "id": "priority",
+      "kind": "task",
+      "path": "tasks/Priority.md",
+      "raw": "---\ntype: task\nid: priority\ntask:\n  status: open\n  priority: .inf\n---\n\n# Priority\n",
+      "structuralLinks": [],
+      "tags": [],
+      "task": {
+        "comments": [],
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "status": "open"
+      },
+      "title": "Priority"
+    },
+    "expected": {
+      "body": "\n# Priority\n",
+      "checklist": [],
+      "diagnostics": [],
+      "id": "priority",
+      "kind": "task",
+      "path": "tasks/Priority.md",
+      "raw": "---\ntype: task\nid: priority\ntask:\n  status: open\n  priority: .inf\n---\n\n# Priority\n",
+      "structuralLinks": [],
+      "tags": [],
+      "task": {
+        "comments": [],
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "status": "open",
+        "unparsedPriority": null
+      },
+      "title": "Priority"
+    },
+    "name": "priority presence / .inf"
+  },
+  {
+    "actual": {
+      "body": "\n# Priority\n",
+      "checklist": [],
+      "diagnostics": [],
+      "id": "priority",
+      "kind": "task",
+      "path": "tasks/Priority.md",
+      "raw": "---\ntype: task\nid: priority\ntask:\n  status: open\n  priority: -.inf\n---\n\n# Priority\n",
+      "structuralLinks": [],
+      "tags": [],
+      "task": {
+        "comments": [],
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "status": "open"
+      },
+      "title": "Priority"
+    },
+    "expected": {
+      "body": "\n# Priority\n",
+      "checklist": [],
+      "diagnostics": [],
+      "id": "priority",
+      "kind": "task",
+      "path": "tasks/Priority.md",
+      "raw": "---\ntype: task\nid: priority\ntask:\n  status: open\n  priority: -.inf\n---\n\n# Priority\n",
+      "structuralLinks": [],
+      "tags": [],
+      "task": {
+        "comments": [],
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "status": "open",
+        "unparsedPriority": null
+      },
+      "title": "Priority"
+    },
+    "name": "priority presence / -.inf"
+  }
+]

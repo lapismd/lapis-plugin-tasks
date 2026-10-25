@@ -136,7 +136,11 @@ fn javascript_string(value: &Value) -> String {
     }
 }
 
-pub(super) fn task(value: &Value, diagnostics: &mut Vec<TaskDiagnostic>) -> Value {
+pub(super) fn task(
+    value: &Value,
+    nonfinite_priority: bool,
+    diagnostics: &mut Vec<TaskDiagnostic>,
+) -> Value {
     let status = string(&value["status"]).unwrap_or_else(|| "open".to_owned());
     let status = if ["open", "completed", "canceled"].contains(&status.as_str()) {
         status
@@ -174,7 +178,7 @@ pub(super) fn task(value: &Value, diagnostics: &mut Vec<TaskDiagnostic>) -> Valu
         ("start".to_owned(), start),
         ("comments".to_owned(), json!(comments(&value["comments"]))),
     ]);
-    if !value["priority"].is_null() {
+    if !value["priority"].is_null() || nonfinite_priority {
         let field = if ["low", "medium", "high"]
             .contains(&javascript_string(&value["priority"]).as_str())
         {

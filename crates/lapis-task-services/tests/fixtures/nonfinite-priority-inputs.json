@@ -1,0 +1,27 @@
+[
+  {
+    "name": "priority presence / .nan",
+    "path": "tasks/Priority.md",
+    "raw": "---\ntype: task\nid: priority\ntask:\n  status: open\n  priority: .nan\n---\n\n# Priority\n"
+  },
+  {
+    "name": "priority presence / .inf",
+    "path": "tasks/Priority.md",
+    "raw": "---\ntype: task\nid: priority\ntask:\n  status: open\n  priority: .inf\n---\n\n# Priority\n"
+  },
+  {
+    "name": "priority presence / -.inf",
+    "path": "tasks/Priority.md",
+    "raw": "---\ntype: task\nid: priority\ntask:\n  status: open\n  priority: -.inf\n---\n\n# Priority\n"
+  },
+  {
+    "name": "priority presence / null",
+    "path": "tasks/Priority.md",
+    "raw": "---\ntype: task\nid: priority\ntask:\n  status: open\n  priority: null\n---\n\n# Priority\n"
+  },
+  {
+    "name": "priority presence / undefined",
+    "path": "tasks/Priority.md",
+    "raw": "---\ntype: task\nid: priority\ntask:\n  status: open\n---\n\n# Priority\n"
+  }
+]

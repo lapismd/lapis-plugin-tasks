@@ -346,3 +346,9 @@ Unicode scalar semantics before mutation serialization can qualify. The owning
 reader repair is separate from pure transformations and host persistence. See
 [Document scalar fidelity](./documents.md#native-yaml-scalar-fidelity) and
 [the source record](../../../records/2026-10-25-task-yaml-reader.md).
+
+LN-TASK-091 retains nonfinite priority presence before YAML values become JSON.
+The existing unparsed-priority snapshot keeps its retained null representation;
+absent and explicit-null priority remain absent. The source-only repair adds no
+write authority or host selection. See
+[the priority presence record](../../../records/2026-10-25-task-priority-presence.md).

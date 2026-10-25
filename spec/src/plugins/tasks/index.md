@@ -91,6 +91,10 @@ The native YAML metadata reader prerequisite retains authored Unicode, exact
 YAML 1.2 scalar semantics, aliases, duplicate rejection and ordered fields.
 LN-TASK-090 and [Task documents](./documents.md#native-yaml-scalar-fidelity)
 record source qualification separately from host adoption.
+LN-TASK-091 additionally preserves nonfinite authored priority presence through
+the native parser's JSON snapshot. Explicit null and absent priority remain
+distinct from these retained invalid scalar values; public projection versions
+and host selection remain unchanged.
 
 ## Requirements
 
