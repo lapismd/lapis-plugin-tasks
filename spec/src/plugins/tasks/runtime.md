@@ -172,10 +172,26 @@ evidence is retained in
 [the recurrence intake](../../../records/2026-10-25-native-task-recurrence.md);
 qualification does not imply host adoption or publication.
 
-Full version-4 `projectTask` normalization follows this engine. Whole-vault
-target/graph resolution, host publication, local-date scheduling, recurrence
-mutations and daily observation materialization retain separate gates. Neither
-this source slice nor a date-sensitive row alone activates native Tasks indexing.
+Whole-vault target/graph resolution, host publication, local-date scheduling,
+recurrence mutations and daily observation materialization retain separate gates.
+Neither this source slice nor a date-sensitive row alone activates native Tasks
+indexing.
+
+## Private native row normalization
+
+LN-TASK-078–079 govern the pure version-4 `project_task` counterpart. Its input
+is a native parsed document and explicit local today. Its typed serializable
+result preserves complete fields for Tasks, Task Lists and navigation, including
+absent versus null task-only values, opaque repeat metadata, planning values
+and counts.
+It reuses the qualified private effective resolver; no wall clock is captured.
+This boundary derives one summary row without resolving graph targets, adding
+structural rows/edges, publishing database records or selecting a host writer.
+Unchanged TypeScript and native acceptance share 106 frozen complete-output
+fixtures covering the qualified parser/effective inputs plus row-specific edge
+cases. See [the source intake](../../../records/2026-10-25-native-task-projection.md).
+Structure/target resolution, projection envelopes and host publication/lifecycle
+remain separate. No host selects this private implementation yet.
 
 ## Repository and file stores
 

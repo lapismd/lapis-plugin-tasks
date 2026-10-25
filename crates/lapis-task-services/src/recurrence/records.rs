@@ -27,7 +27,7 @@ pub struct RecurrenceError {
 }
 
 impl RecurrenceError {
-    pub(super) fn invalid(message: impl Into<String>) -> Self {
+    pub(crate) fn invalid(message: impl Into<String>) -> Self {
         Self {
             name: "Error".into(),
             message: message.into(),

@@ -1,0 +1,3776 @@
+[
+  {
+    "name": "document-ordinary-markdown",
+    "raw": "# Ordinary\n- [Task](task.md)\n",
+    "path": "tasks/ordinary-markdown.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": null
+    }
+  },
+  {
+    "name": "document-unclosed-envelope",
+    "raw": "---\ntype: task\nid: missing-close\n# Document\n",
+    "path": "tasks/unclosed-envelope.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": null
+    }
+  },
+  {
+    "name": "document-malformed-yaml",
+    "raw": "---\ntype: task\nid: [broken\n---\n# Document\n",
+    "path": "tasks/malformed-yaml.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": null
+    }
+  },
+  {
+    "name": "document-duplicate-yaml-key",
+    "raw": "---\ntype: task\ntype: task-list\nid: duplicate\n---\n# Document\n",
+    "path": "tasks/duplicate-yaml-key.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": null
+    }
+  },
+  {
+    "name": "document-array-envelope",
+    "raw": "---\n- type: task\n- id: array\n---\n# Document\n",
+    "path": "tasks/array-envelope.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": null
+    }
+  },
+  {
+    "name": "document-scalar-envelope",
+    "raw": "---\nplain scalar\n---\n# Document\n",
+    "path": "tasks/scalar-envelope.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": null
+    }
+  },
+  {
+    "name": "document-unknown-type",
+    "raw": "---\ntype: daily-note\nid: daily\n---\n# Daily\n",
+    "path": "tasks/unknown-type.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": null
+    }
+  },
+  {
+    "name": "document-missing-id",
+    "raw": "---\ntype: task\n---\n# Missing id\n",
+    "path": "tasks/missing-id.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/missing-id.md",
+        "documentId": "",
+        "kind": "task",
+        "title": "Missing id",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-trimmed-envelope",
+    "raw": "---\ntype: ' task '\nid: ' trimmed-id '\ntags: [' a ', '', 3, b]\ncreated: ' timestamp '\nupdated: false\n---\n# Trimmed\n",
+    "path": "tasks/trimmed-envelope.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/trimmed-envelope.md",
+        "documentId": "trimmed-id",
+        "kind": "task",
+        "title": "Trimmed",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-defaults",
+    "raw": "---\ntype: task\nid: defaults\ntask:\n  status: open\n---\n# Document\n",
+    "path": "tasks/defaults.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/defaults.md",
+        "documentId": "defaults",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-planning",
+    "raw": "---\ntype: task\nid: planning\ntask:\n  status: completed\n  priority: high\n  inbox: true\n  completedAt: done\n  start: 2026-08-18\n  plan: {date: 2026-08-19, at: '09:45', duration: 1h30m}\n  deadline: 2026-08-24\n---\n# Document\n",
+    "path": "tasks/planning.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/planning.md",
+        "documentId": "planning",
+        "kind": "task",
+        "title": "Document",
+        "status": "completed",
+        "priority": "high",
+        "inbox": true,
+        "startKind": "date",
+        "startDate": "2026-08-18",
+        "planDate": "2026-08-19",
+        "planKind": "time",
+        "planTime": "09:45",
+        "durationMinutes": 90,
+        "deadline": "2026-08-24",
+        "completedAt": "done",
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-plan-anytime",
+    "raw": "---\ntype: task\nid: plan-anytime\ntask:\n  plan: {date: 2026-08-19, at: 'anytime'}\n---\n# Document\n",
+    "path": "tasks/plan-anytime.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/plan-anytime.md",
+        "documentId": "plan-anytime",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-19",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-plan-morning",
+    "raw": "---\ntype: task\nid: plan-morning\ntask:\n  plan: {date: 2026-08-19, at: 'morning'}\n---\n# Document\n",
+    "path": "tasks/plan-morning.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/plan-morning.md",
+        "documentId": "plan-morning",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-19",
+        "planKind": "morning",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-plan-afternoon",
+    "raw": "---\ntype: task\nid: plan-afternoon\ntask:\n  plan: {date: 2026-08-19, at: 'afternoon'}\n---\n# Document\n",
+    "path": "tasks/plan-afternoon.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/plan-afternoon.md",
+        "documentId": "plan-afternoon",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-19",
+        "planKind": "afternoon",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-plan-evening",
+    "raw": "---\ntype: task\nid: plan-evening\ntask:\n  plan: {date: 2026-08-19, at: 'evening'}\n---\n# Document\n",
+    "path": "tasks/plan-evening.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/plan-evening.md",
+        "documentId": "plan-evening",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-19",
+        "planKind": "evening",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-plan-all-day",
+    "raw": "---\ntype: task\nid: plan-all-day\ntask:\n  plan: {date: 2026-08-19, at: 'all-day'}\n---\n# Document\n",
+    "path": "tasks/plan-all-day.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/plan-all-day.md",
+        "documentId": "plan-all-day",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-19",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-plan-99-99",
+    "raw": "---\ntype: task\nid: plan-99-99\ntask:\n  plan: {date: 2026-08-19, at: '99:99'}\n---\n# Document\n",
+    "path": "tasks/plan-99-99.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/plan-99-99.md",
+        "documentId": "plan-99-99",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-19",
+        "planKind": "time",
+        "planTime": "99:99",
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-invalid-fields",
+    "raw": "---\ntype: task\nid: invalid-fields\ntask:\n  status: todo\n  start: false\n  priority: urgent\n  plan: {date: broken, at: invalid, duration: nope}\n  inbox: 'true'\n---\n# Document\n",
+    "path": "tasks/invalid-fields.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/invalid-fields.md",
+        "documentId": "invalid-fields",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-invalid-duration",
+    "raw": "---\ntype: task\nid: invalid-duration\ntask:\n  plan: {date: 2026-08-19, at: invalid, duration: 0m}\n---\n# Document\n",
+    "path": "tasks/invalid-duration.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/invalid-duration.md",
+        "documentId": "invalid-duration",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-19",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-lexical-dates",
+    "raw": "---\ntype: task\nid: lexical-dates\ntask:\n  start: 2026-99-88\n  plan: {date: 2026-99-89, at: anytime}\n---\n# Document\n",
+    "path": "tasks/lexical-dates.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/lexical-dates.md",
+        "documentId": "lexical-dates",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "date",
+        "startDate": "2026-99-88",
+        "planDate": "2026-99-89",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-someday-with-plan",
+    "raw": "---\ntype: task\nid: someday-with-plan\ntask:\n  start: someday\n  plan: {date: 2026-08-19}\n---\n# Document\n",
+    "path": "tasks/someday-with-plan.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/someday-with-plan.md",
+        "documentId": "someday-with-plan",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "someday",
+        "startDate": null,
+        "planDate": "2026-08-19",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-plan-before-start",
+    "raw": "---\ntype: task\nid: plan-before-start\ntask:\n  start: 2026-08-20\n  plan: {date: 2026-08-19}\n---\n# Document\n",
+    "path": "tasks/plan-before-start.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/plan-before-start.md",
+        "documentId": "plan-before-start",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "date",
+        "startDate": "2026-08-20",
+        "planDate": "2026-08-19",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-array-priority",
+    "raw": "---\ntype: task\nid: array-priority\ntask:\n  priority: [high]\n---\n# Document\n",
+    "path": "tasks/array-priority.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/array-priority.md",
+        "documentId": "array-priority",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": [
+          "high"
+        ],
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-comments",
+    "raw": "---\ntype: task\nid: comments\ntask:\n  comments:\n    - {id: a, at: now, text: ' first ', resolved: true, occurrence: 2026-08-19, editedAt: later}\n    - {id: b, at: later, text: second, resolved: false}\n    - {id: missing-text, at: now}\n    - plain\n---\n# Document\n",
+    "path": "tasks/comments.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/comments.md",
+        "documentId": "comments",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 2,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-task-scalars",
+    "raw": "---\ntype: task\nid: task-scalars\ntitle: Ignored task front matter title\ntask:\n  status: open\n---\nProse without H1\n",
+    "path": "tasks/task-scalars.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/task-scalars.md",
+        "documentId": "task-scalars",
+        "kind": "task",
+        "title": "task-scalars",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-list-front-matter-title",
+    "raw": "---\ntype: task-list\nid: list_id\ntitle: ' Preferred '\nlist: {status: archived, role: area}\n---\n# Other\n",
+    "path": "lists/list-front-matter-title.MD",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "lists/list-front-matter-title.MD",
+        "documentId": "list_id",
+        "kind": "task-list",
+        "title": "Preferred",
+        "status": "archived",
+        "inbox": false,
+        "startKind": "anytime",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-list-heading-title",
+    "raw": "---\ntype: task-list\nid: list_id\nlist: {status: unknown, role: other}\n---\n# Heading title\n",
+    "path": "lists/list-heading-title.MD",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "lists/list-heading-title.MD",
+        "documentId": "list_id",
+        "kind": "task-list",
+        "title": "Heading title",
+        "status": "active",
+        "inbox": false,
+        "startKind": "anytime",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-list-id-title",
+    "raw": "---\ntype: task-list\nid: list_some-work\n---\nNo heading\n",
+    "path": "lists/list-id-title.MD",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "lists/list-id-title.MD",
+        "documentId": "list_some-work",
+        "kind": "task-list",
+        "title": "List Some Work",
+        "status": "active",
+        "inbox": false,
+        "startKind": "anytime",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-list-path-title",
+    "raw": "---\ntype: task-list\n---\nNo heading\n",
+    "path": "lists/list-path-title.MD",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "lists/list-path-title.MD",
+        "documentId": "",
+        "kind": "task-list",
+        "title": "list-path-title",
+        "status": "active",
+        "inbox": false,
+        "startKind": "anytime",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-navigation",
+    "raw": "---\ntype: task-list-navigation\nid: nav\n---\n- [Root](./root.md)\n# One\n- [First](./one.md)\n- [Second](../two.md)\n# Two\n- [Third](./three.md)\n# One\n- [Fourth](./four.md)\n- ![Image](image.png)\n",
+    "path": "tasks/navigation.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/navigation.md",
+        "documentId": "nav",
+        "kind": "task-list-navigation",
+        "title": "One",
+        "status": "active",
+        "inbox": false,
+        "startKind": "anytime",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-markdown-structure",
+    "raw": "---\ntype: task\nid: markdown-structure\ntask:\n  status: open\n---\n# Root\n- [Root task](./one.md)\n- [ ] Root checkbox\n\n## Section\n- [List](./list.md)\n- [x] Done\n  - [Nested](../nested.md)\n  - [ ] Child checkbox\n- **rich** [Reference](other.md)\n- [Outside](https://example.com)\n- [Fragment](#section)\n- [Protocol relative](//example.com)\n\n### Deeper\n- [Unicode ✨](./emoji.md)\n\n```md\n- [Fenced](fenced.md)\n- [x] Not a checklist\n```\n\n1. [Ordered](ordered.md)\n\nSetext heading\n--------------\n- [Setext](setext.md)\n",
+    "path": "tasks/markdown-structure.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/markdown-structure.md",
+        "documentId": "markdown-structure",
+        "kind": "task",
+        "title": "Root",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 3,
+        "checklistCompleted": 1,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-list-structure",
+    "raw": "---\ntype: task-list\nid: list-structure\n---\n# Root\n- [Root task](./one.md)\n- [ ] Root checkbox\n\n## Section\n- [List](./list.md)\n- [x] Done\n  - [Nested](../nested.md)\n  - [ ] Child checkbox\n- **rich** [Reference](other.md)\n- [Outside](https://example.com)\n- [Fragment](#section)\n- [Protocol relative](//example.com)\n\n### Deeper\n- [Unicode ✨](./emoji.md)\n\n```md\n- [Fenced](fenced.md)\n- [x] Not a checklist\n```\n\n1. [Ordered](ordered.md)\n\nSetext heading\n--------------\n- [Setext](setext.md)\n",
+    "path": "tasks/list-structure.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/list-structure.md",
+        "documentId": "list-structure",
+        "kind": "task-list",
+        "title": "Root",
+        "status": "active",
+        "inbox": false,
+        "startKind": "anytime",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-utf16-crlf",
+    "raw": "---\ntype: task\nid: utf16-crlf\ntask:\n  status: open\n---\n# Emoji 😀\r\n\r\n## Héading 🦀\r\n- [Task 🚀](./note.md)\r\n- [X] Complete 🧪\r\n  indented context\r\n",
+    "path": "tasks/utf16-crlf.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/utf16-crlf.md",
+        "documentId": "utf16-crlf",
+        "kind": "task",
+        "title": "Emoji 😀",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 1,
+        "checklistCompleted": 1,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-daily",
+    "raw": "---\ntype: task\nid: daily\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY'\n---\n# Document\n",
+    "path": "tasks/daily.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/daily.md",
+        "documentId": "daily",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "overdue",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-weekly",
+    "raw": "---\ntype: task\nid: weekly\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,WE;WKST=SU'\n---\n# Document\n",
+    "path": "tasks/weekly.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/weekly.md",
+        "documentId": "weekly",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,WE;WKST=SU",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "overdue",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-monthly",
+    "raw": "---\ntype: task\nid: monthly\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-1;COUNT=12'\n---\n# Document\n",
+    "path": "tasks/monthly.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/monthly.md",
+        "documentId": "monthly",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-1;COUNT=12",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "overdue",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-yearly",
+    "raw": "---\ntype: task\nid: yearly\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=29;UNTIL=20320229'\n---\n# Document\n",
+    "path": "tasks/yearly.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/yearly.md",
+        "documentId": "yearly",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=29;UNTIL=20320229",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "overdue",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-unsupported-hourly",
+    "raw": "---\ntype: task\nid: unsupported-hourly\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=HOURLY'\n---\n# Document\n",
+    "path": "tasks/unsupported-hourly.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/unsupported-hourly.md",
+        "documentId": "unsupported-hourly",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=HOURLY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-unsupported-hour",
+    "raw": "---\ntype: task\nid: unsupported-hour\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY;BYHOUR=10'\n---\n# Document\n",
+    "path": "tasks/unsupported-hour.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/unsupported-hour.md",
+        "documentId": "unsupported-hour",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY;BYHOUR=10",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-unsupported-until-time",
+    "raw": "---\ntype: task\nid: unsupported-until-time\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY;UNTIL=20260831T120000Z'\n---\n# Document\n",
+    "path": "tasks/unsupported-until-time.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/unsupported-until-time.md",
+        "documentId": "unsupported-until-time",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY;UNTIL=20260831T120000Z",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-invalid-unknown",
+    "raw": "---\ntype: task\nid: invalid-unknown\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY;WHATEVER=1'\n---\n# Document\n",
+    "path": "tasks/invalid-unknown.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/invalid-unknown.md",
+        "documentId": "invalid-unknown",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY;WHATEVER=1"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-invalid-frequency",
+    "raw": "---\ntype: task\nid: invalid-frequency\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=NOTREAL'\n---\n# Document\n",
+    "path": "tasks/invalid-frequency.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/invalid-frequency.md",
+        "documentId": "invalid-frequency",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=NOTREAL"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-invalid-duplicate",
+    "raw": "---\ntype: task\nid: invalid-duplicate\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY;FREQ=WEEKLY'\n---\n# Document\n",
+    "path": "tasks/invalid-duplicate.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/invalid-duplicate.md",
+        "documentId": "invalid-duplicate",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY;FREQ=WEEKLY"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-invalid-count-until",
+    "raw": "---\ntype: task\nid: invalid-count-until\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY;COUNT=3;UNTIL=20260831'\n---\n# Document\n",
+    "path": "tasks/invalid-count-until.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/invalid-count-until.md",
+        "documentId": "invalid-count-until",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY;COUNT=3;UNTIL=20260831"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-invalid-prefix",
+    "raw": "---\ntype: task\nid: invalid-prefix\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'RRULE:FREQ=DAILY'\n---\n# Document\n",
+    "path": "tasks/invalid-prefix.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/invalid-prefix.md",
+        "documentId": "invalid-prefix",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "RRULE:FREQ=DAILY"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-invalid-missing-frequency",
+    "raw": "---\ntype: task\nid: invalid-missing-frequency\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'BYDAY=MO'\n---\n# Document\n",
+    "path": "tasks/invalid-missing-frequency.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/invalid-missing-frequency.md",
+        "documentId": "invalid-missing-frequency",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "BYDAY=MO"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-invalid-part",
+    "raw": "---\ntype: task\nid: invalid-part\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY;broken'\n---\n# Document\n",
+    "path": "tasks/invalid-part.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/invalid-part.md",
+        "documentId": "invalid-part",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY;broken"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-invalid-weekday",
+    "raw": "---\ntype: task\nid: invalid-weekday\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=WEEKLY;BYDAY=NO'\n---\n# Document\n",
+    "path": "tasks/invalid-weekday.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/invalid-weekday.md",
+        "documentId": "invalid-weekday",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=WEEKLY;BYDAY=NO"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-complete-repeat",
+    "raw": "---\ntype: task\nid: complete-repeat\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    anchor: schedule\n    missed: skip\n    rdate: [2026-08-20, 2026-08-20, 2026-08-21]\n    exdate: [2026-08-22]\n    paused: true\n    pausedSince: 2026-08-23\n    pauseRanges: [{start: 2026-08-10, end: 2026-08-12}]\n    resetChecklist: true\n    lastCompletedAt: 2026-08-19T09:00:00.000Z\n    completionCount: 4\n  tracking: {type: count, unit: glasses, target: 8}\n---\n# Document\n",
+    "path": "tasks/complete-repeat.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/complete-repeat.md",
+        "documentId": "complete-repeat",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "skip",
+          "rdate": [
+            "2026-08-20",
+            "2026-08-21"
+          ],
+          "exdate": [
+            "2026-08-22"
+          ],
+          "resetChecklist": true,
+          "paused": true,
+          "pausedSince": "2026-08-23",
+          "pauseRanges": [
+            {
+              "start": "2026-08-10",
+              "end": "2026-08-12"
+            }
+          ],
+          "lastCompletedAt": "2026-08-19T09:00:00.000Z",
+          "completionCount": 4
+        },
+        "tracking": {
+          "type": "count",
+          "unit": "glasses",
+          "target": 8
+        },
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "paused",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-completion-without-start",
+    "raw": "---\ntype: task\nid: completion-without-start\ntask:\n  repeat:\n    rrule: FREQ=DAILY\n    anchor: completion\n---\n# Document\n",
+    "path": "tasks/completion-without-start.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/completion-without-start.md",
+        "documentId": "completion-without-start",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "rrule": "FREQ=DAILY",
+          "anchor": "completion",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "current",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-legacy-repeat",
+    "raw": "---\ntype: task\nid: legacy-repeat\ntask:\n  repeat:\n    frequency: daily\n    interval: 1\n    strategy: rolling\n---\n# Document\n",
+    "path": "tasks/legacy-repeat.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/legacy-repeat.md",
+        "documentId": "legacy-repeat",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "frequency": "daily",
+          "interval": 1,
+          "strategy": "rolling"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-missing-repeat-start",
+    "raw": "---\ntype: task\nid: missing-repeat-start\ntask:\n  repeat:\n    rrule: FREQ=DAILY\n---\n# Document\n",
+    "path": "tasks/missing-repeat-start.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/missing-repeat-start.md",
+        "documentId": "missing-repeat-start",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "rrule": "FREQ=DAILY"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-bad-repeat-date",
+    "raw": "---\ntype: task\nid: bad-repeat-date\ntask:\n  repeat:\n    start: 2026-02-30\n    rrule: FREQ=DAILY\n---\n# Document\n",
+    "path": "tasks/bad-repeat-date.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/bad-repeat-date.md",
+        "documentId": "bad-repeat-date",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-02-30",
+          "rrule": "FREQ=DAILY"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-completion-skip",
+    "raw": "---\ntype: task\nid: completion-skip\ntask:\n  repeat:\n    rrule: FREQ=DAILY\n    anchor: completion\n    missed: skip\n---\n# Document\n",
+    "path": "tasks/completion-skip.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/completion-skip.md",
+        "documentId": "completion-skip",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "rrule": "FREQ=DAILY",
+          "anchor": "completion",
+          "missed": "skip"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-unknown-repeat-field",
+    "raw": "---\ntype: task\nid: unknown-repeat-field\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    unknown: retained\n---\n# Document\n",
+    "path": "tasks/unknown-repeat-field.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/unknown-repeat-field.md",
+        "documentId": "unknown-repeat-field",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "unknown": "retained"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-bad-pause-range",
+    "raw": "---\ntype: task\nid: bad-pause-range\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    pauseRanges: [{start: 2026-08-20, end: 2026-08-19}]\n---\n# Document\n",
+    "path": "tasks/bad-pause-range.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/bad-pause-range.md",
+        "documentId": "bad-pause-range",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "pauseRanges": [
+            {
+              "start": "2026-08-20",
+              "end": "2026-08-19"
+            }
+          ]
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-paused-without-date",
+    "raw": "---\ntype: task\nid: paused-without-date\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    paused: true\n---\n# Document\n",
+    "path": "tasks/paused-without-date.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/paused-without-date.md",
+        "documentId": "paused-without-date",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "paused": true
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-invalid-completion-count",
+    "raw": "---\ntype: task\nid: invalid-completion-count\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    completionCount: -1\n---\n# Document\n",
+    "path": "tasks/invalid-completion-count.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/invalid-completion-count.md",
+        "documentId": "invalid-completion-count",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "completionCount": -1
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-tracking-boolean",
+    "raw": "---\ntype: task\nid: tracking-boolean\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n  tracking: {type: boolean}\n---\n# Document\n",
+    "path": "tasks/tracking-boolean.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/tracking-boolean.md",
+        "documentId": "tracking-boolean",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": {
+          "type": "boolean"
+        },
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "overdue",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-tracking-number",
+    "raw": "---\ntype: task\nid: tracking-number\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n  tracking: {type: number, unit: kg, target: 20.5}\n---\n# Document\n",
+    "path": "tasks/tracking-number.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/tracking-number.md",
+        "documentId": "tracking-number",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": {
+          "type": "number",
+          "unit": "kg",
+          "target": 20.5
+        },
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "overdue",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-tracking-duration",
+    "raw": "---\ntype: task\nid: tracking-duration\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n  tracking: {type: duration, target: 1h15m}\n---\n# Document\n",
+    "path": "tasks/tracking-duration.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/tracking-duration.md",
+        "documentId": "tracking-duration",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": {
+          "type": "duration",
+          "target": "1h15m"
+        },
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "overdue",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-tracking-bad-target",
+    "raw": "---\ntype: task\nid: tracking-bad-target\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n  tracking: {type: count, unit: count, target: -2}\n---\n# Document\n",
+    "path": "tasks/tracking-bad-target.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/tracking-bad-target.md",
+        "documentId": "tracking-bad-target",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "overdue",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-tracking-unknown-field",
+    "raw": "---\ntype: task\nid: tracking-unknown-field\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n  tracking: {type: boolean, extra: retained}\n---\n# Document\n",
+    "path": "tasks/tracking-unknown-field.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/tracking-unknown-field.md",
+        "documentId": "tracking-unknown-field",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "overdue",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-tracking-bad-duration",
+    "raw": "---\ntype: task\nid: tracking-bad-duration\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n  tracking: {type: duration, target: nope}\n---\n# Document\n",
+    "path": "tasks/tracking-bad-duration.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/tracking-bad-duration.md",
+        "documentId": "tracking-bad-duration",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "overdue",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-tracking-without-repeat",
+    "raw": "---\ntype: task\nid: tracking-without-repeat\ntask:\n  tracking: {type: count, unit: steps, target: 100}\n---\n# Document\n",
+    "path": "tasks/tracking-without-repeat.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/tracking-without-repeat.md",
+        "documentId": "tracking-without-repeat",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-scalar-repeat-and-tracking",
+    "raw": "---\ntype: task\nid: scalar-repeat-and-tracking\ntask:\n  repeat: plain\n  tracking: plain\n---\n# Document\n",
+    "path": "tasks/scalar-repeat-and-tracking.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/scalar-repeat-and-tracking.md",
+        "documentId": "scalar-repeat-and-tracking",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": "plain",
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-scalar-task-envelope",
+    "raw": "---\ntype: task\nid: scalar-task-envelope\ntitle: Ignored\ntask:\n  status: open\n---\n# Body heading\n",
+    "path": "tasks/scalar-task-envelope.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/scalar-task-envelope.md",
+        "documentId": "scalar-task-envelope",
+        "kind": "task",
+        "title": "Body heading",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-scalar-plan",
+    "raw": "---\ntype: task\nid: scalar-plan\ntask:\n  plan: []\n  tags: ignored\n---\n# Document\n",
+    "path": "tasks/scalar-plan.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/scalar-plan.md",
+        "documentId": "scalar-plan",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-date-with-final-newline",
+    "raw": "---\ntype: task\nid: date-with-final-newline\ntask:\n  start: \"2026-08-19\\n\"\n---\n# Document\n",
+    "path": "tasks/date-with-final-newline.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/date-with-final-newline.md",
+        "documentId": "date-with-final-newline",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-non-calendar-until",
+    "raw": "---\ntype: task\nid: non-calendar-until\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY;UNTIL=20260230\n---\n# Document\n",
+    "path": "tasks/non-calendar-until.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/non-calendar-until.md",
+        "documentId": "non-calendar-until",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY;UNTIL=20260230",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-timestamp-date-only",
+    "raw": "---\ntype: task\nid: timestamp-date-only\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    lastCompletedAt: '2026-08-19'\n---\n# Document\n",
+    "path": "tasks/timestamp-date-only.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/timestamp-date-only.md",
+        "documentId": "timestamp-date-only",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false,
+          "lastCompletedAt": "2026-08-19"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "overdue",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-timestamp-rfc2822",
+    "raw": "---\ntype: task\nid: timestamp-rfc2822\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    lastCompletedAt: 'Wed, 19 Aug 2026 09:00:00 GMT'\n---\n# Document\n",
+    "path": "tasks/timestamp-rfc2822.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/timestamp-rfc2822.md",
+        "documentId": "timestamp-rfc2822",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false,
+          "lastCompletedAt": "Wed, 19 Aug 2026 09:00:00 GMT"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "overdue",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-timestamp-numeric",
+    "raw": "---\ntype: task\nid: timestamp-numeric\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    lastCompletedAt: '1'\n---\n# Document\n",
+    "path": "tasks/timestamp-numeric.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/timestamp-numeric.md",
+        "documentId": "timestamp-numeric",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false,
+          "lastCompletedAt": "1"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "overdue",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-timestamp-rollover",
+    "raw": "---\ntype: task\nid: timestamp-rollover\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    lastCompletedAt: '2026-02-30T09:00:00Z'\n---\n# Document\n",
+    "path": "tasks/timestamp-rollover.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/timestamp-rollover.md",
+        "documentId": "timestamp-rollover",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false,
+          "lastCompletedAt": "2026-02-30T09:00:00Z"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "overdue",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "document-timestamp-invalid",
+    "raw": "---\ntype: task\nid: timestamp-invalid\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    lastCompletedAt: 'not a date'\n---\n# Document\n",
+    "path": "tasks/timestamp-invalid.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/timestamp-invalid.md",
+        "documentId": "timestamp-invalid",
+        "kind": "task",
+        "title": "Document",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "lastCompletedAt": "not a date"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "effective-carry-overdue",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"project-carry-overdue\", \"task\": {\"status\": \"open\", \"start\": \"anytime\", \"repeat\": {\"start\": \"2026-08-17\", \"rrule\": \"FREQ=DAILY\", \"anchor\": \"schedule\", \"missed\": \"carry\", \"resetChecklist\": false, \"paused\": false}, \"plan\": {\"date\": \"2026-08-17\", \"at\": \"anytime\"}}}\n---\n# Projection carry-overdue\n",
+    "path": "tasks/carry-overdue.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/carry-overdue.md",
+        "documentId": "project-carry-overdue",
+        "kind": "task",
+        "title": "Projection carry-overdue",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-17",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-17",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-17",
+        "effectiveOccurrenceState": "overdue",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "effective-skip-current",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"project-skip-current\", \"task\": {\"status\": \"open\", \"start\": \"anytime\", \"repeat\": {\"start\": \"2026-08-17\", \"rrule\": \"FREQ=DAILY\", \"anchor\": \"schedule\", \"missed\": \"skip\", \"resetChecklist\": false, \"paused\": false}, \"plan\": {\"date\": \"2026-08-17\", \"at\": \"anytime\"}}}\n---\n# Projection skip-current\n",
+    "path": "tasks/skip-current.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/skip-current.md",
+        "documentId": "project-skip-current",
+        "kind": "task",
+        "title": "Projection skip-current",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-17",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-17",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "skip",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-21",
+        "effectiveOccurrenceState": "current",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "effective-current",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"project-current\", \"task\": {\"status\": \"open\", \"start\": \"anytime\", \"repeat\": {\"start\": \"2026-08-17\", \"rrule\": \"FREQ=DAILY\", \"anchor\": \"schedule\", \"missed\": \"carry\", \"resetChecklist\": false, \"paused\": false}, \"plan\": {\"date\": \"2026-08-21\", \"at\": \"anytime\"}}}\n---\n# Projection current\n",
+    "path": "tasks/current.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/current.md",
+        "documentId": "project-current",
+        "kind": "task",
+        "title": "Projection current",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-21",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-17",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-21",
+        "effectiveOccurrenceState": "current",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "effective-future-plan",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"project-future-plan\", \"task\": {\"status\": \"open\", \"start\": \"anytime\", \"repeat\": {\"start\": \"2026-08-17\", \"rrule\": \"FREQ=WEEKLY;BYDAY=MO\", \"anchor\": \"schedule\", \"missed\": \"carry\", \"resetChecklist\": false, \"paused\": false}, \"plan\": {\"date\": \"2026-08-24\", \"at\": \"anytime\"}}}\n---\n# Projection future-plan\n",
+    "path": "tasks/future-plan.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/future-plan.md",
+        "documentId": "project-future-plan",
+        "kind": "task",
+        "title": "Projection future-plan",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-24",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-17",
+          "rrule": "FREQ=WEEKLY;BYDAY=MO",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-24",
+        "effectiveOccurrenceState": "future",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "effective-count-exhausted",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"project-count-exhausted\", \"task\": {\"status\": \"open\", \"start\": \"anytime\", \"repeat\": {\"start\": \"2026-08-17\", \"rrule\": \"FREQ=DAILY;COUNT=2\", \"anchor\": \"schedule\", \"missed\": \"carry\", \"resetChecklist\": false, \"paused\": false, \"completionCount\": 2}}}\n---\n# Projection count-exhausted\n",
+    "path": "tasks/count-exhausted.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/count-exhausted.md",
+        "documentId": "project-count-exhausted",
+        "kind": "task",
+        "title": "Projection count-exhausted",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-17",
+          "rrule": "FREQ=DAILY;COUNT=2",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false,
+          "completionCount": 2
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "exhausted",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "effective-completion-without-origin-overdue",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"project-completion-without-origin-overdue\", \"task\": {\"status\": \"open\", \"start\": \"anytime\", \"repeat\": {\"rrule\": \"FREQ=DAILY\", \"anchor\": \"completion\", \"missed\": \"carry\", \"resetChecklist\": false, \"paused\": false}, \"plan\": {\"date\": \"2026-08-19\", \"at\": \"anytime\"}}}\n---\n# Projection completion-without-origin-overdue\n",
+    "path": "tasks/completion-without-origin-overdue.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/completion-without-origin-overdue.md",
+        "documentId": "project-completion-without-origin-overdue",
+        "kind": "task",
+        "title": "Projection completion-without-origin-overdue",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-19",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "rrule": "FREQ=DAILY",
+          "anchor": "completion",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "overdue",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "effective-completion-without-origin-current",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"project-completion-without-origin-current\", \"task\": {\"status\": \"open\", \"start\": \"anytime\", \"repeat\": {\"rrule\": \"FREQ=DAILY\", \"anchor\": \"completion\", \"missed\": \"carry\", \"resetChecklist\": false, \"paused\": false}}}\n---\n# Projection completion-without-origin-current\n",
+    "path": "tasks/completion-without-origin-current.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/completion-without-origin-current.md",
+        "documentId": "project-completion-without-origin-current",
+        "kind": "task",
+        "title": "Projection completion-without-origin-current",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "rrule": "FREQ=DAILY",
+          "anchor": "completion",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": "current",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "effective-completion-without-origin-future",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"project-completion-without-origin-future\", \"task\": {\"status\": \"open\", \"start\": \"anytime\", \"repeat\": {\"rrule\": \"FREQ=DAILY\", \"anchor\": \"completion\", \"missed\": \"carry\", \"resetChecklist\": false, \"paused\": false}, \"plan\": {\"date\": \"2026-08-24\", \"at\": \"anytime\"}}}\n---\n# Projection completion-without-origin-future\n",
+    "path": "tasks/completion-without-origin-future.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/completion-without-origin-future.md",
+        "documentId": "project-completion-without-origin-future",
+        "kind": "task",
+        "title": "Projection completion-without-origin-future",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-24",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "rrule": "FREQ=DAILY",
+          "anchor": "completion",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-24",
+        "effectiveOccurrenceState": "future",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "effective-paused-retains-plan",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"project-paused-retains-plan\", \"task\": {\"status\": \"open\", \"start\": \"anytime\", \"repeat\": {\"start\": \"2026-08-17\", \"rrule\": \"FREQ=DAILY\", \"anchor\": \"schedule\", \"missed\": \"carry\", \"resetChecklist\": false, \"paused\": true, \"pausedSince\": \"2026-08-20\"}, \"plan\": {\"date\": \"2026-08-19\", \"at\": \"anytime\"}}}\n---\n# Projection paused-retains-plan\n",
+    "path": "tasks/paused-retains-plan.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/paused-retains-plan.md",
+        "documentId": "project-paused-retains-plan",
+        "kind": "task",
+        "title": "Projection paused-retains-plan",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-19",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-17",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": true,
+          "pausedSince": "2026-08-20"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "paused",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "effective-paused-without-plan",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"project-paused-without-plan\", \"task\": {\"status\": \"open\", \"start\": \"anytime\", \"repeat\": {\"start\": \"2026-08-17\", \"rrule\": \"FREQ=DAILY\", \"anchor\": \"schedule\", \"missed\": \"carry\", \"resetChecklist\": false, \"paused\": true, \"pausedSince\": \"2026-08-20\"}}}\n---\n# Projection paused-without-plan\n",
+    "path": "tasks/paused-without-plan.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/paused-without-plan.md",
+        "documentId": "project-paused-without-plan",
+        "kind": "task",
+        "title": "Projection paused-without-plan",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-17",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": true,
+          "pausedSince": "2026-08-20"
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-17",
+        "effectiveOccurrenceState": "paused",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "effective-unsupported-retains-plan",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"project-unsupported-retains-plan\", \"task\": {\"status\": \"open\", \"start\": \"anytime\", \"repeat\": {\"start\": \"2026-08-17\", \"rrule\": \"FREQ=HOURLY\", \"anchor\": \"schedule\", \"missed\": \"carry\", \"resetChecklist\": false, \"paused\": false}, \"plan\": {\"date\": \"2026-08-19\", \"at\": \"anytime\"}}}\n---\n# Projection unsupported-retains-plan\n",
+    "path": "tasks/unsupported-retains-plan.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/unsupported-retains-plan.md",
+        "documentId": "project-unsupported-retains-plan",
+        "kind": "task",
+        "title": "Projection unsupported-retains-plan",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-19",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-17",
+          "rrule": "FREQ=HOURLY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "effective-unsupported-retains-origin",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"project-unsupported-retains-origin\", \"task\": {\"status\": \"open\", \"start\": \"anytime\", \"repeat\": {\"start\": \"2026-08-17\", \"rrule\": \"FREQ=HOURLY\", \"anchor\": \"schedule\", \"missed\": \"carry\", \"resetChecklist\": false, \"paused\": false}}}\n---\n# Projection unsupported-retains-origin\n",
+    "path": "tasks/unsupported-retains-origin.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/unsupported-retains-origin.md",
+        "documentId": "project-unsupported-retains-origin",
+        "kind": "task",
+        "title": "Projection unsupported-retains-origin",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-17",
+          "rrule": "FREQ=HOURLY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-17",
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "effective-invalid-rule-warning",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"project-invalid-rule-warning\", \"task\": {\"status\": \"open\", \"start\": \"anytime\", \"repeat\": {\"start\": \"2026-08-17\", \"rrule\": \"RRULE:FREQ=DAILY\", \"anchor\": \"schedule\", \"missed\": \"carry\", \"resetChecklist\": false, \"paused\": false}, \"plan\": {\"date\": \"2026-08-17\", \"at\": \"anytime\"}}}\n---\n# Projection invalid-rule-warning\n",
+    "path": "tasks/invalid-rule-warning.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/invalid-rule-warning.md",
+        "documentId": "project-invalid-rule-warning",
+        "kind": "task",
+        "title": "Projection invalid-rule-warning",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-17",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-17",
+          "rrule": "RRULE:FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-17",
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "effective-inclusive-pause-ranges",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"project-inclusive-pause-ranges\", \"task\": {\"status\": \"open\", \"start\": \"anytime\", \"repeat\": {\"start\": \"2026-08-17\", \"rrule\": \"FREQ=DAILY\", \"anchor\": \"schedule\", \"missed\": \"carry\", \"resetChecklist\": false, \"paused\": false, \"pauseRanges\": [{\"start\": \"2026-08-18\", \"end\": \"2026-08-20\"}]}, \"plan\": {\"date\": \"2026-08-18\", \"at\": \"anytime\"}}}\n---\n# Projection inclusive-pause-ranges\n",
+    "path": "tasks/inclusive-pause-ranges.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/inclusive-pause-ranges.md",
+        "documentId": "project-inclusive-pause-ranges",
+        "kind": "task",
+        "title": "Projection inclusive-pause-ranges",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-18",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-17",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false,
+          "pauseRanges": [
+            {
+              "start": "2026-08-18",
+              "end": "2026-08-20"
+            }
+          ]
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-21",
+        "effectiveOccurrenceState": "current",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "effective-lifecycle-count-without-plan",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"project-lifecycle-count-without-plan\", \"task\": {\"status\": \"open\", \"start\": \"anytime\", \"repeat\": {\"start\": \"2026-08-17\", \"rrule\": \"FREQ=DAILY\", \"anchor\": \"schedule\", \"missed\": \"carry\", \"resetChecklist\": false, \"paused\": false, \"completionCount\": 3}}}\n---\n# Projection lifecycle-count-without-plan\n",
+    "path": "tasks/lifecycle-count-without-plan.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/lifecycle-count-without-plan.md",
+        "documentId": "project-lifecycle-count-without-plan",
+        "kind": "task",
+        "title": "Projection lifecycle-count-without-plan",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-17",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false,
+          "completionCount": 3
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-20",
+        "effectiveOccurrenceState": "overdue",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "effective-skip-retains-future-plan",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"project-skip-retains-future-plan\", \"task\": {\"status\": \"open\", \"start\": \"anytime\", \"repeat\": {\"start\": \"2026-08-17\", \"rrule\": \"FREQ=DAILY\", \"anchor\": \"schedule\", \"missed\": \"skip\", \"resetChecklist\": false, \"paused\": false}, \"plan\": {\"date\": \"2026-08-24\", \"at\": \"anytime\"}}}\n---\n# Projection skip-retains-future-plan\n",
+    "path": "tasks/skip-retains-future-plan.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/skip-retains-future-plan.md",
+        "documentId": "project-skip-retains-future-plan",
+        "kind": "task",
+        "title": "Projection skip-retains-future-plan",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-24",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-17",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "skip",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-24",
+        "effectiveOccurrenceState": "future",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "effective-skip-no-observation-or-write",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"project-skip-no-observation-or-write\", \"task\": {\"status\": \"open\", \"start\": \"anytime\", \"repeat\": {\"start\": \"2026-08-17\", \"rrule\": \"FREQ=DAILY\", \"anchor\": \"schedule\", \"missed\": \"skip\", \"resetChecklist\": false, \"paused\": false}, \"plan\": {\"date\": \"2026-08-17\", \"at\": \"anytime\"}}}\n---\n# Projection skip-no-observation-or-write\n",
+    "path": "tasks/skip-no-observation-or-write.md",
+    "today": "2026-09-07",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/skip-no-observation-or-write.md",
+        "documentId": "project-skip-no-observation-or-write",
+        "kind": "task",
+        "title": "Projection skip-no-observation-or-write",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-17",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-17",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "skip",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-09-07",
+        "effectiveOccurrenceState": "current",
+        "effectiveForDate": "2026-09-07",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "effective-exceptions-with-pause-ranges",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"project-exceptions-with-pause-ranges\", \"task\": {\"status\": \"open\", \"start\": \"anytime\", \"repeat\": {\"start\": \"2026-08-17\", \"rrule\": \"FREQ=DAILY\", \"anchor\": \"schedule\", \"missed\": \"carry\", \"resetChecklist\": false, \"paused\": false, \"rdate\": [\"2026-08-21\"], \"exdate\": [\"2026-08-21\"], \"pauseRanges\": [{\"start\": \"2026-08-22\", \"end\": \"2026-08-24\"}]}, \"plan\": {\"date\": \"2026-08-21\", \"at\": \"anytime\"}}}\n---\n# Projection exceptions-with-pause-ranges\n",
+    "path": "tasks/exceptions-with-pause-ranges.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/exceptions-with-pause-ranges.md",
+        "documentId": "project-exceptions-with-pause-ranges",
+        "kind": "task",
+        "title": "Projection exceptions-with-pause-ranges",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-21",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-17",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "rdate": [
+            "2026-08-21"
+          ],
+          "exdate": [
+            "2026-08-21"
+          ],
+          "resetChecklist": false,
+          "paused": false,
+          "pauseRanges": [
+            {
+              "start": "2026-08-22",
+              "end": "2026-08-24"
+            }
+          ]
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-25",
+        "effectiveOccurrenceState": "future",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "all-task-fields",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"all-task-fields\", \"task\": {\"status\": \"completed\", \"priority\": \"high\", \"inbox\": true, \"start\": \"2026-08-17\", \"plan\": {\"date\": \"2026-08-20\", \"at\": \"09:45\", \"duration\": \"1h30m\"}, \"deadline\": \"2026-08-25\", \"completedAt\": \"2026-08-20T12:30:00Z\", \"repeat\": {\"start\": \"2026-08-17\", \"rrule\": \"FREQ=DAILY;COUNT=8\", \"anchor\": \"schedule\", \"missed\": \"carry\", \"completionCount\": 2}, \"tracking\": {\"type\": \"count\", \"unit\": \"glasses\", \"target\": 8}, \"comments\": [{\"id\": \"c1\", \"at\": \"2026-08-20T10:00:00Z\", \"text\": \"first\"}, {\"id\": \"c2\", \"at\": \"2026-08-20T11:00:00Z\", \"text\": \"second\", \"resolved\": true}, {\"id\": \"bad\", \"at\": \"missing text\"}]}}\n---\n# all-task-fields\n- [x] done\n- [ ] pending\n  - [x] nested done\n",
+    "path": "tasks/🗒️ all-task-fields.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/🗒️ all-task-fields.md",
+        "documentId": "all-task-fields",
+        "kind": "task",
+        "title": "all-task-fields",
+        "status": "completed",
+        "priority": "high",
+        "inbox": true,
+        "startKind": "date",
+        "startDate": "2026-08-17",
+        "planDate": "2026-08-20",
+        "planKind": "time",
+        "planTime": "09:45",
+        "durationMinutes": 90,
+        "deadline": "2026-08-25",
+        "completedAt": "2026-08-20T12:30:00Z",
+        "repeat": {
+          "start": "2026-08-17",
+          "rrule": "FREQ=DAILY;COUNT=8",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false,
+          "completionCount": 2
+        },
+        "tracking": {
+          "type": "count",
+          "unit": "glasses",
+          "target": 8
+        },
+        "effectiveOccurrenceDate": "2026-08-20",
+        "effectiveOccurrenceState": "overdue",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 3,
+        "checklistCompleted": 2,
+        "commentCount": 2,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "canceled-someday",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"canceled-someday\", \"task\": {\"status\": \"canceled\", \"priority\": \"low\", \"start\": \"someday\", \"completedAt\": \"retained arbitrary timestamp\"}}\n---\n# canceled-someday\n",
+    "path": "tasks/🗒️ canceled-someday.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/🗒️ canceled-someday.md",
+        "documentId": "canceled-someday",
+        "kind": "task",
+        "title": "canceled-someday",
+        "status": "canceled",
+        "priority": "low",
+        "inbox": false,
+        "startKind": "someday",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": "retained arbitrary timestamp",
+        "repeat": null,
+        "tracking": null,
+        "effectiveOccurrenceDate": null,
+        "effectiveOccurrenceState": null,
+        "effectiveForDate": null,
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "opaque-repeat-false",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"opaque-repeat-false\", \"task\": {\"start\": \"anytime\", \"repeat\": false, \"plan\": {\"date\": \"2026-08-19\", \"at\": \"evening\"}}}\n---\n# opaque-repeat-false\n",
+    "path": "tasks/🗒️ opaque-repeat-false.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/🗒️ opaque-repeat-false.md",
+        "documentId": "opaque-repeat-false",
+        "kind": "task",
+        "title": "opaque-repeat-false",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-19",
+        "planKind": "evening",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": false,
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "opaque-repeat-zero",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"opaque-repeat-zero\", \"task\": {\"start\": \"anytime\", \"repeat\": 0, \"plan\": {\"date\": \"2026-08-19\", \"at\": \"evening\"}}}\n---\n# opaque-repeat-zero\n",
+    "path": "tasks/🗒️ opaque-repeat-zero.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/🗒️ opaque-repeat-zero.md",
+        "documentId": "opaque-repeat-zero",
+        "kind": "task",
+        "title": "opaque-repeat-zero",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-19",
+        "planKind": "evening",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": 0,
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "opaque-repeat-empty-string",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"opaque-repeat-empty-string\", \"task\": {\"start\": \"anytime\", \"repeat\": \"\", \"plan\": {\"date\": \"2026-08-19\", \"at\": \"evening\"}}}\n---\n# opaque-repeat-empty-string\n",
+    "path": "tasks/🗒️ opaque-repeat-empty-string.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/🗒️ opaque-repeat-empty-string.md",
+        "documentId": "opaque-repeat-empty-string",
+        "kind": "task",
+        "title": "opaque-repeat-empty-string",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-19",
+        "planKind": "evening",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": "",
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "opaque-repeat-empty-array",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"opaque-repeat-empty-array\", \"task\": {\"start\": \"anytime\", \"repeat\": [], \"plan\": {\"date\": \"2026-08-19\", \"at\": \"evening\"}}}\n---\n# opaque-repeat-empty-array\n",
+    "path": "tasks/🗒️ opaque-repeat-empty-array.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/🗒️ opaque-repeat-empty-array.md",
+        "documentId": "opaque-repeat-empty-array",
+        "kind": "task",
+        "title": "opaque-repeat-empty-array",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-19",
+        "planKind": "evening",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": [],
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "opaque-repeat-object",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"opaque-repeat-object\", \"task\": {\"start\": \"anytime\", \"repeat\": {\"unknown\": [\"retained\", 7]}, \"plan\": {\"date\": \"2026-08-19\", \"at\": \"evening\"}}}\n---\n# opaque-repeat-object\n",
+    "path": "tasks/🗒️ opaque-repeat-object.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/🗒️ opaque-repeat-object.md",
+        "documentId": "opaque-repeat-object",
+        "kind": "task",
+        "title": "opaque-repeat-object",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-08-19",
+        "planKind": "evening",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "unknown": [
+            "retained",
+            7
+          ]
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-19",
+        "effectiveOccurrenceState": "unsupported",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "recurring-invalid-lexical-plan",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"recurring-invalid-lexical-plan\", \"task\": {\"start\": \"anytime\", \"repeat\": {\"start\": \"2026-08-17\", \"rrule\": \"FREQ=DAILY\", \"anchor\": \"schedule\", \"missed\": \"carry\"}, \"plan\": {\"date\": \"2026-99-99\", \"at\": \"morning\"}}}\n---\n# recurring-invalid-lexical-plan\n",
+    "path": "tasks/🗒️ recurring-invalid-lexical-plan.md",
+    "today": "2026-08-21",
+    "expected": {
+      "error": {
+        "name": "Error",
+        "message": "Invalid local date: 2026-99-99"
+      }
+    }
+  },
+  {
+    "name": "explicit-today-before",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"explicit-today-before\", \"task\": {\"start\": \"anytime\", \"repeat\": {\"start\": \"2026-08-21\", \"rrule\": \"FREQ=DAILY\", \"anchor\": \"schedule\", \"missed\": \"carry\"}}}\n---\n# explicit-today-before\n",
+    "path": "tasks/🗒️ explicit-today-before.md",
+    "today": "2026-08-20",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/🗒️ explicit-today-before.md",
+        "documentId": "explicit-today-before",
+        "kind": "task",
+        "title": "explicit-today-before",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-21",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-21",
+        "effectiveOccurrenceState": "future",
+        "effectiveForDate": "2026-08-20",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "explicit-today-on",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"explicit-today-on\", \"task\": {\"start\": \"anytime\", \"repeat\": {\"start\": \"2026-08-21\", \"rrule\": \"FREQ=DAILY\", \"anchor\": \"schedule\", \"missed\": \"carry\"}}}\n---\n# explicit-today-on\n",
+    "path": "tasks/🗒️ explicit-today-on.md",
+    "today": "2026-08-21",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/🗒️ explicit-today-on.md",
+        "documentId": "explicit-today-on",
+        "kind": "task",
+        "title": "explicit-today-on",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-21",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-21",
+        "effectiveOccurrenceState": "current",
+        "effectiveForDate": "2026-08-21",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "explicit-today-after",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"explicit-today-after\", \"task\": {\"start\": \"anytime\", \"repeat\": {\"start\": \"2026-08-21\", \"rrule\": \"FREQ=DAILY\", \"anchor\": \"schedule\", \"missed\": \"carry\"}}}\n---\n# explicit-today-after\n",
+    "path": "tasks/🗒️ explicit-today-after.md",
+    "today": "2026-08-22",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/🗒️ explicit-today-after.md",
+        "documentId": "explicit-today-after",
+        "kind": "task",
+        "title": "explicit-today-after",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": null,
+        "planKind": null,
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-08-21",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-08-21",
+        "effectiveOccurrenceState": "overdue",
+        "effectiveForDate": "2026-08-22",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "monthly-ordinal-projection",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"monthly-ordinal-projection\", \"task\": {\"start\": \"anytime\", \"repeat\": {\"start\": \"2026-01-01\", \"rrule\": \"FREQ=MONTHLY;BYDAY=-5MO;COUNT=3;BYSETPOS=-1\", \"anchor\": \"schedule\", \"missed\": \"carry\", \"rdate\": [\"2025-12-31\"], \"exdate\": [\"2026-03-02\"]}, \"plan\": {\"date\": \"2026-03-02\", \"at\": \"anytime\"}}}\n---\n# monthly-ordinal-projection\n",
+    "path": "tasks/🗒️ monthly-ordinal-projection.md",
+    "today": "2026-05-01",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/🗒️ monthly-ordinal-projection.md",
+        "documentId": "monthly-ordinal-projection",
+        "kind": "task",
+        "title": "monthly-ordinal-projection",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2026-03-02",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2026-01-01",
+          "rrule": "FREQ=MONTHLY;BYDAY=-5MO;COUNT=3;BYSETPOS=-1",
+          "anchor": "schedule",
+          "missed": "carry",
+          "rdate": [
+            "2025-12-31"
+          ],
+          "exdate": [
+            "2026-03-02"
+          ],
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2026-06-01",
+        "effectiveOccurrenceState": "future",
+        "effectiveForDate": "2026-05-01",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  },
+  {
+    "name": "yearly-ordinal-projection",
+    "raw": "---\n{\"type\": \"task\", \"id\": \"yearly-ordinal-projection\", \"task\": {\"start\": \"anytime\", \"repeat\": {\"start\": \"2024-01-01\", \"rrule\": \"FREQ=YEARLY;BYDAY=-53MO;COUNT=3\", \"anchor\": \"schedule\", \"missed\": \"carry\", \"rdate\": [\"2023-12-31\"], \"exdate\": [\"2029-01-01\"]}, \"plan\": {\"date\": \"2029-01-01\", \"at\": \"anytime\"}}}\n---\n# yearly-ordinal-projection\n",
+    "path": "tasks/🗒️ yearly-ordinal-projection.md",
+    "today": "2030-01-01",
+    "expected": {
+      "value": {
+        "documentPath": "tasks/🗒️ yearly-ordinal-projection.md",
+        "documentId": "yearly-ordinal-projection",
+        "kind": "task",
+        "title": "yearly-ordinal-projection",
+        "status": "open",
+        "priority": null,
+        "inbox": false,
+        "startKind": "anytime",
+        "startDate": null,
+        "planDate": "2029-01-01",
+        "planKind": "anytime",
+        "planTime": null,
+        "durationMinutes": null,
+        "deadline": null,
+        "completedAt": null,
+        "repeat": {
+          "start": "2024-01-01",
+          "rrule": "FREQ=YEARLY;BYDAY=-53MO;COUNT=3",
+          "anchor": "schedule",
+          "missed": "carry",
+          "rdate": [
+            "2023-12-31"
+          ],
+          "exdate": [
+            "2029-01-01"
+          ],
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": null,
+        "effectiveOccurrenceDate": "2035-01-01",
+        "effectiveOccurrenceState": "future",
+        "effectiveForDate": "2030-01-01",
+        "checklistTotal": 0,
+        "checklistCompleted": 0,
+        "commentCount": 0,
+        "projectionVersion": 4
+      }
+    }
+  }
+]

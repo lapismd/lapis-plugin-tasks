@@ -6,6 +6,7 @@
 mod document;
 mod marker;
 mod occurrence;
+mod projection;
 mod record;
 mod recurrence;
 
@@ -14,6 +15,7 @@ pub use document::{
     parse_task_document,
 };
 pub use occurrence::{is_canonical_daily_document, task_occurrence_projection_rows};
+pub use projection::{TASK_PROJECTION_VERSION, TaskProjectionRecord, project_task};
 pub use record::{TaskOccurrenceRecord, TaskOutcome, TaskTrackingKind};
 pub use recurrence::{
     EffectiveOccurrence, RecurrenceAnalysis, RecurrenceEngine, RecurrenceError, RecurrenceOptions,
