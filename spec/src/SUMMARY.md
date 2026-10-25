@@ -6,6 +6,7 @@
     - [Plugins / Tasks / Documents](plugins/tasks/documents.md)
       - [Plugins / Tasks / Documents / Recurrence](plugins/tasks/documents/recurrence.md)
     - [Plugins / Tasks / Runtime](plugins/tasks/runtime.md)
+      - [Plugins / Tasks / Runtime / Native transformations](plugins/tasks/runtime/native-transformations.md)
     - [Plugins / Tasks / Lists](plugins/tasks/lists.md)
     - [Plugins / Tasks / Planner](plugins/tasks/planner.md)
       - [Plugins / Tasks / Planner / Workspace surfaces](plugins/tasks/planner/workspace-surfaces.md)

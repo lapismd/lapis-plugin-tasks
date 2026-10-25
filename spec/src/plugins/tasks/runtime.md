@@ -233,6 +233,15 @@ the admitted host. Complete unchanged-TypeScript parity, exact native before/aft
 and complete owner source gates pass. See
 [the index source record](../../../records/2026-10-25-native-task-index.md).
 
+## Native transformation source
+
+LN-TASK-086–089 define the approved [native transformation contract](./runtime/native-transformations.md).
+The unchanged TypeScript oracle/corpus is authored before native exports. Task
+and daily-observation transformations return values only; file authority,
+materialization scheduling and both host adoptions stay separate. The pure export contract is approved. The frozen unchanged-TypeScript corpus
+and new native implementation are undergoing source qualification; read-only
+qualification remains unchanged.
+
 ## Repository and file stores
 
 `TaskRepository` in `src/lib/model/task-repository.ts` is the mutation

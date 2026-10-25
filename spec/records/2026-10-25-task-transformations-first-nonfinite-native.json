@@ -1,0 +1,329 @@
+[
+  {
+    "actual": {
+      "value": {
+        "raw": "---\ntask:\n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: nonfinite\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Nonfinite\n",
+        "steps": [
+          {
+            "document": {
+              "body": "\n# Nonfinite\n",
+              "checklist": [],
+              "diagnostics": [],
+              "id": "nonfinite",
+              "kind": "task",
+              "path": "tasks/Nonfinite.md",
+              "raw": "---\ntype: task\nid: nonfinite\ntask:\n  status: open\n  priority: .nan\n---\n\n# Nonfinite\n",
+              "structuralLinks": [],
+              "tags": [],
+              "task": {
+                "comments": [],
+                "inbox": false,
+                "start": {
+                  "kind": "anytime"
+                },
+                "status": "canceled"
+              },
+              "title": "Nonfinite",
+              "updated": "2026-10-25T00:00:00Z"
+            },
+            "raw": "---\ntask:\n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: nonfinite\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Nonfinite\n",
+            "reparsed": {
+              "body": "\n# Nonfinite\n",
+              "checklist": [],
+              "diagnostics": [],
+              "id": "nonfinite",
+              "kind": "task",
+              "path": "tasks/Nonfinite.md",
+              "raw": "---\ntask:\n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: nonfinite\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Nonfinite\n",
+              "structuralLinks": [],
+              "tags": [],
+              "task": {
+                "comments": [],
+                "inbox": false,
+                "start": {
+                  "kind": "anytime"
+                },
+                "status": "canceled"
+              },
+              "title": "Nonfinite",
+              "updated": "2026-10-25T00:00:00Z"
+            }
+          }
+        ]
+      }
+    },
+    "expected": {
+      "value": {
+        "raw": "---\ntask:\n  status: canceled\n  priority: .nan\n  inbox: false\n  start: anytime\ntype: task\nid: nonfinite\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Nonfinite\n",
+        "steps": [
+          {
+            "document": {
+              "body": "\n# Nonfinite\n",
+              "checklist": [],
+              "diagnostics": [],
+              "id": "nonfinite",
+              "kind": "task",
+              "path": "tasks/Nonfinite.md",
+              "raw": "---\ntype: task\nid: nonfinite\ntask:\n  status: open\n  priority: .nan\n---\n\n# Nonfinite\n",
+              "structuralLinks": [],
+              "tags": [],
+              "task": {
+                "comments": [],
+                "inbox": false,
+                "start": {
+                  "kind": "anytime"
+                },
+                "status": "canceled",
+                "unparsedPriority": null
+              },
+              "title": "Nonfinite",
+              "updated": "2026-10-25T00:00:00Z"
+            },
+            "raw": "---\ntask:\n  status: canceled\n  priority: .nan\n  inbox: false\n  start: anytime\ntype: task\nid: nonfinite\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Nonfinite\n",
+            "reparsed": {
+              "body": "\n# Nonfinite\n",
+              "checklist": [],
+              "diagnostics": [],
+              "id": "nonfinite",
+              "kind": "task",
+              "path": "tasks/Nonfinite.md",
+              "raw": "---\ntask:\n  status: canceled\n  priority: .nan\n  inbox: false\n  start: anytime\ntype: task\nid: nonfinite\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Nonfinite\n",
+              "structuralLinks": [],
+              "tags": [],
+              "task": {
+                "comments": [],
+                "inbox": false,
+                "start": {
+                  "kind": "anytime"
+                },
+                "status": "canceled",
+                "unparsedPriority": null
+              },
+              "title": "Nonfinite",
+              "updated": "2026-10-25T00:00:00Z"
+            }
+          }
+        ]
+      }
+    },
+    "name": "nonfinite priority / .nan"
+  },
+  {
+    "actual": {
+      "value": {
+        "raw": "---\ntask:\n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: nonfinite\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Nonfinite\n",
+        "steps": [
+          {
+            "document": {
+              "body": "\n# Nonfinite\n",
+              "checklist": [],
+              "diagnostics": [],
+              "id": "nonfinite",
+              "kind": "task",
+              "path": "tasks/Nonfinite.md",
+              "raw": "---\ntype: task\nid: nonfinite\ntask:\n  status: open\n  priority: .inf\n---\n\n# Nonfinite\n",
+              "structuralLinks": [],
+              "tags": [],
+              "task": {
+                "comments": [],
+                "inbox": false,
+                "start": {
+                  "kind": "anytime"
+                },
+                "status": "canceled"
+              },
+              "title": "Nonfinite",
+              "updated": "2026-10-25T00:00:00Z"
+            },
+            "raw": "---\ntask:\n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: nonfinite\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Nonfinite\n",
+            "reparsed": {
+              "body": "\n# Nonfinite\n",
+              "checklist": [],
+              "diagnostics": [],
+              "id": "nonfinite",
+              "kind": "task",
+              "path": "tasks/Nonfinite.md",
+              "raw": "---\ntask:\n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: nonfinite\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Nonfinite\n",
+              "structuralLinks": [],
+              "tags": [],
+              "task": {
+                "comments": [],
+                "inbox": false,
+                "start": {
+                  "kind": "anytime"
+                },
+                "status": "canceled"
+              },
+              "title": "Nonfinite",
+              "updated": "2026-10-25T00:00:00Z"
+            }
+          }
+        ]
+      }
+    },
+    "expected": {
+      "value": {
+        "raw": "---\ntask:\n  status: canceled\n  priority: .inf\n  inbox: false\n  start: anytime\ntype: task\nid: nonfinite\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Nonfinite\n",
+        "steps": [
+          {
+            "document": {
+              "body": "\n# Nonfinite\n",
+              "checklist": [],
+              "diagnostics": [],
+              "id": "nonfinite",
+              "kind": "task",
+              "path": "tasks/Nonfinite.md",
+              "raw": "---\ntype: task\nid: nonfinite\ntask:\n  status: open\n  priority: .inf\n---\n\n# Nonfinite\n",
+              "structuralLinks": [],
+              "tags": [],
+              "task": {
+                "comments": [],
+                "inbox": false,
+                "start": {
+                  "kind": "anytime"
+                },
+                "status": "canceled",
+                "unparsedPriority": null
+              },
+              "title": "Nonfinite",
+              "updated": "2026-10-25T00:00:00Z"
+            },
+            "raw": "---\ntask:\n  status: canceled\n  priority: .inf\n  inbox: false\n  start: anytime\ntype: task\nid: nonfinite\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Nonfinite\n",
+            "reparsed": {
+              "body": "\n# Nonfinite\n",
+              "checklist": [],
+              "diagnostics": [],
+              "id": "nonfinite",
+              "kind": "task",
+              "path": "tasks/Nonfinite.md",
+              "raw": "---\ntask:\n  status: canceled\n  priority: .inf\n  inbox: false\n  start: anytime\ntype: task\nid: nonfinite\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Nonfinite\n",
+              "structuralLinks": [],
+              "tags": [],
+              "task": {
+                "comments": [],
+                "inbox": false,
+                "start": {
+                  "kind": "anytime"
+                },
+                "status": "canceled",
+                "unparsedPriority": null
+              },
+              "title": "Nonfinite",
+              "updated": "2026-10-25T00:00:00Z"
+            }
+          }
+        ]
+      }
+    },
+    "name": "nonfinite priority / .inf"
+  },
+  {
+    "actual": {
+      "value": {
+        "raw": "---\ntask:\n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: nonfinite\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Nonfinite\n",
+        "steps": [
+          {
+            "document": {
+              "body": "\n# Nonfinite\n",
+              "checklist": [],
+              "diagnostics": [],
+              "id": "nonfinite",
+              "kind": "task",
+              "path": "tasks/Nonfinite.md",
+              "raw": "---\ntype: task\nid: nonfinite\ntask:\n  status: open\n  priority: -.inf\n---\n\n# Nonfinite\n",
+              "structuralLinks": [],
+              "tags": [],
+              "task": {
+                "comments": [],
+                "inbox": false,
+                "start": {
+                  "kind": "anytime"
+                },
+                "status": "canceled"
+              },
+              "title": "Nonfinite",
+              "updated": "2026-10-25T00:00:00Z"
+            },
+            "raw": "---\ntask:\n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: nonfinite\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Nonfinite\n",
+            "reparsed": {
+              "body": "\n# Nonfinite\n",
+              "checklist": [],
+              "diagnostics": [],
+              "id": "nonfinite",
+              "kind": "task",
+              "path": "tasks/Nonfinite.md",
+              "raw": "---\ntask:\n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: nonfinite\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Nonfinite\n",
+              "structuralLinks": [],
+              "tags": [],
+              "task": {
+                "comments": [],
+                "inbox": false,
+                "start": {
+                  "kind": "anytime"
+                },
+                "status": "canceled"
+              },
+              "title": "Nonfinite",
+              "updated": "2026-10-25T00:00:00Z"
+            }
+          }
+        ]
+      }
+    },
+    "expected": {
+      "value": {
+        "raw": "---\ntask:\n  status: canceled\n  priority: -.inf\n  inbox: false\n  start: anytime\ntype: task\nid: nonfinite\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Nonfinite\n",
+        "steps": [
+          {
+            "document": {
+              "body": "\n# Nonfinite\n",
+              "checklist": [],
+              "diagnostics": [],
+              "id": "nonfinite",
+              "kind": "task",
+              "path": "tasks/Nonfinite.md",
+              "raw": "---\ntype: task\nid: nonfinite\ntask:\n  status: open\n  priority: -.inf\n---\n\n# Nonfinite\n",
+              "structuralLinks": [],
+              "tags": [],
+              "task": {
+                "comments": [],
+                "inbox": false,
+                "start": {
+                  "kind": "anytime"
+                },
+                "status": "canceled",
+                "unparsedPriority": null
+              },
+              "title": "Nonfinite",
+              "updated": "2026-10-25T00:00:00Z"
+            },
+            "raw": "---\ntask:\n  status: canceled\n  priority: -.inf\n  inbox: false\n  start: anytime\ntype: task\nid: nonfinite\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Nonfinite\n",
+            "reparsed": {
+              "body": "\n# Nonfinite\n",
+              "checklist": [],
+              "diagnostics": [],
+              "id": "nonfinite",
+              "kind": "task",
+              "path": "tasks/Nonfinite.md",
+              "raw": "---\ntask:\n  status: canceled\n  priority: -.inf\n  inbox: false\n  start: anytime\ntype: task\nid: nonfinite\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Nonfinite\n",
+              "structuralLinks": [],
+              "tags": [],
+              "task": {
+                "comments": [],
+                "inbox": false,
+                "start": {
+                  "kind": "anytime"
+                },
+                "status": "canceled",
+                "unparsedPriority": null
+              },
+              "title": "Nonfinite",
+              "updated": "2026-10-25T00:00:00Z"
+            }
+          }
+        ]
+      }
+    },
+    "name": "nonfinite priority / -.inf"
+  }
+]

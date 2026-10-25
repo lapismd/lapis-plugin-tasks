@@ -1,7 +1,7 @@
-//! Source-owned, read-only Tasks algorithms for native Lapis hosts.
+//! Source-owned Tasks algorithms for native Lapis hosts.
 //!
 //! Hosts own admission, indexing lifetime, projection registration and writes.
-//! This crate derives disposable document and occurrence records from authored Markdown.
+//! This crate derives records and replacement Markdown from explicit authored values.
 
 mod document;
 mod index;
@@ -11,6 +11,15 @@ mod projection;
 mod record;
 mod recurrence;
 mod structure;
+mod transform;
+
+pub use transform::{
+    TaskDayPartSettings, TaskMutation, TaskOccurrenceCompletion, TaskOccurrenceDayPart,
+    TaskOccurrenceMaterialization, TaskOccurrenceObservation, TaskPauseRange, TaskPlan, TaskPlanAt,
+    TaskRepeat, TaskRepeatAnchor, TaskRepeatMissed, TaskStart, TaskTracking, TaskTransformError,
+    apply_task_mutation, complete_task_occurrence, materialize_task_occurrence,
+    scan_task_occurrence_observations, task_occurrence_day_part, tracking_completion,
+};
 
 pub use document::{
     ChecklistItem, ParsedTaskDocument, StructuralLink, TaskDiagnostic, TaskDocumentKind,

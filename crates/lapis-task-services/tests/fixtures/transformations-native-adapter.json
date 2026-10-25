@@ -1,0 +1,592 @@
+[
+  {
+    "name": "valid authored / repeat patch {\"anchor\": \"schedule\", \"missed\": \"skip\", \"rrule\": \"FREQ=HOURLY\", \"start\": \"2026-08-20\"}",
+    "raw": "---\ntype: task\nid: read\ncreated: 2026-08-01T10:00:00Z\nextra:\n  keep: [one, two]\ntask:\n  status: open\n  inbox: true\n  start: anytime\n  future: keep\n  comments:\n    - id: c1\n      at: 2026-08-19T09:00:00Z\n      text: Keep this\n  plan:\n    date: 2026-08-20\n    at: \"07:00\"\n    duration: 45m\n  repeat:\n    start: 2026-08-20\n    rrule: FREQ=DAILY\n    anchor: schedule\n    missed: carry\n    resetChecklist: true\n    completionCount: 0\n    lastCompletedAt: 2026-08-19T08:00:00Z\n---\n\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+    "path": "tasks/Read.md",
+    "actions": [
+      {
+        "type": "repeat",
+        "at": "2026-08-20T10:00:00+01:00",
+        "repeat": {
+          "rrule": "FREQ=HOURLY",
+          "start": "2026-08-20",
+          "anchor": "schedule",
+          "missed": "skip"
+        }
+      }
+    ],
+    "expected": {
+      "value": {
+        "raw": "---\nextra:\n  keep:\n    - one\n    - two\ntask:\n  future: keep\n  status: open\n  inbox: true\n  start: anytime\n  plan:\n    date: 2026-08-20\n    at: 07:00\n    duration: 45m\n  repeat:\n    start: 2026-08-20\n    rrule: FREQ=HOURLY\n    anchor: schedule\n    missed: skip\n    lastCompletedAt: 2026-08-19T08:00:00Z\n    completionCount: 0\n  comments:\n    - id: c1\n      at: 2026-08-19T09:00:00Z\n      text: Keep this\ntype: task\nid: read\ncreated: 2026-08-01T10:00:00Z\nupdated: 2026-08-20T10:00:00+01:00\n---\n\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+        "steps": [
+          {
+            "document": {
+              "path": "tasks/Read.md",
+              "raw": "---\ntype: task\nid: read\ncreated: 2026-08-01T10:00:00Z\nextra:\n  keep: [one, two]\ntask:\n  status: open\n  inbox: true\n  start: anytime\n  future: keep\n  comments:\n    - id: c1\n      at: 2026-08-19T09:00:00Z\n      text: Keep this\n  plan:\n    date: 2026-08-20\n    at: \"07:00\"\n    duration: 45m\n  repeat:\n    start: 2026-08-20\n    rrule: FREQ=DAILY\n    anchor: schedule\n    missed: carry\n    resetChecklist: true\n    completionCount: 0\n    lastCompletedAt: 2026-08-19T08:00:00Z\n---\n\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+              "id": "read",
+              "kind": "task",
+              "title": "Read 📝",
+              "tags": [],
+              "created": "2026-08-01T10:00:00Z",
+              "updated": "2026-08-20T10:00:00+01:00",
+              "task": {
+                "status": "open",
+                "inbox": true,
+                "start": {
+                  "kind": "anytime"
+                },
+                "plan": {
+                  "date": "2026-08-20",
+                  "at": "time",
+                  "time": "07:00",
+                  "duration": "45m",
+                  "durationMinutes": 45
+                },
+                "repeat": {
+                  "start": "2026-08-20",
+                  "rrule": "FREQ=HOURLY",
+                  "anchor": "schedule",
+                  "missed": "skip",
+                  "lastCompletedAt": "2026-08-19T08:00:00Z",
+                  "completionCount": 0
+                },
+                "comments": [
+                  {
+                    "id": "c1",
+                    "at": "2026-08-19T09:00:00Z",
+                    "text": "Keep this"
+                  }
+                ]
+              },
+              "body": "\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+              "checklist": [
+                {
+                  "text": "First",
+                  "checked": true,
+                  "position": 0,
+                  "sourceStart": 487,
+                  "sourceEnd": 498,
+                  "source": "- [x] First"
+                },
+                {
+                  "text": "Second",
+                  "checked": false,
+                  "position": 1,
+                  "sourceStart": 499,
+                  "sourceEnd": 511,
+                  "source": "- [ ] Second"
+                }
+              ],
+              "structuralLinks": [],
+              "diagnostics": []
+            },
+            "raw": "---\nextra:\n  keep:\n    - one\n    - two\ntask:\n  future: keep\n  status: open\n  inbox: true\n  start: anytime\n  plan:\n    date: 2026-08-20\n    at: 07:00\n    duration: 45m\n  repeat:\n    start: 2026-08-20\n    rrule: FREQ=HOURLY\n    anchor: schedule\n    missed: skip\n    lastCompletedAt: 2026-08-19T08:00:00Z\n    completionCount: 0\n  comments:\n    - id: c1\n      at: 2026-08-19T09:00:00Z\n      text: Keep this\ntype: task\nid: read\ncreated: 2026-08-01T10:00:00Z\nupdated: 2026-08-20T10:00:00+01:00\n---\n\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+            "reparsed": {
+              "path": "tasks/Read.md",
+              "raw": "---\nextra:\n  keep:\n    - one\n    - two\ntask:\n  future: keep\n  status: open\n  inbox: true\n  start: anytime\n  plan:\n    date: 2026-08-20\n    at: 07:00\n    duration: 45m\n  repeat:\n    start: 2026-08-20\n    rrule: FREQ=HOURLY\n    anchor: schedule\n    missed: skip\n    lastCompletedAt: 2026-08-19T08:00:00Z\n    completionCount: 0\n  comments:\n    - id: c1\n      at: 2026-08-19T09:00:00Z\n      text: Keep this\ntype: task\nid: read\ncreated: 2026-08-01T10:00:00Z\nupdated: 2026-08-20T10:00:00+01:00\n---\n\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+              "id": "read",
+              "kind": "task",
+              "title": "Read 📝",
+              "tags": [],
+              "created": "2026-08-01T10:00:00Z",
+              "updated": "2026-08-20T10:00:00+01:00",
+              "task": {
+                "status": "open",
+                "inbox": true,
+                "start": {
+                  "kind": "anytime"
+                },
+                "plan": {
+                  "date": "2026-08-20",
+                  "at": "time",
+                  "time": "07:00",
+                  "duration": "45m",
+                  "durationMinutes": 45
+                },
+                "repeat": {
+                  "start": "2026-08-20",
+                  "rrule": "FREQ=HOURLY",
+                  "anchor": "schedule",
+                  "missed": "skip",
+                  "resetChecklist": false,
+                  "paused": false,
+                  "lastCompletedAt": "2026-08-19T08:00:00Z",
+                  "completionCount": 0
+                },
+                "comments": [
+                  {
+                    "id": "c1",
+                    "at": "2026-08-19T09:00:00Z",
+                    "text": "Keep this"
+                  }
+                ]
+              },
+              "body": "\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+              "checklist": [
+                {
+                  "text": "First",
+                  "checked": true,
+                  "position": 0,
+                  "sourceStart": 504,
+                  "sourceEnd": 515,
+                  "source": "- [x] First"
+                },
+                {
+                  "text": "Second",
+                  "checked": false,
+                  "position": 1,
+                  "sourceStart": 516,
+                  "sourceEnd": 528,
+                  "source": "- [ ] Second"
+                }
+              ],
+              "structuralLinks": [],
+              "diagnostics": [
+                {
+                  "code": "unsupported-repeat-rule",
+                  "field": "task.repeat.rrule",
+                  "message": "The RRULE is preserved but automatic advancement is blocked because Tasks does not execute: FREQ=HOURLY."
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "retainedExpected": {
+      "value": {
+        "raw": "---\nextra:\n  keep:\n    - one\n    - two\ntask:\n  future: keep\n  status: open\n  inbox: true\n  start: anytime\n  plan:\n    date: 2026-08-20\n    at: 07:00\n    duration: 45m\n  repeat:\n    rrule: FREQ=HOURLY\n    start: 2026-08-20\n    anchor: schedule\n    missed: skip\n    lastCompletedAt: 2026-08-19T08:00:00Z\n    completionCount: 0\n  comments:\n    - id: c1\n      at: 2026-08-19T09:00:00Z\n      text: Keep this\ntype: task\nid: read\ncreated: 2026-08-01T10:00:00Z\nupdated: 2026-08-20T10:00:00+01:00\n---\n\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+        "steps": [
+          {
+            "document": {
+              "path": "tasks/Read.md",
+              "raw": "---\ntype: task\nid: read\ncreated: 2026-08-01T10:00:00Z\nextra:\n  keep: [one, two]\ntask:\n  status: open\n  inbox: true\n  start: anytime\n  future: keep\n  comments:\n    - id: c1\n      at: 2026-08-19T09:00:00Z\n      text: Keep this\n  plan:\n    date: 2026-08-20\n    at: \"07:00\"\n    duration: 45m\n  repeat:\n    start: 2026-08-20\n    rrule: FREQ=DAILY\n    anchor: schedule\n    missed: carry\n    resetChecklist: true\n    completionCount: 0\n    lastCompletedAt: 2026-08-19T08:00:00Z\n---\n\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+              "id": "read",
+              "kind": "task",
+              "title": "Read 📝",
+              "tags": [],
+              "created": "2026-08-01T10:00:00Z",
+              "updated": "2026-08-20T10:00:00+01:00",
+              "task": {
+                "status": "open",
+                "inbox": true,
+                "start": {
+                  "kind": "anytime"
+                },
+                "plan": {
+                  "date": "2026-08-20",
+                  "at": "time",
+                  "time": "07:00",
+                  "duration": "45m",
+                  "durationMinutes": 45
+                },
+                "repeat": {
+                  "rrule": "FREQ=HOURLY",
+                  "start": "2026-08-20",
+                  "anchor": "schedule",
+                  "missed": "skip",
+                  "lastCompletedAt": "2026-08-19T08:00:00Z",
+                  "completionCount": 0
+                },
+                "comments": [
+                  {
+                    "id": "c1",
+                    "at": "2026-08-19T09:00:00Z",
+                    "text": "Keep this"
+                  }
+                ]
+              },
+              "body": "\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+              "checklist": [
+                {
+                  "text": "First",
+                  "checked": true,
+                  "position": 0,
+                  "sourceStart": 487,
+                  "sourceEnd": 498,
+                  "source": "- [x] First"
+                },
+                {
+                  "text": "Second",
+                  "checked": false,
+                  "position": 1,
+                  "sourceStart": 499,
+                  "sourceEnd": 511,
+                  "source": "- [ ] Second"
+                }
+              ],
+              "structuralLinks": [],
+              "diagnostics": []
+            },
+            "raw": "---\nextra:\n  keep:\n    - one\n    - two\ntask:\n  future: keep\n  status: open\n  inbox: true\n  start: anytime\n  plan:\n    date: 2026-08-20\n    at: 07:00\n    duration: 45m\n  repeat:\n    rrule: FREQ=HOURLY\n    start: 2026-08-20\n    anchor: schedule\n    missed: skip\n    lastCompletedAt: 2026-08-19T08:00:00Z\n    completionCount: 0\n  comments:\n    - id: c1\n      at: 2026-08-19T09:00:00Z\n      text: Keep this\ntype: task\nid: read\ncreated: 2026-08-01T10:00:00Z\nupdated: 2026-08-20T10:00:00+01:00\n---\n\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+            "reparsed": {
+              "path": "tasks/Read.md",
+              "raw": "---\nextra:\n  keep:\n    - one\n    - two\ntask:\n  future: keep\n  status: open\n  inbox: true\n  start: anytime\n  plan:\n    date: 2026-08-20\n    at: 07:00\n    duration: 45m\n  repeat:\n    rrule: FREQ=HOURLY\n    start: 2026-08-20\n    anchor: schedule\n    missed: skip\n    lastCompletedAt: 2026-08-19T08:00:00Z\n    completionCount: 0\n  comments:\n    - id: c1\n      at: 2026-08-19T09:00:00Z\n      text: Keep this\ntype: task\nid: read\ncreated: 2026-08-01T10:00:00Z\nupdated: 2026-08-20T10:00:00+01:00\n---\n\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+              "id": "read",
+              "kind": "task",
+              "title": "Read 📝",
+              "tags": [],
+              "created": "2026-08-01T10:00:00Z",
+              "updated": "2026-08-20T10:00:00+01:00",
+              "task": {
+                "status": "open",
+                "inbox": true,
+                "start": {
+                  "kind": "anytime"
+                },
+                "plan": {
+                  "date": "2026-08-20",
+                  "at": "time",
+                  "time": "07:00",
+                  "duration": "45m",
+                  "durationMinutes": 45
+                },
+                "repeat": {
+                  "start": "2026-08-20",
+                  "rrule": "FREQ=HOURLY",
+                  "anchor": "schedule",
+                  "missed": "skip",
+                  "resetChecklist": false,
+                  "paused": false,
+                  "lastCompletedAt": "2026-08-19T08:00:00Z",
+                  "completionCount": 0
+                },
+                "comments": [
+                  {
+                    "id": "c1",
+                    "at": "2026-08-19T09:00:00Z",
+                    "text": "Keep this"
+                  }
+                ]
+              },
+              "body": "\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+              "checklist": [
+                {
+                  "text": "First",
+                  "checked": true,
+                  "position": 0,
+                  "sourceStart": 504,
+                  "sourceEnd": 515,
+                  "source": "- [x] First"
+                },
+                {
+                  "text": "Second",
+                  "checked": false,
+                  "position": 1,
+                  "sourceStart": 516,
+                  "sourceEnd": 528,
+                  "source": "- [ ] Second"
+                }
+              ],
+              "structuralLinks": [],
+              "diagnostics": [
+                {
+                  "code": "unsupported-repeat-rule",
+                  "field": "task.repeat.rrule",
+                  "message": "The RRULE is preserved but automatic advancement is blocked because Tasks does not execute: FREQ=HOURLY."
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "valid authored / repeat patch {\"anchor\": \"schedule\", \"completionCount\": 0, \"exdate\": [], \"missed\": \"carry\", \"pauseRanges\": [], \"paused\": false, \"rdate\": [], \"resetChecklist\": false, \"rrule\": \"FREQ=DAILY\", \"start\": \"2026-08-20\"}",
+    "raw": "---\ntype: task\nid: read\ncreated: 2026-08-01T10:00:00Z\nextra:\n  keep: [one, two]\ntask:\n  status: open\n  inbox: true\n  start: anytime\n  future: keep\n  comments:\n    - id: c1\n      at: 2026-08-19T09:00:00Z\n      text: Keep this\n  plan:\n    date: 2026-08-20\n    at: \"07:00\"\n    duration: 45m\n  repeat:\n    start: 2026-08-20\n    rrule: FREQ=DAILY\n    anchor: schedule\n    missed: carry\n    resetChecklist: true\n    completionCount: 0\n    lastCompletedAt: 2026-08-19T08:00:00Z\n---\n\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+    "path": "tasks/Read.md",
+    "actions": [
+      {
+        "type": "repeat",
+        "at": "2026-08-20T10:00:00+01:00",
+        "repeat": {
+          "rrule": "FREQ=DAILY",
+          "start": "2026-08-20",
+          "anchor": "schedule",
+          "missed": "carry",
+          "rdate": [],
+          "exdate": [],
+          "resetChecklist": false,
+          "paused": false,
+          "pauseRanges": [],
+          "completionCount": 0
+        }
+      }
+    ],
+    "expected": {
+      "value": {
+        "raw": "---\nextra:\n  keep:\n    - one\n    - two\ntask:\n  future: keep\n  status: open\n  inbox: true\n  start: anytime\n  plan:\n    date: 2026-08-20\n    at: 07:00\n    duration: 45m\n  repeat:\n    start: 2026-08-20\n    rrule: FREQ=DAILY\n    anchor: schedule\n    missed: carry\n    rdate: []\n    exdate: []\n    resetChecklist: false\n    paused: false\n    pauseRanges: []\n    completionCount: 0\n    lastCompletedAt: 2026-08-19T08:00:00Z\n  comments:\n    - id: c1\n      at: 2026-08-19T09:00:00Z\n      text: Keep this\ntype: task\nid: read\ncreated: 2026-08-01T10:00:00Z\nupdated: 2026-08-20T10:00:00+01:00\n---\n\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+        "steps": [
+          {
+            "document": {
+              "path": "tasks/Read.md",
+              "raw": "---\ntype: task\nid: read\ncreated: 2026-08-01T10:00:00Z\nextra:\n  keep: [one, two]\ntask:\n  status: open\n  inbox: true\n  start: anytime\n  future: keep\n  comments:\n    - id: c1\n      at: 2026-08-19T09:00:00Z\n      text: Keep this\n  plan:\n    date: 2026-08-20\n    at: \"07:00\"\n    duration: 45m\n  repeat:\n    start: 2026-08-20\n    rrule: FREQ=DAILY\n    anchor: schedule\n    missed: carry\n    resetChecklist: true\n    completionCount: 0\n    lastCompletedAt: 2026-08-19T08:00:00Z\n---\n\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+              "id": "read",
+              "kind": "task",
+              "title": "Read 📝",
+              "tags": [],
+              "created": "2026-08-01T10:00:00Z",
+              "updated": "2026-08-20T10:00:00+01:00",
+              "task": {
+                "status": "open",
+                "inbox": true,
+                "start": {
+                  "kind": "anytime"
+                },
+                "plan": {
+                  "date": "2026-08-20",
+                  "at": "time",
+                  "time": "07:00",
+                  "duration": "45m",
+                  "durationMinutes": 45
+                },
+                "repeat": {
+                  "start": "2026-08-20",
+                  "rrule": "FREQ=DAILY",
+                  "anchor": "schedule",
+                  "missed": "carry",
+                  "rdate": [],
+                  "exdate": [],
+                  "resetChecklist": false,
+                  "paused": false,
+                  "pauseRanges": [],
+                  "completionCount": 0,
+                  "lastCompletedAt": "2026-08-19T08:00:00Z"
+                },
+                "comments": [
+                  {
+                    "id": "c1",
+                    "at": "2026-08-19T09:00:00Z",
+                    "text": "Keep this"
+                  }
+                ]
+              },
+              "body": "\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+              "checklist": [
+                {
+                  "text": "First",
+                  "checked": true,
+                  "position": 0,
+                  "sourceStart": 487,
+                  "sourceEnd": 498,
+                  "source": "- [x] First"
+                },
+                {
+                  "text": "Second",
+                  "checked": false,
+                  "position": 1,
+                  "sourceStart": 499,
+                  "sourceEnd": 511,
+                  "source": "- [ ] Second"
+                }
+              ],
+              "structuralLinks": [],
+              "diagnostics": []
+            },
+            "raw": "---\nextra:\n  keep:\n    - one\n    - two\ntask:\n  future: keep\n  status: open\n  inbox: true\n  start: anytime\n  plan:\n    date: 2026-08-20\n    at: 07:00\n    duration: 45m\n  repeat:\n    start: 2026-08-20\n    rrule: FREQ=DAILY\n    anchor: schedule\n    missed: carry\n    rdate: []\n    exdate: []\n    resetChecklist: false\n    paused: false\n    pauseRanges: []\n    completionCount: 0\n    lastCompletedAt: 2026-08-19T08:00:00Z\n  comments:\n    - id: c1\n      at: 2026-08-19T09:00:00Z\n      text: Keep this\ntype: task\nid: read\ncreated: 2026-08-01T10:00:00Z\nupdated: 2026-08-20T10:00:00+01:00\n---\n\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+            "reparsed": {
+              "path": "tasks/Read.md",
+              "raw": "---\nextra:\n  keep:\n    - one\n    - two\ntask:\n  future: keep\n  status: open\n  inbox: true\n  start: anytime\n  plan:\n    date: 2026-08-20\n    at: 07:00\n    duration: 45m\n  repeat:\n    start: 2026-08-20\n    rrule: FREQ=DAILY\n    anchor: schedule\n    missed: carry\n    rdate: []\n    exdate: []\n    resetChecklist: false\n    paused: false\n    pauseRanges: []\n    completionCount: 0\n    lastCompletedAt: 2026-08-19T08:00:00Z\n  comments:\n    - id: c1\n      at: 2026-08-19T09:00:00Z\n      text: Keep this\ntype: task\nid: read\ncreated: 2026-08-01T10:00:00Z\nupdated: 2026-08-20T10:00:00+01:00\n---\n\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+              "id": "read",
+              "kind": "task",
+              "title": "Read 📝",
+              "tags": [],
+              "created": "2026-08-01T10:00:00Z",
+              "updated": "2026-08-20T10:00:00+01:00",
+              "task": {
+                "status": "open",
+                "inbox": true,
+                "start": {
+                  "kind": "anytime"
+                },
+                "plan": {
+                  "date": "2026-08-20",
+                  "at": "time",
+                  "time": "07:00",
+                  "duration": "45m",
+                  "durationMinutes": 45
+                },
+                "repeat": {
+                  "start": "2026-08-20",
+                  "rrule": "FREQ=DAILY",
+                  "anchor": "schedule",
+                  "missed": "carry",
+                  "resetChecklist": false,
+                  "paused": false,
+                  "lastCompletedAt": "2026-08-19T08:00:00Z",
+                  "completionCount": 0
+                },
+                "comments": [
+                  {
+                    "id": "c1",
+                    "at": "2026-08-19T09:00:00Z",
+                    "text": "Keep this"
+                  }
+                ]
+              },
+              "body": "\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+              "checklist": [
+                {
+                  "text": "First",
+                  "checked": true,
+                  "position": 0,
+                  "sourceStart": 597,
+                  "sourceEnd": 608,
+                  "source": "- [x] First"
+                },
+                {
+                  "text": "Second",
+                  "checked": false,
+                  "position": 1,
+                  "sourceStart": 609,
+                  "sourceEnd": 621,
+                  "source": "- [ ] Second"
+                }
+              ],
+              "structuralLinks": [],
+              "diagnostics": []
+            }
+          }
+        ]
+      }
+    },
+    "retainedExpected": {
+      "value": {
+        "raw": "---\nextra:\n  keep:\n    - one\n    - two\ntask:\n  future: keep\n  status: open\n  inbox: true\n  start: anytime\n  plan:\n    date: 2026-08-20\n    at: 07:00\n    duration: 45m\n  repeat:\n    rrule: FREQ=DAILY\n    start: 2026-08-20\n    anchor: schedule\n    missed: carry\n    rdate: []\n    exdate: []\n    resetChecklist: false\n    paused: false\n    pauseRanges: []\n    completionCount: 0\n    lastCompletedAt: 2026-08-19T08:00:00Z\n  comments:\n    - id: c1\n      at: 2026-08-19T09:00:00Z\n      text: Keep this\ntype: task\nid: read\ncreated: 2026-08-01T10:00:00Z\nupdated: 2026-08-20T10:00:00+01:00\n---\n\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+        "steps": [
+          {
+            "document": {
+              "path": "tasks/Read.md",
+              "raw": "---\ntype: task\nid: read\ncreated: 2026-08-01T10:00:00Z\nextra:\n  keep: [one, two]\ntask:\n  status: open\n  inbox: true\n  start: anytime\n  future: keep\n  comments:\n    - id: c1\n      at: 2026-08-19T09:00:00Z\n      text: Keep this\n  plan:\n    date: 2026-08-20\n    at: \"07:00\"\n    duration: 45m\n  repeat:\n    start: 2026-08-20\n    rrule: FREQ=DAILY\n    anchor: schedule\n    missed: carry\n    resetChecklist: true\n    completionCount: 0\n    lastCompletedAt: 2026-08-19T08:00:00Z\n---\n\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+              "id": "read",
+              "kind": "task",
+              "title": "Read 📝",
+              "tags": [],
+              "created": "2026-08-01T10:00:00Z",
+              "updated": "2026-08-20T10:00:00+01:00",
+              "task": {
+                "status": "open",
+                "inbox": true,
+                "start": {
+                  "kind": "anytime"
+                },
+                "plan": {
+                  "date": "2026-08-20",
+                  "at": "time",
+                  "time": "07:00",
+                  "duration": "45m",
+                  "durationMinutes": 45
+                },
+                "repeat": {
+                  "rrule": "FREQ=DAILY",
+                  "start": "2026-08-20",
+                  "anchor": "schedule",
+                  "missed": "carry",
+                  "rdate": [],
+                  "exdate": [],
+                  "resetChecklist": false,
+                  "paused": false,
+                  "pauseRanges": [],
+                  "completionCount": 0,
+                  "lastCompletedAt": "2026-08-19T08:00:00Z"
+                },
+                "comments": [
+                  {
+                    "id": "c1",
+                    "at": "2026-08-19T09:00:00Z",
+                    "text": "Keep this"
+                  }
+                ]
+              },
+              "body": "\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+              "checklist": [
+                {
+                  "text": "First",
+                  "checked": true,
+                  "position": 0,
+                  "sourceStart": 487,
+                  "sourceEnd": 498,
+                  "source": "- [x] First"
+                },
+                {
+                  "text": "Second",
+                  "checked": false,
+                  "position": 1,
+                  "sourceStart": 499,
+                  "sourceEnd": 511,
+                  "source": "- [ ] Second"
+                }
+              ],
+              "structuralLinks": [],
+              "diagnostics": []
+            },
+            "raw": "---\nextra:\n  keep:\n    - one\n    - two\ntask:\n  future: keep\n  status: open\n  inbox: true\n  start: anytime\n  plan:\n    date: 2026-08-20\n    at: 07:00\n    duration: 45m\n  repeat:\n    rrule: FREQ=DAILY\n    start: 2026-08-20\n    anchor: schedule\n    missed: carry\n    rdate: []\n    exdate: []\n    resetChecklist: false\n    paused: false\n    pauseRanges: []\n    completionCount: 0\n    lastCompletedAt: 2026-08-19T08:00:00Z\n  comments:\n    - id: c1\n      at: 2026-08-19T09:00:00Z\n      text: Keep this\ntype: task\nid: read\ncreated: 2026-08-01T10:00:00Z\nupdated: 2026-08-20T10:00:00+01:00\n---\n\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+            "reparsed": {
+              "path": "tasks/Read.md",
+              "raw": "---\nextra:\n  keep:\n    - one\n    - two\ntask:\n  future: keep\n  status: open\n  inbox: true\n  start: anytime\n  plan:\n    date: 2026-08-20\n    at: 07:00\n    duration: 45m\n  repeat:\n    rrule: FREQ=DAILY\n    start: 2026-08-20\n    anchor: schedule\n    missed: carry\n    rdate: []\n    exdate: []\n    resetChecklist: false\n    paused: false\n    pauseRanges: []\n    completionCount: 0\n    lastCompletedAt: 2026-08-19T08:00:00Z\n  comments:\n    - id: c1\n      at: 2026-08-19T09:00:00Z\n      text: Keep this\ntype: task\nid: read\ncreated: 2026-08-01T10:00:00Z\nupdated: 2026-08-20T10:00:00+01:00\n---\n\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+              "id": "read",
+              "kind": "task",
+              "title": "Read 📝",
+              "tags": [],
+              "created": "2026-08-01T10:00:00Z",
+              "updated": "2026-08-20T10:00:00+01:00",
+              "task": {
+                "status": "open",
+                "inbox": true,
+                "start": {
+                  "kind": "anytime"
+                },
+                "plan": {
+                  "date": "2026-08-20",
+                  "at": "time",
+                  "time": "07:00",
+                  "duration": "45m",
+                  "durationMinutes": 45
+                },
+                "repeat": {
+                  "start": "2026-08-20",
+                  "rrule": "FREQ=DAILY",
+                  "anchor": "schedule",
+                  "missed": "carry",
+                  "resetChecklist": false,
+                  "paused": false,
+                  "lastCompletedAt": "2026-08-19T08:00:00Z",
+                  "completionCount": 0
+                },
+                "comments": [
+                  {
+                    "id": "c1",
+                    "at": "2026-08-19T09:00:00Z",
+                    "text": "Keep this"
+                  }
+                ]
+              },
+              "body": "\n# Read 📝\n\n- [x] First\n- [ ] Second\n\n[Child](Child.md)\n",
+              "checklist": [
+                {
+                  "text": "First",
+                  "checked": true,
+                  "position": 0,
+                  "sourceStart": 597,
+                  "sourceEnd": 608,
+                  "source": "- [x] First"
+                },
+                {
+                  "text": "Second",
+                  "checked": false,
+                  "position": 1,
+                  "sourceStart": 609,
+                  "sourceEnd": 621,
+                  "source": "- [ ] Second"
+                }
+              ],
+              "structuralLinks": [],
+              "diagnostics": []
+            }
+          }
+        ]
+      }
+    }
+  }
+]

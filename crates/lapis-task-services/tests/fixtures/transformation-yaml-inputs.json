@@ -1,0 +1,1061 @@
+{
+  "schema": 1,
+  "mutations": [
+    {
+      "name": "metadata scalar 0 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"plain\", \"task\": {\"status\": \"open\", \"custom\": \"plain\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"plain\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 0 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"plain\", \"task\": {\"status\": \"open\", \"custom\": \"plain\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"plain\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 1 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"true\", \"task\": {\"status\": \"open\", \"custom\": \"true\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"true\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 1 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"true\", \"task\": {\"status\": \"open\", \"custom\": \"true\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"true\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 2 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"FALSE\", \"task\": {\"status\": \"open\", \"custom\": \"FALSE\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"FALSE\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 2 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"FALSE\", \"task\": {\"status\": \"open\", \"custom\": \"FALSE\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"FALSE\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 3 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"null\", \"task\": {\"status\": \"open\", \"custom\": \"null\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"null\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 3 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"null\", \"task\": {\"status\": \"open\", \"custom\": \"null\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"null\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 4 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"Null\", \"task\": {\"status\": \"open\", \"custom\": \"Null\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"Null\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 4 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"Null\", \"task\": {\"status\": \"open\", \"custom\": \"Null\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"Null\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 5 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"~\", \"task\": {\"status\": \"open\", \"custom\": \"~\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"~\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 5 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"~\", \"task\": {\"status\": \"open\", \"custom\": \"~\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"~\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 6 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"yes\", \"task\": {\"status\": \"open\", \"custom\": \"yes\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"yes\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 6 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"yes\", \"task\": {\"status\": \"open\", \"custom\": \"yes\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"yes\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 7 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"no\", \"task\": {\"status\": \"open\", \"custom\": \"no\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"no\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 7 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"no\", \"task\": {\"status\": \"open\", \"custom\": \"no\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"no\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 8 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"on\", \"task\": {\"status\": \"open\", \"custom\": \"on\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"on\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 8 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"on\", \"task\": {\"status\": \"open\", \"custom\": \"on\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"on\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 9 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"off\", \"task\": {\"status\": \"open\", \"custom\": \"off\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"off\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 9 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"off\", \"task\": {\"status\": \"open\", \"custom\": \"off\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"off\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 10 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"0\", \"task\": {\"status\": \"open\", \"custom\": \"0\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"0\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 10 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"0\", \"task\": {\"status\": \"open\", \"custom\": \"0\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"0\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 11 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"-2\", \"task\": {\"status\": \"open\", \"custom\": \"-2\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"-2\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 11 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"-2\", \"task\": {\"status\": \"open\", \"custom\": \"-2\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"-2\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 12 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"1.5\", \"task\": {\"status\": \"open\", \"custom\": \"1.5\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"1.5\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 12 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"1.5\", \"task\": {\"status\": \"open\", \"custom\": \"1.5\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"1.5\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 13 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"1e3\", \"task\": {\"status\": \"open\", \"custom\": \"1e3\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"1e3\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 13 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"1e3\", \"task\": {\"status\": \"open\", \"custom\": \"1e3\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"1e3\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 14 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"1:30\", \"task\": {\"status\": \"open\", \"custom\": \"1:30\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"1:30\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 14 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"1:30\", \"task\": {\"status\": \"open\", \"custom\": \"1:30\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"1:30\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 15 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"2026-10-25\", \"task\": {\"status\": \"open\", \"custom\": \"2026-10-25\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"2026-10-25\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 15 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"2026-10-25\", \"task\": {\"status\": \"open\", \"custom\": \"2026-10-25\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"2026-10-25\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 16 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \" leading\", \"task\": {\"status\": \"open\", \"custom\": \" leading\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \" leading\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 16 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \" leading\", \"task\": {\"status\": \"open\", \"custom\": \" leading\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \" leading\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 17 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"trailing \", \"task\": {\"status\": \"open\", \"custom\": \"trailing \", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"trailing \"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 17 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"trailing \", \"task\": {\"status\": \"open\", \"custom\": \"trailing \", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"trailing \"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 18 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a: b\", \"task\": {\"status\": \"open\", \"custom\": \"a: b\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a: b\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 18 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a: b\", \"task\": {\"status\": \"open\", \"custom\": \"a: b\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a: b\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 19 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a # b\", \"task\": {\"status\": \"open\", \"custom\": \"a # b\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a # b\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 19 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a # b\", \"task\": {\"status\": \"open\", \"custom\": \"a # b\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a # b\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 20 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\nb\", \"task\": {\"status\": \"open\", \"custom\": \"a\\nb\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\nb\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 20 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\nb\", \"task\": {\"status\": \"open\", \"custom\": \"a\\nb\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\nb\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 21 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\nb\\n\", \"task\": {\"status\": \"open\", \"custom\": \"a\\nb\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\nb\\n\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 21 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\nb\\n\", \"task\": {\"status\": \"open\", \"custom\": \"a\\nb\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\nb\\n\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 22 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\nb\\n\\n\", \"task\": {\"status\": \"open\", \"custom\": \"a\\nb\\n\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\nb\\n\\n\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 22 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\nb\\n\\n\", \"task\": {\"status\": \"open\", \"custom\": \"a\\nb\\n\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\nb\\n\\n\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 23 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"\\na\", \"task\": {\"status\": \"open\", \"custom\": \"\\na\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"\\na\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 23 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"\\na\", \"task\": {\"status\": \"open\", \"custom\": \"\\na\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"\\na\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 24 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"\\n\", \"task\": {\"status\": \"open\", \"custom\": \"\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"\\n\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 24 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"\\n\", \"task\": {\"status\": \"open\", \"custom\": \"\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"\\n\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 25 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"\\n\\n\", \"task\": {\"status\": \"open\", \"custom\": \"\\n\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"\\n\\n\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 25 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"\\n\\n\", \"task\": {\"status\": \"open\", \"custom\": \"\\n\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"\\n\\n\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 26 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"😀 Héllo\", \"task\": {\"status\": \"open\", \"custom\": \"😀 Héllo\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"😀 Héllo\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 26 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"😀 Héllo\", \"task\": {\"status\": \"open\", \"custom\": \"😀 Héllo\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"😀 Héllo\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 27 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\tb\", \"task\": {\"status\": \"open\", \"custom\": \"a\\tb\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\tb\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 27 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\tb\", \"task\": {\"status\": \"open\", \"custom\": \"a\\tb\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\tb\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 28 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"ab\", \"task\": {\"status\": \"open\", \"custom\": \"ab\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"ab\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 28 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"ab\", \"task\": {\"status\": \"open\", \"custom\": \"ab\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"ab\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 29 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"[array]\", \"task\": {\"status\": \"open\", \"custom\": \"[array]\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"[array]\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 29 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"[array]\", \"task\": {\"status\": \"open\", \"custom\": \"[array]\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"[array]\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 30 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"{map}\", \"task\": {\"status\": \"open\", \"custom\": \"{map}\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"{map}\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 30 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"{map}\", \"task\": {\"status\": \"open\", \"custom\": \"{map}\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"{map}\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 31 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"- item\", \"task\": {\"status\": \"open\", \"custom\": \"- item\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"- item\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 31 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"- item\", \"task\": {\"status\": \"open\", \"custom\": \"- item\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"- item\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 32 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \": value\", \"task\": {\"status\": \"open\", \"custom\": \": value\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \": value\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 32 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \": value\", \"task\": {\"status\": \"open\", \"custom\": \": value\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \": value\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 33 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"? key\", \"task\": {\"status\": \"open\", \"custom\": \"? key\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"? key\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 33 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"? key\", \"task\": {\"status\": \"open\", \"custom\": \"? key\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"? key\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 34 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"%value\", \"task\": {\"status\": \"open\", \"custom\": \"%value\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"%value\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 34 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"%value\", \"task\": {\"status\": \"open\", \"custom\": \"%value\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"%value\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 35 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"@value\", \"task\": {\"status\": \"open\", \"custom\": \"@value\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"@value\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 35 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"@value\", \"task\": {\"status\": \"open\", \"custom\": \"@value\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"@value\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 36 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a, b\", \"task\": {\"status\": \"open\", \"custom\": \"a, b\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a, b\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 36 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a, b\", \"task\": {\"status\": \"open\", \"custom\": \"a, b\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a, b\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 37 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": {\"z\": 1, \"a\": 2}, \"task\": {\"status\": \"open\", \"custom\": {\"z\": 1, \"a\": 2}, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 37 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": {\"z\": 1, \"a\": 2}, \"task\": {\"status\": \"open\", \"custom\": {\"z\": 1, \"a\": 2}, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 38 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": [{\"z\": 1, \"a\": 2}], \"task\": {\"status\": \"open\", \"custom\": [{\"z\": 1, \"a\": 2}], \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 38 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": [{\"z\": 1, \"a\": 2}], \"task\": {\"status\": \"open\", \"custom\": [{\"z\": 1, \"a\": 2}], \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 39 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": [1, \"two\", false], \"task\": {\"status\": \"open\", \"custom\": [1, \"two\", false], \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 39 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": [1, \"two\", false], \"task\": {\"status\": \"open\", \"custom\": [1, \"two\", false], \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 40 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": [], \"task\": {\"status\": \"open\", \"custom\": [], \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 40 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": [], \"task\": {\"status\": \"open\", \"custom\": [], \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 41 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": {}, \"task\": {\"status\": \"open\", \"custom\": {}, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 41 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": {}, \"task\": {\"status\": \"open\", \"custom\": {}, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 42 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": null, \"task\": {\"status\": \"open\", \"custom\": null, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 42 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": null, \"task\": {\"status\": \"open\", \"custom\": null, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 43 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": true, \"task\": {\"status\": \"open\", \"custom\": true, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 43 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": true, \"task\": {\"status\": \"open\", \"custom\": true, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 44 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": 0, \"task\": {\"status\": \"open\", \"custom\": 0, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 44 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": 0, \"task\": {\"status\": \"open\", \"custom\": 0, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 45 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": 4.5, \"task\": {\"status\": \"open\", \"custom\": 4.5, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 45 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": 4.5, \"task\": {\"status\": \"open\", \"custom\": 4.5, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 46 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": 1e+25, \"task\": {\"status\": \"open\", \"custom\": 1e+25, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 46 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": 1e+25, \"task\": {\"status\": \"open\", \"custom\": 1e+25, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 47 / cancel",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": 1e-08, \"task\": {\"status\": \"open\", \"custom\": 1e-08, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "metadata scalar 47 / complete",
+      "path": "tasks/Metadata.md",
+      "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": 1e-08, \"task\": {\"status\": \"open\", \"custom\": 1e-08, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+      "actions": [
+        {
+          "type": "complete",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    }
+  ]
+}

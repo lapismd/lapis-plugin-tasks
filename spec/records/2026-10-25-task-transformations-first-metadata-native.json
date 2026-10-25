@@ -1,0 +1,2519 @@
+{
+  "run": "lapis-task-mutations-0d531956-543d-4bf9-8e92-8cb0580aef67",
+  "revision": "4490e88eedc0b4ab56eec6f60300816c44451436",
+  "failedCases": 20,
+  "cases": 96,
+  "exactDifferences": [
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: \"a\\nb\"\ntask:\n  custom: \"a\\nb\"\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\nb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\nb\", \"task\": {\"status\": \"open\", \"custom\": \"a\\nb\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\nb\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: \"a\\nb\"\ntask:\n  custom: \"a\\nb\"\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\nb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: \"a\\nb\"\ntask:\n  custom: \"a\\nb\"\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\nb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: |-\n  a\n  b\ntask:\n  custom: |-\n    a\n    b\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: |-\n        a\n        b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\nb\", \"task\": {\"status\": \"open\", \"custom\": \"a\\nb\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\nb\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: |-\n  a\n  b\ntask:\n  custom: |-\n    a\n    b\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: |-\n        a\n        b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: |-\n  a\n  b\ntask:\n  custom: |-\n    a\n    b\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: |-\n        a\n        b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 20 / cancel"
+    },
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: \"a\\nb\"\ntask:\n  custom: \"a\\nb\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\nb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\nb\", \"task\": {\"status\": \"open\", \"custom\": \"a\\nb\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\nb\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: \"a\\nb\"\ntask:\n  custom: \"a\\nb\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\nb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: \"a\\nb\"\ntask:\n  custom: \"a\\nb\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\nb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: |-\n  a\n  b\ntask:\n  custom: |-\n    a\n    b\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: |-\n        a\n        b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\nb\", \"task\": {\"status\": \"open\", \"custom\": \"a\\nb\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\nb\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: |-\n  a\n  b\ntask:\n  custom: |-\n    a\n    b\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: |-\n        a\n        b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: |-\n  a\n  b\ntask:\n  custom: |-\n    a\n    b\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: |-\n        a\n        b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 20 / complete"
+    },
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: \"a\\nb\\n\"\ntask:\n  custom: \"a\\nb\\n\"\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\nb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\nb\\n\", \"task\": {\"status\": \"open\", \"custom\": \"a\\nb\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\nb\\n\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: \"a\\nb\\n\"\ntask:\n  custom: \"a\\nb\\n\"\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\nb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: \"a\\nb\\n\"\ntask:\n  custom: \"a\\nb\\n\"\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\nb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: |\n  a\n  b\ntask:\n  custom: |\n    a\n    b\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: |-\n        a\n        b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\nb\\n\", \"task\": {\"status\": \"open\", \"custom\": \"a\\nb\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\nb\\n\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: |\n  a\n  b\ntask:\n  custom: |\n    a\n    b\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: |-\n        a\n        b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: |\n  a\n  b\ntask:\n  custom: |\n    a\n    b\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: |-\n        a\n        b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 21 / cancel"
+    },
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: \"a\\nb\\n\"\ntask:\n  custom: \"a\\nb\\n\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\nb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\nb\\n\", \"task\": {\"status\": \"open\", \"custom\": \"a\\nb\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\nb\\n\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: \"a\\nb\\n\"\ntask:\n  custom: \"a\\nb\\n\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\nb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: \"a\\nb\\n\"\ntask:\n  custom: \"a\\nb\\n\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\nb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: |\n  a\n  b\ntask:\n  custom: |\n    a\n    b\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: |-\n        a\n        b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\nb\\n\", \"task\": {\"status\": \"open\", \"custom\": \"a\\nb\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\nb\\n\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: |\n  a\n  b\ntask:\n  custom: |\n    a\n    b\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: |-\n        a\n        b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: |\n  a\n  b\ntask:\n  custom: |\n    a\n    b\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: |-\n        a\n        b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 21 / complete"
+    },
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: \"a\\nb\\n\\n\"\ntask:\n  custom: \"a\\nb\\n\\n\"\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\nb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\nb\\n\\n\", \"task\": {\"status\": \"open\", \"custom\": \"a\\nb\\n\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\nb\\n\\n\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: \"a\\nb\\n\\n\"\ntask:\n  custom: \"a\\nb\\n\\n\"\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\nb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: \"a\\nb\\n\\n\"\ntask:\n  custom: \"a\\nb\\n\\n\"\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\nb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: |+\n  a\n  b\n\ntask:\n  custom: |+\n    a\n    b\n\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: |-\n        a\n        b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\nb\\n\\n\", \"task\": {\"status\": \"open\", \"custom\": \"a\\nb\\n\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\nb\\n\\n\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: |+\n  a\n  b\n\ntask:\n  custom: |+\n    a\n    b\n\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: |-\n        a\n        b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: |+\n  a\n  b\n\ntask:\n  custom: |+\n    a\n    b\n\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: |-\n        a\n        b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 22 / cancel"
+    },
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: \"a\\nb\\n\\n\"\ntask:\n  custom: \"a\\nb\\n\\n\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\nb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\nb\\n\\n\", \"task\": {\"status\": \"open\", \"custom\": \"a\\nb\\n\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\nb\\n\\n\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: \"a\\nb\\n\\n\"\ntask:\n  custom: \"a\\nb\\n\\n\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\nb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: \"a\\nb\\n\\n\"\ntask:\n  custom: \"a\\nb\\n\\n\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\nb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: |+\n  a\n  b\n\ntask:\n  custom: |+\n    a\n    b\n\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: |-\n        a\n        b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\nb\\n\\n\", \"task\": {\"status\": \"open\", \"custom\": \"a\\nb\\n\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\nb\\n\\n\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: |+\n  a\n  b\n\ntask:\n  custom: |+\n    a\n    b\n\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: |-\n        a\n        b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: |+\n  a\n  b\n\ntask:\n  custom: |+\n    a\n    b\n\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: |-\n        a\n        b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\nb"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 22 / complete"
+    },
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: \"\\na\"\ntask:\n  custom: \"\\na\"\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: a\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"\\na\", \"task\": {\"status\": \"open\", \"custom\": \"\\na\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"\\na\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: \"\\na\"\ntask:\n  custom: \"\\na\"\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: a\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: \"\\na\"\ntask:\n  custom: \"\\na\"\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: a\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: |-\n  \n  a\ntask:\n  custom: |-\n    \n    a\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: a\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"\\na\", \"task\": {\"status\": \"open\", \"custom\": \"\\na\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"\\na\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: |-\n  \n  a\ntask:\n  custom: |-\n    \n    a\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: a\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: |-\n  \n  a\ntask:\n  custom: |-\n    \n    a\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: a\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 23 / cancel"
+    },
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: \"\\na\"\ntask:\n  custom: \"\\na\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: a\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"\\na\", \"task\": {\"status\": \"open\", \"custom\": \"\\na\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"\\na\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: \"\\na\"\ntask:\n  custom: \"\\na\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: a\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: \"\\na\"\ntask:\n  custom: \"\\na\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: a\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: |-\n  \n  a\ntask:\n  custom: |-\n    \n    a\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: a\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"\\na\", \"task\": {\"status\": \"open\", \"custom\": \"\\na\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"\\na\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: |-\n  \n  a\ntask:\n  custom: |-\n    \n    a\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: a\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: |-\n  \n  a\ntask:\n  custom: |-\n    \n    a\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: a\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 23 / complete"
+    },
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: \"\\n\"\ntask:\n  custom: \"\\n\"\n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"\\n\", \"task\": {\"status\": \"open\", \"custom\": \"\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"\\n\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: \"\\n\"\ntask:\n  custom: \"\\n\"\n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: \"\\n\"\ntask:\n  custom: \"\\n\"\n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: |+\n  \ntask:\n  custom: |+\n    \n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"\\n\", \"task\": {\"status\": \"open\", \"custom\": \"\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"\\n\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: |+\n  \ntask:\n  custom: |+\n    \n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: |+\n  \ntask:\n  custom: |+\n    \n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 24 / cancel"
+    },
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: \"\\n\"\ntask:\n  custom: \"\\n\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"\\n\", \"task\": {\"status\": \"open\", \"custom\": \"\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"\\n\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: \"\\n\"\ntask:\n  custom: \"\\n\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: \"\\n\"\ntask:\n  custom: \"\\n\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: |+\n  \ntask:\n  custom: |+\n    \n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"\\n\", \"task\": {\"status\": \"open\", \"custom\": \"\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"\\n\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: |+\n  \ntask:\n  custom: |+\n    \n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: |+\n  \ntask:\n  custom: |+\n    \n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 24 / complete"
+    },
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: \"\\n\\n\"\ntask:\n  custom: \"\\n\\n\"\n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"\\n\\n\", \"task\": {\"status\": \"open\", \"custom\": \"\\n\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"\\n\\n\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: \"\\n\\n\"\ntask:\n  custom: \"\\n\\n\"\n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: \"\\n\\n\"\ntask:\n  custom: \"\\n\\n\"\n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: |+\n  \n\ntask:\n  custom: |+\n    \n\n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"\\n\\n\", \"task\": {\"status\": \"open\", \"custom\": \"\\n\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"\\n\\n\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: |+\n  \n\ntask:\n  custom: |+\n    \n\n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: |+\n  \n\ntask:\n  custom: |+\n    \n\n  status: canceled\n  inbox: false\n  start: anytime\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 25 / cancel"
+    },
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: \"\\n\\n\"\ntask:\n  custom: \"\\n\\n\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"\\n\\n\", \"task\": {\"status\": \"open\", \"custom\": \"\\n\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"\\n\\n\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: \"\\n\\n\"\ntask:\n  custom: \"\\n\\n\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: \"\\n\\n\"\ntask:\n  custom: \"\\n\\n\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: |+\n  \n\ntask:\n  custom: |+\n    \n\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"\\n\\n\", \"task\": {\"status\": \"open\", \"custom\": \"\\n\\n\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"\\n\\n\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: |+\n  \n\ntask:\n  custom: |+\n    \n\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: |+\n  \n\ntask:\n  custom: |+\n    \n\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 25 / complete"
+    },
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: \"a\\tb\"\ntask:\n  custom: \"a\\tb\"\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\tb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\tb\", \"task\": {\"status\": \"open\", \"custom\": \"a\\tb\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\tb\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\tb"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: \"a\\tb\"\ntask:\n  custom: \"a\\tb\"\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\tb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: \"a\\tb\"\ntask:\n  custom: \"a\\tb\"\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\tb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\tb"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: a\tb\ntask:\n  custom: a\tb\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: a\tb\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\tb\", \"task\": {\"status\": \"open\", \"custom\": \"a\\tb\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\tb\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\tb"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: a\tb\ntask:\n  custom: a\tb\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: a\tb\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: a\tb\ntask:\n  custom: a\tb\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: a\tb\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\tb"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 27 / cancel"
+    },
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: \"a\\tb\"\ntask:\n  custom: \"a\\tb\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\tb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\tb\", \"task\": {\"status\": \"open\", \"custom\": \"a\\tb\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\tb\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\tb"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: \"a\\tb\"\ntask:\n  custom: \"a\\tb\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\tb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: \"a\\tb\"\ntask:\n  custom: \"a\\tb\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: \"a\\tb\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\tb"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: a\tb\ntask:\n  custom: a\tb\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: a\tb\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"a\\tb\", \"task\": {\"status\": \"open\", \"custom\": \"a\\tb\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"a\\tb\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\tb"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: a\tb\ntask:\n  custom: a\tb\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: a\tb\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: a\tb\ntask:\n  custom: a\tb\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: a\tb\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a\tb"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 27 / complete"
+    },
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: a b\ntask:\n  custom: a b\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: a b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"ab\", \"task\": {\"status\": \"open\", \"custom\": \"ab\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"ab\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a b"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: a b\ntask:\n  custom: a b\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: a b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: a b\ntask:\n  custom: a b\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: a b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a b"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: \"ab\"\ntask:\n  custom: \"ab\"\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: \"ab\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"ab\", \"task\": {\"status\": \"open\", \"custom\": \"ab\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"ab\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "ab"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: \"ab\"\ntask:\n  custom: \"ab\"\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: \"ab\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: \"ab\"\ntask:\n  custom: \"ab\"\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: \"ab\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "ab"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 28 / cancel"
+    },
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: a b\ntask:\n  custom: a b\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: a b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"ab\", \"task\": {\"status\": \"open\", \"custom\": \"ab\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"ab\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a b"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: a b\ntask:\n  custom: a b\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: a b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: a b\ntask:\n  custom: a b\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: a b\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "a b"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: \"ab\"\ntask:\n  custom: \"ab\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: \"ab\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": \"ab\", \"task\": {\"status\": \"open\", \"custom\": \"ab\", \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"ab\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "ab"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: \"ab\"\ntask:\n  custom: \"ab\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: \"ab\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: \"ab\"\ntask:\n  custom: \"ab\"\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: \"ab\"\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "ab"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 28 / complete"
+    },
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: 10000000000000000000000000\ntask:\n  custom: 10000000000000000000000000\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": 1e+25, \"task\": {\"status\": \"open\", \"custom\": 1e+25, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "text"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: 10000000000000000000000000\ntask:\n  custom: 10000000000000000000000000\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": null
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: 1e+25\ntask:\n  custom: 1e+25\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": 1e+25, \"task\": {\"status\": \"open\", \"custom\": 1e+25, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "text"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: 1e+25\ntask:\n  custom: 1e+25\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: 1e+25\ntask:\n  custom: 1e+25\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "text"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 46 / cancel"
+    },
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: 10000000000000000000000000\ntask:\n  custom: 10000000000000000000000000\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": 1e+25, \"task\": {\"status\": \"open\", \"custom\": 1e+25, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "text"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: 10000000000000000000000000\ntask:\n  custom: 10000000000000000000000000\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": null
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: 1e+25\ntask:\n  custom: 1e+25\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": 1e+25, \"task\": {\"status\": \"open\", \"custom\": 1e+25, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "text"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: 1e+25\ntask:\n  custom: 1e+25\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: 1e+25\ntask:\n  custom: 1e+25\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "text"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 46 / complete"
+    },
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: 0.00000001\ntask:\n  custom: 0.00000001\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": 1e-08, \"task\": {\"status\": \"open\", \"custom\": 1e-08, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "text"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: 0.00000001\ntask:\n  custom: 0.00000001\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: 0.00000001\ntask:\n  custom: 0.00000001\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "text"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: 1e-8\ntask:\n  custom: 1e-8\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": 1e-08, \"task\": {\"status\": \"open\", \"custom\": 1e-08, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "text"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: 1e-8\ntask:\n  custom: 1e-8\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: 1e-8\ntask:\n  custom: 1e-8\n  status: canceled\n  inbox: false\n  start: anytime\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "text"
+                    }
+                  ],
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "canceled"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 47 / cancel"
+    },
+    {
+      "actual": {
+        "value": {
+          "raw": "---\nextra: 0.00000001\ntask:\n  custom: 0.00000001\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": 1e-08, \"task\": {\"status\": \"open\", \"custom\": 1e-08, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "text"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: 0.00000001\ntask:\n  custom: 0.00000001\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: 0.00000001\ntask:\n  custom: 0.00000001\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "text"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "expected": {
+        "value": {
+          "raw": "---\nextra: 1e-8\ntask:\n  custom: 1e-8\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+          "steps": [
+            {
+              "document": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\n{\"type\": \"task\", \"id\": \"metadata\", \"extra\": 1e-08, \"task\": {\"status\": \"open\", \"custom\": 1e-08, \"comments\": [{\"id\": \"comment\", \"at\": \"explicit\", \"text\": \"text\"}]}}\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "text"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              },
+              "raw": "---\nextra: 1e-8\ntask:\n  custom: 1e-8\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+              "reparsed": {
+                "body": "\n# Metadata\n",
+                "checklist": [],
+                "diagnostics": [],
+                "id": "metadata",
+                "kind": "task",
+                "path": "tasks/Metadata.md",
+                "raw": "---\nextra: 1e-8\ntask:\n  custom: 1e-8\n  status: completed\n  inbox: false\n  start: anytime\n  completedAt: 2026-10-25T00:00:00Z\n  comments:\n    - id: comment\n      at: explicit\n      text: text\ntype: task\nid: metadata\nupdated: 2026-10-25T00:00:00Z\n---\n\n# Metadata\n",
+                "structuralLinks": [],
+                "tags": [],
+                "task": {
+                  "comments": [
+                    {
+                      "at": "explicit",
+                      "id": "comment",
+                      "text": "text"
+                    }
+                  ],
+                  "completedAt": "2026-10-25T00:00:00Z",
+                  "inbox": false,
+                  "start": {
+                    "kind": "anytime"
+                  },
+                  "status": "completed"
+                },
+                "title": "Metadata",
+                "updated": "2026-10-25T00:00:00Z"
+              }
+            }
+          ]
+        }
+      },
+      "name": "metadata scalar 47 / complete"
+    }
+  ]
+}

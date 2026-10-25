@@ -1,0 +1,137 @@
+{
+  "schema": 1,
+  "mutations": [
+    {
+      "name": "nonfinite extra / .nan",
+      "raw": "---\ntype: task\nid: nonfinite\nextra: .nan\ntask:\n  status: open\n---\n\n# Nonfinite\n",
+      "path": "tasks/Nonfinite.md",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "nonfinite priority / .nan",
+      "raw": "---\ntype: task\nid: nonfinite\ntask:\n  status: open\n  priority: .nan\n---\n\n# Nonfinite\n",
+      "path": "tasks/Nonfinite.md",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "nonfinite repeat / .nan",
+      "raw": "---\ntype: task\nid: nonfinite\ntask:\n  status: open\n  repeat:\n    future: .nan\n---\n\n# Nonfinite\n",
+      "path": "tasks/Nonfinite.md",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "nonfinite tracking / .nan",
+      "raw": "---\ntype: task\nid: nonfinite\ntask:\n  status: open\n  tracking:\n    type: count\n    target: .nan\n---\n\n# Nonfinite\n",
+      "path": "tasks/Nonfinite.md",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "nonfinite extra / .inf",
+      "raw": "---\ntype: task\nid: nonfinite\nextra: .inf\ntask:\n  status: open\n---\n\n# Nonfinite\n",
+      "path": "tasks/Nonfinite.md",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "nonfinite priority / .inf",
+      "raw": "---\ntype: task\nid: nonfinite\ntask:\n  status: open\n  priority: .inf\n---\n\n# Nonfinite\n",
+      "path": "tasks/Nonfinite.md",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "nonfinite repeat / .inf",
+      "raw": "---\ntype: task\nid: nonfinite\ntask:\n  status: open\n  repeat:\n    future: .inf\n---\n\n# Nonfinite\n",
+      "path": "tasks/Nonfinite.md",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "nonfinite tracking / .inf",
+      "raw": "---\ntype: task\nid: nonfinite\ntask:\n  status: open\n  tracking:\n    type: count\n    target: .inf\n---\n\n# Nonfinite\n",
+      "path": "tasks/Nonfinite.md",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "nonfinite extra / -.inf",
+      "raw": "---\ntype: task\nid: nonfinite\nextra: -.inf\ntask:\n  status: open\n---\n\n# Nonfinite\n",
+      "path": "tasks/Nonfinite.md",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "nonfinite priority / -.inf",
+      "raw": "---\ntype: task\nid: nonfinite\ntask:\n  status: open\n  priority: -.inf\n---\n\n# Nonfinite\n",
+      "path": "tasks/Nonfinite.md",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "nonfinite repeat / -.inf",
+      "raw": "---\ntype: task\nid: nonfinite\ntask:\n  status: open\n  repeat:\n    future: -.inf\n---\n\n# Nonfinite\n",
+      "path": "tasks/Nonfinite.md",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "name": "nonfinite tracking / -.inf",
+      "raw": "---\ntype: task\nid: nonfinite\ntask:\n  status: open\n  tracking:\n    type: count\n    target: -.inf\n---\n\n# Nonfinite\n",
+      "path": "tasks/Nonfinite.md",
+      "actions": [
+        {
+          "type": "cancel",
+          "at": "2026-10-25T00:00:00Z"
+        }
+      ]
+    }
+  ]
+}

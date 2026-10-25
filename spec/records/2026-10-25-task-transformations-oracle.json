@@ -1,0 +1,368 @@
+{
+  "oracleRevision": "fcb2a8b514d68464034173e2aed886133d2a2e99",
+  "status": "Frozen unchanged-TypeScript oracle; native source qualified",
+  "inputSha256": "844300861aeddfe4316df988d0129570a94d8d198ca6fb34914894b440d892a6",
+  "protectedFiles": {
+    "crates/lapis-task-services/Cargo.lock": "b8b5e338c78dacc9737472680aed1c47f3bb09ae7b9d2a084ada58313642cac5",
+    "crates/lapis-task-services/Cargo.toml": "299a374026006113270b2ac9faa3254c844fcdb9cd76ddf4deb2a70bb2622f8b",
+    "crates/lapis-task-services/LICENSES/rrule.txt": "6c12f89b62fce4d9a75629a68086f1bcf0192a2ce678d2caadd9f86aa1a0fa58",
+    "crates/lapis-task-services/src/document/dates.rs": "92c95e78f6823c6f80a67d624f6e9965fcecec95835ae5b8bd4f2c47227fdad7",
+    "crates/lapis-task-services/src/document/envelope.rs": "9fff89297d07a4c3f52bb10bda6c9a4ba6cc14b3f417eed067e560a7b770bfdb",
+    "crates/lapis-task-services/src/document/fields.rs": "fe5b2b83999a1c6b719ac7e2f0044b4a968eac9ef01e3f0b9d056d91789fd807",
+    "crates/lapis-task-services/src/document/markdown.rs": "4d46c6c706b0535c54941f3d545552867861f86f5ea97765382e463ca34aac6c",
+    "crates/lapis-task-services/src/document/mod.rs": "798c95188fb0d90dd4e272b539bd61ba118405d8af1a358293618e3d474bbd93",
+    "crates/lapis-task-services/src/document/records.rs": "b81d66b3632f14dc838a883658fb85d29a5846c68f7d1d92ccfa7d626fb808dd",
+    "crates/lapis-task-services/src/document/repeat.rs": "e6fd0efaf8b1171913e7c0a1eba5046892f87f176470745ea4eadf7eb5b1eaa6",
+    "crates/lapis-task-services/src/document/rule.rs": "a87eab0a6297beaa668365e52ac52030f41644f3b3a108216878e4f407ca5dfd",
+    "crates/lapis-task-services/src/document/tracking.rs": "35e112473952a2f2f87c71896cb2db699d35a09436f326174308ac08eb3cd85d",
+    "crates/lapis-task-services/src/document/value.rs": "b5f2d4af227585fe14082b42d841489bb78c9be7022bcebd5a6c9acb11a047cf",
+    "crates/lapis-task-services/src/index/envelopes.rs": "40bae8dbb19d0e1bc20378b6b8f9b27a22226d10d3b2a003edd3739a6478446a",
+    "crates/lapis-task-services/src/index/links.rs": "58bbf0aa1600a9fe6a0f1621bd147789569d1799cbe55fb97b86142bedfdf694",
+    "crates/lapis-task-services/src/index/mod.rs": "d6b0866e6339d2a3ea32effb3a36e5993854b69dbd145ed6b81b472026fa5ffd",
+    "crates/lapis-task-services/src/index/records.rs": "3588856c330ad7622d99ebd98c45a154135dd9ec069c0a62523c00ae06b2cf68",
+    "crates/lapis-task-services/src/index/targets.rs": "cf105b425205c876c4a2b5a9d45bcc5ea387edc0227e5239d550fcee706012cb",
+    "crates/lapis-task-services/src/lib.rs": "cc016fa9f25d15ed355037b12c137bf9fedbd19bc0210e294ad7c8f75f813a78",
+    "crates/lapis-task-services/src/marker.rs": "2ee51bc64adb1a040b9ff6ee8e46cff1429968016e6e8b9876dc028e881d4ac8",
+    "crates/lapis-task-services/src/occurrence.rs": "ed0bc140362e65374b83009a3a1cfc2a6744526294d66f8b474544a5bdaf9fc6",
+    "crates/lapis-task-services/src/projection/mod.rs": "ab301e030b72d9dde8ed18123ab9a3915d65a31f753b69c8b2c22d60d5951fd7",
+    "crates/lapis-task-services/src/projection/records.rs": "eed4b8702e751e65c6b5cce0c30252ba086eb2f34f37fb5fd094af484ce341f8",
+    "crates/lapis-task-services/src/record.rs": "2f69d58d591210b77d59185a12f99ff82081d50c42c381b86042fb23682b9545",
+    "crates/lapis-task-services/src/recurrence/compatibility.rs": "ea52eb2fb917cf119576038d6687462c7049742048851c2ba847dc15758d0cb2",
+    "crates/lapis-task-services/src/recurrence/effective.rs": "33566f4aa62244af2917b25c246106abaf9e9bc44b8b2e5ae6f31042970c8fbd",
+    "crates/lapis-task-services/src/recurrence/mod.rs": "5d38ec6314ac4b5d6f570c6c95deca1b3ad2842be45fd57fc827b980cfdbfb32",
+    "crates/lapis-task-services/src/recurrence/primary.rs": "dd0e1a551dcbf094df233da2e71de4c44f370fda6a099380dbea276675437736",
+    "crates/lapis-task-services/src/recurrence/records.rs": "fb84dc22d8fa817324cc3ed206c2f9f426f6bbef08c5c7961193ddef2ff3734b",
+    "crates/lapis-task-services/src/structure/graph/components.rs": "eb07d0237ddca7a073b862df624517124c6fdf683bd0d5d923e94047a8da0c66",
+    "crates/lapis-task-services/src/structure/graph/mod.rs": "3f1621a9fb33a4848e56fbda6d19d748555447f2a772853dec7cfa09366765c2",
+    "crates/lapis-task-services/src/structure/mod.rs": "56aa23bc888db4d2656e3903aeb2ad24289eb0e814890778c2aa81d47adf24d3",
+    "crates/lapis-task-services/src/structure/records.rs": "1746dc8221fbb3ec82ce9aa6a87e0376a0d4faad878e4d29e2d2a3449a2872c3",
+    "crates/lapis-task-services/src/structure/resolution.rs": "3e0274430b55ad04d34fed1b176f997ea41689127df13c880a054196a2d32b7b",
+    "crates/lapis-task-services/src/structure/scanner.rs": "9cdeabf9a4bee008626029fee2c8601febc64d5470e1cdc5cbb3cb889f4291fa",
+    "crates/lapis-task-services/src/structure/source.rs": "04c80b401f73ed61e3f93ec35bad015157faa171f8dad1792ec9f7bc10b2f253",
+    "crates/lapis-task-services/tests/documents.rs": "f26c7e4f25fb38d33ae657fdd2093de96ab8b9a46578b399eceb75bdd2719608",
+    "crates/lapis-task-services/tests/fixtures/documents.json": "6b76ac09053be6e367efc816fb2222f989904a8347ce98d0f5fdd156e42af8bf",
+    "crates/lapis-task-services/tests/fixtures/effective-inputs.json": "ba4d41fef91cd05b296b55f2632ae2a5b421866e4a539aa3d24cabef947effeb",
+    "crates/lapis-task-services/tests/fixtures/graph-inputs.json": "ed871a6c9b06a5a4f37acd0c51805e207e38a751ba7d083dd26e6fb35ebac134",
+    "crates/lapis-task-services/tests/fixtures/index-inputs.json": "21363c0731828a3984e88de9f784134564652d0b856a6ae35f745919ab432b1b",
+    "crates/lapis-task-services/tests/fixtures/occurrences.json": "67f3de29e7046669f6d53c22d3d8af1f9d24c200e5bb43418efc1927c06f47b9",
+    "crates/lapis-task-services/tests/fixtures/projection-inputs.json": "63d4fd0ced616b1e69f78f6870dc9a999a15ce58d382837bf9710a8c272d9742",
+    "crates/lapis-task-services/tests/fixtures/recurrence-compatibility-inputs.json": "5ce22d9531b6829ec27b57f105e32c2e78c1529e59ce4113238284457c194ceb",
+    "crates/lapis-task-services/tests/fixtures/recurrence-inputs.json": "04441fec4d1761114f9044db1ac5881f58c69cb8fa1f65cc1ad9f94e7b7bb13f",
+    "crates/lapis-task-services/tests/fixtures/structure-document-inputs.json": "0ae9bbe5fabd971e3e1b05338d70ad70fc6f45d2f9fc7fc8c9f9c3661819383b",
+    "crates/lapis-task-services/tests/fixtures/structure-inputs.json": "1fa7eb3870be29bee67d179bddedb0211e2dbc2e8489dc568333bf86083e72d0",
+    "crates/lapis-task-services/tests/graph.rs": "dacd7ad92bb13a80fed602eb365ed81106943be1dacad5dc841b7a7bf69d9d84",
+    "crates/lapis-task-services/tests/index.rs": "999991446a820718968bf6601ca90ad3fc1e75c3eff7e9b31ce0199f8f7098c2",
+    "crates/lapis-task-services/tests/occurrences.rs": "8e4b0e7305058f1b9d207dae4600d7cf7fa432ebf147d89669925f60a7def9c1",
+    "crates/lapis-task-services/tests/projection.rs": "8eac5186c3bdcaf9b98e9163fa4ab59f2d2c2721c6c92f208e54bfb5fdb95b2d",
+    "crates/lapis-task-services/tests/recurrence.rs": "dcc6c6dc4527509364dd9fe93122c0099b06b10232cb204dd148c9d2707df9ca",
+    "crates/lapis-task-services/tests/structure.rs": "52a8969d1e83640e5063f797142a958c8c96ca28ed780b646907374e6068a616",
+    "package.json": "867a964a9ec27b023b15121a6905c5239f12e970c6b82bdc03022d1ef4901cab",
+    "pnpm-lock.yaml": "1418cb3f49b4d13a999662c9426eb6ca21ec938dfde6cfc94256155a57e777db",
+    "src/lib/model/ReferenceMarkdownPreview.css": "bda8e4d55b0740a3558c4f1d714ee6ffa542ccf3ff38d70182ccec646491f8d6",
+    "src/lib/model/ReferenceMarkdownPreview.svelte": "05e9ac2832acdab4149d22ad1c5e02bc73f7609067a733c7c07d902a00c7720f",
+    "src/lib/model/application-adapter.test.ts": "d9ead9cda2ec4dd6fccc67562eabd4192700082fffd21d1631aa3fc0d9785c27",
+    "src/lib/model/application-adapter.ts": "16f64a9b73d46cbed4f8925c27fba35a5ff42dcc33b601b0624e22557f24762b",
+    "src/lib/model/application.ts": "a8befd60bc8518d024acfa07cc5e851c6e2cae74af97b7c5e5f21ae3467b9580",
+    "src/lib/model/apply-catalog-task.test.ts": "9db3f355260e91eebb525df7fbe836ca43ffc2e0bb89d3b675a9db547ac0ecd7",
+    "src/lib/model/apply-catalog-task.ts": "661d1269c4d792fe30e0102fd87ee286576e4ccdbe2c2ad94dbd5ad60e2f4726",
+    "src/lib/model/catalog-adapter.ts": "7692bd4f22b90bbacdd5cc6e927012f5aec7bca1b6863d916699ab8bf76195aa",
+    "src/lib/model/effective-occurrence.test.ts": "c2e58005de3998d2e39f0646f02ef95792b40fa1dc53c3aa80972a5a2ad5fc01",
+    "src/lib/model/effective-occurrence.ts": "95461689d5669c11b18663956935d9e14f99fec9859ec891bd7a9bd7dcb1613f",
+    "src/lib/model/fixtures.ts": "67589221a87b5a305463ab575c0e490a61bce3e74d7f53a7ea25f8d780e019dc",
+    "src/lib/model/index.ts": "946e5fa9d5bc35360235c6802dda153851397f95e77f9579db36b40aa6730150",
+    "src/lib/model/list-navigation.test.ts": "1e0c384c50c4dbcedde6d2633a991ceb4ba142829d5a29e278eaa7ba611913c4",
+    "src/lib/model/list-navigation.ts": "c7e8abb77c3a6264156f597bebec6b61dd54d88045f0975866fef5375cc1eeeb",
+    "src/lib/model/planner-fixtures.test.ts": "d22143fd71708250d82e892446b230815f4c7fcbcf86e29278b160f7d771f5c1",
+    "src/lib/model/planner-fixtures.ts": "b205245757d5c12155a7291f4bf8719364da2aa50dd135332515e6b6635f3617",
+    "src/lib/model/planner.test.ts": "29fd5f79505e07b1492af283ea8d07ec245216e454d49e4c3276b0ad8bf3ca25",
+    "src/lib/model/planner.ts": "ffc969446864e92e3f94f453ec9903628051be13e3a0e8aa89e9b37091ab8f4a",
+    "src/lib/model/recurrence-engine.test.ts": "aff47a2cd5fda8499aabb6b573430ee5c78702fb869610fe5243491e062275f1",
+    "src/lib/model/recurrence-engine.ts": "f3f4ee01f444c03795b537ffc53220169ce058862c87925e902b2a21870428c6",
+    "src/lib/model/recurrence-native.test.ts": "ba8f2ba095d208baa1681b94327c5df72aee7c3a4225b6aa29a01d72c6753d32",
+    "src/lib/model/task-agenda-order.test.ts": "6b29da1ce9b56333d6c629104e6a91c8da5b77026850799a13baf358f91a117c",
+    "src/lib/model/task-agenda-order.ts": "4ebb91183d7a408c10acc1c4bf15364fcad140fd7f087f359c23b8b9e96e4391",
+    "src/lib/model/task-dates.test.ts": "dab75be1cd0ad6c536b27f2bc377d79767c5bd32c680ad261a2010b7de1e4efe",
+    "src/lib/model/task-dates.ts": "4704198a35d7e98d3763a0807e1742910e35970d79f7fe2bd401a8ab913399c0",
+    "src/lib/model/task-document-native.test.ts": "4224a2de53cc62b08a17af39333f2211b312352ca9062f646f493aab1cd76a8d",
+    "src/lib/model/task-document.test.ts": "b490fce3b400292045ec8214645a3ba7753040ed59bfa7ef5a86587f0bda3b79",
+    "src/lib/model/task-document.ts": "5d95b0ab02ca07102d12ef0543372db023eece8013595940bfab3f943cca2fc9",
+    "src/lib/model/task-graph-native.test.ts": "480b8cb4dc76741a8cbd791ed7aa04987a86eb4c3b1721b63791f348d7eadb05",
+    "src/lib/model/task-history.test.ts": "396c7d77c7c533dd815b9e5aaad2ff135c54b796e1bbe5ebb08c1bdd7db95ee8",
+    "src/lib/model/task-history.ts": "565c3837436e7151e35b7d27cc374fe5fdf1fee706beb58a2ff7f5fc83d7d4b8",
+    "src/lib/model/task-index-native.test.ts": "b868091320f39319d14b7b8a09b5ece8307fc2e35c7a31f71363f013bc211a34",
+    "src/lib/model/task-index.ts": "dcc6194e76ac8f43123ab0ea55a4d8f4ef568c818c6fa4111f7a15361d78cbfe",
+    "src/lib/model/task-list-items.test.ts": "6d31a34574bb9110fe71fdeaa4937424d4ab69206221caefd1ffe10c2cff2f7a",
+    "src/lib/model/task-list-items.ts": "30b2b9c41710eb049e5425ea7df22084c61f946635815bc95384c61a0d25f974",
+    "src/lib/model/task-markdown-targets.test.ts": "b269d0a63305852eff37a41807167c9f11143c3b214996af9e2b37d53db19ade",
+    "src/lib/model/task-markdown-targets.ts": "53d5a47f0c054517aba0d29b572741bf81d3b9b80bff1b4f5c90ad4f5bc6e96b",
+    "src/lib/model/task-mutations.test.ts": "453c2cf049c46d6b254d5a046536d116c22c774b8942e4425a02eb3a751a1d3e",
+    "src/lib/model/task-mutations.ts": "d2ae074bec4b0cafcf48b1927023ad97d923cb8e863a707de4b85da11f3d173d",
+    "src/lib/model/task-occurrence-native.test.ts": "48e27e17d9cf1a8789f0fa8be8b8fa565cc4ac7b1f38e8fedd2bb1d21ace279e",
+    "src/lib/model/task-occurrence-rebuild.test.ts": "c140326de02120c84c3bcab6b4a53065fa660938f242dddc84d760a50e713da0",
+    "src/lib/model/task-occurrence-repository.test.ts": "5153edcf119a1b27b6ea81d20cdc32678d3d6f2ea183a5538e9f97fe49225c06",
+    "src/lib/model/task-occurrence-repository.ts": "807c5c53570c02ec7667c5b9e113afa504f1488c9da8994c1328ce355ff05ecb",
+    "src/lib/model/task-occurrence.test.ts": "efe0819bafffd906f54fa125df7430db1577508cceeaf09416f5680786dd5c29",
+    "src/lib/model/task-occurrence.ts": "c7f83e09813fc69aa945a0d7d5b29ec925340eda86641bdae0d7b600100bd6ca",
+    "src/lib/model/task-projection-native.test.ts": "90422ff17070d9c8237c1983b3d5d6c1d921c52d51c2bc55e6d750d7d57cb24b",
+    "src/lib/model/task-projection.test.ts": "c856b350cbbb3ed26e85ce26fe713eeac638c54607f0672b3db49008cc03b396",
+    "src/lib/model/task-projection.ts": "ab6469d66dfcf4bc3806e1a23aeec0892558d2916e04b334b9ce5642066e08d6",
+    "src/lib/model/task-queries.test.ts": "643748cae1bcc38d159b6c4787b7021c85abf2de16bd063d3bfbab95a233fbe1",
+    "src/lib/model/task-queries.ts": "b74a3aeda99b978ad6cdc5db6a944306fbc0a3f79823a0352a420976a01ce33e",
+    "src/lib/model/task-repeat-options.test.ts": "855e0afcbd63983c0b3d78d12e8599d4fca84c06a64e2a5dc0f20a85e1ca30ed",
+    "src/lib/model/task-repeat-options.ts": "41e9d3af98f7ec2347ef685a33dfe875b54aeb3e8f83f476b86c5467dddac758",
+    "src/lib/model/task-repository.test.ts": "99bc80b86fbac2f01065b1a37d09a4e16ff51ecc4cd2ef2ffc7b30b30788b1ab",
+    "src/lib/model/task-repository.ts": "cc07e76726dd76e995c822b57a43560fce29f8e5f2dc56cedb98288aaeeb0854",
+    "src/lib/model/task-runtime-actions.test.ts": "6cedd1950bc5499274a90c1b7853fb43318f8ec62bfc6480481e435ce0be070f",
+    "src/lib/model/task-structure-native.test.ts": "c30e831f32f31af1c1d1696d864954ccdb090c18c2dceee2d3789fc9cf2241ab",
+    "src/lib/model/task-structure.test.ts": "4049d6929d701aebc860e7a79cdcfeae9a78c50c521556fa77dd8c08a9f8b8a7",
+    "src/lib/model/task-structure.ts": "32a5ee5031b4f52d24fe6490c0ceeace32b8419ac9692ad7ad4bed613308421c",
+    "src/lib/model/types.ts": "f1f6078c5c93a30faa764466f5cbe65b79ba0ee215dd272a22215557550762c2",
+    "src/lib/model/vault-task-file-store.ts": "6beb7057c345c8bbb72e08ae2fe9d36a13d0632bbf27cf6db2fdf4e5dabe558a",
+    "src/lib/tasks-plugin.ts": "c98a2563a644414edebcf43c22ed61d6e8d1c956466178f0cd1d4f3564709116"
+  },
+  "capturedAt": "2026-10-25T22:56:27.175Z",
+  "captureRun": "lapis-task-mutations-9d3928ba-1a21-4165-9aa8-d21dabda550d",
+  "captureRevision": "3ffa0473aa3b6813f68e7c8f7d7a4dbf845c7bc4",
+  "expectedSha256": "35b099569d7aa630380828891ca682f250e6d84126b45c9051ec6433f250dea8",
+  "counts": {
+    "mutations": 1297,
+    "materializations": 165,
+    "completions": 124,
+    "tracking": 40,
+    "dayParts": 32
+  },
+  "inputRevisionNote": "Retains 153 malformed custom negative cases and adds corrected indented positive variants before native implementation.",
+  "nativeTypedAdapter": {
+    "run": "lapis-task-mutations-0d0399fc-2e53-4b3f-9f5e-203bc46163a8",
+    "changedNewRequestCases": 2,
+    "description": "Declared TaskRepeat value-field order only; original corpus and all 269 first-native exact diffs retained. No authored/opaque metadata is recanonicalized.",
+    "sha256": "570372bcaf43d0da3350170cac03efce4e16b9fe3b046c78cfed1f6b17311b3d"
+  },
+  "metadataSerialization": {
+    "run": "lapis-task-mutations-ac334557-8d18-4a08-8ce9-47df15f063c0",
+    "cases": 96,
+    "expectedSha256": "46fc1bcd910911f7498e44a66c0383ca3026cc2123f34c317470771fa83d7ca3",
+    "inputSha256": "86a4cf8f65b2037dd7fb9dec1563e0d2f6ec94ea8d503bf2a67ab922a91b0aba"
+  },
+  "nativePrerequisite": {
+    "revision": "9131b27db49d81ca872582f37b145309b9c4cb09",
+    "requirement": "LN-TASK-090",
+    "description": "Separately qualified owning YAML reader; no original TypeScript model or frozen old corpus changed."
+  },
+  "nonfiniteSerialization": {
+    "run": "lapis-task-mutations-51169002-08d0-4244-acde-0e48da4e0845",
+    "cases": 12,
+    "inputSha256": "1d965f46366e1933a8a7c2f7f25d9a682368dbf5d7006a94b700914c5865bcd1",
+    "beforeRun": "lapis-task-mutations-a568c75b-559c-4f92-bd2a-647ab47faae6",
+    "beforeFailures": 3,
+    "description": "Complete retained output and input capture; priority presence requires a separately qualified parser repair.",
+    "expectedSha256": "4ff572cd16479e5766d1f43e61855e90f199723e5870e85171a4c678ab367c0a"
+  },
+  "nativePriorityPrerequisite": {
+    "revision": "2cfcdc59d79ed30e0e6625362dedae6deaa6d0e6",
+    "requirement": "LN-TASK-091",
+    "description": "Separately qualified nonfinite priority presence; no original TypeScript model or frozen old corpus changed."
+  },
+  "protectedAudit": {
+    "parent": "2cfcdc59d79ed30e0e6625362dedae6deaa6d0e6",
+    "originalFiles": 116,
+    "allowedChangesFromQualifiedParent": [
+      "crates/lapis-task-services/Cargo.toml",
+      "crates/lapis-task-services/Cargo.lock",
+      "crates/lapis-task-services/src/lib.rs"
+    ],
+    "changedFromOriginalBaseline": [
+      {
+        "path": "crates/lapis-task-services/Cargo.lock",
+        "originalSha256": "b8b5e338c78dacc9737472680aed1c47f3bb09ae7b9d2a084ada58313642cac5",
+        "qualifiedParentSha256": "93841eb2c119b30e8c1cd4ac12bd614bba3ba1195038433483b3f39a3ed94844",
+        "currentSha256": "9add3ff80c0077422835eecd012a1a914f92ce29beaecb08c429c93ac633e9a6"
+      },
+      {
+        "path": "crates/lapis-task-services/Cargo.toml",
+        "originalSha256": "299a374026006113270b2ac9faa3254c844fcdb9cd76ddf4deb2a70bb2622f8b",
+        "qualifiedParentSha256": "412d417014043f0c17302987fd03edee514db79b47b9723b9c70ef194a68d4c7",
+        "currentSha256": "f95d25bbedfca06ccbf0feb0a446a192dd585efb12015cf3784ec701225a40aa"
+      },
+      {
+        "path": "crates/lapis-task-services/src/document/envelope.rs",
+        "originalSha256": "9fff89297d07a4c3f52bb10bda6c9a4ba6cc14b3f417eed067e560a7b770bfdb",
+        "qualifiedParentSha256": "59cfab3979e20ca3986357dcac7b59e869020e23cc7637767501adc4bc3d3b0d",
+        "currentSha256": "59cfab3979e20ca3986357dcac7b59e869020e23cc7637767501adc4bc3d3b0d"
+      },
+      {
+        "path": "crates/lapis-task-services/src/document/fields.rs",
+        "originalSha256": "fe5b2b83999a1c6b719ac7e2f0044b4a968eac9ef01e3f0b9d056d91789fd807",
+        "qualifiedParentSha256": "a6eb6a97ec6a54fb380d9808b446e47cdfff5110f3c583cc9ae21a99783e98e0",
+        "currentSha256": "a6eb6a97ec6a54fb380d9808b446e47cdfff5110f3c583cc9ae21a99783e98e0"
+      },
+      {
+        "path": "crates/lapis-task-services/src/document/mod.rs",
+        "originalSha256": "798c95188fb0d90dd4e272b539bd61ba118405d8af1a358293618e3d474bbd93",
+        "qualifiedParentSha256": "6705088485f137bf1e90fee32e7c315da34f1f2a90ebbf86d918011f38e147c6",
+        "currentSha256": "6705088485f137bf1e90fee32e7c315da34f1f2a90ebbf86d918011f38e147c6"
+      },
+      {
+        "path": "crates/lapis-task-services/src/lib.rs",
+        "originalSha256": "cc016fa9f25d15ed355037b12c137bf9fedbd19bc0210e294ad7c8f75f813a78",
+        "qualifiedParentSha256": "cc016fa9f25d15ed355037b12c137bf9fedbd19bc0210e294ad7c8f75f813a78",
+        "currentSha256": "a7c693f2a1269be3264793dc897f51a58223c74f706ba876bcf0e779a8274939"
+      },
+      {
+        "path": "crates/lapis-task-services/tests/documents.rs",
+        "originalSha256": "f26c7e4f25fb38d33ae657fdd2093de96ab8b9a46578b399eceb75bdd2719608",
+        "qualifiedParentSha256": "8b19de07f9655024d66bc6579af63f46270eca080f1c82a046f2ff571cfd889b",
+        "currentSha256": "8b19de07f9655024d66bc6579af63f46270eca080f1c82a046f2ff571cfd889b"
+      }
+    ]
+  },
+  "qualification": {
+    "run": "lapis-task-mutations-25408aba-e1d4-4780-b421-c47280c685ab",
+    "revision": "89ef14a9bb893c34a9169643fcccdd9771edf038",
+    "status": "passed",
+    "started": "2026-10-25T23:38:24.633Z",
+    "finished": "2026-10-25T23:43:26.809Z",
+    "nativeConformanceCases": 1766,
+    "typescriptReferenceCases": 1768,
+    "nativeTests": 25,
+    "unitTests": 2847,
+    "coldCatalogTests": 62,
+    "failures": 0,
+    "commands": [
+      [
+        "cargo",
+        "test",
+        "--locked",
+        "--manifest-path",
+        "crates/lapis-task-services/Cargo.toml",
+        "--test",
+        "transformations"
+      ],
+      [
+        "env",
+        "TASK_TRANSFORM_DIFFERENCES=/results",
+        "cargo",
+        "test",
+        "--locked",
+        "--manifest-path",
+        "crates/lapis-task-services/Cargo.toml",
+        "--lib",
+        "transform::",
+        "--",
+        "--nocapture"
+      ],
+      [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "--project",
+        "unit",
+        "src/lib/model/native-transformations.test.ts",
+        "--maxWorkers=1",
+        "--no-file-parallelism"
+      ],
+      [
+        "pnpm",
+        "validation:all"
+      ]
+    ],
+    "tools": {
+      "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+      "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+      "node": "v24.15.0",
+      "pnpm": "10.32.1",
+      "jj": "jj 0.45.1-7c41cdeb16b6b321c64e789a966b6adf723816a5"
+    },
+    "resources": {
+      "slot": 3,
+      "cpus": 4,
+      "memoryGiB": 12,
+      "shmGiB": 2
+    },
+    "imageId": "sha256:32c745d2c3bd24816b49548c72888ce5b4a09f5cdbb6bb03eeeba06fd750bfe3",
+    "sourcePackSha256": "baab01e66a4292f43be6238463e7c95789c38c88e145d2d7351e2fc265cb35c4",
+    "archives": [
+      {
+        "name": "@lapis-notes/api",
+        "version": "0.1.4",
+        "sha256": "cc164da81823285086876e0a1948b801031c795808999faa1218f68f38ee5393"
+      },
+      {
+        "name": "@lapis-notes/ui",
+        "version": "0.1.3",
+        "sha256": "349ad6b2400837c6c6c90dd0d6b5f1798d540a50faf1efa4efa13d6e56652093"
+      },
+      {
+        "name": "@lapis-notes/workspace",
+        "version": "0.2.1",
+        "sha256": "8dc7c3687a77e1f8d6e830ef8b0a613e0e96f353920a5412521584bdf8562bd4"
+      },
+      {
+        "name": "@lapis-notes/file-explorer",
+        "version": "0.1.2",
+        "sha256": "4986e61768dcc4fe25b1be864257e8341bf69794419b961316be29dd9085bb47"
+      },
+      {
+        "name": "@lapis-notes/language-service",
+        "version": "0.1.1",
+        "sha256": "b7887e713c0a7d8d77c4d86cfb4cf6a70926c5e681357a456678b5d8c9b0ba11"
+      },
+      {
+        "name": "@lapismd/mira-editor",
+        "version": "0.0.3",
+        "sha256": "6701b115869bf977cb0d640cabbeb3a2d21259fe3af812c8350c8bde6aa24b4e"
+      },
+      {
+        "name": "@lapismd/mira-plugin-ai",
+        "version": "0.0.3",
+        "sha256": "3485795c48403a44ab3ecef40baf0f912fdea9bcac01a5ae810fb5dad31ce70d"
+      },
+      {
+        "name": "@lapismd/mira-plugin-mermaid",
+        "version": "0.0.3",
+        "sha256": "3bef4e48184999fbec876e8e562d24dba709b62332035642b5228b9f2fa6031c"
+      },
+      {
+        "name": "@lapismd/mira",
+        "version": "0.1.1",
+        "sha256": "85d80be38df1ddf358b2d6793e4fc9be211b6ac2545073a978a52fe808d555d3"
+      },
+      {
+        "name": "@lapis-notes/source-editor",
+        "version": "0.1.2",
+        "sha256": "faeadec898f3c6bbe71af01e50f7baa4a831523eeab1d023308d4cb8cd6ae9e1"
+      },
+      {
+        "name": "@lapis-notes/markdown",
+        "version": "0.1.6",
+        "sha256": "56f9ffc731301ca670518ac7bf90283536ec2662557d36c8cabf582b9f7b451a"
+      },
+      {
+        "name": "@lapis-notes/search",
+        "version": "0.1.3",
+        "sha256": "39baabc1cbb2cf29738ed58571a8502901ce40f5dd0b4fb58725bf11488ba1db"
+      },
+      {
+        "name": "@lapismd/design-core",
+        "version": "0.6.0",
+        "sha256": "c77a3a83391b9fafd42c7f99f695af03b29941c1022a5a8bbacb3964d45e55c7"
+      },
+      {
+        "name": "@lapismd/agent-ui",
+        "version": "0.1.0",
+        "sha256": "b6d8a4283d8007d83d7f786458a2712d2796df8e8031c1a48e9692ebe7135f3d"
+      },
+      {
+        "name": "@lapis-notes/ai",
+        "version": "0.1.5",
+        "sha256": "04efc90fedf0669e703239410bc479b7e6fc0cb4e6b3e00a19b024f455a9d565"
+      },
+      {
+        "name": "bits-ui",
+        "version": "2.20.2",
+        "sha256": "7b0fea714ddc489a57340ba649276b9f23bbd91ffac38d62244e44d24b7a5109"
+      }
+    ]
+  }
+}
