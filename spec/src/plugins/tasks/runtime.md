@@ -92,6 +92,42 @@ source range. `TaskRepository.occurrenceHistory` queries those rows and
 The projection is disposable: deleting the database and reindexing Task and
 daily Markdown recreates the same historical result.
 
+## Native occurrence parser
+
+The private `crates/lapis-task-services` crate is the native source boundary for
+read-only `tasks/occurrence` parsing. It takes the complete unmodified daily
+Markdown and vault-relative daily-document path, and returns ordered version-1
+`TaskOccurrenceRecord` values. Serialization uses the existing camel-case
+AppDatabase record fields, omits absent quantitative fields, and preserves
+UTF-16 source offsets including CRLF and astral characters.
+
+See LN-TASK-070–071 in the [package requirements](./index.md#requirements).
+
+The host registers projection ID `tasks/occurrence`, owner `tasks`, schema
+version 1, public visibility and the existing API-owned field definition. Each
+record maps to an `observation` row with its `observationId` as row ID and its
+scanner ordinal. Host admission, source hashes, publication limits, errors,
+watching and deletion remain native service responsibilities. The parser does
+not truncate records or deduplicate observations; the host must report rejected
+publication explicitly.
+
+The shared reference corpus is
+`crates/lapis-task-services/tests/fixtures/occurrences.json`. Its expected
+records were captured from the unchanged TypeScript implementation. Run:
+
+```sh
+pnpm exec vitest run --project unit src/lib/model/task-occurrence-native.test.ts src/lib/model/task-occurrence.test.ts src/lib/model/task-occurrence-rebuild.test.ts
+cargo test --locked --manifest-path crates/lapis-task-services/Cargo.toml
+cargo clippy --locked --manifest-path crates/lapis-task-services/Cargo.toml --all-targets -- -D warnings
+cargo fmt --manifest-path crates/lapis-task-services/Cargo.toml -- --check
+cargo build --locked --manifest-path crates/lapis-task-services/Cargo.toml
+```
+
+This source slice does not activate native occurrence indexing in a host or
+replace renderer ownership. Full task parsing, structural resolution,
+recurrence, local-date refresh, materialization and Search remain separate
+migration work.
+
 ## Repository and file stores
 
 `TaskRepository` in `src/lib/model/task-repository.ts` is the mutation

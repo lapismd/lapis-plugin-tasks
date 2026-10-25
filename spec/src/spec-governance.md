@@ -28,6 +28,14 @@ list-navigation and catalog-list attach sources to
 package, manifest, plugin, and Storybook contract sources stay on
 [Tasks](plugins/tasks/index.md).
 
+Private native Tasks sources, tests, fixtures and Cargo manifests under
+`crates/lapis-task-services` are protected by spec-first and map to
+[Runtime](plugins/tasks/runtime.md). This crate is not published through npm or
+Cargo. Its source acceptance uses locked native tests/build, strict Clippy and
+formatting in addition to the retained TypeScript reference and normal package
+lanes. Native parser acceptance does not establish host integration or default
+ownership.
+
 The shared `@lapismd/spec-validator` package is repository validation tooling,
 not a runtime package. It MUST resolve from npm through the root development
 dependency. This exception does not weaken source-first validation for runtime

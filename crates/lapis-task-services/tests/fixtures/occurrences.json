@@ -1,0 +1,500 @@
+[
+  {
+    "name": "pending boolean",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 2026-08-20\n---\n\n## Tasks\n### Anytime\n- [ ] [Read](../tasks/read.md) <!-- task-occurrence task=read date=2026-08-20 kind=boolean -->\n",
+    "canonical": true,
+    "expected": [
+      {
+        "observationId": "read:2026-08-20",
+        "taskId": "read",
+        "taskPath": "tasks/read.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "pending",
+        "trackingKind": "boolean",
+        "sourceStart": 64,
+        "sourceEnd": 159,
+        "projectionVersion": 1
+      }
+    ]
+  },
+  {
+    "name": "count suffix overrides marker unit",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 2026-08-20\n---\n- [x] [Read](../tasks/water.md) : 7 glasses <!-- task-occurrence task=water date=2026-08-20 kind=count unit=bottles -->\n",
+    "canonical": true,
+    "expected": [
+      {
+        "observationId": "water:2026-08-20",
+        "taskId": "water",
+        "taskPath": "tasks/water.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "completed",
+        "trackingKind": "count",
+        "value": 7,
+        "unit": "glasses",
+        "sourceStart": 42,
+        "sourceEnd": 162,
+        "projectionVersion": 1
+      }
+    ]
+  },
+  {
+    "name": "decimal number and URI-decoded marker values",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 2026-08-20\n---\n- [X] [Read](../tasks/weigh.md) : 12.5 kg <!-- task-occurrence task=weigh%20%F0%9F%8C%8D date=2026-08-20 kind=number unit=stone -->\n",
+    "canonical": true,
+    "expected": [
+      {
+        "observationId": "weigh 🌍:2026-08-20",
+        "taskId": "weigh 🌍",
+        "taskPath": "tasks/weigh.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "completed",
+        "trackingKind": "number",
+        "value": 12.5,
+        "unit": "kg",
+        "sourceStart": 42,
+        "sourceEnd": 174,
+        "projectionVersion": 1
+      }
+    ]
+  },
+  {
+    "name": "duration hours and minutes",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 2026-08-20\n---\n- [x] [Read](../tasks/read.md) : 1H30M <!-- task-occurrence task=read date=2026-08-20 kind=duration -->\n",
+    "canonical": true,
+    "expected": [
+      {
+        "observationId": "read:2026-08-20",
+        "taskId": "read",
+        "taskPath": "tasks/read.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "completed",
+        "trackingKind": "duration",
+        "durationMinutes": 90,
+        "sourceStart": 42,
+        "sourceEnd": 146,
+        "projectionVersion": 1
+      }
+    ]
+  },
+  {
+    "name": "zero and invalid durations omit the value",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 2026-08-20\n---\n- [ ] [Read](../tasks/read.md) : 0m <!-- task-occurrence task=zero date=2026-08-20 kind=duration unit=minutes -->\n- [ ] [Read](../tasks/read.md) : 1h 30m <!-- task-occurrence task=spaced date=2026-08-20 kind=duration -->\n",
+    "canonical": true,
+    "expected": [
+      {
+        "observationId": "zero:2026-08-20",
+        "taskId": "zero",
+        "taskPath": "tasks/read.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "pending",
+        "trackingKind": "duration",
+        "unit": "minutes",
+        "sourceStart": 42,
+        "sourceEnd": 156,
+        "projectionVersion": 1
+      },
+      {
+        "observationId": "spaced:2026-08-20",
+        "taskId": "spaced",
+        "taskPath": "tasks/read.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "pending",
+        "trackingKind": "duration",
+        "sourceStart": 156,
+        "sourceEnd": 263,
+        "projectionVersion": 1
+      }
+    ]
+  },
+  {
+    "name": "CRLF astral text and contextual source end",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\r\ntype: daily-note\r\ndate: 2026-08-20\r\n---\r\n# 🌍 Daily\r\n- [ ] [Read](../tasks/read.md) : 2 pages <!-- task-occurrence task=read date=2026-08-20 kind=count -->\r\n  Notes 😀\r\n\r\n\tMore context\r\nEnd",
+    "canonical": true,
+    "expected": [
+      {
+        "observationId": "read:2026-08-20",
+        "taskId": "read",
+        "taskPath": "tasks/read.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "pending",
+        "trackingKind": "count",
+        "value": 2,
+        "unit": "pages",
+        "sourceStart": 58,
+        "sourceEnd": 191,
+        "projectionVersion": 1
+      }
+    ]
+  },
+  {
+    "name": "duplicate identities and last valid attribute survive",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 2026-08-20\n---\n- [ ] [Read](../tasks/read.md) <!-- task-occurrence task=old task=read task=%FF date=2026-08-20 kind=boolean -->\n- [X] [Read](../tasks/read.md) <!-- task-occurrence task=read date=2026-08-20 kind=boolean -->\n",
+    "canonical": true,
+    "expected": [
+      {
+        "observationId": "read:2026-08-20",
+        "taskId": "read",
+        "taskPath": "tasks/read.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "pending",
+        "trackingKind": "boolean",
+        "sourceStart": 42,
+        "sourceEnd": 155,
+        "projectionVersion": 1
+      },
+      {
+        "observationId": "read:2026-08-20",
+        "taskId": "read",
+        "taskPath": "tasks/read.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "completed",
+        "trackingKind": "boolean",
+        "sourceStart": 155,
+        "sourceEnd": 250,
+        "projectionVersion": 1
+      }
+    ]
+  },
+  {
+    "name": "decodeURI preserves reserved path escapes",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 2026-08-20\n---\n- [ ] [Read](<../tasks/caf%C3%A9%2Fread%23tag.md#heading>) <!-- task-occurrence task=caf%C3%A9 date=2026-08-20 kind=boolean -->\n",
+    "canonical": true,
+    "expected": [
+      {
+        "observationId": "café:2026-08-20",
+        "taskId": "café",
+        "taskPath": "tasks/café%2Fread%23tag.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "pending",
+        "trackingKind": "boolean",
+        "sourceStart": 42,
+        "sourceEnd": 170,
+        "projectionVersion": 1
+      }
+    ]
+  },
+  {
+    "name": "invalid href escapes retain all authored escapes",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 2026-08-20\n---\n- [ ] [Read](../tasks/caf%C3%A9%E0%A4%A.md) <!-- task-occurrence task=read date=2026-08-20 kind=boolean -->\n",
+    "canonical": true,
+    "expected": [
+      {
+        "observationId": "read:2026-08-20",
+        "taskId": "read",
+        "taskPath": "tasks/caf%C3%A9%E0%A4%A.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "pending",
+        "trackingKind": "boolean",
+        "sourceStart": 42,
+        "sourceEnd": 150,
+        "projectionVersion": 1
+      }
+    ]
+  },
+  {
+    "name": "absolute href strips slashes without resolving segments",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 2026-08-20\n---\n- [ ] [Read](//tasks/../read.md#heading) <!-- task-occurrence task=read date=2026-08-20 kind=boolean -->\n",
+    "canonical": true,
+    "expected": [
+      {
+        "observationId": "read:2026-08-20",
+        "taskId": "read",
+        "taskPath": "tasks/../read.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "pending",
+        "trackingKind": "boolean",
+        "sourceStart": 42,
+        "sourceEnd": 147,
+        "projectionVersion": 1
+      }
+    ]
+  },
+  {
+    "name": "invalid markers are ignored",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 2026-08-20\n---\n- [ ] [Read](../tasks/read.md) <!-- task-occurrence task=%FF date=2026-08-20 kind=boolean -->\n- [ ] [Read](../tasks/read.md) <!-- task-occurrence task=read date=２０２６-08-20 kind=boolean -->\n- [ ] [Read](../tasks/read.md) <!-- task-occurrence task=read date=2026-8-20 kind=boolean -->\n- [ ] [Read](../tasks/read.md) <!-- task-occurrence task=read date=2026-08-20 kind=unknown -->\n- [ ] [Read](../tasks/read.md) <!-- task-occurrence task=read date=2026-08-20 -->\n",
+    "canonical": true,
+    "expected": []
+  },
+  {
+    "name": "scanner retains lines outside task headings and inside fences",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 2026-08-20\n---\n## Journal\n- [ ] [Read](../tasks/read.md) <!-- task-occurrence task=read date=2026-08-20 kind=boolean -->\n```md\n- [ ] [Read](../tasks/read.md) <!-- task-occurrence task=fenced date=2026-08-20 kind=boolean -->\n```\n",
+    "canonical": true,
+    "expected": [
+      {
+        "observationId": "read:2026-08-20",
+        "taskId": "read",
+        "taskPath": "tasks/read.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "pending",
+        "trackingKind": "boolean",
+        "sourceStart": 53,
+        "sourceEnd": 148,
+        "projectionVersion": 1
+      },
+      {
+        "observationId": "fenced:2026-08-20",
+        "taskId": "fenced",
+        "taskPath": "tasks/read.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "pending",
+        "trackingKind": "boolean",
+        "sourceStart": 154,
+        "sourceEnd": 251,
+        "projectionVersion": 1
+      }
+    ]
+  },
+  {
+    "name": "marker date need not match daily envelope or calendar",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: anything\n---\n- [ ] [Read](../tasks/read.md) <!-- task-occurrence task=read date=2026-99-99 kind=boolean -->\n",
+    "canonical": true,
+    "expected": [
+      {
+        "observationId": "read:2026-99-99",
+        "taskId": "read",
+        "taskPath": "tasks/read.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-99-99",
+        "outcome": "pending",
+        "trackingKind": "boolean",
+        "sourceStart": 40,
+        "sourceEnd": 135,
+        "projectionVersion": 1
+      }
+    ]
+  },
+  {
+    "name": "missing front matter",
+    "path": "daily/2026-08-20.md",
+    "raw": "- [ ] [Read](../tasks/read.md) <!-- task-occurrence task=read date=2026-08-20 kind=boolean -->\n",
+    "canonical": false,
+    "expected": []
+  },
+  {
+    "name": "wrong document type",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: task\ndate: 2026-08-20\n---\n- [ ] [Read](../tasks/read.md) <!-- task-occurrence task=read date=2026-08-20 kind=boolean -->\n",
+    "canonical": false,
+    "expected": []
+  },
+  {
+    "name": "non-string YAML date",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 20260820\n---\n- [ ] [Read](../tasks/read.md) <!-- task-occurrence task=read date=2026-08-20 kind=boolean -->\n",
+    "canonical": false,
+    "expected": []
+  },
+  {
+    "name": "duplicate YAML keys invalidate the document",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 2026-08-20\ndate: 2026-08-21\n---\n- [ ] [Read](../tasks/read.md) <!-- task-occurrence task=read date=2026-08-20 kind=boolean -->\n",
+    "canonical": false,
+    "expected": []
+  },
+  {
+    "name": "YAML aliases and explicit string dates",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\nkind: &kind daily-note\ntype: *kind\ndate: !!str 20260820\n---\n- [ ] [Read](../tasks/read.md) <!-- task-occurrence task=read date=2026-08-20 kind=boolean -->\n",
+    "canonical": true,
+    "expected": [
+      {
+        "observationId": "read:2026-08-20",
+        "taskId": "read",
+        "taskPath": "tasks/read.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "pending",
+        "trackingKind": "boolean",
+        "sourceStart": 64,
+        "sourceEnd": 159,
+        "projectionVersion": 1
+      }
+    ]
+  },
+  {
+    "name": "BOM before front matter remains noncanonical",
+    "path": "daily/2026-08-20.md",
+    "raw": "﻿---\ntype: daily-note\ndate: 2026-08-20\n---\n- [ ] [Read](../tasks/read.md) <!-- task-occurrence task=read date=2026-08-20 kind=boolean -->\n",
+    "canonical": false,
+    "expected": []
+  },
+  {
+    "name": "ECMAScript whitespace in marker and list prefix",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 2026-08-20\n---\n﻿+ [X] [Read](../tasks/read.md)﻿: 2 pages﻿<!--﻿task-occurrence task=read date=2026-08-20 kind=count﻿-->﻿\n",
+    "canonical": true,
+    "expected": [
+      {
+        "observationId": "read:2026-08-20",
+        "taskId": "read",
+        "taskPath": "tasks/read.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "completed",
+        "trackingKind": "count",
+        "value": 2,
+        "unit": "pages",
+        "sourceStart": 42,
+        "sourceEnd": 147,
+        "projectionVersion": 1
+      }
+    ]
+  },
+  {
+    "name": "unmatched and escaped closing link labels remain ignored",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 2026-08-20\n---\n- [x] [Read\\]](../tasks/read.md) <!-- task-occurrence task=read date=2026-08-20 kind=boolean -->\n- [ ] [Read]() <!-- task-occurrence task=read date=2026-08-20 kind=boolean -->\n",
+    "canonical": true,
+    "expected": []
+  },
+  {
+    "name": "invalid quantities keep marker unit without a value",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 2026-08-20\n---\n- [ ] [Read](../tasks/read.md) : -2 <!-- task-occurrence task=negative date=2026-08-20 kind=count unit=pages -->\n- [ ] [Read](../tasks/read.md) 2 pages <!-- task-occurrence task=unprefixed date=2026-08-20 kind=count unit=pages -->\n- [ ] [Read](../tasks/read.md) : 4 <!-- task-occurrence task=boolean date=2026-08-20 kind=boolean unit=kept -->\n",
+    "canonical": true,
+    "expected": [
+      {
+        "observationId": "negative:2026-08-20",
+        "taskId": "negative",
+        "taskPath": "tasks/read.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "pending",
+        "trackingKind": "count",
+        "unit": "pages",
+        "sourceStart": 42,
+        "sourceEnd": 155,
+        "projectionVersion": 1
+      },
+      {
+        "observationId": "unprefixed:2026-08-20",
+        "taskId": "unprefixed",
+        "taskPath": "tasks/read.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "pending",
+        "trackingKind": "count",
+        "unit": "pages",
+        "sourceStart": 155,
+        "sourceEnd": 273,
+        "projectionVersion": 1
+      },
+      {
+        "observationId": "boolean:2026-08-20",
+        "taskId": "boolean",
+        "taskPath": "tasks/read.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "pending",
+        "trackingKind": "boolean",
+        "unit": "kept",
+        "sourceStart": 273,
+        "sourceEnd": 385,
+        "projectionVersion": 1
+      }
+    ]
+  },
+  {
+    "name": "blank line extends only into an indented context",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 2026-08-20\n---\n- [ ] [Read](../tasks/read.md) <!-- task-occurrence task=read date=2026-08-20 kind=boolean -->\n\n  First context\n\n\tSecond context\n\nStop\n  Separate\n",
+    "canonical": true,
+    "expected": [
+      {
+        "observationId": "read:2026-08-20",
+        "taskId": "read",
+        "taskPath": "tasks/read.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "pending",
+        "trackingKind": "boolean",
+        "sourceStart": 42,
+        "sourceEnd": 171,
+        "projectionVersion": 1
+      }
+    ]
+  },
+  {
+    "name": "empty date string remains canonical",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: \"\"\n---\n- [ ] [Read](../tasks/read.md) <!-- task-occurrence task=read date=2026-08-20 kind=boolean -->\n",
+    "canonical": true,
+    "expected": [
+      {
+        "observationId": "read:2026-08-20",
+        "taskId": "read",
+        "taskPath": "tasks/read.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "pending",
+        "trackingKind": "boolean",
+        "sourceStart": 34,
+        "sourceEnd": 129,
+        "projectionVersion": 1
+      }
+    ]
+  },
+  {
+    "name": "front matter ending at EOF",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 2026-08-20\n---",
+    "canonical": true,
+    "expected": []
+  },
+  {
+    "name": "unterminated front matter",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 2026-08-20\n- [ ] [Read](../tasks/read.md) <!-- task-occurrence task=read date=2026-08-20 kind=boolean -->",
+    "canonical": false,
+    "expected": []
+  },
+  {
+    "name": "tab-indented observation and root traversal",
+    "path": "daily/2026-08-20.md",
+    "raw": "---\ntype: daily-note\ndate: 2026-08-20\n---\n\t- [ ] [Read](../../../../tasks/./read.md) : 3.25 units <!-- task-occurrence task=read date=2026-08-20 kind=number unit=old -->\n",
+    "canonical": true,
+    "expected": [
+      {
+        "observationId": "read:2026-08-20",
+        "taskId": "read",
+        "taskPath": "tasks/read.md",
+        "dailyDocumentPath": "daily/2026-08-20.md",
+        "occurrenceDate": "2026-08-20",
+        "outcome": "pending",
+        "trackingKind": "number",
+        "value": 3.25,
+        "unit": "units",
+        "sourceStart": 42,
+        "sourceEnd": 170,
+        "projectionVersion": 1
+      }
+    ]
+  }
+]

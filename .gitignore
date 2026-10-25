@@ -9,3 +9,4 @@ AGENTS.override.md
 .cursor/
 *.tgz
 *.tsbuildinfo
+crates/lapis-task-services/target/

@@ -79,6 +79,10 @@ export default defineConfig(tableRequirements(), {
       ],
       rules: [
         {
+          pattern: "^crates/lapis-task-services/",
+          chapters: ["spec/src/plugins/tasks/runtime.md"],
+        },
+        {
           pattern: "^src/lib/model/(?:task-document|task-index)\\.",
           chapters: ["spec/src/plugins/tasks/documents.md"],
         },
@@ -108,7 +112,7 @@ export default defineConfig(tableRequirements(), {
         },
       ],
       protected: [
-        "^(?:package\\.json$|manifest\\.json$|src/|\\.storybook/|pnpm-|scripts/|\\.github/|AGENTS\\.md$|spec-validator\\.config\\.mjs$)",
+        "^(?:package\\.json$|manifest\\.json$|src/|crates/|\\.storybook/|pnpm-|scripts/|\\.github/|AGENTS\\.md$|spec-validator\\.config\\.mjs$)",
       ],
     },
   },
