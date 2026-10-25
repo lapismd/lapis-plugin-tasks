@@ -221,6 +221,18 @@ selection remain separate. Complete unchanged-TypeScript capture, exact native
 before/after acceptance and complete owner source gates pass. See
 [the whole-vault graph source record](../../../records/2026-10-25-native-task-graph.md).
 
+## Private native index envelopes
+
+LN-TASK-084–085 govern the implemented pure source boundary for href normalization,
+snapshot-only target lookup, structural/navigation edges and links, tag/metadata
+records, indexed files and projection-source envelopes with an explicit local
+date. UTF-16 file sizes and existing source/projection identities are retained.
+The source returns values only; App/filesystem/database lookup, publication,
+provider registration, replacement/pruning, watches and host lifecycle stay with
+the admitted host. Complete unchanged-TypeScript parity, exact native before/after
+and complete owner source gates pass. See
+[the index source record](../../../records/2026-10-25-native-task-index.md).
+
 ## Repository and file stores
 
 `TaskRepository` in `src/lib/model/task-repository.ts` is the mutation

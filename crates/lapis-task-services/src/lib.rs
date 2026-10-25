@@ -4,6 +4,7 @@
 //! This crate derives disposable document and occurrence records from authored Markdown.
 
 mod document;
+mod index;
 mod marker;
 mod occurrence;
 mod projection;
@@ -14,6 +15,12 @@ mod structure;
 pub use document::{
     ChecklistItem, ParsedTaskDocument, StructuralLink, TaskDiagnostic, TaskDocumentKind,
     parse_task_document,
+};
+pub use index::{
+    TASKS_PUBLIC_PROJECTION_ID, TaskIndexEdge, TaskIndexedFile, TaskIndexedFileRecord,
+    TaskIndexedLink, TaskIndexedMetadata, TaskIndexedSummary, TaskIndexedTag, TaskProjectionSource,
+    TaskPublicationData, TaskPublicationRow, TaskStructureSnapshotResolver, resolve_task_href,
+    task_document_to_indexed_file, task_edges, task_projection_source,
 };
 pub use occurrence::{is_canonical_daily_document, task_occurrence_projection_rows};
 pub use projection::{TASK_PROJECTION_VERSION, TaskProjectionRecord, project_task};
