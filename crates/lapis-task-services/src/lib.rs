@@ -30,5 +30,5 @@ pub use structure::{
     ScannedTaskStructure, StructuralEntry, StructuralEntryCandidate, TaskRun,
     TaskStructureDiagnostic, TaskStructureOptions, TaskStructureProjection, TaskStructureTarget,
     resolve_task_document_structure, scan_task_headings, scan_task_structure,
-    task_structure_for_projection,
+    task_structure_for_projection, validate_task_structure_graph,
 };

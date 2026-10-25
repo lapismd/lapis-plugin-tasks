@@ -1,8 +1,10 @@
+mod graph;
 mod records;
 mod resolution;
 mod scanner;
 mod source;
 
+pub use graph::validate_task_structure_graph;
 pub use records::{
     HeadingContext, IndexedTaskRun, ResolvedTaskDocumentStructure, ScannedChecklistItem,
     ScannedTaskStructure, StructuralEntry, StructuralEntryCandidate, TaskRun,

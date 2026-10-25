@@ -209,6 +209,18 @@ separate. A per-document resolved structure is not an admitted whole-vault graph
 The source intake records complete parity and source-gate evidence in
 [the per-document structure record](../../../records/2026-10-25-native-task-structure.md).
 
+## Private whole-vault structure validation
+
+LN-TASK-082–083 govern the implemented private source boundary over a complete resolved
+snapshot. Multiple-parent edges are excluded before strongly connected cycle
+detection. Duplicate occurrences from one source remain distinct, invalid runs
+are filtered without changing their source identity, and diagnostics retain
+source order. Document paths retain ordered last-value replacement semantics.
+Target lookup, href/edge envelopes, publication and either host's native provider
+selection remain separate. Complete unchanged-TypeScript capture, exact native
+before/after acceptance and complete owner source gates pass. See
+[the whole-vault graph source record](../../../records/2026-10-25-native-task-graph.md).
+
 ## Repository and file stores
 
 `TaskRepository` in `src/lib/model/task-repository.ts` is the mutation
