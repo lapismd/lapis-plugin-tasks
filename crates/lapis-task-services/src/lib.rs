@@ -1,12 +1,17 @@
 //! Source-owned, read-only Tasks algorithms for native Lapis hosts.
 //!
 //! Hosts own admission, indexing lifetime, projection registration and writes.
-//! This crate only derives disposable occurrence records from authored Markdown.
+//! This crate derives disposable document and occurrence records from authored Markdown.
 
+mod document;
 mod marker;
 mod occurrence;
 mod record;
 
+pub use document::{
+    ChecklistItem, ParsedTaskDocument, StructuralLink, TaskDiagnostic, TaskDocumentKind,
+    parse_task_document,
+};
 pub use occurrence::{is_canonical_daily_document, task_occurrence_projection_rows};
 pub use record::{TaskOccurrenceRecord, TaskOutcome, TaskTrackingKind};
 

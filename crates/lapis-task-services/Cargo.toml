@@ -8,11 +8,11 @@ publish = false
 description = "Transport-independent native algorithms owned by the Lapis Tasks plugin"
 
 [dependencies]
+chrono = { version = "0.4", default-features = false, features = ["std"] }
+pulldown-cmark = { version = "0.13", default-features = false }
 regex = "1.12.3"
 serde = { version = "1", features = ["derive"] }
-serde_yaml = "=0.9.34"
-
-[dev-dependencies]
 serde_json = "1"
+serde_yaml = "=0.9.34"
 
 [workspace]

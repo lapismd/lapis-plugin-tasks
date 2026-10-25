@@ -1,0 +1,2479 @@
+[
+  {
+    "name": "ordinary-markdown",
+    "raw": "# Ordinary\n- [Task](task.md)\n",
+    "path": "tasks/ordinary-markdown.md",
+    "expected": null
+  },
+  {
+    "name": "unclosed-envelope",
+    "raw": "---\ntype: task\nid: missing-close\n# Document\n",
+    "path": "tasks/unclosed-envelope.md",
+    "expected": null
+  },
+  {
+    "name": "malformed-yaml",
+    "raw": "---\ntype: task\nid: [broken\n---\n# Document\n",
+    "path": "tasks/malformed-yaml.md",
+    "expected": null
+  },
+  {
+    "name": "duplicate-yaml-key",
+    "raw": "---\ntype: task\ntype: task-list\nid: duplicate\n---\n# Document\n",
+    "path": "tasks/duplicate-yaml-key.md",
+    "expected": null
+  },
+  {
+    "name": "array-envelope",
+    "raw": "---\n- type: task\n- id: array\n---\n# Document\n",
+    "path": "tasks/array-envelope.md",
+    "expected": null
+  },
+  {
+    "name": "scalar-envelope",
+    "raw": "---\nplain scalar\n---\n# Document\n",
+    "path": "tasks/scalar-envelope.md",
+    "expected": null
+  },
+  {
+    "name": "unknown-type",
+    "raw": "---\ntype: daily-note\nid: daily\n---\n# Daily\n",
+    "path": "tasks/unknown-type.md",
+    "expected": null
+  },
+  {
+    "name": "missing-id",
+    "raw": "---\ntype: task\n---\n# Missing id\n",
+    "path": "tasks/missing-id.md",
+    "expected": {
+      "path": "tasks/missing-id.md",
+      "raw": "---\ntype: task\n---\n# Missing id\n",
+      "id": "",
+      "kind": "task",
+      "title": "Missing id",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "# Missing id\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "missing-id",
+          "field": "id",
+          "message": "Task, task-list, and navigation files must have a stable id."
+        }
+      ]
+    }
+  },
+  {
+    "name": "trimmed-envelope",
+    "raw": "---\ntype: ' task '\nid: ' trimmed-id '\ntags: [' a ', '', 3, b]\ncreated: ' timestamp '\nupdated: false\n---\n# Trimmed\n",
+    "path": "tasks/trimmed-envelope.md",
+    "expected": {
+      "path": "tasks/trimmed-envelope.md",
+      "raw": "---\ntype: ' task '\nid: ' trimmed-id '\ntags: [' a ', '', 3, b]\ncreated: ' timestamp '\nupdated: false\n---\n# Trimmed\n",
+      "id": "trimmed-id",
+      "kind": "task",
+      "title": "Trimmed",
+      "tags": [
+        "a",
+        "b"
+      ],
+      "created": "timestamp",
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "# Trimmed\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "defaults",
+    "raw": "---\ntype: task\nid: defaults\ntask:\n  status: open\n---\n# Document\n",
+    "path": "tasks/defaults.md",
+    "expected": {
+      "path": "tasks/defaults.md",
+      "raw": "---\ntype: task\nid: defaults\ntask:\n  status: open\n---\n# Document\n",
+      "id": "defaults",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "planning",
+    "raw": "---\ntype: task\nid: planning\ntask:\n  status: completed\n  priority: high\n  inbox: true\n  completedAt: done\n  start: 2026-08-18\n  plan: {date: 2026-08-19, at: '09:45', duration: 1h30m}\n  deadline: 2026-08-24\n---\n# Document\n",
+    "path": "tasks/planning.md",
+    "expected": {
+      "path": "tasks/planning.md",
+      "raw": "---\ntype: task\nid: planning\ntask:\n  status: completed\n  priority: high\n  inbox: true\n  completedAt: done\n  start: 2026-08-18\n  plan: {date: 2026-08-19, at: '09:45', duration: 1h30m}\n  deadline: 2026-08-24\n---\n# Document\n",
+      "id": "planning",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "completed",
+        "priority": "high",
+        "completedAt": "done",
+        "inbox": true,
+        "start": {
+          "kind": "date",
+          "date": "2026-08-18"
+        },
+        "plan": {
+          "date": "2026-08-19",
+          "at": "time",
+          "time": "09:45",
+          "duration": "1h30m",
+          "durationMinutes": 90
+        },
+        "deadline": "2026-08-24",
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "plan-anytime",
+    "raw": "---\ntype: task\nid: plan-anytime\ntask:\n  plan: {date: 2026-08-19, at: 'anytime'}\n---\n# Document\n",
+    "path": "tasks/plan-anytime.md",
+    "expected": {
+      "path": "tasks/plan-anytime.md",
+      "raw": "---\ntype: task\nid: plan-anytime\ntask:\n  plan: {date: 2026-08-19, at: 'anytime'}\n---\n# Document\n",
+      "id": "plan-anytime",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "plan": {
+          "date": "2026-08-19",
+          "at": "anytime"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "plan-morning",
+    "raw": "---\ntype: task\nid: plan-morning\ntask:\n  plan: {date: 2026-08-19, at: 'morning'}\n---\n# Document\n",
+    "path": "tasks/plan-morning.md",
+    "expected": {
+      "path": "tasks/plan-morning.md",
+      "raw": "---\ntype: task\nid: plan-morning\ntask:\n  plan: {date: 2026-08-19, at: 'morning'}\n---\n# Document\n",
+      "id": "plan-morning",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "plan": {
+          "date": "2026-08-19",
+          "at": "morning"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "plan-afternoon",
+    "raw": "---\ntype: task\nid: plan-afternoon\ntask:\n  plan: {date: 2026-08-19, at: 'afternoon'}\n---\n# Document\n",
+    "path": "tasks/plan-afternoon.md",
+    "expected": {
+      "path": "tasks/plan-afternoon.md",
+      "raw": "---\ntype: task\nid: plan-afternoon\ntask:\n  plan: {date: 2026-08-19, at: 'afternoon'}\n---\n# Document\n",
+      "id": "plan-afternoon",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "plan": {
+          "date": "2026-08-19",
+          "at": "afternoon"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "plan-evening",
+    "raw": "---\ntype: task\nid: plan-evening\ntask:\n  plan: {date: 2026-08-19, at: 'evening'}\n---\n# Document\n",
+    "path": "tasks/plan-evening.md",
+    "expected": {
+      "path": "tasks/plan-evening.md",
+      "raw": "---\ntype: task\nid: plan-evening\ntask:\n  plan: {date: 2026-08-19, at: 'evening'}\n---\n# Document\n",
+      "id": "plan-evening",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "plan": {
+          "date": "2026-08-19",
+          "at": "evening"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "plan-all-day",
+    "raw": "---\ntype: task\nid: plan-all-day\ntask:\n  plan: {date: 2026-08-19, at: 'all-day'}\n---\n# Document\n",
+    "path": "tasks/plan-all-day.md",
+    "expected": {
+      "path": "tasks/plan-all-day.md",
+      "raw": "---\ntype: task\nid: plan-all-day\ntask:\n  plan: {date: 2026-08-19, at: 'all-day'}\n---\n# Document\n",
+      "id": "plan-all-day",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "plan": {
+          "date": "2026-08-19",
+          "at": "anytime"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-plan-at",
+          "field": "task.plan.at",
+          "message": "plan.at must be anytime, morning, afternoon, evening, or HH:mm."
+        }
+      ]
+    }
+  },
+  {
+    "name": "plan-99-99",
+    "raw": "---\ntype: task\nid: plan-99-99\ntask:\n  plan: {date: 2026-08-19, at: '99:99'}\n---\n# Document\n",
+    "path": "tasks/plan-99-99.md",
+    "expected": {
+      "path": "tasks/plan-99-99.md",
+      "raw": "---\ntype: task\nid: plan-99-99\ntask:\n  plan: {date: 2026-08-19, at: '99:99'}\n---\n# Document\n",
+      "id": "plan-99-99",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "plan": {
+          "date": "2026-08-19",
+          "at": "time",
+          "time": "99:99"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "invalid-fields",
+    "raw": "---\ntype: task\nid: invalid-fields\ntask:\n  status: todo\n  start: false\n  priority: urgent\n  plan: {date: broken, at: invalid, duration: nope}\n  inbox: 'true'\n---\n# Document\n",
+    "path": "tasks/invalid-fields.md",
+    "expected": {
+      "path": "tasks/invalid-fields.md",
+      "raw": "---\ntype: task\nid: invalid-fields\ntask:\n  status: todo\n  start: false\n  priority: urgent\n  plan: {date: broken, at: invalid, duration: nope}\n  inbox: 'true'\n---\n# Document\n",
+      "id": "invalid-fields",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "unparsedPriority": "urgent",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-status",
+          "field": "task.status",
+          "message": "task.status must be open, completed, or canceled."
+        },
+        {
+          "code": "invalid-start",
+          "field": "task.start",
+          "message": "start must be anytime, someday, or a YYYY-MM-DD date."
+        },
+        {
+          "code": "invalid-plan-date",
+          "field": "task.plan.date",
+          "message": "plan.date must be a YYYY-MM-DD date."
+        }
+      ]
+    }
+  },
+  {
+    "name": "invalid-duration",
+    "raw": "---\ntype: task\nid: invalid-duration\ntask:\n  plan: {date: 2026-08-19, at: invalid, duration: 0m}\n---\n# Document\n",
+    "path": "tasks/invalid-duration.md",
+    "expected": {
+      "path": "tasks/invalid-duration.md",
+      "raw": "---\ntype: task\nid: invalid-duration\ntask:\n  plan: {date: 2026-08-19, at: invalid, duration: 0m}\n---\n# Document\n",
+      "id": "invalid-duration",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "plan": {
+          "date": "2026-08-19",
+          "at": "anytime",
+          "duration": "0m"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-plan-at",
+          "field": "task.plan.at",
+          "message": "plan.at must be anytime, morning, afternoon, evening, or HH:mm."
+        },
+        {
+          "code": "invalid-duration",
+          "field": "task.plan.duration",
+          "message": "plan.duration must be a positive duration such as 45m or 1h30m."
+        }
+      ]
+    }
+  },
+  {
+    "name": "lexical-dates",
+    "raw": "---\ntype: task\nid: lexical-dates\ntask:\n  start: 2026-99-88\n  plan: {date: 2026-99-89, at: anytime}\n---\n# Document\n",
+    "path": "tasks/lexical-dates.md",
+    "expected": {
+      "path": "tasks/lexical-dates.md",
+      "raw": "---\ntype: task\nid: lexical-dates\ntask:\n  start: 2026-99-88\n  plan: {date: 2026-99-89, at: anytime}\n---\n# Document\n",
+      "id": "lexical-dates",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "date",
+          "date": "2026-99-88"
+        },
+        "plan": {
+          "date": "2026-99-89",
+          "at": "anytime"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "someday-with-plan",
+    "raw": "---\ntype: task\nid: someday-with-plan\ntask:\n  start: someday\n  plan: {date: 2026-08-19}\n---\n# Document\n",
+    "path": "tasks/someday-with-plan.md",
+    "expected": {
+      "path": "tasks/someday-with-plan.md",
+      "raw": "---\ntype: task\nid: someday-with-plan\ntask:\n  start: someday\n  plan: {date: 2026-08-19}\n---\n# Document\n",
+      "id": "someday-with-plan",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "someday"
+        },
+        "plan": {
+          "date": "2026-08-19",
+          "at": "anytime"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "someday-plan",
+          "field": "task.plan",
+          "message": "A someday task must not also have an active plan."
+        }
+      ]
+    }
+  },
+  {
+    "name": "plan-before-start",
+    "raw": "---\ntype: task\nid: plan-before-start\ntask:\n  start: 2026-08-20\n  plan: {date: 2026-08-19}\n---\n# Document\n",
+    "path": "tasks/plan-before-start.md",
+    "expected": {
+      "path": "tasks/plan-before-start.md",
+      "raw": "---\ntype: task\nid: plan-before-start\ntask:\n  start: 2026-08-20\n  plan: {date: 2026-08-19}\n---\n# Document\n",
+      "id": "plan-before-start",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "date",
+          "date": "2026-08-20"
+        },
+        "plan": {
+          "date": "2026-08-19",
+          "at": "anytime"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "plan-before-start",
+          "field": "task.plan.date",
+          "message": "plan.date must not be before a dated start."
+        }
+      ]
+    }
+  },
+  {
+    "name": "array-priority",
+    "raw": "---\ntype: task\nid: array-priority\ntask:\n  priority: [high]\n---\n# Document\n",
+    "path": "tasks/array-priority.md",
+    "expected": {
+      "path": "tasks/array-priority.md",
+      "raw": "---\ntype: task\nid: array-priority\ntask:\n  priority: [high]\n---\n# Document\n",
+      "id": "array-priority",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "priority": [
+          "high"
+        ],
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "comments",
+    "raw": "---\ntype: task\nid: comments\ntask:\n  comments:\n    - {id: a, at: now, text: ' first ', resolved: true, occurrence: 2026-08-19, editedAt: later}\n    - {id: b, at: later, text: second, resolved: false}\n    - {id: missing-text, at: now}\n    - plain\n---\n# Document\n",
+    "path": "tasks/comments.md",
+    "expected": {
+      "path": "tasks/comments.md",
+      "raw": "---\ntype: task\nid: comments\ntask:\n  comments:\n    - {id: a, at: now, text: ' first ', resolved: true, occurrence: 2026-08-19, editedAt: later}\n    - {id: b, at: later, text: second, resolved: false}\n    - {id: missing-text, at: now}\n    - plain\n---\n# Document\n",
+      "id": "comments",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": [
+          {
+            "id": "a",
+            "at": "now",
+            "text": "first",
+            "occurrence": "2026-08-19",
+            "editedAt": "later",
+            "resolved": true
+          },
+          {
+            "id": "b",
+            "at": "later",
+            "text": "second"
+          }
+        ]
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "task-scalars",
+    "raw": "---\ntype: task\nid: task-scalars\ntitle: Ignored task front matter title\ntask:\n  status: open\n---\nProse without H1\n",
+    "path": "tasks/task-scalars.md",
+    "expected": {
+      "path": "tasks/task-scalars.md",
+      "raw": "---\ntype: task\nid: task-scalars\ntitle: Ignored task front matter title\ntask:\n  status: open\n---\nProse without H1\n",
+      "id": "task-scalars",
+      "kind": "task",
+      "title": "task-scalars",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "Prose without H1\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "list-front-matter-title",
+    "raw": "---\ntype: task-list\nid: list_id\ntitle: ' Preferred '\nlist: {status: archived, role: area}\n---\n# Other\n",
+    "path": "lists/list-front-matter-title.MD",
+    "expected": {
+      "path": "lists/list-front-matter-title.MD",
+      "raw": "---\ntype: task-list\nid: list_id\ntitle: ' Preferred '\nlist: {status: archived, role: area}\n---\n# Other\n",
+      "id": "list_id",
+      "kind": "task-list",
+      "title": "Preferred",
+      "frontMatterTitle": "Preferred",
+      "tags": [],
+      "list": {
+        "status": "archived",
+        "role": "area"
+      },
+      "body": "# Other\n",
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "list-heading-title",
+    "raw": "---\ntype: task-list\nid: list_id\nlist: {status: unknown, role: other}\n---\n# Heading title\n",
+    "path": "lists/list-heading-title.MD",
+    "expected": {
+      "path": "lists/list-heading-title.MD",
+      "raw": "---\ntype: task-list\nid: list_id\nlist: {status: unknown, role: other}\n---\n# Heading title\n",
+      "id": "list_id",
+      "kind": "task-list",
+      "title": "Heading title",
+      "tags": [],
+      "list": {
+        "status": "active",
+        "role": "list"
+      },
+      "body": "# Heading title\n",
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "list-id-title",
+    "raw": "---\ntype: task-list\nid: list_some-work\n---\nNo heading\n",
+    "path": "lists/list-id-title.MD",
+    "expected": {
+      "path": "lists/list-id-title.MD",
+      "raw": "---\ntype: task-list\nid: list_some-work\n---\nNo heading\n",
+      "id": "list_some-work",
+      "kind": "task-list",
+      "title": "List Some Work",
+      "tags": [],
+      "list": {
+        "status": "active",
+        "role": "list"
+      },
+      "body": "No heading\n",
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "list-path-title",
+    "raw": "---\ntype: task-list\n---\nNo heading\n",
+    "path": "lists/list-path-title.MD",
+    "expected": {
+      "path": "lists/list-path-title.MD",
+      "raw": "---\ntype: task-list\n---\nNo heading\n",
+      "id": "",
+      "kind": "task-list",
+      "title": "list-path-title",
+      "tags": [],
+      "list": {
+        "status": "active",
+        "role": "list"
+      },
+      "body": "No heading\n",
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "missing-id",
+          "field": "id",
+          "message": "Task, task-list, and navigation files must have a stable id."
+        }
+      ]
+    }
+  },
+  {
+    "name": "navigation",
+    "raw": "---\ntype: task-list-navigation\nid: nav\n---\n- [Root](./root.md)\n# One\n- [First](./one.md)\n- [Second](../two.md)\n# Two\n- [Third](./three.md)\n# One\n- [Fourth](./four.md)\n- ![Image](image.png)\n",
+    "path": "tasks/navigation.md",
+    "expected": {
+      "path": "tasks/navigation.md",
+      "raw": "---\ntype: task-list-navigation\nid: nav\n---\n- [Root](./root.md)\n# One\n- [First](./one.md)\n- [Second](../two.md)\n# Two\n- [Third](./three.md)\n# One\n- [Fourth](./four.md)\n- ![Image](image.png)\n",
+      "id": "nav",
+      "kind": "task-list-navigation",
+      "title": "One",
+      "tags": [],
+      "body": "- [Root](./root.md)\n# One\n- [First](./one.md)\n- [Second](../two.md)\n# Two\n- [Third](./three.md)\n# One\n- [Fourth](./four.md)\n- ![Image](image.png)\n",
+      "structuralLinks": [
+        {
+          "title": "Root",
+          "href": "./root.md",
+          "kind": "navigation-item",
+          "heading": null,
+          "ordinal": 0
+        },
+        {
+          "title": "First",
+          "href": "./one.md",
+          "kind": "navigation-item",
+          "heading": "One",
+          "ordinal": 0
+        },
+        {
+          "title": "Second",
+          "href": "../two.md",
+          "kind": "navigation-item",
+          "heading": "One",
+          "ordinal": 1
+        },
+        {
+          "title": "Third",
+          "href": "./three.md",
+          "kind": "navigation-item",
+          "heading": "Two",
+          "ordinal": 0
+        },
+        {
+          "title": "Fourth",
+          "href": "./four.md",
+          "kind": "navigation-item",
+          "heading": "One",
+          "ordinal": 2
+        }
+      ],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "markdown-structure",
+    "raw": "---\ntype: task\nid: markdown-structure\ntask:\n  status: open\n---\n# Root\n- [Root task](./one.md)\n- [ ] Root checkbox\n\n## Section\n- [List](./list.md)\n- [x] Done\n  - [Nested](../nested.md)\n  - [ ] Child checkbox\n- **rich** [Reference](other.md)\n- [Outside](https://example.com)\n- [Fragment](#section)\n- [Protocol relative](//example.com)\n\n### Deeper\n- [Unicode ✨](./emoji.md)\n\n```md\n- [Fenced](fenced.md)\n- [x] Not a checklist\n```\n\n1. [Ordered](ordered.md)\n\nSetext heading\n--------------\n- [Setext](setext.md)\n",
+    "path": "tasks/markdown-structure.md",
+    "expected": {
+      "path": "tasks/markdown-structure.md",
+      "raw": "---\ntype: task\nid: markdown-structure\ntask:\n  status: open\n---\n# Root\n- [Root task](./one.md)\n- [ ] Root checkbox\n\n## Section\n- [List](./list.md)\n- [x] Done\n  - [Nested](../nested.md)\n  - [ ] Child checkbox\n- **rich** [Reference](other.md)\n- [Outside](https://example.com)\n- [Fragment](#section)\n- [Protocol relative](//example.com)\n\n### Deeper\n- [Unicode ✨](./emoji.md)\n\n```md\n- [Fenced](fenced.md)\n- [x] Not a checklist\n```\n\n1. [Ordered](ordered.md)\n\nSetext heading\n--------------\n- [Setext](setext.md)\n",
+      "id": "markdown-structure",
+      "kind": "task",
+      "title": "Root",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "# Root\n- [Root task](./one.md)\n- [ ] Root checkbox\n\n## Section\n- [List](./list.md)\n- [x] Done\n  - [Nested](../nested.md)\n  - [ ] Child checkbox\n- **rich** [Reference](other.md)\n- [Outside](https://example.com)\n- [Fragment](#section)\n- [Protocol relative](//example.com)\n\n### Deeper\n- [Unicode ✨](./emoji.md)\n\n```md\n- [Fenced](fenced.md)\n- [x] Not a checklist\n```\n\n1. [Ordered](ordered.md)\n\nSetext heading\n--------------\n- [Setext](setext.md)\n",
+      "checklist": [
+        {
+          "text": "Root checkbox",
+          "checked": false,
+          "position": 0,
+          "sourceStart": 94,
+          "sourceEnd": 113,
+          "source": "- [ ] Root checkbox"
+        },
+        {
+          "text": "Done",
+          "checked": true,
+          "position": 1,
+          "sourceStart": 146,
+          "sourceEnd": 206,
+          "source": "- [x] Done\n  - [Nested](../nested.md)\n  - [ ] Child checkbox"
+        },
+        {
+          "text": "Child checkbox",
+          "checked": false,
+          "position": 2,
+          "sourceStart": 186,
+          "sourceEnd": 206,
+          "source": "- [ ] Child checkbox"
+        }
+      ],
+      "structuralLinks": [
+        {
+          "title": "Root task",
+          "href": "./one.md",
+          "kind": "reference",
+          "heading": null,
+          "ordinal": 0,
+          "sourceStart": 70,
+          "sourceEnd": 93
+        },
+        {
+          "title": "List",
+          "href": "./list.md",
+          "kind": "reference",
+          "heading": "Section",
+          "ordinal": 1,
+          "sourceStart": 126,
+          "sourceEnd": 145
+        },
+        {
+          "title": "Nested",
+          "href": "../nested.md",
+          "kind": "reference",
+          "heading": "Section",
+          "ordinal": 2,
+          "sourceStart": 159,
+          "sourceEnd": 183
+        },
+        {
+          "title": "Unicode ✨",
+          "href": "./emoji.md",
+          "kind": "reference",
+          "heading": "Deeper",
+          "ordinal": 3,
+          "sourceStart": 345,
+          "sourceEnd": 370
+        },
+        {
+          "title": "Setext",
+          "href": "setext.md",
+          "kind": "reference",
+          "heading": "Setext heading",
+          "ordinal": 4,
+          "sourceStart": 483,
+          "sourceEnd": 504
+        }
+      ],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "list-structure",
+    "raw": "---\ntype: task-list\nid: list-structure\n---\n# Root\n- [Root task](./one.md)\n- [ ] Root checkbox\n\n## Section\n- [List](./list.md)\n- [x] Done\n  - [Nested](../nested.md)\n  - [ ] Child checkbox\n- **rich** [Reference](other.md)\n- [Outside](https://example.com)\n- [Fragment](#section)\n- [Protocol relative](//example.com)\n\n### Deeper\n- [Unicode ✨](./emoji.md)\n\n```md\n- [Fenced](fenced.md)\n- [x] Not a checklist\n```\n\n1. [Ordered](ordered.md)\n\nSetext heading\n--------------\n- [Setext](setext.md)\n",
+    "path": "tasks/list-structure.md",
+    "expected": {
+      "path": "tasks/list-structure.md",
+      "raw": "---\ntype: task-list\nid: list-structure\n---\n# Root\n- [Root task](./one.md)\n- [ ] Root checkbox\n\n## Section\n- [List](./list.md)\n- [x] Done\n  - [Nested](../nested.md)\n  - [ ] Child checkbox\n- **rich** [Reference](other.md)\n- [Outside](https://example.com)\n- [Fragment](#section)\n- [Protocol relative](//example.com)\n\n### Deeper\n- [Unicode ✨](./emoji.md)\n\n```md\n- [Fenced](fenced.md)\n- [x] Not a checklist\n```\n\n1. [Ordered](ordered.md)\n\nSetext heading\n--------------\n- [Setext](setext.md)\n",
+      "id": "list-structure",
+      "kind": "task-list",
+      "title": "Root",
+      "tags": [],
+      "list": {
+        "status": "active",
+        "role": "list"
+      },
+      "body": "# Root\n- [Root task](./one.md)\n- [ ] Root checkbox\n\n## Section\n- [List](./list.md)\n- [x] Done\n  - [Nested](../nested.md)\n  - [ ] Child checkbox\n- **rich** [Reference](other.md)\n- [Outside](https://example.com)\n- [Fragment](#section)\n- [Protocol relative](//example.com)\n\n### Deeper\n- [Unicode ✨](./emoji.md)\n\n```md\n- [Fenced](fenced.md)\n- [x] Not a checklist\n```\n\n1. [Ordered](ordered.md)\n\nSetext heading\n--------------\n- [Setext](setext.md)\n",
+      "structuralLinks": [
+        {
+          "title": "Root task",
+          "href": "./one.md",
+          "kind": "reference",
+          "heading": null,
+          "ordinal": 0,
+          "sourceStart": 50,
+          "sourceEnd": 73
+        },
+        {
+          "title": "List",
+          "href": "./list.md",
+          "kind": "reference",
+          "heading": "Section",
+          "ordinal": 1,
+          "sourceStart": 106,
+          "sourceEnd": 125
+        },
+        {
+          "title": "Nested",
+          "href": "../nested.md",
+          "kind": "reference",
+          "heading": "Section",
+          "ordinal": 2,
+          "sourceStart": 139,
+          "sourceEnd": 163
+        },
+        {
+          "title": "Unicode ✨",
+          "href": "./emoji.md",
+          "kind": "reference",
+          "heading": "Deeper",
+          "ordinal": 3,
+          "sourceStart": 325,
+          "sourceEnd": 350
+        },
+        {
+          "title": "Setext",
+          "href": "setext.md",
+          "kind": "reference",
+          "heading": "Setext heading",
+          "ordinal": 4,
+          "sourceStart": 463,
+          "sourceEnd": 484
+        }
+      ],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "utf16-crlf",
+    "raw": "---\ntype: task\nid: utf16-crlf\ntask:\n  status: open\n---\n# Emoji 😀\r\n\r\n## Héading 🦀\r\n- [Task 🚀](./note.md)\r\n- [X] Complete 🧪\r\n  indented context\r\n",
+    "path": "tasks/utf16-crlf.md",
+    "expected": {
+      "path": "tasks/utf16-crlf.md",
+      "raw": "---\ntype: task\nid: utf16-crlf\ntask:\n  status: open\n---\n# Emoji 😀\r\n\r\n## Héading 🦀\r\n- [Task 🚀](./note.md)\r\n- [X] Complete 🧪\r\n  indented context\r\n",
+      "id": "utf16-crlf",
+      "kind": "task",
+      "title": "Emoji 😀",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "# Emoji 😀\r\n\r\n## Héading 🦀\r\n- [Task 🚀](./note.md)\r\n- [X] Complete 🧪\r\n  indented context\r\n",
+      "checklist": [
+        {
+          "text": "Complete 🧪\r\n  indented context",
+          "checked": true,
+          "position": 0,
+          "sourceStart": 108,
+          "sourceEnd": 146,
+          "source": "- [X] Complete 🧪\r\n  indented context\r"
+        }
+      ],
+      "structuralLinks": [
+        {
+          "title": "Task 🚀",
+          "href": "./note.md",
+          "kind": "reference",
+          "heading": "Héading 🦀",
+          "ordinal": 0,
+          "sourceStart": 84,
+          "sourceEnd": 107
+        }
+      ],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "daily",
+    "raw": "---\ntype: task\nid: daily\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY'\n---\n# Document\n",
+    "path": "tasks/daily.md",
+    "expected": {
+      "path": "tasks/daily.md",
+      "raw": "---\ntype: task\nid: daily\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY'\n---\n# Document\n",
+      "id": "daily",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "weekly",
+    "raw": "---\ntype: task\nid: weekly\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,WE;WKST=SU'\n---\n# Document\n",
+    "path": "tasks/weekly.md",
+    "expected": {
+      "path": "tasks/weekly.md",
+      "raw": "---\ntype: task\nid: weekly\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,WE;WKST=SU'\n---\n# Document\n",
+      "id": "weekly",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,WE;WKST=SU",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "monthly",
+    "raw": "---\ntype: task\nid: monthly\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-1;COUNT=12'\n---\n# Document\n",
+    "path": "tasks/monthly.md",
+    "expected": {
+      "path": "tasks/monthly.md",
+      "raw": "---\ntype: task\nid: monthly\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-1;COUNT=12'\n---\n# Document\n",
+      "id": "monthly",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-1;COUNT=12",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "yearly",
+    "raw": "---\ntype: task\nid: yearly\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=29;UNTIL=20320229'\n---\n# Document\n",
+    "path": "tasks/yearly.md",
+    "expected": {
+      "path": "tasks/yearly.md",
+      "raw": "---\ntype: task\nid: yearly\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=29;UNTIL=20320229'\n---\n# Document\n",
+      "id": "yearly",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=29;UNTIL=20320229",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "unsupported-hourly",
+    "raw": "---\ntype: task\nid: unsupported-hourly\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=HOURLY'\n---\n# Document\n",
+    "path": "tasks/unsupported-hourly.md",
+    "expected": {
+      "path": "tasks/unsupported-hourly.md",
+      "raw": "---\ntype: task\nid: unsupported-hourly\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=HOURLY'\n---\n# Document\n",
+      "id": "unsupported-hourly",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=HOURLY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "unsupported-repeat-rule",
+          "field": "task.repeat.rrule",
+          "message": "The RRULE is preserved but automatic advancement is blocked because Tasks does not execute: FREQ=HOURLY."
+        }
+      ]
+    }
+  },
+  {
+    "name": "unsupported-hour",
+    "raw": "---\ntype: task\nid: unsupported-hour\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY;BYHOUR=10'\n---\n# Document\n",
+    "path": "tasks/unsupported-hour.md",
+    "expected": {
+      "path": "tasks/unsupported-hour.md",
+      "raw": "---\ntype: task\nid: unsupported-hour\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY;BYHOUR=10'\n---\n# Document\n",
+      "id": "unsupported-hour",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY;BYHOUR=10",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "unsupported-repeat-rule",
+          "field": "task.repeat.rrule",
+          "message": "The RRULE is preserved but automatic advancement is blocked because Tasks does not execute: BYHOUR."
+        }
+      ]
+    }
+  },
+  {
+    "name": "unsupported-until-time",
+    "raw": "---\ntype: task\nid: unsupported-until-time\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY;UNTIL=20260831T120000Z'\n---\n# Document\n",
+    "path": "tasks/unsupported-until-time.md",
+    "expected": {
+      "path": "tasks/unsupported-until-time.md",
+      "raw": "---\ntype: task\nid: unsupported-until-time\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY;UNTIL=20260831T120000Z'\n---\n# Document\n",
+      "id": "unsupported-until-time",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY;UNTIL=20260831T120000Z",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "unsupported-repeat-rule",
+          "field": "task.repeat.rrule",
+          "message": "The RRULE is preserved but automatic advancement is blocked because Tasks does not execute: UNTIL with a time or zone."
+        }
+      ]
+    }
+  },
+  {
+    "name": "invalid-unknown",
+    "raw": "---\ntype: task\nid: invalid-unknown\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY;WHATEVER=1'\n---\n# Document\n",
+    "path": "tasks/invalid-unknown.md",
+    "expected": {
+      "path": "tasks/invalid-unknown.md",
+      "raw": "---\ntype: task\nid: invalid-unknown\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY;WHATEVER=1'\n---\n# Document\n",
+      "id": "invalid-unknown",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "unparsedRepeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY;WHATEVER=1"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-repeat-rule",
+          "field": "task.repeat.rrule",
+          "message": "Unknown RRULE property 'WHATEVER'"
+        }
+      ]
+    }
+  },
+  {
+    "name": "invalid-frequency",
+    "raw": "---\ntype: task\nid: invalid-frequency\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=NOTREAL'\n---\n# Document\n",
+    "path": "tasks/invalid-frequency.md",
+    "expected": {
+      "path": "tasks/invalid-frequency.md",
+      "raw": "---\ntype: task\nid: invalid-frequency\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=NOTREAL'\n---\n# Document\n",
+      "id": "invalid-frequency",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "unparsedRepeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=NOTREAL"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-repeat-rule",
+          "field": "task.repeat.rrule",
+          "message": "Invalid frequency: undefined undefined"
+        }
+      ]
+    }
+  },
+  {
+    "name": "invalid-duplicate",
+    "raw": "---\ntype: task\nid: invalid-duplicate\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY;FREQ=WEEKLY'\n---\n# Document\n",
+    "path": "tasks/invalid-duplicate.md",
+    "expected": {
+      "path": "tasks/invalid-duplicate.md",
+      "raw": "---\ntype: task\nid: invalid-duplicate\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY;FREQ=WEEKLY'\n---\n# Document\n",
+      "id": "invalid-duplicate",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "unparsedRepeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY;FREQ=WEEKLY"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-repeat-rule",
+          "field": "task.repeat.rrule",
+          "message": "Duplicate RRULE property: FREQ"
+        }
+      ]
+    }
+  },
+  {
+    "name": "invalid-count-until",
+    "raw": "---\ntype: task\nid: invalid-count-until\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY;COUNT=3;UNTIL=20260831'\n---\n# Document\n",
+    "path": "tasks/invalid-count-until.md",
+    "expected": {
+      "path": "tasks/invalid-count-until.md",
+      "raw": "---\ntype: task\nid: invalid-count-until\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY;COUNT=3;UNTIL=20260831'\n---\n# Document\n",
+      "id": "invalid-count-until",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "unparsedRepeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY;COUNT=3;UNTIL=20260831"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-repeat-rule",
+          "field": "task.repeat.rrule",
+          "message": "RRULE must not combine COUNT and UNTIL."
+        }
+      ]
+    }
+  },
+  {
+    "name": "invalid-prefix",
+    "raw": "---\ntype: task\nid: invalid-prefix\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'RRULE:FREQ=DAILY'\n---\n# Document\n",
+    "path": "tasks/invalid-prefix.md",
+    "expected": {
+      "path": "tasks/invalid-prefix.md",
+      "raw": "---\ntype: task\nid: invalid-prefix\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'RRULE:FREQ=DAILY'\n---\n# Document\n",
+      "id": "invalid-prefix",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "unparsedRepeat": {
+          "start": "2026-08-19",
+          "rrule": "RRULE:FREQ=DAILY"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-repeat-rule",
+          "field": "task.repeat.rrule",
+          "message": "RRULE must store only the property value, without a prefix."
+        }
+      ]
+    }
+  },
+  {
+    "name": "invalid-missing-frequency",
+    "raw": "---\ntype: task\nid: invalid-missing-frequency\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'BYDAY=MO'\n---\n# Document\n",
+    "path": "tasks/invalid-missing-frequency.md",
+    "expected": {
+      "path": "tasks/invalid-missing-frequency.md",
+      "raw": "---\ntype: task\nid: invalid-missing-frequency\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'BYDAY=MO'\n---\n# Document\n",
+      "id": "invalid-missing-frequency",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "unparsedRepeat": {
+          "start": "2026-08-19",
+          "rrule": "BYDAY=MO"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-repeat-rule",
+          "field": "task.repeat.rrule",
+          "message": "RRULE must include FREQ."
+        }
+      ]
+    }
+  },
+  {
+    "name": "invalid-part",
+    "raw": "---\ntype: task\nid: invalid-part\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY;broken'\n---\n# Document\n",
+    "path": "tasks/invalid-part.md",
+    "expected": {
+      "path": "tasks/invalid-part.md",
+      "raw": "---\ntype: task\nid: invalid-part\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=DAILY;broken'\n---\n# Document\n",
+      "id": "invalid-part",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "unparsedRepeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY;broken"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-repeat-rule",
+          "field": "task.repeat.rrule",
+          "message": "Invalid RRULE part: broken"
+        }
+      ]
+    }
+  },
+  {
+    "name": "invalid-weekday",
+    "raw": "---\ntype: task\nid: invalid-weekday\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=WEEKLY;BYDAY=NO'\n---\n# Document\n",
+    "path": "tasks/invalid-weekday.md",
+    "expected": {
+      "path": "tasks/invalid-weekday.md",
+      "raw": "---\ntype: task\nid: invalid-weekday\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: 'FREQ=WEEKLY;BYDAY=NO'\n---\n# Document\n",
+      "id": "invalid-weekday",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "unparsedRepeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=WEEKLY;BYDAY=NO"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-repeat-rule",
+          "field": "task.repeat.rrule",
+          "message": "Cannot read properties of undefined (reading 'n')"
+        }
+      ]
+    }
+  },
+  {
+    "name": "complete-repeat",
+    "raw": "---\ntype: task\nid: complete-repeat\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    anchor: schedule\n    missed: skip\n    rdate: [2026-08-20, 2026-08-20, 2026-08-21]\n    exdate: [2026-08-22]\n    paused: true\n    pausedSince: 2026-08-23\n    pauseRanges: [{start: 2026-08-10, end: 2026-08-12}]\n    resetChecklist: true\n    lastCompletedAt: 2026-08-19T09:00:00.000Z\n    completionCount: 4\n  tracking: {type: count, unit: glasses, target: 8}\n---\n# Document\n",
+    "path": "tasks/complete-repeat.md",
+    "expected": {
+      "path": "tasks/complete-repeat.md",
+      "raw": "---\ntype: task\nid: complete-repeat\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    anchor: schedule\n    missed: skip\n    rdate: [2026-08-20, 2026-08-20, 2026-08-21]\n    exdate: [2026-08-22]\n    paused: true\n    pausedSince: 2026-08-23\n    pauseRanges: [{start: 2026-08-10, end: 2026-08-12}]\n    resetChecklist: true\n    lastCompletedAt: 2026-08-19T09:00:00.000Z\n    completionCount: 4\n  tracking: {type: count, unit: glasses, target: 8}\n---\n# Document\n",
+      "id": "complete-repeat",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "skip",
+          "rdate": [
+            "2026-08-20",
+            "2026-08-21"
+          ],
+          "exdate": [
+            "2026-08-22"
+          ],
+          "resetChecklist": true,
+          "paused": true,
+          "pausedSince": "2026-08-23",
+          "pauseRanges": [
+            {
+              "start": "2026-08-10",
+              "end": "2026-08-12"
+            }
+          ],
+          "lastCompletedAt": "2026-08-19T09:00:00.000Z",
+          "completionCount": 4
+        },
+        "tracking": {
+          "type": "count",
+          "unit": "glasses",
+          "target": 8
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "completion-without-start",
+    "raw": "---\ntype: task\nid: completion-without-start\ntask:\n  repeat:\n    rrule: FREQ=DAILY\n    anchor: completion\n---\n# Document\n",
+    "path": "tasks/completion-without-start.md",
+    "expected": {
+      "path": "tasks/completion-without-start.md",
+      "raw": "---\ntype: task\nid: completion-without-start\ntask:\n  repeat:\n    rrule: FREQ=DAILY\n    anchor: completion\n---\n# Document\n",
+      "id": "completion-without-start",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "rrule": "FREQ=DAILY",
+          "anchor": "completion",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "legacy-repeat",
+    "raw": "---\ntype: task\nid: legacy-repeat\ntask:\n  repeat:\n    frequency: daily\n    interval: 1\n    strategy: rolling\n---\n# Document\n",
+    "path": "tasks/legacy-repeat.md",
+    "expected": {
+      "path": "tasks/legacy-repeat.md",
+      "raw": "---\ntype: task\nid: legacy-repeat\ntask:\n  repeat:\n    frequency: daily\n    interval: 1\n    strategy: rolling\n---\n# Document\n",
+      "id": "legacy-repeat",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "unparsedRepeat": {
+          "frequency": "daily",
+          "interval": 1,
+          "strategy": "rolling"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "legacy-repeat",
+          "field": "task.repeat",
+          "message": "Legacy frequency/interval recurrence is retained but is no longer executable; replace or remove it in the recurrence editor."
+        }
+      ]
+    }
+  },
+  {
+    "name": "missing-repeat-start",
+    "raw": "---\ntype: task\nid: missing-repeat-start\ntask:\n  repeat:\n    rrule: FREQ=DAILY\n---\n# Document\n",
+    "path": "tasks/missing-repeat-start.md",
+    "expected": {
+      "path": "tasks/missing-repeat-start.md",
+      "raw": "---\ntype: task\nid: missing-repeat-start\ntask:\n  repeat:\n    rrule: FREQ=DAILY\n---\n# Document\n",
+      "id": "missing-repeat-start",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "unparsedRepeat": {
+          "rrule": "FREQ=DAILY"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-repeat",
+          "field": "task.repeat",
+          "message": "repeat must use a valid RRULE, anchor/missed policy, date-only start and exceptions, pause ranges, and non-negative completionCount."
+        }
+      ]
+    }
+  },
+  {
+    "name": "bad-repeat-date",
+    "raw": "---\ntype: task\nid: bad-repeat-date\ntask:\n  repeat:\n    start: 2026-02-30\n    rrule: FREQ=DAILY\n---\n# Document\n",
+    "path": "tasks/bad-repeat-date.md",
+    "expected": {
+      "path": "tasks/bad-repeat-date.md",
+      "raw": "---\ntype: task\nid: bad-repeat-date\ntask:\n  repeat:\n    start: 2026-02-30\n    rrule: FREQ=DAILY\n---\n# Document\n",
+      "id": "bad-repeat-date",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "unparsedRepeat": {
+          "start": "2026-02-30",
+          "rrule": "FREQ=DAILY"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-repeat",
+          "field": "task.repeat",
+          "message": "repeat must use a valid RRULE, anchor/missed policy, date-only start and exceptions, pause ranges, and non-negative completionCount."
+        }
+      ]
+    }
+  },
+  {
+    "name": "completion-skip",
+    "raw": "---\ntype: task\nid: completion-skip\ntask:\n  repeat:\n    rrule: FREQ=DAILY\n    anchor: completion\n    missed: skip\n---\n# Document\n",
+    "path": "tasks/completion-skip.md",
+    "expected": {
+      "path": "tasks/completion-skip.md",
+      "raw": "---\ntype: task\nid: completion-skip\ntask:\n  repeat:\n    rrule: FREQ=DAILY\n    anchor: completion\n    missed: skip\n---\n# Document\n",
+      "id": "completion-skip",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "unparsedRepeat": {
+          "rrule": "FREQ=DAILY",
+          "anchor": "completion",
+          "missed": "skip"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-repeat",
+          "field": "task.repeat",
+          "message": "repeat must use a valid RRULE, anchor/missed policy, date-only start and exceptions, pause ranges, and non-negative completionCount."
+        }
+      ]
+    }
+  },
+  {
+    "name": "unknown-repeat-field",
+    "raw": "---\ntype: task\nid: unknown-repeat-field\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    unknown: retained\n---\n# Document\n",
+    "path": "tasks/unknown-repeat-field.md",
+    "expected": {
+      "path": "tasks/unknown-repeat-field.md",
+      "raw": "---\ntype: task\nid: unknown-repeat-field\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    unknown: retained\n---\n# Document\n",
+      "id": "unknown-repeat-field",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "unparsedRepeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "unknown": "retained"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-repeat",
+          "field": "task.repeat",
+          "message": "repeat must use a valid RRULE, anchor/missed policy, date-only start and exceptions, pause ranges, and non-negative completionCount."
+        }
+      ]
+    }
+  },
+  {
+    "name": "bad-pause-range",
+    "raw": "---\ntype: task\nid: bad-pause-range\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    pauseRanges: [{start: 2026-08-20, end: 2026-08-19}]\n---\n# Document\n",
+    "path": "tasks/bad-pause-range.md",
+    "expected": {
+      "path": "tasks/bad-pause-range.md",
+      "raw": "---\ntype: task\nid: bad-pause-range\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    pauseRanges: [{start: 2026-08-20, end: 2026-08-19}]\n---\n# Document\n",
+      "id": "bad-pause-range",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "unparsedRepeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "pauseRanges": [
+            {
+              "start": "2026-08-20",
+              "end": "2026-08-19"
+            }
+          ]
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-repeat",
+          "field": "task.repeat",
+          "message": "repeat must use a valid RRULE, anchor/missed policy, date-only start and exceptions, pause ranges, and non-negative completionCount."
+        }
+      ]
+    }
+  },
+  {
+    "name": "paused-without-date",
+    "raw": "---\ntype: task\nid: paused-without-date\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    paused: true\n---\n# Document\n",
+    "path": "tasks/paused-without-date.md",
+    "expected": {
+      "path": "tasks/paused-without-date.md",
+      "raw": "---\ntype: task\nid: paused-without-date\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    paused: true\n---\n# Document\n",
+      "id": "paused-without-date",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "unparsedRepeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "paused": true
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-repeat",
+          "field": "task.repeat",
+          "message": "repeat must use a valid RRULE, anchor/missed policy, date-only start and exceptions, pause ranges, and non-negative completionCount."
+        }
+      ]
+    }
+  },
+  {
+    "name": "invalid-completion-count",
+    "raw": "---\ntype: task\nid: invalid-completion-count\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    completionCount: -1\n---\n# Document\n",
+    "path": "tasks/invalid-completion-count.md",
+    "expected": {
+      "path": "tasks/invalid-completion-count.md",
+      "raw": "---\ntype: task\nid: invalid-completion-count\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    completionCount: -1\n---\n# Document\n",
+      "id": "invalid-completion-count",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "unparsedRepeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "completionCount": -1
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-repeat",
+          "field": "task.repeat",
+          "message": "repeat must use a valid RRULE, anchor/missed policy, date-only start and exceptions, pause ranges, and non-negative completionCount."
+        }
+      ]
+    }
+  },
+  {
+    "name": "tracking-boolean",
+    "raw": "---\ntype: task\nid: tracking-boolean\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n  tracking: {type: boolean}\n---\n# Document\n",
+    "path": "tasks/tracking-boolean.md",
+    "expected": {
+      "path": "tasks/tracking-boolean.md",
+      "raw": "---\ntype: task\nid: tracking-boolean\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n  tracking: {type: boolean}\n---\n# Document\n",
+      "id": "tracking-boolean",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": {
+          "type": "boolean"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "tracking-number",
+    "raw": "---\ntype: task\nid: tracking-number\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n  tracking: {type: number, unit: kg, target: 20.5}\n---\n# Document\n",
+    "path": "tasks/tracking-number.md",
+    "expected": {
+      "path": "tasks/tracking-number.md",
+      "raw": "---\ntype: task\nid: tracking-number\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n  tracking: {type: number, unit: kg, target: 20.5}\n---\n# Document\n",
+      "id": "tracking-number",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": {
+          "type": "number",
+          "unit": "kg",
+          "target": 20.5
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "tracking-duration",
+    "raw": "---\ntype: task\nid: tracking-duration\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n  tracking: {type: duration, target: 1h15m}\n---\n# Document\n",
+    "path": "tasks/tracking-duration.md",
+    "expected": {
+      "path": "tasks/tracking-duration.md",
+      "raw": "---\ntype: task\nid: tracking-duration\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n  tracking: {type: duration, target: 1h15m}\n---\n# Document\n",
+      "id": "tracking-duration",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "tracking": {
+          "type": "duration",
+          "target": "1h15m"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "tracking-bad-target",
+    "raw": "---\ntype: task\nid: tracking-bad-target\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n  tracking: {type: count, unit: count, target: -2}\n---\n# Document\n",
+    "path": "tasks/tracking-bad-target.md",
+    "expected": {
+      "path": "tasks/tracking-bad-target.md",
+      "raw": "---\ntype: task\nid: tracking-bad-target\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n  tracking: {type: count, unit: count, target: -2}\n---\n# Document\n",
+      "id": "tracking-bad-target",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "unparsedTracking": {
+          "type": "count",
+          "unit": "count",
+          "target": -2
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-tracking",
+          "field": "task.tracking",
+          "message": "count and number tracking require a unit and optional positive target; duration accepts an optional positive duration target."
+        }
+      ]
+    }
+  },
+  {
+    "name": "tracking-unknown-field",
+    "raw": "---\ntype: task\nid: tracking-unknown-field\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n  tracking: {type: boolean, extra: retained}\n---\n# Document\n",
+    "path": "tasks/tracking-unknown-field.md",
+    "expected": {
+      "path": "tasks/tracking-unknown-field.md",
+      "raw": "---\ntype: task\nid: tracking-unknown-field\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n  tracking: {type: boolean, extra: retained}\n---\n# Document\n",
+      "id": "tracking-unknown-field",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "unparsedTracking": {
+          "type": "boolean",
+          "extra": "retained"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-tracking",
+          "field": "task.tracking",
+          "message": "count and number tracking require a unit and optional positive target; duration accepts an optional positive duration target."
+        }
+      ]
+    }
+  },
+  {
+    "name": "tracking-bad-duration",
+    "raw": "---\ntype: task\nid: tracking-bad-duration\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n  tracking: {type: duration, target: nope}\n---\n# Document\n",
+    "path": "tasks/tracking-bad-duration.md",
+    "expected": {
+      "path": "tasks/tracking-bad-duration.md",
+      "raw": "---\ntype: task\nid: tracking-bad-duration\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n  tracking: {type: duration, target: nope}\n---\n# Document\n",
+      "id": "tracking-bad-duration",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "unparsedTracking": {
+          "type": "duration",
+          "target": "nope"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-tracking",
+          "field": "task.tracking",
+          "message": "count and number tracking require a unit and optional positive target; duration accepts an optional positive duration target."
+        }
+      ]
+    }
+  },
+  {
+    "name": "tracking-without-repeat",
+    "raw": "---\ntype: task\nid: tracking-without-repeat\ntask:\n  tracking: {type: count, unit: steps, target: 100}\n---\n# Document\n",
+    "path": "tasks/tracking-without-repeat.md",
+    "expected": {
+      "path": "tasks/tracking-without-repeat.md",
+      "raw": "---\ntype: task\nid: tracking-without-repeat\ntask:\n  tracking: {type: count, unit: steps, target: 100}\n---\n# Document\n",
+      "id": "tracking-without-repeat",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "unparsedTracking": {
+          "type": "count",
+          "unit": "steps",
+          "target": 100
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "tracking-without-repeat",
+          "field": "task.tracking",
+          "message": "tracking requires an executable or preserved RRULE recurrence."
+        }
+      ]
+    }
+  },
+  {
+    "name": "scalar-repeat-and-tracking",
+    "raw": "---\ntype: task\nid: scalar-repeat-and-tracking\ntask:\n  repeat: plain\n  tracking: plain\n---\n# Document\n",
+    "path": "tasks/scalar-repeat-and-tracking.md",
+    "expected": {
+      "path": "tasks/scalar-repeat-and-tracking.md",
+      "raw": "---\ntype: task\nid: scalar-repeat-and-tracking\ntask:\n  repeat: plain\n  tracking: plain\n---\n# Document\n",
+      "id": "scalar-repeat-and-tracking",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "unparsedRepeat": "plain",
+        "unparsedTracking": "plain",
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-repeat",
+          "field": "task.repeat",
+          "message": "repeat must be an RRULE recurrence object."
+        },
+        {
+          "code": "invalid-tracking",
+          "field": "task.tracking",
+          "message": "tracking must be a boolean, count, duration, or number object."
+        }
+      ]
+    }
+  },
+  {
+    "name": "scalar-task-envelope",
+    "raw": "---\ntype: task\nid: scalar-task-envelope\ntitle: Ignored\ntask:\n  status: open\n---\n# Body heading\n",
+    "path": "tasks/scalar-task-envelope.md",
+    "expected": {
+      "path": "tasks/scalar-task-envelope.md",
+      "raw": "---\ntype: task\nid: scalar-task-envelope\ntitle: Ignored\ntask:\n  status: open\n---\n# Body heading\n",
+      "id": "scalar-task-envelope",
+      "kind": "task",
+      "title": "Body heading",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "# Body heading\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "scalar-plan",
+    "raw": "---\ntype: task\nid: scalar-plan\ntask:\n  plan: []\n  tags: ignored\n---\n# Document\n",
+    "path": "tasks/scalar-plan.md",
+    "expected": {
+      "path": "tasks/scalar-plan.md",
+      "raw": "---\ntype: task\nid: scalar-plan\ntask:\n  plan: []\n  tags: ignored\n---\n# Document\n",
+      "id": "scalar-plan",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "date-with-final-newline",
+    "raw": "---\ntype: task\nid: date-with-final-newline\ntask:\n  start: \"2026-08-19\\n\"\n---\n# Document\n",
+    "path": "tasks/date-with-final-newline.md",
+    "expected": {
+      "path": "tasks/date-with-final-newline.md",
+      "raw": "---\ntype: task\nid: date-with-final-newline\ntask:\n  start: \"2026-08-19\\n\"\n---\n# Document\n",
+      "id": "date-with-final-newline",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-start",
+          "field": "task.start",
+          "message": "start must be anytime, someday, or a YYYY-MM-DD date."
+        }
+      ]
+    }
+  },
+  {
+    "name": "non-calendar-until",
+    "raw": "---\ntype: task\nid: non-calendar-until\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY;UNTIL=20260230\n---\n# Document\n",
+    "path": "tasks/non-calendar-until.md",
+    "expected": {
+      "path": "tasks/non-calendar-until.md",
+      "raw": "---\ntype: task\nid: non-calendar-until\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY;UNTIL=20260230\n---\n# Document\n",
+      "id": "non-calendar-until",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY;UNTIL=20260230",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "unsupported-repeat-rule",
+          "field": "task.repeat.rrule",
+          "message": "The RRULE is preserved but automatic advancement is blocked because Tasks does not execute: UNTIL with a time or zone."
+        }
+      ]
+    }
+  },
+  {
+    "name": "timestamp-date-only",
+    "raw": "---\ntype: task\nid: timestamp-date-only\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    lastCompletedAt: '2026-08-19'\n---\n# Document\n",
+    "path": "tasks/timestamp-date-only.md",
+    "expected": {
+      "path": "tasks/timestamp-date-only.md",
+      "raw": "---\ntype: task\nid: timestamp-date-only\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    lastCompletedAt: '2026-08-19'\n---\n# Document\n",
+      "id": "timestamp-date-only",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false,
+          "lastCompletedAt": "2026-08-19"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "timestamp-rfc2822",
+    "raw": "---\ntype: task\nid: timestamp-rfc2822\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    lastCompletedAt: 'Wed, 19 Aug 2026 09:00:00 GMT'\n---\n# Document\n",
+    "path": "tasks/timestamp-rfc2822.md",
+    "expected": {
+      "path": "tasks/timestamp-rfc2822.md",
+      "raw": "---\ntype: task\nid: timestamp-rfc2822\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    lastCompletedAt: 'Wed, 19 Aug 2026 09:00:00 GMT'\n---\n# Document\n",
+      "id": "timestamp-rfc2822",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false,
+          "lastCompletedAt": "Wed, 19 Aug 2026 09:00:00 GMT"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "timestamp-numeric",
+    "raw": "---\ntype: task\nid: timestamp-numeric\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    lastCompletedAt: '1'\n---\n# Document\n",
+    "path": "tasks/timestamp-numeric.md",
+    "expected": {
+      "path": "tasks/timestamp-numeric.md",
+      "raw": "---\ntype: task\nid: timestamp-numeric\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    lastCompletedAt: '1'\n---\n# Document\n",
+      "id": "timestamp-numeric",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false,
+          "lastCompletedAt": "1"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "timestamp-rollover",
+    "raw": "---\ntype: task\nid: timestamp-rollover\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    lastCompletedAt: '2026-02-30T09:00:00Z'\n---\n# Document\n",
+    "path": "tasks/timestamp-rollover.md",
+    "expected": {
+      "path": "tasks/timestamp-rollover.md",
+      "raw": "---\ntype: task\nid: timestamp-rollover\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    lastCompletedAt: '2026-02-30T09:00:00Z'\n---\n# Document\n",
+      "id": "timestamp-rollover",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "repeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "anchor": "schedule",
+          "missed": "carry",
+          "resetChecklist": false,
+          "paused": false,
+          "lastCompletedAt": "2026-02-30T09:00:00Z"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "timestamp-invalid",
+    "raw": "---\ntype: task\nid: timestamp-invalid\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    lastCompletedAt: 'not a date'\n---\n# Document\n",
+    "path": "tasks/timestamp-invalid.md",
+    "expected": {
+      "path": "tasks/timestamp-invalid.md",
+      "raw": "---\ntype: task\nid: timestamp-invalid\ntask:\n  repeat:\n    start: 2026-08-19\n    rrule: FREQ=DAILY\n    lastCompletedAt: 'not a date'\n---\n# Document\n",
+      "id": "timestamp-invalid",
+      "kind": "task",
+      "title": "Document",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "unparsedRepeat": {
+          "start": "2026-08-19",
+          "rrule": "FREQ=DAILY",
+          "lastCompletedAt": "not a date"
+        },
+        "comments": []
+      },
+      "body": "# Document\n",
+      "checklist": [],
+      "structuralLinks": [],
+      "diagnostics": [
+        {
+          "code": "invalid-repeat",
+          "field": "task.repeat",
+          "message": "repeat must use a valid RRULE, anchor/missed policy, date-only start and exceptions, pause ranges, and non-negative completionCount."
+        }
+      ]
+    }
+  }
+]

@@ -128,6 +128,28 @@ replace renderer ownership. Full task parsing, structural resolution,
 recurrence, local-date refresh, materialization and Search remain separate
 migration work.
 
+## Native document parser source slice
+
+LN-TASK-073–074 govern the private native document parser. Its input is complete
+unmodified Markdown plus a vault-relative path; its output matches serialized
+`parseTaskDocument` values for Task, Task List and navigation documents. Missing
+or unrecognized envelopes return no document. Opaque invalid recurrence,
+tracking and priority values, diagnostic order, title defaults, checklists and
+structural candidates remain observable. All source offsets use UTF-16 units.
+
+The shared corpus is
+`crates/lapis-task-services/tests/fixtures/documents.json`. The TypeScript
+oracle remains unchanged; a dedicated test compares its full JSON serialization
+with each fixture. Rust acceptance consumes that same file. No subset match,
+handwritten replacement oracle or weakened diagnostic expectation qualifies
+native parity.
+
+This is parser-only source qualification. RRULE syntax classification needed by
+the parser does not implement calendar execution or effective occurrence
+resolution. Version-4 `projectTask`, whole-vault target/graph resolution,
+registration, publication, date refresh and mutation authority remain later
+gates. The existing native occurrence corpus must continue to pass unchanged.
+
 ## Repository and file stores
 
 `TaskRepository` in `src/lib/model/task-repository.ts` is the mutation
