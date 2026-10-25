@@ -1,7 +1,7 @@
 pub(crate) mod dates;
-mod envelope;
+pub(crate) mod envelope;
 mod fields;
-mod markdown;
+pub(crate) mod markdown;
 mod records;
 mod repeat;
 pub(crate) mod rule;

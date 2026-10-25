@@ -13,8 +13,9 @@ static SCHEME: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"(?i)\A[a-z][a-z0-
 static CHECKLIST: LazyLock<Regex> =
     LazyLock::new(|| Regex::new(&format!(r"\A\[( |x|X)\][{JS_SPACE}]+(?s:(.+))\z")).unwrap());
 static HEADING_START: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\A {0,3}#{1,6}\s*").unwrap());
-static HEADING_END: LazyLock<Regex> =
-    LazyLock::new(|| Regex::new(r"\s+#+\s*\z|\s*(?:=+|-+)\s*\z").unwrap());
+static HEADING_CLOSE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\s+#+\s*\z").unwrap());
+static HEADING_SETEXT: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"\s*(?:=+|-+)\s*\z").unwrap());
 static NAV_HEADING: LazyLock<Regex> = LazyLock::new(|| {
     Regex::new(&format!(
         r"\A#{{1,6}}[{JS_SPACE}]+([^\r\n\u{{2028}}\u{{2029}}]+?)[{JS_SPACE}]*\z"
@@ -55,7 +56,7 @@ pub(super) fn navigation(body: &str) -> Vec<StructuralLink> {
 }
 
 #[derive(Clone, Copy, PartialEq)]
-enum Kind {
+pub(crate) enum Kind {
     Root,
     BulletList,
     Item,
@@ -66,13 +67,13 @@ enum Kind {
     Other,
 }
 
-struct Node {
-    kind: Kind,
-    range: Range<usize>,
-    children: Vec<Node>,
+pub(crate) struct Node {
+    pub(crate) kind: Kind,
+    pub(crate) range: Range<usize>,
+    pub(crate) children: Vec<Node>,
 }
 
-fn tree(body: &str) -> Node {
+pub(crate) fn tree(body: &str) -> Node {
     let mut stack = vec![Node {
         kind: Kind::Root,
         range: 0..body.len(),
@@ -135,6 +136,56 @@ fn paragraph(item: &Node) -> Option<(Range<usize>, Vec<&Node>)> {
     ))
 }
 
+pub(crate) fn content_start(body: &str, node: &Node) -> usize {
+    let source = &body[node.range.clone()];
+    node.range.start + source.len() - source.trim_start_matches([' ', '\t', '\r', '\n']).len()
+}
+
+pub(crate) fn content_end(body: &str, node: &Node) -> usize {
+    // CommonMark ranges can retain trailing blank CRLF lines. Lezer excludes
+    // those lines while retaining the content line's own carriage return.
+    let (mut at, mut end) = (0, 0);
+    for line in body[node.range.clone()].split('\n') {
+        if !trim(line).is_empty() {
+            end = at + line.len();
+        }
+        at += line.len() + 1;
+    }
+    node.range.start + end
+}
+
+pub(crate) fn heading_text(body: &str, node: &Node) -> String {
+    let text = HEADING_START.replace(&body[node.range.clone()], "");
+    let text = HEADING_CLOSE.replace(&text, "");
+    let text = HEADING_SETEXT.replace(&text, "");
+    trim(&text).to_owned()
+}
+
+pub(crate) fn standalone_link(body: &str, item: &Node) -> Option<(String, String)> {
+    let (range, children) = paragraph(item)?;
+    if children.len() != 1
+        || children[0].kind != Kind::Link
+        || item
+            .children
+            .iter()
+            .any(|node| node.kind == Kind::BulletList)
+    {
+        return None;
+    }
+    let captures = LINK.captures(trim(&body[range]))?;
+    let href = trim(&captures[2]);
+    if href.is_empty() || href.starts_with('#') || href.starts_with("//") || SCHEME.is_match(href) {
+        return None;
+    }
+    Some((trim(&captures[1]).into(), href.into()))
+}
+
+pub(crate) fn checklist_item(body: &str, item: &Node) -> Option<(String, bool)> {
+    let (range, _) = paragraph(item)?;
+    let captures = CHECKLIST.captures(body[range].trim_end_matches('\n'))?;
+    Some((trim(&captures[2]).into(), &captures[1] != " "))
+}
+
 fn links_and_checklist(
     raw: &str,
     body: &str,
@@ -145,48 +196,29 @@ fn links_and_checklist(
     checklist: &mut Vec<ChecklistItem>,
 ) {
     for item in list.children.iter().filter(|node| node.kind == Kind::Item) {
-        let source_start = offset + item.range.start;
-        let source_end =
-            offset + item.range.start + body[item.range.clone()].trim_end_matches('\n').len();
+        let source_start = offset + content_start(body, item);
+        let source_end = offset + content_end(body, item);
         let utf16_start = raw[..source_start].encode_utf16().count();
         let utf16_end = raw[..source_end].encode_utf16().count();
-        if let Some((range, children)) = paragraph(item) {
-            let paragraph = &body[range];
-            let candidate = (children.len() == 1
-                && children[0].kind == Kind::Link
-                && !item
-                    .children
-                    .iter()
-                    .any(|node| node.kind == Kind::BulletList))
-            .then(|| LINK.captures(trim(paragraph)))
-            .flatten()
-            .filter(|captures| {
-                let href = trim(&captures[2]);
-                !href.is_empty()
-                    && !href.starts_with('#')
-                    && !href.starts_with("//")
-                    && !SCHEME.is_match(href)
+        if let Some((title, href)) = standalone_link(body, item) {
+            links.push(StructuralLink {
+                title,
+                href,
+                kind: "reference".to_owned(),
+                heading: heading.map(str::to_owned),
+                ordinal: links.len(),
+                source_start: Some(utf16_start),
+                source_end: Some(utf16_end),
             });
-            if let Some(captures) = candidate {
-                links.push(StructuralLink {
-                    title: trim(&captures[1]).to_owned(),
-                    href: trim(&captures[2]).to_owned(),
-                    kind: "reference".to_owned(),
-                    heading: heading.map(str::to_owned),
-                    ordinal: links.len(),
-                    source_start: Some(utf16_start),
-                    source_end: Some(utf16_end),
-                });
-            } else if let Some(captures) = CHECKLIST.captures(paragraph.trim_end_matches('\n')) {
-                checklist.push(ChecklistItem {
-                    text: trim(&captures[2]).to_owned(),
-                    checked: &captures[1] != " ",
-                    position: checklist.len(),
-                    source_start: utf16_start,
-                    source_end: utf16_end,
-                    source: raw[source_start..source_end].to_owned(),
-                });
-            }
+        } else if let Some((text, checked)) = checklist_item(body, item) {
+            checklist.push(ChecklistItem {
+                text,
+                checked,
+                position: checklist.len(),
+                source_start: utf16_start,
+                source_end: utf16_end,
+                source: raw[source_start..source_end].to_owned(),
+            });
         }
         for child in item
             .children
@@ -207,9 +239,7 @@ pub(super) fn structure(raw: &str, body: &str) -> (Vec<StructuralLink>, Vec<Chec
             Kind::Heading(1) => {}
             Kind::Heading(level) => {
                 headings.resize(level as usize - 1, None);
-                let text = HEADING_START.replace(&body[node.range], "");
-                let text = HEADING_END.replace(&text, "");
-                headings[level as usize - 2] = Some(trim(&text).to_owned());
+                headings[level as usize - 2] = Some(heading_text(body, &node));
             }
             Kind::BulletList => links_and_checklist(
                 raw,

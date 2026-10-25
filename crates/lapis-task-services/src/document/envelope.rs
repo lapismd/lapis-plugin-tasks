@@ -16,6 +16,12 @@ static FIRST_HEADING: LazyLock<Regex> = LazyLock::new(|| {
 static ID_SEPARATORS: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"[-_]+").unwrap());
 static SPACES: LazyLock<Regex> = LazyLock::new(|| Regex::new(&format!(r"[{JS_SPACE}]+")).unwrap());
 
+pub(crate) fn body(raw: &str) -> &str {
+    ENVELOPE
+        .captures(raw)
+        .map_or(raw, |captures| &raw[captures.get(0).unwrap().end()..])
+}
+
 pub(super) fn split(raw: &str) -> (Map<String, Value>, &str) {
     let Some(captures) = ENVELOPE.captures(raw) else {
         return (Map::new(), raw);

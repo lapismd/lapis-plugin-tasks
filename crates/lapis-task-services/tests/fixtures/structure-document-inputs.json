@@ -1,0 +1,152 @@
+[
+  {
+    "name": "empty-heading-context",
+    "raw": "---\ntype: task\nid: source\n---\n\n##\n- [A](a.md)\n\n### Child\n- [B](b.md)\n\n## --- ###\n- [A](a.md)\n",
+    "path": "nested/🗒️ source.md",
+    "expected": {
+      "path": "nested/🗒️ source.md",
+      "raw": "---\ntype: task\nid: source\n---\n\n##\n- [A](a.md)\n\n### Child\n- [B](b.md)\n\n## --- ###\n- [A](a.md)\n",
+      "id": "source",
+      "kind": "task",
+      "title": "🗒️ source",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n##\n- [A](a.md)\n\n### Child\n- [B](b.md)\n\n## --- ###\n- [A](a.md)\n",
+      "checklist": [],
+      "structuralLinks": [
+        {
+          "title": "A",
+          "href": "a.md",
+          "kind": "reference",
+          "heading": "",
+          "ordinal": 0,
+          "sourceStart": 34,
+          "sourceEnd": 45
+        },
+        {
+          "title": "B",
+          "href": "b.md",
+          "kind": "reference",
+          "heading": "Child",
+          "ordinal": 1,
+          "sourceStart": 57,
+          "sourceEnd": 68
+        },
+        {
+          "title": "A",
+          "href": "a.md",
+          "kind": "reference",
+          "heading": "",
+          "ordinal": 2,
+          "sourceStart": 81,
+          "sourceEnd": 92
+        }
+      ],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "unicode-crlf-ranges",
+    "raw": "---\r\ntype: task\r\nid: source\r\n---\r\n\r\n## 🧭 Area\r\n\r\n- [🗒️ A](a.md)\r\n- [x] Unicode 😀 checklist\r\n\r\n### Review 🧪\r\n\r\n- [List](list.md)\r\n",
+    "path": "nested/🗒️ source.md",
+    "expected": {
+      "path": "nested/🗒️ source.md",
+      "raw": "---\r\ntype: task\r\nid: source\r\n---\r\n\r\n## 🧭 Area\r\n\r\n- [🗒️ A](a.md)\r\n- [x] Unicode 😀 checklist\r\n\r\n### Review 🧪\r\n\r\n- [List](list.md)\r\n",
+      "id": "source",
+      "kind": "task",
+      "title": "🗒️ source",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\r\n## 🧭 Area\r\n\r\n- [🗒️ A](a.md)\r\n- [x] Unicode 😀 checklist\r\n\r\n### Review 🧪\r\n\r\n- [List](list.md)\r\n",
+      "checklist": [
+        {
+          "text": "Unicode 😀 checklist",
+          "checked": true,
+          "position": 0,
+          "sourceStart": 67,
+          "sourceEnd": 94,
+          "source": "- [x] Unicode 😀 checklist\r"
+        }
+      ],
+      "structuralLinks": [
+        {
+          "title": "🗒️ A",
+          "href": "a.md",
+          "kind": "reference",
+          "heading": "🧭 Area",
+          "ordinal": 0,
+          "sourceStart": 50,
+          "sourceEnd": 66
+        },
+        {
+          "title": "List",
+          "href": "list.md",
+          "kind": "reference",
+          "heading": "Review 🧪",
+          "ordinal": 1,
+          "sourceStart": 114,
+          "sourceEnd": 132
+        }
+      ],
+      "diagnostics": []
+    }
+  },
+  {
+    "name": "tabs-and-indent",
+    "raw": "---\ntype: task\nid: source\n---\n\n## Work\n\n\t- [Indented code](a.md)\n\n- Parent\n\t- [A](a.md)\n\t- [B](b.md)\n",
+    "path": "nested/🗒️ source.md",
+    "expected": {
+      "path": "nested/🗒️ source.md",
+      "raw": "---\ntype: task\nid: source\n---\n\n## Work\n\n\t- [Indented code](a.md)\n\n- Parent\n\t- [A](a.md)\n\t- [B](b.md)\n",
+      "id": "source",
+      "kind": "task",
+      "title": "🗒️ source",
+      "tags": [],
+      "task": {
+        "status": "open",
+        "inbox": false,
+        "start": {
+          "kind": "anytime"
+        },
+        "comments": []
+      },
+      "body": "\n## Work\n\n\t- [Indented code](a.md)\n\n- Parent\n\t- [A](a.md)\n\t- [B](b.md)\n",
+      "checklist": [],
+      "structuralLinks": [
+        {
+          "title": "A",
+          "href": "a.md",
+          "kind": "reference",
+          "heading": "Work",
+          "ordinal": 0,
+          "sourceStart": 76,
+          "sourceEnd": 87
+        },
+        {
+          "title": "B",
+          "href": "b.md",
+          "kind": "reference",
+          "heading": "Work",
+          "ordinal": 1,
+          "sourceStart": 89,
+          "sourceEnd": 100
+        }
+      ],
+      "diagnostics": []
+    }
+  }
+]

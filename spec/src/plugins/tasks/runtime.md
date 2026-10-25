@@ -193,6 +193,22 @@ cases. See [the source intake](../../../records/2026-10-25-native-task-projectio
 Structure/target resolution, projection envelopes and host publication/lifecycle
 remain separate. No host selects this private implementation yet.
 
+## Private per-document structures
+
+LN-TASK-080–081 govern the implemented private headings, candidate/checklist
+scanning, supplied read-only target lookup and per-document contiguous TaskRuns.
+The private boundary shares
+the native Markdown adapter, preserving UTF-16 ranges and retained source hashes.
+Lookup results are supplied by the caller; no App, metadata cache or filesystem
+access is introduced. Lookup errors must propagate without a fabricated result.
+
+Complete unchanged-TypeScript acceptance covers headings, scans, lookup order,
+resolved structures and the structure projection shape. Whole-vault parent/cycle
+validation, href/edge envelopes, source publication and host selection remain
+separate. A per-document resolved structure is not an admitted whole-vault graph.
+The source intake records complete parity and source-gate evidence in
+[the per-document structure record](../../../records/2026-10-25-native-task-structure.md).
+
 ## Repository and file stores
 
 `TaskRepository` in `src/lib/model/task-repository.ts` is the mutation
