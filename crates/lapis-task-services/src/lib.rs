@@ -7,6 +7,7 @@ mod document;
 mod marker;
 mod occurrence;
 mod record;
+mod recurrence;
 
 pub use document::{
     ChecklistItem, ParsedTaskDocument, StructuralLink, TaskDiagnostic, TaskDocumentKind,
@@ -14,5 +15,9 @@ pub use document::{
 };
 pub use occurrence::{is_canonical_daily_document, task_occurrence_projection_rows};
 pub use record::{TaskOccurrenceRecord, TaskOutcome, TaskTrackingKind};
+pub use recurrence::{
+    EffectiveOccurrence, RecurrenceAnalysis, RecurrenceEngine, RecurrenceError, RecurrenceOptions,
+    RepeatOptions, analyze_recurrence_rule, resolve_effective_occurrence,
+};
 
 pub const TASK_OCCURRENCE_PROJECTION_VERSION: u32 = 1;

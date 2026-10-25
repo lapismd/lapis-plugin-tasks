@@ -1,0 +1,1913 @@
+[
+  {
+    "name": "daily-bounds-and-exhaustion",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY;COUNT=3"
+    },
+    "queries": [
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-19",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-19",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "between",
+        "start": "2026-08-17",
+        "end": "2026-08-19",
+        "inclusive": true
+      },
+      {
+        "method": "between",
+        "start": "2026-08-17",
+        "end": "2026-08-19",
+        "inclusive": false
+      },
+      {
+        "method": "between",
+        "start": "2026-08-19",
+        "end": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": "2026-08-18"
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": null
+      },
+      {
+        "value": "2026-08-18"
+      },
+      {
+        "value": null
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": [
+          "2026-08-17",
+          "2026-08-18",
+          "2026-08-19"
+        ]
+      },
+      {
+        "value": [
+          "2026-08-18"
+        ]
+      },
+      {
+        "value": []
+      },
+      {
+        "value": "2026-08-19"
+      }
+    ]
+  },
+  {
+    "name": "weekly-interval-week-start",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=WEEKLY;INTERVAL=2;BYDAY=MO,WE;WKST=SU;UNTIL=20260831"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2026-10-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17",
+          "2026-08-19",
+          "2026-08-31"
+        ]
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-19"
+      },
+      {
+        "value": "2026-08-31"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "name": "month-end-calendar",
+    "options": {
+      "start": "2026-01-31",
+      "rrule": "FREQ=MONTHLY;COUNT=4"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-01-01",
+        "end": "2026-08-01",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-01-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-01-31",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-01-31",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-01-31",
+          "2026-03-31",
+          "2026-05-31",
+          "2026-07-31"
+        ]
+      },
+      {
+        "value": "2026-01-31"
+      },
+      {
+        "value": "2026-03-31"
+      },
+      {
+        "value": "2026-07-31"
+      },
+      {
+        "value": "2026-01-31"
+      }
+    ]
+  },
+  {
+    "name": "leap-year-calendar",
+    "options": {
+      "start": "2024-02-29",
+      "rrule": "FREQ=YEARLY;COUNT=3"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2024-01-01",
+        "end": "2033-01-01",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2024-02-29",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2024-02-29",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2024-02-29",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2024-02-29",
+          "2028-02-29",
+          "2032-02-29"
+        ]
+      },
+      {
+        "value": "2024-02-29"
+      },
+      {
+        "value": "2028-02-29"
+      },
+      {
+        "value": "2024-02-29"
+      },
+      {
+        "value": "2024-02-29"
+      }
+    ]
+  },
+  {
+    "name": "nonmatching-origin-is-inclusion",
+    "options": {
+      "start": "2026-08-21",
+      "rrule": "FREQ=MONTHLY;COUNT=3;BYDAY=MO;BYSETPOS=1"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2026-11-30",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-21",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-21",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-21",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-21",
+          "2026-09-07",
+          "2026-10-05",
+          "2026-11-02"
+        ]
+      },
+      {
+        "value": "2026-08-21"
+      },
+      {
+        "value": "2026-09-07"
+      },
+      {
+        "value": "2026-08-21"
+      },
+      {
+        "value": "2026-08-21"
+      }
+    ]
+  },
+  {
+    "name": "last-weekday-of-month",
+    "options": {
+      "start": "2026-08-01",
+      "rrule": "FREQ=MONTHLY;COUNT=3;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-1"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2026-10-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-01",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-01",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-01",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-01",
+          "2026-08-31",
+          "2026-09-30",
+          "2026-10-30"
+        ]
+      },
+      {
+        "value": "2026-08-01"
+      },
+      {
+        "value": "2026-08-31"
+      },
+      {
+        "value": "2026-08-31"
+      },
+      {
+        "value": "2026-08-01"
+      }
+    ]
+  },
+  {
+    "name": "negative-month-day",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=MONTHLY;BYMONTHDAY=-1;COUNT=3"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2026-10-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17",
+          "2026-08-31",
+          "2026-09-30",
+          "2026-10-31"
+        ]
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-31"
+      },
+      {
+        "value": "2026-08-31"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "name": "ordinal-weekdays",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=MONTHLY;BYDAY=1MO,-1FR;COUNT=6"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2026-10-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17",
+          "2026-08-28",
+          "2026-09-07",
+          "2026-09-25",
+          "2026-10-05",
+          "2026-10-30"
+        ]
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-28"
+      },
+      {
+        "value": "2026-08-28"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "name": "yearly-months-and-days",
+    "options": {
+      "start": "2026-02-15",
+      "rrule": "FREQ=YEARLY;BYMONTH=2,8;BYMONTHDAY=15;COUNT=5"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-01-01",
+        "end": "2028-12-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-02-15",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-02-15",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-02-15",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-02-15",
+          "2026-08-15",
+          "2027-02-15",
+          "2027-08-15",
+          "2028-02-15"
+        ]
+      },
+      {
+        "value": "2026-02-15"
+      },
+      {
+        "value": "2026-08-15"
+      },
+      {
+        "value": "2026-08-15"
+      },
+      {
+        "value": "2026-02-15"
+      }
+    ]
+  },
+  {
+    "name": "date-only-until-inclusive",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY;UNTIL=20260820"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2026-10-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17",
+          "2026-08-18",
+          "2026-08-19",
+          "2026-08-20"
+        ]
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-18"
+      },
+      {
+        "value": "2026-08-20"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "name": "inclusion-exclusion-precedence",
+    "options": {
+      "start": "2026-08-21",
+      "rrule": "FREQ=DAILY;COUNT=3",
+      "rdate": [
+        "2026-08-30",
+        "2026-08-30",
+        "2026-08-20"
+      ],
+      "exdate": [
+        "2026-08-21",
+        "2026-08-22",
+        "2026-08-30"
+      ]
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2026-10-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-21",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-21",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-21",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-20",
+          "2026-08-23"
+        ]
+      },
+      {
+        "value": "2026-08-20"
+      },
+      {
+        "value": "2026-08-23"
+      },
+      {
+        "value": "2026-08-23"
+      },
+      {
+        "value": "2026-08-23"
+      },
+      {
+        "value": "2026-08-20"
+      }
+    ]
+  },
+  {
+    "name": "duplicate-origin-rdates",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY;COUNT=2",
+      "rdate": [
+        "2026-08-17",
+        "2026-08-18",
+        "2026-08-18"
+      ]
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2026-10-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17",
+          "2026-08-18"
+        ]
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-18"
+      },
+      {
+        "value": "2026-08-18"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "name": "count-zero-keeps-explicit-inclusions",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY;COUNT=0",
+      "rdate": [
+        "2026-08-21"
+      ]
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2026-10-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17",
+          "2026-08-21"
+        ]
+      },
+      {
+        "value": "2026-08-21"
+      },
+      {
+        "value": "2026-08-21"
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "name": "interval-zero-keeps-explicit-inclusions",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY;INTERVAL=0",
+      "rdate": [
+        "2026-08-21"
+      ]
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2026-10-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17",
+          "2026-08-21"
+        ]
+      },
+      {
+        "value": "2026-08-21"
+      },
+      {
+        "value": "2026-08-21"
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "name": "until-before-origin-keeps-inclusions",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY;UNTIL=20260801",
+      "rdate": [
+        "2026-08-21"
+      ]
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2026-10-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17",
+          "2026-08-21"
+        ]
+      },
+      {
+        "value": "2026-08-21"
+      },
+      {
+        "value": "2026-08-21"
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "name": "bysetpos-alone-retained",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY;COUNT=3;BYSETPOS=1"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2026-10-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17",
+          "2026-08-18",
+          "2026-08-19"
+        ]
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-18"
+      },
+      {
+        "value": "2026-08-19"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "name": "monthly-large-position-retained",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=MONTHLY;BYDAY=MO;BYSETPOS=32;UNTIL=20261031"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2026-10-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17"
+        ]
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": null
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "name": "unsupported-hourly",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=HOURLY;BYMINUTE=15"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2026-10-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "unsupported",
+      "parts": [
+        "BYMINUTE",
+        "FREQ=HOURLY"
+      ]
+    },
+    "constructorError": {
+      "name": "UnsupportedRecurrenceRuleError",
+      "message": "Unsupported recurrence properties: BYMINUTE, FREQ=HOURLY",
+      "parts": [
+        "BYMINUTE",
+        "FREQ=HOURLY"
+      ]
+    }
+  },
+  {
+    "name": "unsupported-until-clock",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY;UNTIL=20260831T120000Z"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2026-10-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "unsupported",
+      "parts": [
+        "UNTIL with a time or zone"
+      ]
+    },
+    "constructorError": {
+      "name": "UnsupportedRecurrenceRuleError",
+      "message": "Unsupported recurrence properties: UNTIL with a time or zone",
+      "parts": [
+        "UNTIL with a time or zone"
+      ]
+    }
+  },
+  {
+    "name": "invalid-prefix",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "RRULE:FREQ=DAILY"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2026-10-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "invalid",
+      "message": "RRULE must store only the property value, without a prefix."
+    },
+    "constructorError": {
+      "name": "Error",
+      "message": "RRULE must store only the property value, without a prefix."
+    }
+  },
+  {
+    "name": "invalid-count-and-until",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY;COUNT=2;UNTIL=20260831"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2026-10-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "invalid",
+      "message": "RRULE must not combine COUNT and UNTIL."
+    },
+    "constructorError": {
+      "name": "Error",
+      "message": "RRULE must not combine COUNT and UNTIL."
+    }
+  },
+  {
+    "name": "invalid-calendar-origin",
+    "options": {
+      "start": "2026-02-30",
+      "rrule": "FREQ=DAILY"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2026-10-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-02-30",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-02-30",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-02-30",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "constructorError": {
+      "name": "Error",
+      "message": "Invalid recurrence start: 2026-02-30"
+    }
+  },
+  {
+    "name": "monthly-position-alone-retained",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=MONTHLY;COUNT=3;BYSETPOS=-1"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2029-12-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17",
+          "2026-09-17",
+          "2026-10-17"
+        ]
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-09-17"
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "name": "yearly-position-alone-retained",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=YEARLY;COUNT=3;BYSETPOS=1"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2029-12-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17",
+          "2027-08-17",
+          "2028-08-17"
+        ]
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2027-08-17"
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "name": "weekly-position-alone-retained",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=WEEKLY;COUNT=3;BYSETPOS=1"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2029-12-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17",
+          "2026-08-24",
+          "2026-08-31"
+        ]
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-24"
+      },
+      {
+        "value": "2026-08-31"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "name": "weekly-month-day-retained",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=WEEKLY;BYMONTHDAY=17,24,31;UNTIL=20261031"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2029-12-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17",
+          "2026-08-24",
+          "2026-08-31",
+          "2026-09-17",
+          "2026-09-24",
+          "2026-10-17",
+          "2026-10-24",
+          "2026-10-31"
+        ]
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-24"
+      },
+      {
+        "value": "2026-08-31"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "name": "weekly-ordinal-day-retained",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=WEEKLY;BYDAY=1MO,-1FR;COUNT=6"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2029-12-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17",
+          "2026-08-21",
+          "2026-08-24",
+          "2026-08-28",
+          "2026-08-31",
+          "2026-09-04"
+        ]
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-21"
+      },
+      {
+        "value": "2026-08-31"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "name": "daily-ordinal-day-retained",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY;BYDAY=1MO,-1FR;COUNT=6"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2029-12-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17",
+          "2026-08-21",
+          "2026-08-24",
+          "2026-08-28",
+          "2026-08-31",
+          "2026-09-04"
+        ]
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-21"
+      },
+      {
+        "value": "2026-08-31"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "name": "yearly-ordinal-day",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=YEARLY;BYDAY=1MO,-1FR;COUNT=4"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2029-12-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17",
+          "2026-12-25",
+          "2027-01-04",
+          "2027-12-31",
+          "2028-01-03"
+        ]
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-12-25"
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "name": "monthly-mixed-large-position",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=MONTHLY;BYDAY=MO;BYSETPOS=1,32;COUNT=3"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2029-12-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17",
+          "2026-09-07",
+          "2026-10-05",
+          "2026-11-02"
+        ]
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-09-07"
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "name": "empty-month-selection",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=MONTHLY;BYMONTH=0;UNTIL=20261031"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2029-12-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17"
+        ]
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": null
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  },
+  {
+    "name": "yearly-negative-day",
+    "options": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=-1;COUNT=4"
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2026-08-01",
+        "end": "2029-12-31",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-08-17",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-09-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-08-17",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2026-08-17",
+          "2027-02-28",
+          "2028-02-29",
+          "2029-02-28"
+        ]
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2027-02-28"
+      },
+      {
+        "value": "2026-08-17"
+      },
+      {
+        "value": "2026-08-17"
+      }
+    ]
+  }
+]

@@ -150,6 +150,33 @@ resolution. Version-4 `projectTask`, whole-vault target/graph resolution,
 registration, publication, date refresh and mutation authority remain later
 gates. The existing native occurrence corpus must continue to pass unchanged.
 
+## Private native date-only recurrence
+
+LN-TASK-075 through LN-TASK-077 govern the private native recurrence boundary
+after document parsing. Its source implementation uses pinned `rrule=0.14.0`;
+no host selects it yet.
+The pure recurrence set receives an explicit date-only origin and RRULE,
+RDATE and EXDATE values. The effective-occurrence resolver additionally
+receives explicit local today and an optional plan date.
+
+The adapter preserves retained date-set and effective-policy results, including
+constructor classifications and accepted library edge cases. It reuses the
+document parser's rule/date validation and adapts stricter library validation
+through library-generated period candidates. Explicit DTSTART/RDATE and EXDATE
+keep their retained set precedence independently of primary-rule COUNT.
+
+Shared frozen fixtures contain the original 32 date sets and 18 effective
+outcomes, plus two separate negative-ordinal compatibility cases. Both unchanged
+TypeScript and native tests compare complete serialized outputs. Source-gate
+evidence is retained in
+[the recurrence intake](../../../records/2026-10-25-native-task-recurrence.md);
+qualification does not imply host adoption or publication.
+
+Full version-4 `projectTask` normalization follows this engine. Whole-vault
+target/graph resolution, host publication, local-date scheduling, recurrence
+mutations and daily observation materialization retain separate gates. Neither
+this source slice nor a date-sensitive row alone activates native Tasks indexing.
+
 ## Repository and file stores
 
 `TaskRepository` in `src/lib/model/task-repository.ts` is the mutation

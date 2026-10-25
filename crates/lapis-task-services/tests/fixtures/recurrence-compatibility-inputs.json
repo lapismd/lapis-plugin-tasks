@@ -1,0 +1,192 @@
+[
+  {
+    "name": "monthly-fifth-last-monday",
+    "options": {
+      "start": "2026-01-01",
+      "rrule": "FREQ=MONTHLY;BYDAY=-5MO;COUNT=3;BYSETPOS=-1",
+      "rdate": [
+        "2025-12-31"
+      ],
+      "exdate": [
+        "2026-03-02"
+      ]
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2025-12-30",
+        "end": "2026-12-31",
+        "inclusive": true
+      },
+      {
+        "method": "between",
+        "start": "2025-12-30",
+        "end": "2026-12-31",
+        "inclusive": false
+      },
+      {
+        "method": "next",
+        "after": "2026-06-01",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2026-06-01",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-06-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2026-06-01",
+        "inclusive": false
+      },
+      {
+        "method": "next",
+        "after": "2026-12-31",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2026-12-31",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2025-12-31",
+          "2026-01-01",
+          "2026-06-01",
+          "2026-08-03"
+        ]
+      },
+      {
+        "value": [
+          "2025-12-31",
+          "2026-01-01",
+          "2026-06-01",
+          "2026-08-03"
+        ]
+      },
+      {
+        "value": "2026-06-01"
+      },
+      {
+        "value": "2026-08-03"
+      },
+      {
+        "value": "2026-06-01"
+      },
+      {
+        "value": "2026-01-01"
+      },
+      {
+        "value": null
+      },
+      {
+        "value": "2026-08-03"
+      }
+    ]
+  },
+  {
+    "name": "yearly-fifty-third-last-monday",
+    "options": {
+      "start": "2024-01-01",
+      "rrule": "FREQ=YEARLY;BYDAY=-53MO;COUNT=3",
+      "rdate": [
+        "2023-12-31"
+      ],
+      "exdate": [
+        "2029-01-01"
+      ]
+    },
+    "queries": [
+      {
+        "method": "between",
+        "start": "2023-12-30",
+        "end": "2040-12-31",
+        "inclusive": true
+      },
+      {
+        "method": "between",
+        "start": "2023-12-30",
+        "end": "2040-12-31",
+        "inclusive": false
+      },
+      {
+        "method": "next",
+        "after": "2024-01-01",
+        "inclusive": true
+      },
+      {
+        "method": "next",
+        "after": "2024-01-01",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2024-01-01",
+        "inclusive": true
+      },
+      {
+        "method": "previous",
+        "before": "2024-01-01",
+        "inclusive": false
+      },
+      {
+        "method": "next",
+        "after": "2040-12-31",
+        "inclusive": false
+      },
+      {
+        "method": "previous",
+        "before": "2040-12-31",
+        "inclusive": true
+      }
+    ],
+    "analysis": {
+      "status": "supported"
+    },
+    "expected": [
+      {
+        "value": [
+          "2023-12-31",
+          "2024-01-01",
+          "2035-01-01"
+        ]
+      },
+      {
+        "value": [
+          "2023-12-31",
+          "2024-01-01",
+          "2035-01-01"
+        ]
+      },
+      {
+        "value": "2024-01-01"
+      },
+      {
+        "value": "2035-01-01"
+      },
+      {
+        "value": "2024-01-01"
+      },
+      {
+        "value": "2023-12-31"
+      },
+      {
+        "value": null
+      },
+      {
+        "value": "2035-01-01"
+      }
+    ]
+  }
+]

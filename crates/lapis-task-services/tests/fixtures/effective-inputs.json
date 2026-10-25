@@ -1,0 +1,341 @@
+[
+  {
+    "name": "carry-overdue",
+    "repeat": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY",
+      "anchor": "schedule",
+      "missed": "carry",
+      "resetChecklist": false,
+      "paused": false
+    },
+    "today": "2026-08-21",
+    "planDate": "2026-08-17",
+    "expected": {
+      "date": "2026-08-17",
+      "state": "overdue",
+      "effectiveForDate": "2026-08-21"
+    }
+  },
+  {
+    "name": "skip-current",
+    "repeat": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY",
+      "anchor": "schedule",
+      "missed": "skip",
+      "resetChecklist": false,
+      "paused": false
+    },
+    "today": "2026-08-21",
+    "planDate": "2026-08-17",
+    "expected": {
+      "date": "2026-08-21",
+      "state": "current",
+      "effectiveForDate": "2026-08-21"
+    }
+  },
+  {
+    "name": "current",
+    "repeat": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY",
+      "anchor": "schedule",
+      "missed": "carry",
+      "resetChecklist": false,
+      "paused": false
+    },
+    "today": "2026-08-21",
+    "planDate": "2026-08-21",
+    "expected": {
+      "date": "2026-08-21",
+      "state": "current",
+      "effectiveForDate": "2026-08-21"
+    }
+  },
+  {
+    "name": "future-plan",
+    "repeat": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=WEEKLY;BYDAY=MO",
+      "anchor": "schedule",
+      "missed": "carry",
+      "resetChecklist": false,
+      "paused": false
+    },
+    "today": "2026-08-21",
+    "planDate": "2026-08-24",
+    "expected": {
+      "date": "2026-08-24",
+      "state": "future",
+      "effectiveForDate": "2026-08-21"
+    }
+  },
+  {
+    "name": "count-exhausted",
+    "repeat": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY;COUNT=2",
+      "anchor": "schedule",
+      "missed": "carry",
+      "resetChecklist": false,
+      "paused": false,
+      "completionCount": 2
+    },
+    "today": "2026-08-21",
+    "expected": {
+      "state": "exhausted",
+      "effectiveForDate": "2026-08-21"
+    }
+  },
+  {
+    "name": "completion-without-origin-overdue",
+    "repeat": {
+      "rrule": "FREQ=DAILY",
+      "anchor": "completion",
+      "missed": "carry",
+      "resetChecklist": false,
+      "paused": false
+    },
+    "today": "2026-08-21",
+    "planDate": "2026-08-19",
+    "expected": {
+      "date": "2026-08-19",
+      "state": "overdue",
+      "effectiveForDate": "2026-08-21"
+    }
+  },
+  {
+    "name": "completion-without-origin-current",
+    "repeat": {
+      "rrule": "FREQ=DAILY",
+      "anchor": "completion",
+      "missed": "carry",
+      "resetChecklist": false,
+      "paused": false
+    },
+    "today": "2026-08-21",
+    "expected": {
+      "state": "current",
+      "effectiveForDate": "2026-08-21"
+    }
+  },
+  {
+    "name": "completion-without-origin-future",
+    "repeat": {
+      "rrule": "FREQ=DAILY",
+      "anchor": "completion",
+      "missed": "carry",
+      "resetChecklist": false,
+      "paused": false
+    },
+    "today": "2026-08-21",
+    "planDate": "2026-08-24",
+    "expected": {
+      "date": "2026-08-24",
+      "state": "future",
+      "effectiveForDate": "2026-08-21"
+    }
+  },
+  {
+    "name": "paused-retains-plan",
+    "repeat": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY",
+      "anchor": "schedule",
+      "missed": "carry",
+      "resetChecklist": false,
+      "paused": true,
+      "pausedSince": "2026-08-20"
+    },
+    "today": "2026-08-21",
+    "planDate": "2026-08-19",
+    "expected": {
+      "date": "2026-08-19",
+      "state": "paused",
+      "effectiveForDate": "2026-08-21"
+    }
+  },
+  {
+    "name": "paused-without-plan",
+    "repeat": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY",
+      "anchor": "schedule",
+      "missed": "carry",
+      "resetChecklist": false,
+      "paused": true,
+      "pausedSince": "2026-08-20"
+    },
+    "today": "2026-08-21",
+    "expected": {
+      "date": "2026-08-17",
+      "state": "paused",
+      "effectiveForDate": "2026-08-21"
+    }
+  },
+  {
+    "name": "unsupported-retains-plan",
+    "repeat": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=HOURLY",
+      "anchor": "schedule",
+      "missed": "carry",
+      "resetChecklist": false,
+      "paused": false
+    },
+    "today": "2026-08-21",
+    "planDate": "2026-08-19",
+    "expected": {
+      "date": "2026-08-19",
+      "state": "unsupported",
+      "effectiveForDate": "2026-08-21",
+      "warning": "Unsupported recurrence properties: FREQ=HOURLY"
+    }
+  },
+  {
+    "name": "unsupported-retains-origin",
+    "repeat": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=HOURLY",
+      "anchor": "schedule",
+      "missed": "carry",
+      "resetChecklist": false,
+      "paused": false
+    },
+    "today": "2026-08-21",
+    "expected": {
+      "date": "2026-08-17",
+      "state": "unsupported",
+      "effectiveForDate": "2026-08-21",
+      "warning": "Unsupported recurrence properties: FREQ=HOURLY"
+    }
+  },
+  {
+    "name": "invalid-rule-warning",
+    "repeat": {
+      "start": "2026-08-17",
+      "rrule": "RRULE:FREQ=DAILY",
+      "anchor": "schedule",
+      "missed": "carry",
+      "resetChecklist": false,
+      "paused": false
+    },
+    "today": "2026-08-21",
+    "planDate": "2026-08-17",
+    "expected": {
+      "date": "2026-08-17",
+      "state": "unsupported",
+      "effectiveForDate": "2026-08-21",
+      "warning": "RRULE must store only the property value, without a prefix."
+    }
+  },
+  {
+    "name": "inclusive-pause-ranges",
+    "repeat": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY",
+      "anchor": "schedule",
+      "missed": "carry",
+      "resetChecklist": false,
+      "paused": false,
+      "pauseRanges": [
+        {
+          "start": "2026-08-18",
+          "end": "2026-08-20"
+        }
+      ]
+    },
+    "today": "2026-08-21",
+    "planDate": "2026-08-18",
+    "expected": {
+      "date": "2026-08-21",
+      "state": "current",
+      "effectiveForDate": "2026-08-21"
+    }
+  },
+  {
+    "name": "lifecycle-count-without-plan",
+    "repeat": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY",
+      "anchor": "schedule",
+      "missed": "carry",
+      "resetChecklist": false,
+      "paused": false,
+      "completionCount": 3
+    },
+    "today": "2026-08-21",
+    "expected": {
+      "date": "2026-08-20",
+      "state": "overdue",
+      "effectiveForDate": "2026-08-21"
+    }
+  },
+  {
+    "name": "skip-retains-future-plan",
+    "repeat": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY",
+      "anchor": "schedule",
+      "missed": "skip",
+      "resetChecklist": false,
+      "paused": false
+    },
+    "today": "2026-08-21",
+    "planDate": "2026-08-24",
+    "expected": {
+      "date": "2026-08-24",
+      "state": "future",
+      "effectiveForDate": "2026-08-21"
+    }
+  },
+  {
+    "name": "skip-no-observation-or-write",
+    "repeat": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY",
+      "anchor": "schedule",
+      "missed": "skip",
+      "resetChecklist": false,
+      "paused": false
+    },
+    "today": "2026-09-07",
+    "planDate": "2026-08-17",
+    "expected": {
+      "date": "2026-09-07",
+      "state": "current",
+      "effectiveForDate": "2026-09-07"
+    }
+  },
+  {
+    "name": "exceptions-with-pause-ranges",
+    "repeat": {
+      "start": "2026-08-17",
+      "rrule": "FREQ=DAILY",
+      "anchor": "schedule",
+      "missed": "carry",
+      "resetChecklist": false,
+      "paused": false,
+      "rdate": [
+        "2026-08-21"
+      ],
+      "exdate": [
+        "2026-08-21"
+      ],
+      "pauseRanges": [
+        {
+          "start": "2026-08-22",
+          "end": "2026-08-24"
+        }
+      ]
+    },
+    "today": "2026-08-21",
+    "planDate": "2026-08-21",
+    "expected": {
+      "date": "2026-08-25",
+      "state": "future",
+      "effectiveForDate": "2026-08-21"
+    }
+  }
+]

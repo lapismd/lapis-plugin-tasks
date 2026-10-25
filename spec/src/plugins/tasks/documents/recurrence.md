@@ -48,19 +48,19 @@ task:
     completionCount: 4
 ```
 
-| Field | Contract |
-| --- | --- |
-| `start` | Local `YYYY-MM-DD` recurrence origin. Required for schedule anchoring; completion anchoring may set it on first completion. |
-| `rrule` | Required RFC 5545 property value retained verbatim. |
-| `anchor` | `schedule` or `completion`; defaults to `schedule`. |
-| `missed` | `carry` or `skip`; defaults to `carry`. Completion anchoring always uses carry. |
-| `rdate` | Optional date-only inclusions composed through `RRuleSet`. |
-| `exdate` | Optional date-only exclusions. EXDATE wins over DTSTART, RRULE, and RDATE. |
-| `resetChecklist` | Completion resets lightweight checklist markers only when true. |
-| `paused` / `pausedSince` | Active pause state and the local date on which it started. |
-| `pauseRanges` | Persisted inclusive historical ranges excluded from expectations. |
-| `lastCompletedAt` | Timestamp of the latest completed occurrence. |
-| `completionCount` | Recurrence lifecycle state required for completion-anchored COUNT; not a displayed statistic. |
+| Field                    | Contract                                                                                                                    |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| `start`                  | Local `YYYY-MM-DD` recurrence origin. Required for schedule anchoring; completion anchoring may set it on first completion. |
+| `rrule`                  | Required RFC 5545 property value retained verbatim.                                                                         |
+| `anchor`                 | `schedule` or `completion`; defaults to `schedule`.                                                                         |
+| `missed`                 | `carry` or `skip`; defaults to `carry`. Completion anchoring always uses carry.                                             |
+| `rdate`                  | Optional date-only inclusions composed through `RRuleSet`.                                                                  |
+| `exdate`                 | Optional date-only exclusions. EXDATE wins over DTSTART, RRULE, and RDATE.                                                  |
+| `resetChecklist`         | Completion resets lightweight checklist markers only when true.                                                             |
+| `paused` / `pausedSince` | Active pause state and the local date on which it started.                                                                  |
+| `pauseRanges`            | Persisted inclusive historical ranges excluded from expectations.                                                           |
+| `lastCompletedAt`        | Timestamp of the latest completed occurrence.                                                                               |
+| `completionCount`        | Recurrence lifecycle state required for completion-anchored COUNT; not a displayed statistic.                               |
 
 Date values must be real calendar dates. COUNT and UNTIL are mutually
 exclusive. UNTIL executes only in date-only `YYYYMMDD` form. A completion
@@ -76,9 +76,14 @@ or tracking blocks receive the same non-destructive treatment.
 
 ## Library execution boundary
 
-`RecurrenceEngine` is the only package recurrence calculator. It wraps pinned
+The retained TypeScript `RecurrenceEngine` wraps pinned
 `rrule@2.8.1` with date-only `next`, `previous`, and `between` methods and
 composes `RRuleSet` for DTSTART, RDATE, and EXDATE.
+The private native counterpart wraps pinned `rrule=0.14.0` and preserves retained
+set/effective results through shared complete-output fixtures, including stricter
+library compatibility; see LN-TASK-075 through LN-TASK-077. No host selects it
+yet. Its source scope excludes materialization, storage, wall clocks and mutation
+ownership.
 
 Tasks executes only:
 
@@ -147,12 +152,12 @@ task:
     target: 8
 ```
 
-| Type | Fields | Completion input |
-| --- | --- | --- |
-| `boolean` | no additional fields | direct check-off |
-| `count` | required `unit`, optional positive numeric `target` | numeric value |
-| `duration` | optional positive duration `target` | duration |
-| `number` | required `unit`, optional positive numeric `target` | numeric value |
+| Type       | Fields                                              | Completion input |
+| ---------- | --------------------------------------------------- | ---------------- |
+| `boolean`  | no additional fields                                | direct check-off |
+| `count`    | required `unit`, optional positive numeric `target` | numeric value    |
+| `duration` | optional positive duration `target`                 | duration         |
+| `number`   | required `unit`, optional positive numeric `target` | numeric value    |
 
 Canceling a quantitative prompt makes no change. Confirmation validates and
 writes the idempotent daily observation before advancing the Task. Statistics

@@ -11,7 +11,7 @@ static ISO_TIMESTAMP: LazyLock<Regex> = LazyLock::new(|| {
         .unwrap()
 });
 
-pub(super) fn local(value: &Value) -> bool {
+pub(crate) fn local(value: &Value) -> bool {
     let Some(captures) = value.as_str().and_then(|value| LOCAL_DATE.captures(value)) else {
         return false;
     };

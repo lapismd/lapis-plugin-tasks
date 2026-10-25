@@ -61,7 +61,7 @@ fn weekday(value: &str) -> Result<(), String> {
     Ok(())
 }
 
-pub(super) fn analyze(rule: &str) -> Result<Vec<String>, String> {
+pub(crate) fn analyze(rule: &str) -> Result<Vec<String>, String> {
     if rule.is_empty() || rule != crate::marker::trim(rule) {
         return Err("RRULE must be a non-empty trimmed property value.".to_owned());
     }
