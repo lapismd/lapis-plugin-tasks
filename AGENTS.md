@@ -29,11 +29,31 @@ This repository owns the first-party external Lapis plugin whose runtime ID is
 
 ## Specification and validation
 
+- Portable validation defaults to Docker through `scripts/validation.mjs`.
+  Use the root pnpm commands; Docker failure MUST NOT fall back to the host.
+  Follow `docs/validation.md` for contexts, reports and owned cleanup. Native
+  diagnosis requires the explicit `LAPIS_TASKS_VALIDATION_RUNTIME=native`
+  override. Platform-native qualification and visual approval remain separate.
+- Register every new portable command in `scripts/validation/lanes.json`.
+  The routing audit rejects unclassified scripts and changed native exceptions.
+  Keep tracked manifests/locks on registry semver packages; documented temporary
+  archive acceptance is confined to the isolated worker installation.
+- Keep every executable story family in `stories/catalog/story-parity.json`.
+  Prove its selected render path reaches the actual component or the public
+  `WorkspaceShell`; an unused import or metadata component is insufficient.
+  Synthetic controls belong inside the padded, dotted `FixtureControls`
+  boundary. Application fixtures use its overlay placement. Focused components
+  may use inline placement. Do not replace production roots or style private
+  production selectors to make a story look correct.
+- Keep the fatal Svelte console guard installed through browser teardown.
+  Capture original stacks without throwing through framework cleanup, then fail
+  post-test and post-file assertions. Do not suppress or allowlist diagnostics.
+
 - Canonical requirements live in `spec/src`; protected implementation changes
   require corresponding canonical specification changes.
-- Run `pnpm spec:check`, `pnpm check`, `pnpm test`, `pnpm build`, `pnpm
-  publint`, and Storybook interaction, accessibility, and static-build checks
-  when stories or presentation change.
+- Run `pnpm spec:check`, `pnpm check`, `pnpm test`, `pnpm build` and
+  `pnpm publint`, plus Storybook interaction, accessibility and static-build
+  checks when stories or presentation change.
 - Consume published LapisMD dependencies through normal npm semver ranges.
   Unpublished first-party Lapis host packages remain development-only until
   their own publication plan is complete.

@@ -2,6 +2,7 @@
   import type { ApplicationTask, ChecklistItem } from "../../model";
   import { noop } from "../story-fixture";
   import ApplicationTaskPreviewRow from "./ApplicationTaskPreviewRow.svelte";
+  import FixtureControls from "../../../stories/FixtureControls.svelte";
 
   let {
     failUpdates = false,
@@ -81,9 +82,11 @@
 
 <div class="task-story-frame task-story-frame--xl">
   {#if showExternalRefresh}
-    <button type="button" onclick={refreshChecklistExternally}>
-      Simulate external checklist edit
-    </button>
+    <FixtureControls placement="inline">
+      <button type="button" onclick={refreshChecklistExternally}>
+        Simulate external checklist edit
+      </button>
+    </FixtureControls>
   {/if}
   <ApplicationTaskPreviewRow
     {task}

@@ -1,5 +1,17 @@
 # Planner
 
+Story setup actions are fixture UI. The external-checklist-edit example places
+its synthetic action in the padded dotted `FixtureControls` boundary and tests
+that separation. The production preview-row component remains unchanged. See
+LPT-SPEC-012 and LPT-SPEC-016 in [Specification governance](../../spec-governance.md).
+
+Planner catalog acceptance retains actual dialog visibility/closure and active
+tooltip identity. The final validation cohort aligns the production `mergeProps`
+helper and Design Core plus Notes UI/API on one Bits UI 2.20.2 runtime. Earlier
+2.19.5 layer-teardown evidence remains historical, not final cohort acceptance.
+Runtime diagnostics remain fatal under LPT-SPEC-018; dependency refresh does
+not authorize weaker interactions or a duplicate Bits context graph.
+
 The planner is a main-area Tasks view over the Markdown document model. It
 derives navigation, date buckets, daily sections, and summary rows without
 turning those views into stored task state. The selected Task or List remains a
@@ -7,6 +19,12 @@ normal Markdown file and is edited through the repository or Markdown surface
 that owns it.
 
 See LN-TASK-010, LN-TASK-012, and LN-TASK-018.
+
+LN-TASK-072 keeps source event admission tied to the owning vault's `configDir`.
+Its current private state directory, including `.lapis` and custom directories,
+MUST be excluded from planner source refresh events without excluding sibling
+prefixes or an unrelated inactive directory. Disposable shell fixtures and
+copyable examples use the current `.lapis` default consistently.
 
 ## Responsibilities
 

@@ -1048,9 +1048,11 @@
     let todayTooltip: HTMLElement | null = null;
     await waitFor(() => {
       todayTooltip = portalElement<HTMLElement>(
-        '[data-ui-part="tooltip-content"]',
+        '[data-ui-part="tooltip-content"]:not([data-state="closed"])',
       );
       expect(todayTooltip).toBeVisible();
+      expect(within(todayTooltip!).getByText("Today")).toBeVisible();
+      expect(within(todayTooltip!).getByText("8")).toBeVisible();
     });
     const todayCountChip = within(todayTooltip!).getByText("8");
     expect(todayCountChip).toHaveClass(

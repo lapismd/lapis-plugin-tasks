@@ -24,6 +24,14 @@
     },
   });
 
+  async function visibleDialog(page: ReturnType<typeof within>, name: string) {
+    return waitFor(() => {
+      const dialog = page.getByRole("dialog", { name, exact: true });
+      expect(dialog).toBeVisible();
+      return dialog;
+    });
+  }
+
   async function waitForPointerInteraction(element: HTMLElement): Promise<void> {
     await waitFor(() => {
       let current: HTMLElement | null = element;
@@ -82,20 +90,20 @@
     await waitFor(() => expect(state().notes).toBe("Compact inline notes."));
     expect(notes).toBeVisible();
 
-    await userEvent.click(canvas.getByRole("button", { name: "Task priority" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Task priority: None" }));
     await userEvent.click(page.getByRole("option", { name: "High" }));
     await waitFor(() => expect(state().priority).toBe("high"));
 
     await userEvent.click(canvas.getByRole("button", { name: "Set due date" }));
     await userEvent.click(
-      within(page.getByRole("dialog", { name: "Choose due date" }))
+      within(await visibleDialog(page, "Choose due date"))
         .getByRole("button", { name: "Today" }),
     );
     await waitFor(() => expect(state().dueAt).toBeTruthy());
 
     await userEvent.click(canvas.getByRole("button", { name: "Set planner schedule" }));
     await userEvent.click(
-      within(page.getByRole("dialog", { name: "Choose planner schedule" }))
+      within(await visibleDialog(page, "Choose planner schedule"))
         .getByRole("button", { name: "Tomorrow" }),
     );
     await waitFor(() => expect(state().planDate).toBeTruthy());
@@ -105,9 +113,7 @@
     await waitFor(() => expect(state().planAt).toBe("12:00"));
 
     await userEvent.click(canvas.getByRole("button", { name: "Set planner day part" }));
-    const timeDialog = page.getByRole("dialog", {
-      name: "Choose planner day part",
-    });
+    const timeDialog = await visibleDialog(page, "Choose planner day part");
     const customTime = within(timeDialog).getByLabelText("Custom planner time");
     await userEvent.clear(customTime);
     await userEvent.type(customTime, "14:45");
@@ -136,9 +142,7 @@
     );
 
     await userEvent.click(canvas.getByRole("button", { name: "Set task recurrence" }));
-    let recurrenceMenu = page.getByRole("dialog", {
-      name: "Choose task recurrence",
-    });
+    let recurrenceMenu = await visibleDialog(page, "Choose task recurrence");
     expect(within(recurrenceMenu).queryByText("Presets")).not.toBeInTheDocument();
     expect(within(recurrenceMenu).getByText("Every week")).toBeVisible();
     expect(
@@ -208,9 +212,7 @@
       }),
     );
     await userEvent.click(canvas.getByRole("button", { name: "Set task recurrence" }));
-    recurrenceMenu = page.getByRole("dialog", {
-      name: "Choose task recurrence",
-    });
+    recurrenceMenu = await visibleDialog(page, "Choose task recurrence");
     await userEvent.click(
       within(recurrenceMenu).getByRole("button", { name: "Repeat every" }),
     );
@@ -219,7 +221,7 @@
       name: "Repeat every interval",
     });
     const repeatEveryFrequency = within(recurrenceMenu).getByRole("button", {
-      name: "Repeat every frequency",
+      name: "Repeat every frequency: Weeks",
     });
     expect(repeatEveryInterval.tagName).toBe("INPUT");
     expect(repeatEveryFrequency.tagName).toBe("BUTTON");
@@ -255,9 +257,7 @@
     });
     await waitForPointerInteraction(recurrenceTrigger);
     await userEvent.click(recurrenceTrigger);
-    recurrenceMenu = page.getByRole("dialog", {
-      name: "Choose task recurrence",
-    });
+    recurrenceMenu = await visibleDialog(page, "Choose task recurrence");
     const activePresetsList = within(recurrenceMenu).getByRole("listbox", {
       name: "Recurrence presets",
     });
@@ -275,7 +275,7 @@
     ).toHaveValue(2);
     expect(
       within(recurrenceMenu).getByRole("button", {
-        name: "Repeat every frequency",
+        name: "Repeat every frequency: Months",
       }),
     ).toHaveTextContent("Months");
     await userEvent.click(
@@ -288,9 +288,7 @@
         page.queryByRole("dialog", { name: "Choose task recurrence" }),
       ).not.toBeInTheDocument(),
     );
-    const recurrenceDialog = page.getByRole("dialog", {
-      name: "Custom recurrence",
-    });
+    const recurrenceDialog = await visibleDialog(page, "Custom recurrence");
     await waitFor(() => expect(recurrenceDialog).toBeVisible());
     await waitFor(() => {
       const recurrenceRect = recurrenceDialog.getBoundingClientRect();
@@ -348,7 +346,7 @@
     await userEvent.clear(interval);
     await userEvent.type(interval, "2");
     const frequencySelect = within(recurrenceDialog).getByRole("button", {
-      name: "Recurrence frequency",
+      name: "Recurrence frequency: Months",
     });
     expect(frequencySelect.tagName).toBe("BUTTON");
     await userEvent.click(frequencySelect);
@@ -438,7 +436,7 @@
       }),
     );
 
-    const statusButton = canvas.getByRole("button", { name: "Task status" });
+    const statusButton = canvas.getByRole("button", { name: "Task status: Open" });
     await waitForPointerInteraction(statusButton);
     await userEvent.click(statusButton);
     await userEvent.click(page.getByRole("option", { name: "Completed" }));
@@ -473,9 +471,7 @@
       JSON.parse(canvas.getByTestId("task-preview-state").textContent ?? "{}") as Record<string, unknown>;
 
     await userEvent.click(canvas.getByRole("button", { name: "Set task recurrence" }));
-    let recurrenceDialog = page.getByRole("dialog", {
-      name: "Choose task recurrence",
-    });
+    let recurrenceDialog = await visibleDialog(page, "Choose task recurrence");
     expect(within(recurrenceDialog).queryByText("No planned date")).not.toBeInTheDocument();
     expect(
       recurrenceDialog.querySelector(".task-repeat-picker__summary"),
@@ -532,9 +528,7 @@
     });
     await waitForPointerInteraction(recurrenceTrigger);
     await userEvent.click(recurrenceTrigger);
-    recurrenceDialog = page.getByRole("dialog", {
-      name: "Choose task recurrence",
-    });
+    recurrenceDialog = await visibleDialog(page, "Choose task recurrence");
     await userEvent.click(
       within(recurrenceDialog).getByRole("option", {
         name: "Every weekend",
@@ -553,9 +547,7 @@
 
     await waitForPointerInteraction(recurrenceTrigger);
     await userEvent.click(recurrenceTrigger);
-    recurrenceDialog = page.getByRole("dialog", {
-      name: "Choose task recurrence",
-    });
+    recurrenceDialog = await visibleDialog(page, "Choose task recurrence");
     expect(
       recurrenceDialog.querySelector(".task-repeat-picker__summary"),
     ).toHaveTextContent("Every weekend");
@@ -585,15 +577,13 @@
       JSON.parse(canvas.getByTestId("task-preview-state").textContent ?? "{}") as Record<string, unknown>;
 
     await userEvent.click(canvas.getByRole("button", { name: "Set task recurrence" }));
-    const recurrenceMenu = page.getByRole("dialog", {
-      name: "Choose task recurrence",
-    });
+    const recurrenceMenu = await visibleDialog(page, "Choose task recurrence");
     await userEvent.click(
       within(recurrenceMenu).getByRole("option", {
         name: "Custom recurrence…",
       }),
     );
-    const dialog = page.getByRole("dialog", { name: "Custom recurrence" });
+    const dialog = await visibleDialog(page, "Custom recurrence");
     const customForm = within(dialog).getByRole("form", {
       name: "Custom recurrence form",
     });
@@ -614,7 +604,7 @@
     ).not.toBeChecked();
     expect(
       within(customForm).getByRole("button", {
-        name: "Recurrence frequency",
+        name: "Recurrence frequency: Weeks",
       }),
     ).toHaveTextContent("Weeks");
     expect(
@@ -651,7 +641,7 @@
     expect(tuesday).toHaveAttribute("aria-pressed", "false");
     await userEvent.click(
       within(customForm).getByRole("button", {
-        name: "Recurrence end condition",
+        name: "Recurrence end condition: Never",
       }),
     );
     await userEvent.click(
@@ -668,7 +658,7 @@
     expect(state().repeat).toMatchObject({ rrule: "FREQ=DAILY;INTERVAL=2" });
     await userEvent.click(
       within(customForm).getByRole("button", {
-        name: "Recurrence end condition",
+        name: "Recurrence end condition: On date",
       }),
     );
     await userEvent.click(
@@ -720,7 +710,7 @@
       within(customForm).getByRole("switch", { name: "Pause recurrence" }),
     );
     await userEvent.click(
-      within(customForm).getByRole("button", { name: "Select Tracking type" }),
+      within(customForm).getByRole("button", { name: "Select Tracking type: None" }),
     );
     await userEvent.click(
       within(
@@ -787,15 +777,13 @@
       JSON.parse(canvas.getByTestId("task-preview-state").textContent ?? "{}") as Record<string, unknown>;
 
     await userEvent.click(canvas.getByRole("button", { name: "Set task recurrence" }));
-    let recurrenceMenu = page.getByRole("dialog", {
-      name: "Choose task recurrence",
-    });
+    let recurrenceMenu = await visibleDialog(page, "Choose task recurrence");
     await userEvent.click(
       within(recurrenceMenu).getByRole("option", {
         name: "Custom recurrence…",
       }),
     );
-    let dialog = page.getByRole("dialog", { name: "Custom recurrence" });
+    let dialog = await visibleDialog(page, "Custom recurrence");
     await userEvent.click(within(dialog).getByRole("switch", { name: "Edit raw RRULE" }));
     const raw = within(dialog).getByRole("textbox", { name: "Raw RRULE" });
     await userEvent.clear(raw);
@@ -817,7 +805,7 @@
     });
     await waitForPointerInteraction(recurrenceTrigger);
     await userEvent.click(recurrenceTrigger);
-    recurrenceMenu = page.getByRole("dialog", { name: "Choose task recurrence" });
+    recurrenceMenu = await visibleDialog(page, "Choose task recurrence");
     expect(within(recurrenceMenu).getByRole("alert")).toHaveTextContent(
       "Automatic advancement is blocked",
     );
@@ -839,7 +827,7 @@
       JSON.parse(canvas.getByTestId("task-preview-state").textContent ?? "{}") as Record<string, unknown>;
 
     await userEvent.click(canvas.getByRole("button", { name: "Set task recurrence" }));
-    const dialog = page.getByRole("dialog", { name: "Choose task recurrence" });
+    const dialog = await visibleDialog(page, "Choose task recurrence");
     expect(within(dialog).getByRole("alert")).toHaveTextContent(
       "Legacy or invalid recurrence",
     );
@@ -891,7 +879,7 @@
 
 <Story
   name="Open checklist refreshes after an external edit"
-  tags={["test"]}
+  tags={["test", "visual-pending"]}
   parameters={{
     a11y: {
       // Row chrome is role=button with nested controls; covered by catalog smoke.
@@ -906,6 +894,12 @@
   }}
   play={async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const setup = canvas.getByRole("complementary", { name: "Story setup" });
+    expect(getComputedStyle(setup).borderStyle).toBe("dotted");
+    expect(
+      Number.parseFloat(getComputedStyle(setup).paddingTop),
+    ).toBeGreaterThanOrEqual(8);
+    expect(within(setup).getByText("Story setup")).toBeVisible();
     await userEvent.click(
       canvas.getByRole("button", {
         name: "Show checklist for Review interview notes",

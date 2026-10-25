@@ -1,0 +1,99 @@
+{
+  "src/lib/CatalogBoundary.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/CatalogBoundary.svelte#default"
+  },
+  "src/lib/tasks/application-planner-task-row/ApplicationPlannerTaskRow.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/application-planner-task-row/ApplicationPlannerTaskRow.svelte#default"
+  },
+  "src/lib/tasks/application-task-area-form-field/ApplicationTaskAreaFormField.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/application-task-area-form-field/ApplicationTaskAreaFormField.svelte#default"
+  },
+  "src/lib/tasks/application-task-area-picker/ApplicationTaskAreaPicker.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/application-task-area-picker/ApplicationTaskAreaPicker.svelte#default"
+  },
+  "src/lib/tasks/application-task-at-form-field/ApplicationTaskAtFormField.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/application-task-at-form-field/ApplicationTaskAtFormField.svelte#default"
+  },
+  "src/lib/tasks/application-task-at-picker/ApplicationTaskAtPicker.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/application-task-at-picker/ApplicationTaskAtPicker.svelte#default"
+  },
+  "src/lib/tasks/application-task-inline-option-form-field/ApplicationTaskInlineOptionFormField.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/application-task-inline-option-form-field/ApplicationTaskInlineOptionFormField.svelte#default"
+  },
+  "src/lib/tasks/application-task-line/ApplicationTaskLine.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/application-task-line/ApplicationTaskLine.svelte#default"
+  },
+  "src/lib/tasks/application-task-planner-mode/ApplicationTaskPlannerAppShell.stories.svelte": {
+    "kind": "component",
+    "subject": "@lapismd/design-core/shell#AppShell.Root",
+    "stories": {
+      "Planner Shell": {
+        "kind": "component",
+        "subject": "src/lib/tasks/application-task-planner-shell/ApplicationTaskPlannerShell.svelte#default"
+      }
+    }
+  },
+  "src/lib/tasks/application-task-planner-mode/ApplicationTaskPlannerColumnCanvas.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/application-task-planner-mode/TasksPlannerCanvas.svelte#default"
+  },
+  "src/lib/tasks/application-task-planner-mode/ApplicationTaskPlannerMode.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/application-task-planner-mode/ApplicationTaskPlannerMode.svelte#default"
+  },
+  "src/lib/tasks/application-task-preview-row/ApplicationTaskPreviewRow.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/application-task-preview-row/ApplicationTaskPreviewRow.svelte#default"
+  },
+  "src/lib/tasks/application-task-reference-form-field/ApplicationTaskReferenceFormField.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/application-task-reference-form-field/ApplicationTaskReferenceFormField.svelte#default"
+  },
+  "src/lib/tasks/application-task-reference-picker/ApplicationTaskReferencePicker.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/application-task-reference-picker/ApplicationTaskReferencePicker.svelte#default"
+  },
+  "src/lib/tasks/application-task-when-form-field/ApplicationTaskWhenFormField.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/application-task-when-form-field/ApplicationTaskWhenFormField.svelte#default"
+  },
+  "src/lib/tasks/application-task-when-picker/ApplicationTaskWhenPicker.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/application-task-when-picker/ApplicationTaskWhenPicker.svelte#default"
+  },
+  "src/lib/tasks/application-task-when-picker-content/ApplicationTaskWhenPickerContent.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/application-task-when-picker-content/ApplicationTaskWhenPickerContent.svelte#default"
+  },
+  "src/lib/tasks/application-tasks-editor/ApplicationTasksEditor.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/application-tasks-editor/ApplicationTasksEditor.svelte#default"
+  },
+  "src/lib/tasks/application-tasks-preview/ApplicationTasksPreview.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/application-tasks-preview/ApplicationTasksPreview.svelte#default"
+  },
+  "src/lib/tasks/task-occurrence-history/TaskOccurrenceHistory.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/task-occurrence-history/TaskOccurrenceHistory.svelte#default"
+  },
+  "src/lib/tasks/task-planner/TaskPlanner.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/task-planner/TaskPlanner.svelte#default"
+  },
+  "src/lib/tasks/task-tracking-completion-prompt/TaskTrackingCompletionPrompt.stories.svelte": {
+    "kind": "component",
+    "subject": "src/lib/tasks/task-tracking-completion-prompt/TaskTrackingCompletionPrompt.svelte#default"
+  },
+  "src/stories/PluginWorkspace.stories.svelte": {
+    "kind": "application"
+  }
+}

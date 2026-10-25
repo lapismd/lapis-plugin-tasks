@@ -61,6 +61,15 @@
         exact: true,
       }),
     ).toBeVisible();
+    await waitFor(() => {
+      expect(actions).toHaveAttribute("aria-expanded", "false");
+      expect(
+        screen.queryByRole("menu", { name: "Logbook actions" }),
+      ).not.toBeInTheDocument();
+      expect(
+        getComputedStyle(canvasElement.ownerDocument.body).pointerEvents,
+      ).not.toBe("none");
+    });
   }}
 >
   {#snippet template()}
