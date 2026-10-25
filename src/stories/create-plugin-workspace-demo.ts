@@ -96,7 +96,7 @@ export function createPluginWorkspaceSeed(
   navigationPath: string | null = "lists.md",
 ): Record<string, string> {
   return {
-    ".obsidian/app.json": JSON.stringify(
+    ".lapis/app.json": JSON.stringify(
       {
         "editor.defaultViewForNewTabs": "editing",
         "editor.alwaysFocusNewTabs": true,
@@ -106,7 +106,7 @@ export function createPluginWorkspaceSeed(
       null,
       2,
     ),
-    ".obsidian/workspace.json": JSON.stringify(workspaceLayout(), null, 2),
+    ".lapis/workspace.json": JSON.stringify(workspaceLayout(), null, 2),
     ...Object.fromEntries(
       plannerWorkspaceMarkdownFixtures.flatMap((fixture) => {
         if (fixture.path !== "lists.md") return [[fixture.path, fixture.raw]];
@@ -124,7 +124,7 @@ export async function bootPluginWorkspaceDemo(
 }> {
   const app = new App({
     version: "0.0.1-story",
-    configPath: ".obsidian/app.json",
+    configPath: ".lapis/app.json",
     adapter: new MemoryVaultAdapter(createPluginWorkspaceSeed(navigationPath), {
       name: "Tasks Plugin Workspace",
       vaultId: "tasks-plugin-workspace",

@@ -109,21 +109,40 @@
     );
 
     await userEvent.click(scheduleChip);
-    expect(
-      page.getByRole("dialog", {
-        name: "Choose planner schedule",
-        exact: true,
-      }),
-    ).toBeVisible();
+    await waitFor(() =>
+      expect(
+        page.getByRole("dialog", {
+          name: "Choose planner schedule",
+          exact: true,
+        }),
+      ).toBeVisible(),
+    );
     await userEvent.keyboard("{Escape}");
+    await waitFor(() => {
+      expect(scheduleChip).toHaveAttribute("aria-expanded", "false");
+      expect(
+        page.queryByRole("dialog", { name: "Choose planner schedule" }),
+      ).not.toBeInTheDocument();
+    });
     await userEvent.click(repeatChip);
-    expect(
-      page.getByRole("dialog", {
-        name: "Choose task recurrence",
-        exact: true,
-      }),
-    ).toBeVisible();
+    await waitFor(() =>
+      expect(
+        page.getByRole("dialog", {
+          name: "Choose task recurrence",
+          exact: true,
+        }),
+      ).toBeVisible(),
+    );
     await userEvent.keyboard("{Escape}");
+    await waitFor(() => {
+      expect(repeatChip).toHaveAttribute("aria-expanded", "false");
+      expect(
+        page.queryByRole("dialog", { name: "Choose task recurrence" }),
+      ).not.toBeInTheDocument();
+      expect(
+        getComputedStyle(context.canvasElement.ownerDocument.body).pointerEvents,
+      ).not.toBe("none");
+    });
 
     expect(canvas.getByRole("button", { name: "Daily stand-up reflection" }))
       .toBeVisible();

@@ -72,6 +72,16 @@
     lineHeight: string;
   };
 
+  function inlineOptionTrigger(canvas: ReturnType<typeof within>, label: string) {
+    const trigger = canvas.getByRole("button", {
+      name: (name) => name.startsWith(`${label}: `),
+    });
+    const selected = trigger.textContent?.trim();
+    expect(selected).toBeTruthy();
+    expect(trigger).toHaveAccessibleName(`${label}: ${selected}`);
+    return trigger;
+  }
+
   function storyApp(canvasElement: HTMLElement): App {
     const root = canvasElement.querySelector<
       HTMLElement & { __lapisApp?: App }
@@ -354,12 +364,8 @@
     expect(metadataRow!.getBoundingClientRect().top).toBeGreaterThanOrEqual(
       detailTitle.getBoundingClientRect().bottom - 1,
     );
-    const status = within(metadataRow!).getByRole("button", {
-      name: "Task status",
-    });
-    const priority = within(metadataRow!).getByRole("button", {
-      name: "Task priority",
-    });
+    const status = inlineOptionTrigger(within(metadataRow!), "Task status");
+    const priority = inlineOptionTrigger(within(metadataRow!), "Task priority");
     const deadline = within(metadataRow!).getByRole("button", {
       name: "Set due date",
     });
@@ -549,7 +555,7 @@
       "DM Sans Variable",
     );
     expect(getComputedStyle(settingsTitle).fontSize).toBe("16px");
-    expect(getComputedStyle(settingsTitle).fontWeight).toBe("400");
+    expect(getComputedStyle(settingsTitle).fontWeight).toBe("700");
     expect(
       settingsCanvas.getByLabelText<HTMLInputElement>("Afternoon starts at"),
     ).toHaveValue("12:00");
@@ -1723,8 +1729,18 @@
       )!;
     }
 
-    const writingRow = within(docsBlock())
-      .getByRole("button", { name: "Writing", exact: true })
+    async function docsButton(name: string) {
+      return waitFor(() => {
+        const button = within(docsBlock()).getByRole("button", {
+          name,
+          exact: true,
+        });
+        expect(button).toBeVisible();
+        return button;
+      });
+    }
+
+    const writingRow = (await docsButton("Writing"))
       .closest<HTMLElement>("[data-task-list-row]")!;
     expect(writingRow.querySelector("[data-task-list-row-icon]")).toBeVisible();
     expect(
@@ -1765,8 +1781,7 @@
       Number.parseFloat(linkedListColumnStyle.borderTopLeftRadius),
     ).toBeGreaterThan(0);
 
-    const draftRow = within(docsBlock())
-      .getByRole("button", { name: "Draft design critique", exact: true })
+    const draftRow = (await docsButton("Draft design critique"))
       .closest<HTMLElement>(".task-list-items-block__task")!;
     const writingDragRow = writingRow.closest<HTMLElement>(
       ".task-list-items-block__list",
@@ -1783,11 +1798,9 @@
       expect(docsSurface).toHaveAttribute("data-editing", "true");
     });
 
-    const movedWritingRow = within(docsBlock())
-      .getByRole("button", { name: "Writing", exact: true })
+    const movedWritingRow = (await docsButton("Writing"))
       .closest<HTMLElement>(".task-list-items-block__list")!;
-    const movedDraftRow = within(docsBlock())
-      .getByRole("button", { name: "Draft design critique", exact: true })
+    const movedDraftRow = (await docsButton("Draft design critique"))
       .closest<HTMLElement>(".task-list-items-block__task")!;
     await fireEvent.dragStart(movedWritingRow);
     await fireEvent.dragOver(movedDraftRow);
@@ -1796,8 +1809,7 @@
       expect(await app.vault.cachedRead(docsFile)).toBe(originalDocsSource);
     });
 
-    const restoredWritingRow = within(docsBlock())
-      .getByRole("button", { name: "Writing", exact: true })
+    const restoredWritingRow = (await docsButton("Writing"))
       .closest<HTMLElement>("[data-task-list-row]")!;
     await userEvent.click(
       within(restoredWritingRow).getByRole("button", {
@@ -2004,19 +2016,33 @@
       target: canvas.getByRole("button", { name: "Applications" }),
     });
     const menu = within(canvasElement.ownerDocument.body);
-    expect(
-      await menu.findByRole("menuitem", { name: "Open note" }),
-    ).toBeVisible();
-    expect(menu.getByRole("menuitem", { name: "Rename" })).toBeVisible();
-    expect(
-      menu.getByRole("menuitem", { name: "New nested list" }),
-    ).toBeVisible();
-    expect(menu.getByRole("menuitem", { name: "Unpin" })).toBeVisible();
-    expect(menu.getByRole("menuitem", { name: "Archive" })).toBeVisible();
-    expect(menu.getByRole("menuitem", { name: "Delete" })).toBeVisible();
+    await waitFor(() => {
+      for (const name of [
+        "Open note",
+        "Rename",
+        "New nested list",
+        "Unpin",
+        "Archive",
+        "Delete",
+      ]) {
+        expect(menu.getByRole("menuitem", { name, exact: true })).toBeVisible();
+      }
+      expect(
+        getComputedStyle(menu.getByRole("menuitem", { name: "Open note" }))
+          .pointerEvents,
+      ).not.toBe("none");
+    });
     await userEvent.click(menu.getByRole("menuitem", { name: "Open note" }));
     await waitFor(() => {
       expect(app.workspace.getActiveFile()?.path).toBe("lists/applications.md");
+      expect(
+        menu.queryByRole("menuitem", { name: "Open note" }),
+      ).not.toBeInTheDocument();
+      expect(
+        getComputedStyle(
+          canvas.getByRole("button", { name: "Open Tasks", exact: true }),
+        ).pointerEvents,
+      ).not.toBe("none");
     });
 
     // Leave this visual story on the feature-rich daily agenda instead of the
@@ -2942,7 +2968,7 @@
       detail.getByRole("combobox", { name: "Local comment" }),
     );
     await userEvent.click(
-      detail.getByRole("button", { name: "Task priority" }),
+      inlineOptionTrigger(detail, "Task priority"),
     );
     await userEvent.click(
       page.getByRole("option", { name: "High", exact: true }),
@@ -3800,14 +3826,14 @@
     const apply = async (action: string, title: string, heading?: string) => {
       await userEvent.click(headerAction());
       await userEvent.click(
-        page.getByRole("button", { name: "Document action" }),
+        inlineOptionTrigger(page, "Document action"),
       );
       await userEvent.click(
         page.getByRole("option", { name: action, exact: true }),
       );
       if (heading) {
         await userEvent.click(
-          page.getByRole("button", { name: "Choose heading" }),
+          inlineOptionTrigger(page, "Choose heading"),
         );
         await userEvent.click(
           await page.findByRole("option", { name: heading, exact: true }),

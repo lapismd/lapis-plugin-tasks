@@ -1,7 +1,8 @@
 # Specification Governance
 
-Dependency acceptance now uses published Design Core `0.3.1` and Mira `0.0.3` through portable npm ranges. Source ownership and public contracts remain
-unchanged; local overrides for these released packages are retired.
+Tracked dependencies use registry Design Core `0.6.0` and Mira `0.1.1`.
+Explicit temporary source acceptance follows LPT-SPEC-014 with verified archives
+in isolated installations. Source ownership and public contracts remain unchanged.
 Shared specification tooling resolves `@lapismd/spec-validator@0.1.4` from npm.
 
 ## Requirements
@@ -18,6 +19,19 @@ Shared specification tooling resolves `@lapismd/spec-validator@0.1.4` from npm.
 | LPT-SPEC-008 | Repository validation MUST reject story titles outside the `Plugins/Tasks/*` taxonomy.                                                                                                                                                                                                                                                                                                                                                                                                        |
 | LPT-SPEC-009 | Repository validation MUST compare every SUMMARY chapter with an exact metadata-only Storybook mirror and MUST keep those mirrors as Storybook's first section in SUMMARY order.                                                                                                                                                                                                                                                                                                              |
 | LPT-SPEC-011 | Tracked agent guidance MUST require preserving unrelated work, committing every independently verified change with Jujutsu without waiting for another request, and using a PR-quality message that explains what changed, why it changed, and which validation passed.                                                                                                                                                                                                                       |
+| LPT-SPEC-012 | Every executable Storybook family MUST declare application, component, integration or prototype coverage. The guard MUST follow its selected CSF-Svelte render path through actual imports. Application coverage MUST reach exactly one public WorkspaceShell; focused component coverage MUST identify the real rendered subject. Missing or stale declarations, unused imports, replacement roots and private production presentation overrides MUST fail checks.                           |
+| LPT-SPEC-013 | Portable root validation commands MUST default to the fail-closed Docker runner and be registered in the lane inventory. Every other root script MUST match an explicitly reviewed native development or bootstrap exception. Docker errors MUST NOT trigger a host fallback. Intentional native diagnosis MUST require an explicit runtime override.                                                                                                                                         |
+| LPT-SPEC-014 | Docker validation MUST transfer the exact tracked Jujutsu revision and ancestry without ignored local state, host dependency/source mounts or a Docker socket. Registry installs MUST be frozen. Explicit temporary archive acceptance MUST verify package identity and checksum, restore tracked manifests and lockfiles before checks, and record archive provenance.                                                                                                                       |
+| LPT-SPEC-015 | The Docker image MUST pin base and toolchain identities and install Chromium matching the locked Playwright version. Default browser acceptance MUST use sequential bounded shards and one worker. Explicit file, test-name and shard arguments MUST remain literal and MUST NOT be silently expanded into unrelated cases.                                                                                                                                                                   |
+| LPT-SPEC-016 | Synthetic story controls MUST use the visible padded dotted FixtureControls boundary. Application fixtures MUST use overlay placement outside production geometry; focused component stories MAY use inline placement. The boundary MUST NOT conceal production roots or dynamic component replacement. Functional acceptance MUST verify the visible boundary in an affected story.                                                                                                          |
+| LPT-SPEC-017 | Every Docker worker MUST have finite CPU, memory and shared-memory limits and a per-checkout lease. Reports MUST retain source, image, tool, argument and outcome identities with available outputs and combined logs. Cleanup MUST collect reports before deleting stopped owned runs and MUST NOT prune global data or delete another checkout's containers.                                                                                                                                |
+| LPT-SPEC-018 | Browser acceptance MUST fail on Svelte runtime diagnostics from console warnings or errors, including mount, interaction and teardown. The guard MUST install before story hooks, retain original diagnostic stacks until post-test and post-file assertions without interrupting framework cleanup, and preserve console output without suppression or allowlisting. |
+| LPT-SPEC-019 | The classified validation:all command MUST execute the existing check, unit/native test, build, publint, static Storybook, complete catalog and specification lanes sequentially within one Docker snapshot and dependency installation. It MUST preserve first-failure propagation, refuse aggregate selectors and retain every individual command and exact target. |
+
+Aggregate validation shares the outer worker's single lease, exact snapshot and
+installation. Inner gates use the native execution port inside that worker;
+they MUST NOT create nested workers or silently omit a gate. Reports retain
+the actual installed pnpm graph separately from the tracked registry lock.
 
 `spec-first` maps document parser and index sources to
 [Documents](plugins/tasks/documents.md), projection, query, repository,
@@ -57,12 +71,19 @@ For temporary complete acceptance, run `node scripts/test-storybook-batches.mjs`
 It runs all three Vitest shards sequentially with one worker and a fresh browser
 process per shard, failing immediately on any failed batch. Vitest partitions
 the complete discovered story file set; no story, assertion, accessibility gate,
-or readiness budget is excluded or relaxed. `pnpm test:storybook` remains the
-original unbatched diagnostic lane.
+or readiness budget is excluded or relaxed. `pnpm test:storybook` now selects
+this bounded runner by default. Explicit selectors remain literal. Plays MUST
+wait for visible dialogs, confirmed closure and pointer release before the next
+interaction. Tooltip assertions MUST identify the active content rather than
+retained closing content from an earlier trigger.
+
+Diagnostic capture MUST retain at least 50 stack frames when supported and
+restore the caller's stack-limit setting after each capture.
 
 The preview MUST inherit sans and monospace families from Design Core's public
 stylesheet, matching the main Lapis hosts. The real Tasks settings acceptance
-MUST verify DM Sans plus the shared compact heading tokens (16px, weight 400).
+MUST verify DM Sans plus Design Core's declared settings heading tokens
+(16px, weight 700), following `DC-WS-069` rather than older catalog typography.
 
 The temporary batch runner MUST apply its one-worker bound and disabled file
 parallelism to the nested Storybook project through a batch-only configuration.
@@ -127,3 +148,27 @@ identity across consumer and Design Core surfaces.
 The local package hook retains development host snapshots and has no Design
 Core source mapping. Its mixed-manifest regression verifies that all requested
 foundations retain npm ranges even when sibling checkouts exist.
+
+## Docker validation and story composition
+
+Portable commands and native bootstrap exceptions are governed by the registry
+in `scripts/validation/lanes.json` and its fail-closed routing audit. The small
+private runner retains the source-pack, checksum-qualified tool, archive and
+report patterns used by Notes/Plugins, without importing sibling scripts or
+creating a new public package API. Human workflow is in `docs/validation.md`.
+
+Image identity follows the actual recipe and selected tools. Dependency locks
+and verified archives select the pnpm cache; Cargo inputs and the Rust recipe
+select a separate native cache. Unrelated script or UI dependency edits do not
+discard compiled Rust artifacts. Active or unknown remote worker state retains
+the checkout lease. Cleanup requires completion evidence and removes the
+original lease container ID, never a successor that reused its name.
+Workers use Docker init and drop Linux capabilities. The real smoke verifies
+the denied-write boundary before starting Chromium, so root privileges cannot
+turn permission regressions into false passes.
+
+The explicit coverage inventory supports this repository's CSF-Svelte stories.
+It distinguishes the real Tasks Shell from focused AppShell and Column Canvas
+examples. The fixture helper isolates synthetic setup controls; it is not
+production application UI. Source, interaction, accessibility and visual gates
+remain distinct. No visual baseline is approved by this tooling.

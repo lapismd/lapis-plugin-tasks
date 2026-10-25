@@ -1,6 +1,7 @@
 <script lang="ts">
   import { findOpenFileLeaf, type App } from "@lapis-notes/api";
   import { onMount, untrack } from "svelte";
+  import { isTaskSourcePath } from "./task-source-path";
   import {
     applyCatalogTaskToRepository,
     createAppTaskAgendaRepository,
@@ -92,10 +93,6 @@
   }
 
   const currentTime = () => clock();
-
-  function isTaskSourcePath(path: string): boolean {
-    return path.endsWith(".md") && !path.startsWith(".obsidian/");
-  }
 
   async function refresh() {
     try {
@@ -376,14 +373,14 @@
       settings = nextSettings;
     });
     const changed = app.metadataCache.on("changed", (file) => {
-      if (isTaskSourcePath(file.path)) {
+      if (isTaskSourcePath(file.path, app.vault.configDir)) {
         repository.invalidateEffectiveOccurrences();
         checklistRefreshVersion += 1;
         void queueRefresh();
       }
     });
     const deleted = app.metadataCache.on("deleted", (file) => {
-      if (isTaskSourcePath(file.path)) {
+      if (isTaskSourcePath(file.path, app.vault.configDir)) {
         repository.invalidateEffectiveOccurrences();
         void queueRefresh();
       }

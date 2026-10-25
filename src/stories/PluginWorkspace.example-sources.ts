@@ -26,10 +26,10 @@ export const PluginWorkspaceExample = `<script lang="ts">
   };
   const app = new App({
     version: "1.0.0",
-    configPath: ".obsidian/app.json",
+    configPath: ".lapis/app.json",
     adapter: new MemoryVaultAdapter({
-      ".obsidian/app.json": "{}",
-      ".obsidian/workspace.json": JSON.stringify(layout),
+      ".lapis/app.json": "{}",
+      ".lapis/workspace.json": JSON.stringify(layout),
       "inbox/today.md": taskMarkdown,
     }),
     appDatabase: new MemoryAppDatabase("tasks-story"),

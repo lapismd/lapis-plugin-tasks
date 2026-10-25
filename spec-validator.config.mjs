@@ -79,6 +79,10 @@ export default defineConfig(tableRequirements(), {
       ],
       rules: [
         {
+          pattern: "^stories/catalog/",
+          chapters: ["spec/src/spec-governance.md"],
+        },
+        {
           pattern: "^crates/lapis-task-services/",
           chapters: ["spec/src/plugins/tasks/runtime.md"],
         },
@@ -112,9 +116,13 @@ export default defineConfig(tableRequirements(), {
         },
       ],
       protected: [
-        "^(?:package\\.json$|manifest\\.json$|src/|crates/|\\.storybook/|pnpm-|scripts/|\\.github/|AGENTS\\.md$|spec-validator\\.config\\.mjs$)",
+        "^(?:package\\.json$|manifest\\.json$|src/|crates/|stories/catalog/|\\.storybook/|pnpm-|scripts/|\\.github/|AGENTS\\.md$|spec-validator\\.config\\.mjs$)",
       ],
     },
   },
-  plugins: ["scripts/spec-validation/storybook-taxonomy-audit.mjs"],
+  plugins: [
+    "scripts/spec-validation/storybook-taxonomy-audit.mjs",
+    "scripts/spec-validation/storybook-parity.mjs",
+    "scripts/spec-validation/validation-routing.mjs",
+  ],
 });
