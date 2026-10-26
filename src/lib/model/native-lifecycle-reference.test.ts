@@ -4,6 +4,8 @@ import { describe, expect, it } from "vitest";
 import { lifecycleInputs } from "./native-lifecycle-inputs.test.fixture";
 import { captureLifecycle } from "./native-lifecycle-reference.test.fixture";
 import { durationLifecycleInputs } from "./native-lifecycle-duration.test.fixture";
+import { trackedTodayInputs } from "./native-tracked-today-inputs.test.fixture";
+import { captureTrackedToday } from "./native-tracked-today-reference.test.fixture";
 
 const fixturePath = resolve(
   "crates/lapis-task-services/tests/fixtures/lifecycle.json",
@@ -11,6 +13,39 @@ const fixturePath = resolve(
 const capture = process.env.LAPIS_TASKS_CAPTURE_LIFECYCLE === "1";
 
 describe("retained Task lifecycle repository reference", () => {
+  it("preserves tracked today selection and complete daily snapshots", async () => {
+    const cases = [];
+    for (const input of trackedTodayInputs()) {
+      cases.push({ ...input, expected: await captureTrackedToday(input) });
+    }
+    const actual = {
+      schema: 1,
+      oracleRevision: "da17eba0c7d9a6c90056cb957ef88fb60b975a43",
+      cases,
+    };
+    const path = resolve(
+      "crates/lapis-task-services/tests/fixtures/tracked-today.json",
+    );
+    if (capture) {
+      await mkdir(resolve("test-results"), { recursive: true });
+      await writeFile(
+        resolve("test-results/tracked-today.json"),
+        JSON.stringify(actual, null, 2) + "\n",
+      );
+    } else {
+      expect(actual).toEqual(JSON.parse(await readFile(path, "utf8")));
+    }
+    expect(cases).toHaveLength(15);
+    for (const entry of cases) {
+      const expected = entry.expected as {
+        attempts: Array<{ tasks: Record<string, string> }>;
+      };
+      expect(expected.attempts).toHaveLength(3);
+      for (const attempt of expected.attempts)
+        expect(attempt.tasks).toEqual(entry.files);
+    }
+  }, 30_000);
+
   it("preserves valid duration tracking in complete lifecycle traces", async () => {
     const cases = [];
     for (const input of durationLifecycleInputs()) {

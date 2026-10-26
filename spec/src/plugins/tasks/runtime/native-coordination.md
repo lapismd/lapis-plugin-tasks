@@ -42,6 +42,13 @@ before advancing the Task, retain partial-write outcomes, and recover without
 replaying an uncertain write. Tracked-today scheduling belongs to the existing
 admitted native application owner; this crate adds no timer or writer.
 
+Before that application scheduling intake, a separate frozen reference invokes
+the unchanged plugin's tracked-today method with its real Task and occurrence
+repositories. It retains full daily bytes, observations and unchanged Tasks for
+current tracking kinds, excluded effective/status states, same-date refresh,
+local-date rollover and existing authored daily paths. This reference grants no
+native scheduler selection or application writer authority.
+
 ## Valid duration source acceptance
 
 A separate retained corpus MUST cover authored duration tracking through the

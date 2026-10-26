@@ -52,6 +52,12 @@ Markdown and source hashes remain unchanged; only disposable projection rows
 are replaced. Open planner workspaces subscribe to completed refreshes and
 rebuild their snapshots from those rows.
 
+The retained plugin then materializes only tracked open Tasks with a current
+effective occurrence dated today. It uses the existing occurrence repository,
+which ensures the daily target before mutation; same-date refresh is idempotent
+and never advances the original Task. The [frozen application reference](./runtime/native-coordination.md)
+records full selection and daily snapshots before native Notes scheduling.
+
 For a `task-list`, the parser projects the page display title: its top-level
 front matter `title`, then its first H1, then a human-readable stable-id
 fallback. Repository list renames keep an existing front matter title and H1

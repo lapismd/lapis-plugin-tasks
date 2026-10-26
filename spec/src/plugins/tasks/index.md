@@ -218,3 +218,6 @@ persistence intake. It does not select a host or add a scheduler.
 Valid authored-duration capture uses the existing `target` string; the separate
 18-attempt corpus qualifies this workflow without rewriting earlier
 `targetMinutes` normalization evidence or changing runtime implementation.
+A separate 45-attempt tracked-today reference retains the unchanged plugin's
+selection and complete daily snapshots before Notes adopts its existing native
+owner; it grants no scheduler or host writer authority.
