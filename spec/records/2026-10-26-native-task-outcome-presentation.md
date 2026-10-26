@@ -55,3 +55,19 @@ chapter. Product and story bytes are identical to `01746d89`; only canonical
 governance and this supporting record changed. Its spec-only pack is deliberately
 not a consumable artifact because it contains no built dist. A separate owning
 build and public pack produces the consumer archive.
+
+## Interactive review fixture follow-up
+
+Exact cold baseline `d8e386d0` passes the existing one recovery story. Review of
+its unexercised Forget action found a synthetic throwing fixture callback. The
+story now updates its fixture-owned reference store on explicit Forget and
+separately asserts zero writes during inspection. Its visible menu, native
+result fixture and production implementation are unchanged. The complete owning
+source/catalog gates are rerun; qualified production archive `9522bdb7` remains
+the same because no runtime, package, lockfile or crate files change.
+
+The fixture after-check `d283e24d` passes its exact cold story. Complete owning
+run `4e6f6cd8` passes all 2,875 units, 27 native and 63 cold catalog cases,
+strict/check/build/publint/static/specification gates. Runtime/package/crate
+files remain byte-identical to `703a88e0`; consumer archive `9522bdb7` is retained.
+A final supporting-receipt specification check precedes the fixture commit.

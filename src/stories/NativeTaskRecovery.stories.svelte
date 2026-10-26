@@ -30,15 +30,18 @@
     const root = canvas.getByTestId("plugin-workspace-demo") as HTMLElement & { __lapisApp: App };
     const reference = { requestId: "d5ab7890-0000-4000-8000-000000000001", path: "inbox/today-1.md", action: "complete", at: "2026-10-26T09:00:00Z" };
     let inspections = 0;
+    let writes = 0;
+    let references = [reference];
     openNativeTaskRecovery(root.__lapisApp, {
       inspect: async (requestId) => {
         expect(requestId).toBe(reference.requestId);
         inspections++;
         return { disposition: "completed", daily: null, last_failure: null } as NativeTaskOperation;
       },
-    }, () => [reference], async () => { throw new Error("Inspection must not alter references"); });
+    }, () => references, async (next) => { writes++; references = next; });
     await userEvent.click(await page.findByRole("option", { name: /inbox\/today-1.md · complete/ }));
     await waitFor(() => expect(inspections).toBe(1));
+    expect(writes).toBe(0);
     await waitFor(() => expect(page.getByText(/Native journal recorded completed/)).toBeVisible());
     expect(page.getByText(/Current files may have changed/)).toBeVisible();
     expect(page.getByRole("option", { name: "Open current task: inbox/today-1.md" })).toBeVisible();
