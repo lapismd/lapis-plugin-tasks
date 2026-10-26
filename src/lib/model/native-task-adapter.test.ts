@@ -1,3 +1,4 @@
+import * as nativeApi from "@lapis-notes/api/native-tasks";
 import type { App } from "@lapis-notes/api";
 import { MemoryAppDatabase } from "@lapis-notes/api/app-database";
 import {
@@ -36,6 +37,41 @@ function fixture(call: NativeTasks["call"]) {
 }
 
 describe("native Task source adapter", () => {
+  it.each([
+    { locale: "en-US", firstDay: 7, minimalDays: 1, available: true },
+    { locale: "en-US", firstDay: 7, minimalDays: 2, available: false },
+    { locale: "en-GB", firstDay: 1, minimalDays: 4, available: true },
+    { locale: "en-GB", firstDay: 7, minimalDays: 4, available: false },
+    { locale: "en-AU", firstDay: 1, minimalDays: 4, available: false },
+  ])(
+    "declares only qualified default daily context $locale/$firstDay/$minimalDays",
+    async ({ available, ...format }) => {
+      const declared = vi
+        .spyOn(nativeApi, "nativeTaskDailyFormat")
+        .mockReturnValue(
+          format as ReturnType<typeof nativeApi.nativeTaskDailyFormat>,
+        );
+      try {
+        const call = vi.fn<NativeTasks["call"]>().mockResolvedValue(status);
+        const { adapter } = fixture(call);
+        await adapter.activate(dayParts);
+        expect(call).toHaveBeenCalledExactlyOnceWith(
+          expect.objectContaining({
+            kind: "configure",
+            configuration: expect.objectContaining({
+              format,
+              provider: available
+                ? { kind: "default" }
+                : expect.objectContaining({ kind: "unavailable" }),
+            }),
+          }),
+        );
+      } finally {
+        declared.mockRestore();
+      }
+    },
+  );
+
   it("delegates guarded mutation bytes without renderer file or projection writes", async () => {
     const call = vi.fn<NativeTasks["call"]>().mockResolvedValue({
       kind: "snapshot",

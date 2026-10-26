@@ -44,11 +44,14 @@ export class NativeTaskAdapter {
       const selected = this.app.dailyDocumentProviders.resolve();
       if (selected.id !== "lapis:daily-notes")
         throw new Error(`Daily provider ${selected.id} has no native adapter.`);
-      if (
-        format.locale !== "en-US" ||
-        format.firstDay !== 7 ||
-        format.minimalDays !== 4
-      )
+      const qualified =
+        (format.locale === "en-US" &&
+          format.firstDay === 7 &&
+          (format.minimalDays === 1 || format.minimalDays === 4)) ||
+        (format.locale === "en-GB" &&
+          format.firstDay === 1 &&
+          format.minimalDays === 4);
+      if (!qualified)
         throw new Error(
           `Native daily formatting is not qualified for ${format.locale} (${format.firstDay}/${format.minimalDays}).`,
         );

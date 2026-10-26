@@ -383,3 +383,5 @@ adopts ordered daily/Task persistence and recovery.
 ## Admitted native Task observation
 
 [Native coordination](runtime/native-coordination.md#ln-task-094) defines the selected App-port adapter and source scheduling ownership. Existing repositories delegate qualified actions and complete/skip to the admitted service, retain native outcomes, and stop renderer projection publication and daily materialization in that mode. Existing browser behavior and planner views remain the reference.
+
+The [English daily context source gate](runtime/native-coordination.md#default-daily-locale-qualification) qualifies current en-US week 7/4, declared legacy Intl en-US week 7/1 and en-GB week 1/4 from complete retained outcomes. Notes owns filenames, provider IO and the native writer; actual host timezone/day-boundary and signed-bundle gates remain separate.

@@ -76,3 +76,7 @@ actual signed-bundle and native-screen acceptance.
 
 The existing Task planner observes the native projections when selected.
 Standalone browser repositories retain their own explicit implementation.
+
+## Default daily locale qualification
+
+The [English daily context source gate](../../../../records/2026-10-26-native-daily-contexts.md) qualifies only current en-US week 7/4, declared legacy Intl en-US week 7/1 and en-GB week 1/4 through complete retained filename/provider/registry outcomes and physical default-provider IO. The selected adapter admits only these English Gregorian/Latin-number contexts. Custom or ambiguous providers remain explicitly unavailable; there is no transport or renderer formatting fallback. Actual host timezone/day-boundary and installed-bundle acceptance remain separate.

@@ -225,3 +225,5 @@ owner; it grants no scheduler or host writer authority.
 ## Selected native Task host
 
 The [admitted native adapter](runtime/native-coordination.md#ln-task-094) retains the existing Tasks planner and Markdown contribution while its owning App supplies shared native commands. Native mode observes service projections and scheduling, preserves known/uncertain outcomes, and distinguishes explicit disable from passive teardown. Standalone browser mode keeps its retained implementation.
+
+The [English daily context source gate](runtime/native-coordination.md#default-daily-locale-qualification) retains current en-US week 7/4, declared legacy Intl en-US week 7/1 and en-GB week 1/4. Complete retained outcomes qualify the source adapter; actual host timezone/day-boundary and signed-bundle gates remain separate.
