@@ -13,6 +13,7 @@ checked persistence, accepted lifetime and recovery.
 | LN-TASK-094 | The explicitly selected native adapter MUST send bounded typed actions through its owning App's admitted Tasks port. It MUST reuse the qualified native writer and complete/skip journal, preserve returned errors and partial outcomes, and never retry an uncertain call or fall back to a TypeScript mutation. The existing standalone browser repository MUST retain its implementation.                                                                                                                                                                                                                                                                                                          |
 | LN-TASK-095 | A Tasks plugin using the admitted native port MUST retain its existing views while observing native Task projections and tracked-today materialization. It MUST NOT run renderer projection repair, a competing day-change timer or daily materialization. Explicit disable MUST fence native admissions; passive App teardown MUST release observation without stopping accepted work.                                                                                                                                                                                                                                                                                                               |
 | LN-TASK-096 | An uncertain native lifecycle failure MUST present its submitted request ID and the existing Tasks inspection command through the planner error surface. Before native admission, the plugin MUST persist a bounded request reference through its existing plugin-data writer. Reload and cold recovery MUST retain unresolved identities. Inspection MUST be read-only, distinguish journal results from current file bytes and offer current Task/daily navigation. Capacity MUST refuse new work without evicting unresolved references. The adapter MUST preserve the original error identity, known failure code/parts and partial operation. It MUST NOT retry or replace an unknown operation. |
+| LN-TASK-097 | Native Task writes MUST use the existing App editing registry guard through source re-read, native admission and editor rearm. Single-file mutations MUST use their path; daily/lifecycle/retry operations MUST guard all files. Recovery-reference persistence MUST stay outside that guard. A local flush or guard refusal MUST NOT be classified as an uncertain native admission. Read-only inspection MUST NOT yield editors.                                                                                                                                                                                                                                                                    |
 
 ## Retained lifecycle authority
 
@@ -102,3 +103,15 @@ it. Unknown results survive reload/cold recovery until explicit inspection and
 forgetting. The bounded store refuses new work at capacity instead of evicting
 unresolved identities. Settings writes preserve references. This adds no custom
 recovery screen, retry, fallback or native operation authority.
+
+## Editing registry handoff
+
+<a id="ln-task-097"></a>
+
+The native adapter uses the App-owned guard directly. Existing editor flush and
+native intent yield/rearm stay in the API registry; the plugin adds no claim
+manager, save path or clean-as-dirty state. Native source versions are read after
+flush while the guard remains held. Lifecycle references persist before the
+guard and clear after it returns, avoiding re-entering the same writer queue.
+Local refusals precede native admission; only a submitted operation can become
+an unknown outcome. Actual hosted/Desktop editor acceptance is a separate gate.

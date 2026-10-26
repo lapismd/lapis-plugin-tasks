@@ -389,3 +389,5 @@ The [English daily context source gate](runtime/native-coordination.md#default-d
 [Native outcome presentation](runtime/native-coordination.md#ln-task-096) preserves
 known failures and readable uncertainty/inspection identity in existing alerts.
 No recovery action is inferred from a missing response.
+
+Native Task editing handoff follows [LN-TASK-097](runtime/native-coordination.md#ln-task-097); the existing App registry owns editor protection around native admission.

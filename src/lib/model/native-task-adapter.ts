@@ -111,54 +111,62 @@ export class NativeTaskAdapter {
     path: string,
     mutation: NativeTaskMutation,
   ): Promise<ParsedTaskFile> {
-    const value = await this.app.nativeTasks!.call({
-      kind: "mutate",
-      ...(await this.source(path)),
-      mutation,
+    return this.app.fileEditingSessions.guard(path, async () => {
+      const value = await this.app.nativeTasks!.call({
+        kind: "mutate",
+        ...(await this.source(path)),
+        mutation,
+      });
+      if (value.kind !== "snapshot")
+        throw new Error("Invalid native Task mutation result");
+      return this.document(path, value.snapshot.text);
     });
-    if (value.kind !== "snapshot")
-      throw new Error("Invalid native Task mutation result");
-    return this.document(path, value.snapshot.text);
   }
 
   async lifecycle(
     path: string,
     action: NativeTaskLifecycleAction,
   ): Promise<ParsedTaskFile> {
-    const source = await this.source(path);
     const request_id = crypto.randomUUID();
-    const request = { request_id, ...source, action };
+    const request = { request_id, path, action };
     // Persist before taking the editing guard: plugin data uses the same writer.
     await this.recovery?.remember(request);
-    try {
-      const value = await this.app.nativeTasks!.call({
-        kind: "submit",
-        request,
-      });
-      if (value.kind !== "operation" || !value.operation)
-        throw new Error("Invalid native Task lifecycle result");
-      const document = this.document(path, value.operation.task_replacement);
-      // Retaining an extra reference is safe if plugin-data cleanup fails.
-      await this.recovery?.settled(request_id).catch(() => undefined);
-      return document;
-    } catch (error) {
-      // A lost response must retain the accepted identity for explicit inspection.
-      const failure = error instanceof Error ? error : new Error(String(error));
-      if (!("requestId" in failure) || !failure.requestId)
-        Object.assign(failure, {
-          requestId: request_id,
-          uncertain:
-            "uncertain" in failure && failure.uncertain === false
-              ? false
-              : true,
-        });
-      if ("uncertain" in failure && failure.uncertain === true) {
-        const identity =
-          "requestId" in failure ? failure.requestId : request_id;
-        failure.message = `Task outcome is unknown. Use Tasks: Inspect interrupted task update. Inspect request ${String(identity)} before retrying. ${failure.message}`;
-      }
-      throw failure;
-    }
+    const document = await this.app.fileEditingSessions.guard(
+      undefined,
+      async () => {
+        const source = await this.source(path);
+        try {
+          const value = await this.app.nativeTasks!.call({
+            kind: "submit",
+            request: { ...request, ...source },
+          });
+          if (value.kind !== "operation" || !value.operation)
+            throw new Error("Invalid native Task lifecycle result");
+          return this.document(path, value.operation.task_replacement);
+        } catch (error) {
+          // A lost response must retain the accepted identity for explicit inspection.
+          const failure =
+            error instanceof Error ? error : new Error(String(error));
+          if (!("requestId" in failure) || !failure.requestId)
+            Object.assign(failure, {
+              requestId: request_id,
+              uncertain:
+                "uncertain" in failure && failure.uncertain === false
+                  ? false
+                  : true,
+            });
+          if ("uncertain" in failure && failure.uncertain === true) {
+            const identity =
+              "requestId" in failure ? failure.requestId : request_id;
+            failure.message = `Task outcome is unknown. Use Tasks: Inspect interrupted task update. Inspect request ${String(identity)} before retrying. ${failure.message}`;
+          }
+          throw failure;
+        }
+      },
+    );
+    // Cleanup is outside the guard because plugin data uses the existing writer.
+    await this.recovery?.settled(request_id).catch(() => undefined);
+    return document;
   }
 
   async inspect(requestId: string): Promise<NativeTaskOperation | null> {
@@ -172,13 +180,15 @@ export class NativeTaskAdapter {
   }
 
   async retry(requestId: string): Promise<NativeTaskOperation | null> {
-    const value = await this.app.nativeTasks!.call({
-      kind: "retry",
-      request_id: requestId,
+    return this.app.fileEditingSessions.guard(undefined, async () => {
+      const value = await this.app.nativeTasks!.call({
+        kind: "retry",
+        request_id: requestId,
+      });
+      if (value.kind !== "operation")
+        throw new Error("Invalid native Task retry result");
+      return value.operation;
     });
-    if (value.kind !== "operation")
-      throw new Error("Invalid native Task retry result");
-    return value.operation;
   }
 
   async occurrence(
@@ -186,22 +196,26 @@ export class NativeTaskAdapter {
     date: string,
     completion?: TaskOccurrenceCompletion,
   ): Promise<TaskOccurrenceObservation> {
-    const value = await this.app.nativeTasks!.call({
-      kind: "occurrence",
-      ...(await this.source(path)),
-      date,
-      completion: completion ?? null,
+    return this.app.fileEditingSessions.guard(undefined, async () => {
+      const value = await this.app.nativeTasks!.call({
+        kind: "occurrence",
+        ...(await this.source(path)),
+        date,
+        completion: completion ?? null,
+      });
+      if (value.kind !== "observation")
+        throw new Error("Invalid native Task observation result");
+      const observed = scanTaskOccurrenceObservations(
+        value.document.text,
+        value.document.path,
+      ).filter(
+        (entry) => entry.observationId === value.observation.observationId,
+      );
+      if (observed.length !== 1)
+        throw new Error(
+          "Native Task result has no unique readable observation",
+        );
+      return observed[0]!;
     });
-    if (value.kind !== "observation")
-      throw new Error("Invalid native Task observation result");
-    const observed = scanTaskOccurrenceObservations(
-      value.document.text,
-      value.document.path,
-    ).filter(
-      (entry) => entry.observationId === value.observation.observationId,
-    );
-    if (observed.length !== 1)
-      throw new Error("Native Task result has no unique readable observation");
-    return observed[0]!;
   }
 }

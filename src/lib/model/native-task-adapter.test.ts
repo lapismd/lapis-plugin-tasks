@@ -22,6 +22,12 @@ function fixture(call: NativeTasks["call"]) {
   const nativeTasks = new NativeTasksSession({ call });
   const app = {
     nativeTasks,
+    fileEditingSessions: {
+      guard: vi.fn(
+        async (_path: string | undefined, operation: () => Promise<unknown>) =>
+          operation(),
+      ),
+    },
     configuration: {
       getConfiguration: () => ({
         get: (_key: string, fallback: unknown) => fallback,
@@ -141,6 +147,106 @@ describe("native Task source adapter", () => {
     );
     expect(lost.message).toContain("outcome is unknown");
     expect(lost.message).toContain("Response lost");
+  });
+
+  it("holds the existing single-file guard while reading and admitting native mutation", async () => {
+    const order: string[] = [];
+    const { adapter, app } = fixture(async () => {
+      order.push("admit");
+      return {
+        kind: "snapshot",
+        snapshot: { path: "Task.md", text: raw, version: "a".repeat(64) },
+      };
+    });
+    vi.spyOn(app.vault, "read").mockImplementation(async () => {
+      order.push("read");
+      return raw;
+    });
+    vi.spyOn(app.fileEditingSessions, "guard").mockImplementation(
+      async (path, operation) => {
+        expect(path).toBe("Task.md");
+        order.push("yield");
+        try {
+          return await operation();
+        } finally {
+          order.push("rearm");
+        }
+      },
+    );
+    await adapter.mutate("Task.md", {
+      type: "cancel",
+      at: "2026-10-26T09:00:00Z",
+    });
+    expect(order).toEqual(["yield", "read", "admit", "rearm"]);
+  });
+
+  it("persists lifecycle identity before the all-file guard and retains protection through failed admission", async () => {
+    const order: string[] = [];
+    const { app } = fixture(async () => {
+      order.push("admit");
+      throw new Error("Blocked native write");
+    });
+    vi.spyOn(app.vault, "read").mockImplementation(async () => {
+      order.push("read");
+      return raw;
+    });
+    vi.spyOn(app.fileEditingSessions, "guard").mockImplementation(
+      async (path, operation) => {
+        expect(path).toBeUndefined();
+        order.push("yield");
+        try {
+          return await operation();
+        } finally {
+          order.push("rearm");
+        }
+      },
+    );
+    const adapter = new NativeTaskAdapter(app, {
+      remember: async () => {
+        order.push("persist");
+      },
+      settled: async () => {},
+    });
+    await expect(
+      adapter.lifecycle("Task.md", {
+        type: "skip",
+        at: "2026-10-26T09:00:00Z",
+        localDate: "2026-10-26",
+      }),
+    ).rejects.toThrow("Blocked native write");
+    expect(order).toEqual(["persist", "yield", "read", "admit", "rearm"]);
+  });
+
+  it("keeps a local guard refusal outside unknown native outcomes and never admits work", async () => {
+    const call = vi.fn<NativeTasks["call"]>();
+    const { adapter, app } = fixture(call);
+    const blocked = new Error("An editor has an unresolved write conflict");
+    vi.spyOn(app.fileEditingSessions, "guard").mockRejectedValue(blocked);
+    await expect(
+      adapter.lifecycle("Task.md", {
+        type: "skip",
+        at: "2026-10-26T09:00:00Z",
+        localDate: "2026-10-26",
+      }),
+    ).rejects.toBe(blocked);
+    expect(blocked).not.toHaveProperty("uncertain");
+    expect(blocked.message).not.toContain("outcome is unknown");
+    expect(call).not.toHaveBeenCalled();
+    expect(app.vault.read).not.toHaveBeenCalled();
+  });
+
+  it("guards explicit journal retry but leaves read-only inspection outside mutation handoff", async () => {
+    const { adapter, app } = fixture(async () => ({
+      kind: "operation",
+      operation: null,
+    }));
+    expect(await adapter.retry("retained")).toBeNull();
+    expect(app.fileEditingSessions.guard).toHaveBeenCalledExactlyOnceWith(
+      undefined,
+      expect.any(Function),
+    );
+    expect(await adapter.inspect("retained")).toBeNull();
+    expect(app.fileEditingSessions.guard).toHaveBeenCalledTimes(1);
   });
 
   it("persists the lifecycle reference before admission and retains it on response loss", async () => {

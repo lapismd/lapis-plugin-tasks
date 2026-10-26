@@ -231,3 +231,5 @@ The [English daily context source gate](runtime/native-coordination.md#default-d
 [Uncertain native lifecycle outcomes](runtime/native-coordination.md#ln-task-096)
 retain the submitted request identity and readable inspect-before-retry guidance
 in the existing planner alert, without replaying or replacing accepted work.
+
+Native Task editing handoff follows [LN-TASK-097](runtime/native-coordination.md#ln-task-097); the existing App registry owns editor protection around native admission.

@@ -8,8 +8,13 @@ export type NativeTaskRequestReference = {
   at: string;
 };
 
+export type NativeTaskRequestIntent = Pick<
+  NativeTaskLifecycleRequest,
+  "request_id" | "path" | "action"
+>;
+
 export interface NativeTaskRecoveryStore {
-  remember(request: NativeTaskLifecycleRequest): Promise<void>;
+  remember(request: NativeTaskRequestIntent): Promise<void>;
   settled(requestId: string): Promise<void>;
 }
 
@@ -36,7 +41,7 @@ export function nativeTaskReferences(
 
 export function rememberNativeTaskRequest(
   references: NativeTaskRequestReference[],
-  request: NativeTaskLifecycleRequest,
+  request: NativeTaskRequestIntent,
 ): NativeTaskRequestReference[] {
   if (references.some((entry) => entry.requestId === request.request_id))
     return references;
