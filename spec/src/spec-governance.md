@@ -25,8 +25,8 @@ Shared specification tooling resolves `@lapismd/spec-validator@0.1.4` from npm.
 | LPT-SPEC-015 | The Docker image MUST pin base and toolchain identities and install Chromium matching the locked Playwright version. Default browser acceptance MUST use sequential bounded shards and one worker. Explicit file, test-name and shard arguments MUST remain literal and MUST NOT be silently expanded into unrelated cases.                                                                                                                                                                   |
 | LPT-SPEC-016 | Synthetic story controls MUST use the visible padded dotted FixtureControls boundary. Application fixtures MUST use overlay placement outside production geometry; focused component stories MAY use inline placement. The boundary MUST NOT conceal production roots or dynamic component replacement. Functional acceptance MUST verify the visible boundary in an affected story.                                                                                                          |
 | LPT-SPEC-017 | Every Docker worker MUST have finite CPU, memory and shared-memory limits and a per-checkout lease. Reports MUST retain source, image, tool, argument and outcome identities with available outputs and combined logs. Cleanup MUST collect reports before deleting stopped owned runs and MUST NOT prune global data or delete another checkout's containers.                                                                                                                                |
-| LPT-SPEC-018 | Browser acceptance MUST fail on Svelte runtime diagnostics from console warnings or errors, including mount, interaction and teardown. The guard MUST install before story hooks, retain original diagnostic stacks until post-test and post-file assertions without interrupting framework cleanup, and preserve console output without suppression or allowlisting. |
-| LPT-SPEC-019 | The classified validation:all command MUST execute the existing check, unit/native test, build, publint, static Storybook, complete catalog and specification lanes sequentially within one Docker snapshot and dependency installation. It MUST preserve first-failure propagation, refuse aggregate selectors and retain every individual command and exact target. |
+| LPT-SPEC-018 | Browser acceptance MUST fail on Svelte runtime diagnostics from console warnings or errors, including mount, interaction and teardown. The guard MUST install before story hooks, retain original diagnostic stacks until post-test and post-file assertions without interrupting framework cleanup, and preserve console output without suppression or allowlisting.                                                                                                                         |
+| LPT-SPEC-019 | The classified validation:all command MUST execute the existing check, unit/native test, build, publint, static Storybook, complete catalog and specification lanes sequentially within one Docker snapshot and dependency installation. It MUST preserve first-failure propagation, refuse aggregate selectors and retain every individual command and exact target.                                                                                                                         |
 
 Aggregate validation shares the outer worker's single lease, exact snapshot and
 installation. Inner gates use the native execution port inside that worker;
@@ -41,6 +41,12 @@ list-navigation and catalog-list attach sources to
 `src/lib/tasks/**` sources to [Planner](plugins/tasks/planner.md). Leftover
 package, manifest, plugin, and Storybook contract sources stay on
 [Tasks](plugins/tasks/index.md).
+
+The native recovery catalog family is classified as an application example in
+`stories/catalog/story-parity.json`. It renders the public WorkspaceShell and
+the production Tasks command/menu presentation; its declared native inspection
+result is a fixture, while actual journal, reload and cold recovery acceptance
+belongs to the hosted consumer. It grants no native writer authority.
 
 Private native Tasks sources, tests, fixtures and Cargo manifests under
 `crates/lapis-task-services` are protected by spec-first and map to

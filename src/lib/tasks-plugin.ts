@@ -29,6 +29,10 @@ import { registerTasksWorkspaceSettings } from "./register-tasks-settings";
 import { TASKS_VIEW_TYPE, TasksView } from "./tasks-view";
 import { createTaskStructureMarkdownContribution } from "./task-list-markdown-extension";
 import { todayDateOnly } from "./model/task-dates";
+import {
+  rememberNativeTaskRequest,
+  type NativeTaskRequestReference,
+} from "./model/native-task-recovery";
 
 export const TASKS_PLUGIN_ID = "tasks";
 
@@ -55,7 +59,23 @@ export class TasksPlugin extends Plugin {
 
   constructor(app: App, pluginManifest: PluginManifest = MANIFEST) {
     super(app, pluginManifest);
-    this.native = app.nativeTasks ? new NativeTaskAdapter(app) : undefined;
+    this.native = app.nativeTasks
+      ? new NativeTaskAdapter(app, {
+          remember: (request) =>
+            this.saveNativeTaskReferences(
+              rememberNativeTaskRequest(
+                this.data.nativeTaskRequests ?? [],
+                request,
+              ),
+            ),
+          settled: (requestId) =>
+            this.saveNativeTaskReferences(
+              (this.data.nativeTaskRequests ?? []).filter(
+                (entry) => entry.requestId !== requestId,
+              ),
+            ),
+        })
+      : undefined;
     this.occurrences = new TaskOccurrenceRepository(
       app.appDatabase,
       createAppDailyDocumentMutationStore(app),
@@ -160,6 +180,21 @@ export class TasksPlugin extends Plugin {
       name: "Open tasks",
       callback: () => void this.openTasks(),
     });
+    if (this.native)
+      this.addCommand({
+        id: "inspect-interrupted-update",
+        name: "Inspect interrupted task update",
+        callback: () =>
+          void import("./native-task-recovery-menu").then(
+            ({ openNativeTaskRecovery }) =>
+              openNativeTaskRecovery(
+                this.app,
+                this.native!,
+                () => this.data.nativeTaskRequests ?? [],
+                (references) => this.saveNativeTaskReferences(references),
+              ),
+          ),
+      });
     this.addRibbonIcon("list-todo", "Open Tasks", () => void this.openTasks());
     this.addSettingTab(new TasksSettingsTab(this.app, this));
     registerTasksWorkspaceSettings(this);
@@ -245,6 +280,7 @@ export class TasksPlugin extends Plugin {
       settings: patchTasksPluginSettings(this.data.settings, patch),
     };
     const snapshot: TasksPluginData = {
+      ...this.data,
       version: this.data.version,
       settings: this.getSettings(),
     };
@@ -256,6 +292,20 @@ export class TasksPlugin extends Plugin {
     for (const listener of this.settingsListeners) {
       listener(cloneTasksPluginSettings(snapshot.settings));
     }
+  }
+
+  private async saveNativeTaskReferences(
+    references: NativeTaskRequestReference[],
+  ): Promise<void> {
+    this.data = {
+      ...this.data,
+      nativeTaskRequests: references.map((entry) => ({ ...entry })),
+    };
+    const snapshot = { ...this.data, settings: this.getSettings() };
+    this.saveQueue = this.saveQueue
+      .catch(() => undefined)
+      .then(() => this.saveData(snapshot));
+    await this.saveQueue;
   }
 
   subscribeSettings(

@@ -124,4 +124,25 @@ describe("TasksPlugin settings persistence", () => {
     );
     expect(notifications.at(-1)?.planner.navigationColumnState).toBe("hidden");
   });
+
+  it("preserves interrupted native request identities through settings writes", async () => {
+    const saveData = vi.fn(async () => {});
+    const plugin = settingsHarness(saveData);
+    plugin.data.nativeTaskRequests = [
+      {
+        requestId: "d5ab7890-0000-4000-8000-000000000001",
+        path: "Task.md",
+        action: "skip",
+        at: "2026-10-26T09:00:00Z",
+      },
+    ];
+    await plugin.updateSettings({
+      planner: { navigationColumnState: "hidden" },
+    });
+    expect(saveData).toHaveBeenCalledWith(
+      expect.objectContaining({
+        nativeTaskRequests: plugin.data.nativeTaskRequests,
+      }),
+    );
+  });
 });

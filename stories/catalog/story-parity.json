@@ -95,5 +95,8 @@
   },
   "src/stories/PluginWorkspace.stories.svelte": {
     "kind": "application"
+  },
+  "src/stories/NativeTaskRecovery.stories.svelte": {
+    "kind": "application"
   }
 }

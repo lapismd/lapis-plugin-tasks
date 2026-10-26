@@ -1,3 +1,8 @@
+import {
+  nativeTaskReferences,
+  type NativeTaskRequestReference,
+} from "./model/native-task-recovery";
+
 export const TASKS_PLUGIN_DATA_VERSION = 3 as const;
 
 export const TASKS_NAVIGATION_COLUMN_STATES = [
@@ -52,6 +57,7 @@ export type TasksPluginDataV2 = {
 export type TasksPluginDataV3 = {
   version: typeof TASKS_PLUGIN_DATA_VERSION;
   settings: TasksPluginSettings;
+  nativeTaskRequests?: NativeTaskRequestReference[];
 };
 
 export type TasksPluginData = TasksPluginDataV3;
@@ -172,6 +178,9 @@ export function migrateTasksPluginData(value: unknown): TasksPluginData {
   return {
     version: TASKS_PLUGIN_DATA_VERSION,
     settings: mergeTasksPluginSettings(stored.settings),
+    ...(Array.isArray(stored.nativeTaskRequests)
+      ? { nativeTaskRequests: nativeTaskReferences(stored.nativeTaskRequests) }
+      : {}),
   };
 }
 

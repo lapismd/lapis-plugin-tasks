@@ -136,6 +136,66 @@ describe("native Task source adapter", () => {
       >
     ).request;
     expect(lost).toHaveProperty("requestId", request.request_id);
+    expect(lost.message).toContain(
+      `Inspect request ${request.request_id} before retrying`,
+    );
+    expect(lost.message).toContain("outcome is unknown");
+    expect(lost.message).toContain("Response lost");
+  });
+
+  it("persists the lifecycle reference before admission and retains it on response loss", async () => {
+    const order: string[] = [];
+    const call = vi.fn<NativeTasks["call"]>().mockImplementation(async () => {
+      order.push("submit");
+      throw new Error("Response lost");
+    });
+    const { app } = fixture(call);
+    const recovery = {
+      remember: vi.fn(async () => {
+        order.push("persist");
+      }),
+      settled: vi.fn(async () => {}),
+    };
+    const adapter = new NativeTaskAdapter(app, recovery);
+    await expect(
+      adapter.lifecycle("Task.md", {
+        type: "skip",
+        at: "2026-10-26T09:00:00Z",
+        localDate: "2026-10-26",
+      }),
+    ).rejects.toThrow("Response lost");
+    expect(order).toEqual(["persist", "submit"]);
+    expect(recovery.remember).toHaveBeenCalledWith(
+      expect.objectContaining({
+        request_id: expect.any(String),
+        path: "Task.md",
+        action: {
+          type: "skip",
+          at: "2026-10-26T09:00:00Z",
+          localDate: "2026-10-26",
+        },
+      }),
+    );
+    expect(recovery.settled).not.toHaveBeenCalled();
+  });
+
+  it("does not admit lifecycle work when its recovery reference cannot be persisted", async () => {
+    const call = vi.fn<NativeTasks["call"]>();
+    const { app } = fixture(call);
+    const adapter = new NativeTaskAdapter(app, {
+      remember: vi.fn(async () => {
+        throw new Error("Recovery store full");
+      }),
+      settled: vi.fn(async () => {}),
+    });
+    await expect(
+      adapter.lifecycle("Task.md", {
+        type: "skip",
+        at: "2026-10-26T09:00:00Z",
+        localDate: "2026-10-26",
+      }),
+    ).rejects.toThrow("Recovery store full");
+    expect(call).not.toHaveBeenCalled();
   });
 
   it("keeps declared admission refusal known while retaining the submitted identity", async () => {
@@ -157,6 +217,7 @@ describe("native Task source adapter", () => {
       requestId: expect.stringMatching(/^[a-f0-9-]{36}$/),
     });
     expect(call).toHaveBeenCalledTimes(1);
+    expect(refusal.message).toBe("Native Tasks unavailable");
   });
 
   it("preserves known failure identity and partial state", async () => {

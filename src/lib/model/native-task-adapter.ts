@@ -13,12 +13,16 @@ import type {
   TaskOccurrenceObservation,
 } from "./task-occurrence";
 import { scanTaskOccurrenceObservations } from "./task-occurrence";
+import type { NativeTaskRecoveryStore } from "./native-task-recovery";
 
 /** Thin observer: Rust owns accepted operations, bytes and projection repair. */
 export class NativeTaskAdapter {
   private configurationQueue: Promise<void> = Promise.resolve();
   private disabling = false;
-  constructor(private readonly app: App) {}
+  constructor(
+    private readonly app: App,
+    private readonly recovery?: NativeTaskRecoveryStore,
+  ) {}
 
   activate(dayParts: TasksDayPartSettings): Promise<void> {
     this.disabling = false;
@@ -123,14 +127,20 @@ export class NativeTaskAdapter {
   ): Promise<ParsedTaskFile> {
     const source = await this.source(path);
     const request_id = crypto.randomUUID();
+    const request = { request_id, ...source, action };
+    // Persist before taking the editing guard: plugin data uses the same writer.
+    await this.recovery?.remember(request);
     try {
       const value = await this.app.nativeTasks!.call({
         kind: "submit",
-        request: { request_id, ...source, action },
+        request,
       });
       if (value.kind !== "operation" || !value.operation)
         throw new Error("Invalid native Task lifecycle result");
-      return this.document(path, value.operation.task_replacement);
+      const document = this.document(path, value.operation.task_replacement);
+      // Retaining an extra reference is safe if plugin-data cleanup fails.
+      await this.recovery?.settled(request_id).catch(() => undefined);
+      return document;
     } catch (error) {
       // A lost response must retain the accepted identity for explicit inspection.
       const failure = error instanceof Error ? error : new Error(String(error));
@@ -142,6 +152,11 @@ export class NativeTaskAdapter {
               ? false
               : true,
         });
+      if ("uncertain" in failure && failure.uncertain === true) {
+        const identity =
+          "requestId" in failure ? failure.requestId : request_id;
+        failure.message = `Task outcome is unknown. Use Tasks: Inspect interrupted task update. Inspect request ${String(identity)} before retrying. ${failure.message}`;
+      }
       throw failure;
     }
   }
