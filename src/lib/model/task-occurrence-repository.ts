@@ -1,3 +1,4 @@
+import type { NativeTaskAdapter } from "./native-task-adapter";
 import type { App } from "@lapis-notes/api";
 import type {
   AppDatabase,
@@ -65,6 +66,7 @@ export class TaskOccurrenceRepository {
     private readonly database: AppDatabase,
     private readonly documents: DailyDocumentMutationStore,
     private readonly dayParts: () => TasksDayPartSettings,
+    private readonly native?: NativeTaskAdapter,
   ) {}
 
   async ensure(
@@ -106,6 +108,7 @@ export class TaskOccurrenceRepository {
     occurrenceDate: LocalDateString,
     completion?: TaskOccurrenceCompletion,
   ): Promise<TaskOccurrenceObservation> {
+    if (this.native) return this.native.occurrence(task.path, occurrenceDate, completion);
     const file = await this.documents.ensure(occurrenceDate);
     const tracking: TaskTracking | undefined = task.task.tracking;
     const nextRaw = await this.documents.process(file.path, (raw) => {

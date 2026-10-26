@@ -1,3 +1,4 @@
+import { NativeTaskAdapter } from "./model/native-task-adapter";
 import {
   Plugin,
   type App,
@@ -42,25 +43,31 @@ const MANIFEST: PluginManifest = {
 
 export class TasksPlugin extends Plugin {
   readonly repository: TaskRepository;
+  private readonly native?: NativeTaskAdapter;
   readonly occurrences: TaskOccurrenceRepository;
   private clockSource: () => Date = () => new Date();
   private data: TasksPluginData = migrateTasksPluginData(null);
   private saveQueue: Promise<void> = Promise.resolve();
-  private readonly settingsListeners = new Set<(settings: TasksPluginSettings) => void>();
+  private readonly settingsListeners = new Set<
+    (settings: TasksPluginSettings) => void
+  >();
   private localDateTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(app: App, pluginManifest: PluginManifest = MANIFEST) {
     super(app, pluginManifest);
+    this.native = app.nativeTasks ? new NativeTaskAdapter(app) : undefined;
     this.occurrences = new TaskOccurrenceRepository(
       app.appDatabase,
       createAppDailyDocumentMutationStore(app),
       () => this.getSettings().dayParts,
+      this.native,
     );
     this.repository = new TaskRepository(
       app.appDatabase,
       createVaultTaskFileStore(app),
       () => this.clock(),
       this.occurrences,
+      this.native,
     );
   }
 
@@ -75,41 +82,67 @@ export class TasksPlugin extends Plugin {
 
   async onload(): Promise<void> {
     this.data = migrateTasksPluginData(await this.loadData());
-    const invalidateTaskProjectionDate = (file: { path: string }) => {
-      if (/\.(?:md|markdown)$/i.test(file.path)) {
-        this.repository.invalidateEffectiveOccurrences();
-      }
-    };
-    const metadataChanged = this.app.metadataCache.on(
-      "changed",
-      invalidateTaskProjectionDate,
-    );
-    const metadataDeleted = this.app.metadataCache.on(
-      "deleted",
-      invalidateTaskProjectionDate,
-    );
-    const metadataLoaded = this.app.metadataCache.on("loaded", () => {
-      void this.app.metadataCache.load().then(() => {
-        this.repository.invalidateEffectiveOccurrences();
-        return this.refreshEffectiveOccurrences();
+    if (this.native) {
+      await this.native.activate(this.getSettings().dayParts);
+      this.registerEvent(
+        this.app.dailyDocumentProviders.on("changed", () => {
+          void this.native!.configure(this.getSettings().dayParts).catch(
+            (error) =>
+              this.app.logger.error("Native Task configuration failed", error),
+          );
+        }),
+      );
+      this.registerEvent(
+        this.app.configuration.on("updated", ({ key }) => {
+          if (key.startsWith("dailyNotes."))
+            void this.native!.configure(this.getSettings().dayParts).catch(
+              (error) =>
+                this.app.logger.error(
+                  "Native Task configuration failed",
+                  error,
+                ),
+            );
+        }),
+      );
+    } else {
+      const invalidateTaskProjectionDate = (file: { path: string }) => {
+        if (/\.(?:md|markdown)$/i.test(file.path)) {
+          this.repository.invalidateEffectiveOccurrences();
+        }
+      };
+      const metadataChanged = this.app.metadataCache.on(
+        "changed",
+        invalidateTaskProjectionDate,
+      );
+      const metadataDeleted = this.app.metadataCache.on(
+        "deleted",
+        invalidateTaskProjectionDate,
+      );
+      const metadataLoaded = this.app.metadataCache.on("loaded", () => {
+        void this.app.metadataCache.load().then(() => {
+          this.repository.invalidateEffectiveOccurrences();
+          return this.refreshEffectiveOccurrences();
+        });
       });
-    });
-    this.register(() => {
-      this.app.metadataCache.offref(metadataChanged);
-      this.app.metadataCache.offref(metadataDeleted);
-      this.app.metadataCache.offref(metadataLoaded);
-    });
-    this.registerIndexProjection(
-      createTasksProjectionRegistration(
-        createAppTaskStructureResolver(this.app),
-        () => todayDateOnly(this.clock()),
-      ),
-    );
-    this.registerIndexProjection(createTaskOccurrencesProjectionRegistration());
-    await this.repository.refreshEffectiveOccurrences(
-      todayDateOnly(this.clock()),
-    );
-    await this.materializeTrackedToday();
+      this.register(() => {
+        this.app.metadataCache.offref(metadataChanged);
+        this.app.metadataCache.offref(metadataDeleted);
+        this.app.metadataCache.offref(metadataLoaded);
+      });
+      this.registerIndexProjection(
+        createTasksProjectionRegistration(
+          createAppTaskStructureResolver(this.app),
+          () => todayDateOnly(this.clock()),
+        ),
+      );
+      this.registerIndexProjection(
+        createTaskOccurrencesProjectionRegistration(),
+      );
+      await this.repository.refreshEffectiveOccurrences(
+        todayDateOnly(this.clock()),
+      );
+      await this.materializeTrackedToday();
+    }
     this.registerMarkdownExtension(
       createTaskStructureMarkdownContribution(this.app, this.repository),
     );
@@ -131,26 +164,32 @@ export class TasksPlugin extends Plugin {
     this.addSettingTab(new TasksSettingsTab(this.app, this));
     registerTasksWorkspaceSettings(this);
 
-    if (typeof document !== "undefined") {
-      this.registerDomEvent(document, "visibilitychange", () => {
-        if (document.visibilityState === "visible") {
+    if (!this.native) {
+      if (typeof document !== "undefined") {
+        this.registerDomEvent(document, "visibilitychange", () => {
+          if (document.visibilityState === "visible") {
+            void this.refreshEffectiveOccurrences();
+          }
+        });
+      }
+      if (typeof window !== "undefined") {
+        this.registerDomEvent(window, "focus", () => {
           void this.refreshEffectiveOccurrences();
-        }
+        });
+        this.registerDomEvent(window, "pageshow", () => {
+          void this.refreshEffectiveOccurrences();
+        });
+      }
+      this.scheduleLocalDateRefresh();
+      this.register(() => {
+        if (this.localDateTimer) clearTimeout(this.localDateTimer);
+        this.localDateTimer = null;
       });
     }
-    if (typeof window !== "undefined") {
-      this.registerDomEvent(window, "focus", () => {
-        void this.refreshEffectiveOccurrences();
-      });
-      this.registerDomEvent(window, "pageshow", () => {
-        void this.refreshEffectiveOccurrences();
-      });
-    }
-    this.scheduleLocalDateRefresh();
-    this.register(() => {
-      if (this.localDateTimer) clearTimeout(this.localDateTimer);
-      this.localDateTimer = null;
-    });
+  }
+
+  async onunload(): Promise<void> {
+    await this.native?.disable();
   }
 
   private async refreshEffectiveOccurrences(): Promise<void> {
@@ -159,7 +198,9 @@ export class TasksPlugin extends Plugin {
     await this.materializeTrackedToday(today);
   }
 
-  private async materializeTrackedToday(today = todayDateOnly(this.clock())): Promise<void> {
+  private async materializeTrackedToday(
+    today = todayDateOnly(this.clock()),
+  ): Promise<void> {
     const tasks = await this.repository.today(today);
     for (const task of tasks) {
       if (
@@ -170,7 +211,10 @@ export class TasksPlugin extends Plugin {
         continue;
       }
       const document = await this.repository.getTaskDocument(task.path);
-      await this.occurrences.ensure(document, today as `${number}-${number}-${number}`);
+      await this.occurrences.ensure(
+        document,
+        today as `${number}-${number}-${number}`,
+      );
     }
   }
 
@@ -208,6 +252,7 @@ export class TasksPlugin extends Plugin {
       .catch(() => undefined)
       .then(() => this.saveData(snapshot));
     await this.saveQueue;
+    await this.native?.configure(this.getSettings().dayParts);
     for (const listener of this.settingsListeners) {
       listener(cloneTasksPluginSettings(snapshot.settings));
     }

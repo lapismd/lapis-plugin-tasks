@@ -221,3 +221,7 @@ Valid authored-duration capture uses the existing `target` string; the separate
 A separate 45-attempt tracked-today reference retains the unchanged plugin's
 selection and complete daily snapshots before Notes adopts its existing native
 owner; it grants no scheduler or host writer authority.
+
+## Selected native Task host
+
+The [admitted native adapter](runtime/native-coordination.md#ln-task-094) retains the existing Tasks planner and Markdown contribution while its owning App supplies shared native commands. Native mode observes service projections and scheduling, preserves known/uncertain outcomes, and distinguishes explicit disable from passive teardown. Standalone browser mode keeps its retained implementation.

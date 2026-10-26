@@ -1,3 +1,5 @@
+import type { NativeTaskAdapter } from "./native-task-adapter";
+import type { NativeTaskMutation } from "@lapis-notes/api/native-tasks";
 import type {
   AppDatabase,
   AppDatabaseTaskOccurrenceRecord,
@@ -202,6 +204,7 @@ export class TaskRepository {
     private readonly files?: TaskFileStore,
     private readonly clock: () => Date = () => new Date(),
     private readonly occurrences?: TaskOccurrenceRepository,
+    private readonly native?: NativeTaskAdapter,
   ) {}
 
   invalidateEffectiveOccurrences(): void {
@@ -223,6 +226,7 @@ export class TaskRepository {
   async refreshEffectiveOccurrences(
     today = todayDateOnly(this.clock()),
   ): Promise<void> {
+    if (this.native) return;
     const generation = this.effectiveProjectionGeneration;
     if (
       !this.files ||
@@ -252,7 +256,7 @@ export class TaskRepository {
           const raw = await this.files!.read(row.documentPath);
           const document = parseTaskDocument(raw, row.documentPath);
           if (!document || document.kind !== "task") continue;
-          await indexTaskDocument(
+          await this.indexDocument(
             this.database,
             { ...document, raw },
             (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
@@ -350,7 +354,7 @@ export class TaskRepository {
     const next = { ...reparsed, raw: nextRaw } as
       | TaskDocument
       | TaskListDocument;
-    await indexTaskDocument(
+    await this.indexDocument(
       this.database,
       next,
       (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
@@ -525,6 +529,16 @@ export class TaskRepository {
     }
     const path = await this.resolvePath(idOrPath);
     if (!path) throw new Error(`Missing task document: ${idOrPath}`);
+    if (this.native) {
+      const next = await this.native.mutate(path, {
+        type: "checklist",
+        position,
+        expectedText,
+        checked,
+      });
+      if (next.kind !== "task") throw new Error(`Not a task document: ${path}`);
+      return next;
+    }
     const raw = await this.files.read(path);
     const current = parseTaskDocument(raw, path);
     if (!current || current.kind !== "task") {
@@ -549,7 +563,7 @@ export class TaskRepository {
         return nextRaw;
       });
     else await this.files.write(path, nextRaw);
-    await indexTaskDocument(
+    await this.indexDocument(
       this.database,
       { ...reparsed, raw: nextRaw },
       (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
@@ -686,7 +700,7 @@ export class TaskRepository {
     );
     const validated = validateTaskStructureGraph(structures);
     for (const document of documents) {
-      await indexResolvedTaskDocument(
+      await this.indexResolvedDocument(
         this.database,
         document,
         validated.get(document.path) ?? null,
@@ -866,6 +880,15 @@ export class TaskRepository {
     trackedValue?: number,
   ): Promise<TaskSummary> {
     const localDate = todayDateOnly(this.clock()) as LocalDateString;
+    if (this.native) {
+      const next = await this.native.lifecycle(path, {
+        type: "complete",
+        at,
+        localDate,
+        trackedValue: trackedValue ?? null,
+      });
+      return taskRowToSummary(projectTask(next, localDate));
+    }
     const current = await this.loadDocument(path);
     const next = completeTaskDocument(current, at, localDate);
     if (
@@ -904,10 +927,12 @@ export class TaskRepository {
   }
 
   async cancel(path: string, at: string): Promise<TaskSummary> {
+    if (this.native) return this.nativeMutation(path, { type: "cancel", at });
     return this.mutate(path, (document) => cancelTaskDocument(document, at));
   }
 
   async reopen(path: string, at: string): Promise<TaskSummary> {
+    if (this.native) return this.nativeMutation(path, { type: "reopen", at });
     return this.mutate(path, (document) => reopenTaskDocument(document, at));
   }
 
@@ -1313,7 +1338,7 @@ export class TaskRepository {
     if (!this.files?.create)
       throw new Error("Task duplication requires a create-capable file store.");
     await this.files.create(targetPath, raw);
-    await indexTaskDocument(
+    await this.indexDocument(
       this.database,
       parseTaskDocument(raw, targetPath)!,
       (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
@@ -1386,15 +1411,24 @@ export class TaskRepository {
       );
     }
     await this.files.remove(path);
-    await this.database.deleteProjectionSource(
-      PUBLIC_TASKS_PROJECTION_ID,
-      path,
-      "tasks",
-    );
+    if (!this.native)
+      await this.database.deleteProjectionSource(
+        PUBLIC_TASKS_PROJECTION_ID,
+        path,
+        "tasks",
+      );
   }
 
   async skip(path: string, at: string): Promise<TaskSummary> {
     const localDate = todayDateOnly(this.clock()) as LocalDateString;
+    if (this.native) {
+      const next = await this.native.lifecycle(path, {
+        type: "skip",
+        at,
+        localDate,
+      });
+      return taskRowToSummary(projectTask(next, localDate));
+    }
     const current = await this.loadDocument(path);
     const next = skipOccurrence(current, at, localDate);
     if (this.occurrences && current.kind === "task" && current.task.repeat) {
@@ -1415,6 +1449,12 @@ export class TaskRepository {
     plan: TaskPlan | undefined,
     at: string,
   ): Promise<TaskSummary> {
+    if (this.native)
+      return this.nativeMutation(path, {
+        type: "plan",
+        plan: plan ?? null,
+        at,
+      });
     return this.mutate(path, (document) =>
       planTaskDocument(document, plan, at),
     );
@@ -1425,6 +1465,8 @@ export class TaskRepository {
     start: TaskStart,
     at: string,
   ): Promise<TaskSummary> {
+    if (this.native)
+      return this.nativeMutation(path, { type: "start", start, at });
     return this.mutate(path, (document) => setTaskStart(document, start, at));
   }
 
@@ -1433,6 +1475,12 @@ export class TaskRepository {
     deadline: string | undefined,
     at: string,
   ): Promise<TaskSummary> {
+    if (this.native)
+      return this.nativeMutation(path, {
+        type: "deadline",
+        deadline: deadline ?? null,
+        at,
+      });
     return this.mutate(path, (document) =>
       setTaskDeadline(document, deadline, at),
     );
@@ -1443,6 +1491,8 @@ export class TaskRepository {
     inbox: boolean,
     at: string,
   ): Promise<TaskSummary> {
+    if (this.native)
+      return this.nativeMutation(path, { type: "inbox", inbox, at });
     return this.mutate(path, (document) => setTaskInbox(document, inbox, at));
   }
 
@@ -1451,6 +1501,12 @@ export class TaskRepository {
     repeat: TaskDocument["task"]["repeat"],
     at: string,
   ): Promise<TaskSummary> {
+    if (this.native)
+      return this.nativeMutation(path, {
+        type: "repeat",
+        repeat: repeat ?? null,
+        at,
+      });
     return this.mutate(path, (document) => setTaskRepeat(document, repeat, at));
   }
 
@@ -1459,6 +1515,12 @@ export class TaskRepository {
     tracking: TaskDocument["task"]["tracking"],
     at: string,
   ): Promise<TaskSummary> {
+    if (this.native)
+      return this.nativeMutation(path, {
+        type: "tracking",
+        tracking: tracking ?? null,
+        at,
+      });
     return this.mutate(path, (document) =>
       setTaskTracking(document, tracking, at),
     );
@@ -1717,7 +1779,7 @@ export class TaskRepository {
       );
     }
     await this.files!.write(listPath, nextRaw);
-    await indexTaskDocument(
+    await this.indexDocument(
       this.database,
       { ...next, raw: nextRaw },
       (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
@@ -1805,7 +1867,7 @@ export class TaskRepository {
       });
       next = parseTaskDocument(raw, path)!;
       this.invalidateEffectiveOccurrences();
-      await indexTaskDocument(
+      await this.indexDocument(
         this.database,
         next,
         (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
@@ -1815,6 +1877,26 @@ export class TaskRepository {
       next = mutate(await this.loadDocument(path));
       await this.writeDocument(next);
     }
+    return taskRowToSummary(projectTask(next, todayDateOnly(this.clock())));
+  }
+
+  private async indexDocument(
+    ...args: Parameters<typeof indexTaskDocument>
+  ): Promise<void> {
+    if (!this.native) await indexTaskDocument(...args);
+  }
+
+  private async indexResolvedDocument(
+    ...args: Parameters<typeof indexResolvedTaskDocument>
+  ): Promise<void> {
+    if (!this.native) await indexResolvedTaskDocument(...args);
+  }
+
+  private async nativeMutation(
+    path: string,
+    mutation: NativeTaskMutation,
+  ): Promise<TaskSummary> {
+    const next = await this.native!.mutate(path, mutation);
     return taskRowToSummary(projectTask(next, todayDateOnly(this.clock())));
   }
 
@@ -1846,7 +1928,7 @@ export class TaskRepository {
       await this.files.create(document.path, serialized);
     else await this.files.write(document.path, serialized);
     this.invalidateEffectiveOccurrences();
-    await indexTaskDocument(
+    await this.indexDocument(
       this.database,
       { ...next, raw: serialized },
       (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),
@@ -1884,7 +1966,7 @@ export class TaskRepository {
       await this.files.write(path, raw);
     }
     this.invalidateEffectiveOccurrences();
-    await indexTaskDocument(
+    await this.indexDocument(
       this.database,
       { ...parsed, raw },
       (sourcePath, href) => this.resolveStructureTarget(sourcePath, href),

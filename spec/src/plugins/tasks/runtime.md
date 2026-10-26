@@ -379,3 +379,7 @@ The [native lifecycle contract](runtime/native-coordination.md) separates valid
 source-owned duration targets from the unchanged legacy normalization corpus.
 Its retained source reference qualifies complete observation intent before Notes
 adopts ordered daily/Task persistence and recovery.
+
+## Admitted native Task observation
+
+[Native coordination](runtime/native-coordination.md#ln-task-094) defines the selected App-port adapter and source scheduling ownership. Existing repositories delegate qualified actions and complete/skip to the admitted service, retain native outcomes, and stop renderer projection publication and daily materialization in that mode. Existing browser behavior and planner views remain the reference.

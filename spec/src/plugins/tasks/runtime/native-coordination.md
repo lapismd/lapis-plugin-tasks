@@ -10,6 +10,8 @@ checked persistence, accepted lifetime and recovery.
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | LN-TASK-092 | A private native lifecycle planner MUST preserve the retained Task repository's complete/skip replacement and optional observation intent from explicit authored bytes, local date, timestamp, tracking value and day-part settings. It MUST establish a missing completion origin before choosing the observation date, preserve tracked-completion versus skip distinctions, and retain source errors. It MUST NOT read a clock, resolve a provider, write files, publish projections or start a scheduler. |
 | LN-TASK-093 | Native lifecycle acceptance MUST compare complete planner outputs and source errors against frozen captures from the unchanged Task and occurrence repositories. Captures MUST retain full attempted and persisted Markdown, source observations, errors, write order and partial-failure retries. Existing qualified fixture bytes MUST remain unchanged. Source qualification MUST NOT imply native provider, persistence, recovery or host acceptance.                                                     |
+| LN-TASK-094 | The explicitly selected native adapter MUST send bounded typed actions through its owning App's admitted Tasks port. It MUST reuse the qualified native writer and complete/skip journal, preserve returned errors and partial outcomes, and never retry an uncertain call or fall back to a TypeScript mutation. The existing standalone browser repository MUST retain its implementation.                                                                                                                  |
+| LN-TASK-095 | A Tasks plugin using the admitted native port MUST retain its existing views while observing native Task projections and tracked-today materialization. It MUST NOT run renderer projection repair, a competing day-change timer or daily materialization. Explicit disable MUST fence native admissions; passive App teardown MUST release observation without stopping accepted work.                                                                                                                       |
 
 ## Retained lifecycle authority
 
@@ -58,3 +60,19 @@ The prior `targetMinutes` traces MUST remain byte-preserved as normalization
 observations; their no-tracking result MUST NOT qualify valid duration capture.
 Capture MUST retain complete repository attempts and planner results before
 native application intake; it grants no new writer or scheduler authority.
+
+## Native Task action adapter
+
+<a id="ln-task-094"></a>
+
+The admitted native port adds no transformation engine or writer here. The
+existing repository delegates its supported actions and retains native known
+failure/partial status or an uncertain request identity. Application hosts own
+actual signed-bundle and native-screen acceptance.
+
+## Native scheduling ownership
+
+<a id="ln-task-095"></a>
+
+The existing Task planner observes the native projections when selected.
+Standalone browser repositories retain their own explicit implementation.
