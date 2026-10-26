@@ -129,7 +129,7 @@ export class NativeTaskAdapter {
   ): Promise<ParsedTaskFile> {
     const request_id = crypto.randomUUID();
     const request = { request_id, path, action };
-    // Persist before taking the editing guard: plugin data uses the same writer.
+    // Persist the inspection identity before taking the editing guard.
     await this.recovery?.remember(request);
     const document = await this.app.fileEditingSessions.guard(
       undefined,
@@ -164,7 +164,7 @@ export class NativeTaskAdapter {
         }
       },
     );
-    // Cleanup is outside the guard because plugin data uses the existing writer.
+    // Cleanup follows successful rearm; failed cleanup safely retains inspection.
     await this.recovery?.settled(request_id).catch(() => undefined);
     return document;
   }

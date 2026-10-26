@@ -36,7 +36,12 @@ export function nativeTaskReferences(
         typeof entry.action === "string" &&
         typeof entry.at === "string",
     )
-    .map((entry) => ({ ...entry }));
+    .map(({ requestId, path, action, at }) => ({
+      requestId,
+      path,
+      action,
+      at,
+    }));
 }
 
 export function rememberNativeTaskRequest(

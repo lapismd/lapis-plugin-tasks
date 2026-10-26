@@ -41,13 +41,14 @@ export function taskInspectionMessage(
   return `${reference.path}: ${result} Current files may have changed since this result. Request ${reference.requestId}. No update was retried.`;
 }
 
-export function openNativeTaskRecovery(
+export async function openNativeTaskRecovery(
   app: App,
   adapter: Pick<NativeTaskAdapter, "inspect">,
-  references: () => NativeTaskRequestReference[],
-  save: (references: NativeTaskRequestReference[]) => Promise<void>,
-): void {
-  if (!references().length) {
+  references: () => Promise<NativeTaskRequestReference[]>,
+  forget: (requestId: string) => Promise<void>,
+): Promise<void> {
+  const retained = await references();
+  if (!retained.length) {
     app.notifications.notify({
       title: "Task update inspection",
       message: "No interrupted task updates are retained.",
@@ -63,7 +64,7 @@ export function openNativeTaskRecovery(
   showRecoveryMenu(
     app,
     "Inspect interrupted task update",
-    references().map((reference) => ({
+    retained.map((reference) => ({
       label: `${reference.path} · ${reference.action} · ${reference.at} · ${reference.requestId}`,
       choose: async () => {
         const operation = await adapter.inspect(reference.requestId);
@@ -88,12 +89,7 @@ export function openNativeTaskRecovery(
         choices.push({
           label:
             "Forget this inspected reference (does not change files or retry)",
-          choose: () =>
-            save(
-              references().filter(
-                (entry) => entry.requestId !== reference.requestId,
-              ),
-            ),
+          choose: () => forget(reference.requestId),
         });
         showRecoveryMenu(app, "Inspected task update", choices);
       },

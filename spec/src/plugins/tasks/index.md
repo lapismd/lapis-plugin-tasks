@@ -235,3 +235,8 @@ in the existing planner alert, without replaying or replacing accepted work.
 Native Task editing handoff follows [LN-TASK-097](runtime/native-coordination.md#ln-task-097); the existing App registry owns editor protection around native admission.
 
 The native recovery review fixture keeps inspection read-only while allowing explicit Forget to update its fixture-owned reference store, without synthetic user-facing errors.
+
+Native interrupted-request references use the existing public App database
+metadata transaction facility, independently of cached plugin settings. See
+[native coordination](runtime/native-coordination.md#ln-task-096) for atomic
+capacity, per-request cleanup and retained reload-inspection requirements.

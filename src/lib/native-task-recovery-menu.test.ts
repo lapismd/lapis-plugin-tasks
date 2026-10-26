@@ -67,7 +67,12 @@ describe("existing Tasks recovery picker", () => {
         getCommandHostDocument: () => ({ defaultView: { innerWidth: 800 } }),
       },
     } as unknown as App;
-    openNativeTaskRecovery(app, { inspect }, () => [reference], save);
+    await openNativeTaskRecovery(
+      app,
+      { inspect },
+      async () => [reference],
+      save,
+    );
     await menus[0]!.choices[0]!.choose();
     expect(inspect).toHaveBeenCalledExactlyOnceWith(reference.requestId);
     expect(save).not.toHaveBeenCalled();
@@ -89,14 +94,14 @@ describe("existing Tasks recovery picker", () => {
     await choices[0]!.choose();
     expect(openFile).toHaveBeenCalledExactlyOnceWith({ path: "Task.md" });
     await choices[2]!.choose();
-    expect(save).toHaveBeenCalledExactlyOnceWith([]);
+    expect(save).toHaveBeenCalledExactlyOnceWith(reference.requestId);
     expect(inspect).toHaveBeenCalledTimes(1);
   });
 
   it("does not treat a missing journal record as proof that replay is safe", async () => {
     menus.length = 0;
     const notify = vi.fn();
-    openNativeTaskRecovery(
+    await openNativeTaskRecovery(
       {
         notifications: { notify },
         workspace: {
@@ -104,7 +109,7 @@ describe("existing Tasks recovery picker", () => {
         },
       } as unknown as App,
       { inspect: vi.fn(async () => null) },
-      () => [
+      async () => [
         {
           requestId: "d5ab7890-0000-4000-8000-000000000001",
           path: "Task.md",

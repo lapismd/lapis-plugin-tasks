@@ -29,10 +29,7 @@ import { registerTasksWorkspaceSettings } from "./register-tasks-settings";
 import { TASKS_VIEW_TYPE, TasksView } from "./tasks-view";
 import { createTaskStructureMarkdownContribution } from "./task-list-markdown-extension";
 import { todayDateOnly } from "./model/task-dates";
-import {
-  rememberNativeTaskRequest,
-  type NativeTaskRequestReference,
-} from "./model/native-task-recovery";
+import { NativeTaskReferenceStore } from "./model/native-task-reference-store";
 
 export const TASKS_PLUGIN_ID = "tasks";
 
@@ -48,6 +45,7 @@ const MANIFEST: PluginManifest = {
 export class TasksPlugin extends Plugin {
   readonly repository: TaskRepository;
   private readonly native?: NativeTaskAdapter;
+  private readonly nativeReferences?: NativeTaskReferenceStore;
   readonly occurrences: TaskOccurrenceRepository;
   private clockSource: () => Date = () => new Date();
   private data: TasksPluginData = migrateTasksPluginData(null);
@@ -59,22 +57,11 @@ export class TasksPlugin extends Plugin {
 
   constructor(app: App, pluginManifest: PluginManifest = MANIFEST) {
     super(app, pluginManifest);
+    this.nativeReferences = app.nativeTasks
+      ? new NativeTaskReferenceStore(app.appDatabase)
+      : undefined;
     this.native = app.nativeTasks
-      ? new NativeTaskAdapter(app, {
-          remember: (request) =>
-            this.saveNativeTaskReferences(
-              rememberNativeTaskRequest(
-                this.data.nativeTaskRequests ?? [],
-                request,
-              ),
-            ),
-          settled: (requestId) =>
-            this.saveNativeTaskReferences(
-              (this.data.nativeTaskRequests ?? []).filter(
-                (entry) => entry.requestId !== requestId,
-              ),
-            ),
-        })
+      ? new NativeTaskAdapter(app, this.nativeReferences)
       : undefined;
     this.occurrences = new TaskOccurrenceRepository(
       app.appDatabase,
@@ -103,6 +90,12 @@ export class TasksPlugin extends Plugin {
   async onload(): Promise<void> {
     this.data = migrateTasksPluginData(await this.loadData());
     if (this.native) {
+      if (this.data.nativeTaskRequests) {
+        await this.nativeReferences!.importLegacy(this.data.nativeTaskRequests);
+        const { nativeTaskRequests: _legacyReferences, ...data } = this.data;
+        this.data = data;
+        await this.saveData(data);
+      }
       await this.native.activate(this.getSettings().dayParts);
       this.registerEvent(
         this.app.dailyDocumentProviders.on("changed", () => {
@@ -185,15 +178,24 @@ export class TasksPlugin extends Plugin {
         id: "inspect-interrupted-update",
         name: "Inspect interrupted task update",
         callback: () =>
-          void import("./native-task-recovery-menu").then(
-            ({ openNativeTaskRecovery }) =>
+          void import("./native-task-recovery-menu")
+            .then(({ openNativeTaskRecovery }) =>
               openNativeTaskRecovery(
                 this.app,
                 this.native!,
-                () => this.data.nativeTaskRequests ?? [],
-                (references) => this.saveNativeTaskReferences(references),
+                () => this.nativeReferences!.list(),
+                (requestId) => this.nativeReferences!.forget(requestId),
               ),
-          ),
+            )
+            .catch((error) =>
+              this.app.notifications.notify({
+                title: "Task inspection failed",
+                message: error instanceof Error ? error.message : String(error),
+                severity: "error",
+                source: "tasks",
+                persist: true,
+              }),
+            ),
       });
     this.addRibbonIcon("list-todo", "Open Tasks", () => void this.openTasks());
     this.addSettingTab(new TasksSettingsTab(this.app, this));
@@ -292,20 +294,6 @@ export class TasksPlugin extends Plugin {
     for (const listener of this.settingsListeners) {
       listener(cloneTasksPluginSettings(snapshot.settings));
     }
-  }
-
-  private async saveNativeTaskReferences(
-    references: NativeTaskRequestReference[],
-  ): Promise<void> {
-    this.data = {
-      ...this.data,
-      nativeTaskRequests: references.map((entry) => ({ ...entry })),
-    };
-    const snapshot = { ...this.data, settings: this.getSettings() };
-    this.saveQueue = this.saveQueue
-      .catch(() => undefined)
-      .then(() => this.saveData(snapshot));
-    await this.saveQueue;
   }
 
   subscribeSettings(

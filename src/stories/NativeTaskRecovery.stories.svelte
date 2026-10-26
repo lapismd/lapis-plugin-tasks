@@ -32,13 +32,13 @@
     let inspections = 0;
     let writes = 0;
     let references = [reference];
-    openNativeTaskRecovery(root.__lapisApp, {
+    await openNativeTaskRecovery(root.__lapisApp, {
       inspect: async (requestId) => {
         expect(requestId).toBe(reference.requestId);
         inspections++;
         return { disposition: "completed", daily: null, last_failure: null } as NativeTaskOperation;
       },
-    }, () => references, async (next) => { writes++; references = next; });
+    }, async () => references, async (requestId) => { writes++; references = references.filter((entry) => entry.requestId !== requestId); });
     await userEvent.click(await page.findByRole("option", { name: /inbox\/today-1.md · complete/ }));
     await waitFor(() => expect(inspections).toBe(1));
     expect(writes).toBe(0);
