@@ -368,3 +368,8 @@ The [private coordination contract](./runtime/native-coordination.md) defines
 LN-TASK-092–093. It freezes retained complete/skip observation selection and
 partial-write retry behavior before the native pure planner and Notes provider/
 persistence intake. It does not select a host or add a scheduler.
+
+The [native lifecycle contract](runtime/native-coordination.md) separates valid
+source-owned duration targets from the unchanged legacy normalization corpus.
+Its retained source reference qualifies complete observation intent before Notes
+adopts ordered daily/Task persistence and recovery.

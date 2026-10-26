@@ -6,10 +6,10 @@ checked persistence, accepted lifetime and recovery.
 
 ## Requirements
 
-| ID | Requirement |
-| --- | --- |
+| ID          | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | LN-TASK-092 | A private native lifecycle planner MUST preserve the retained Task repository's complete/skip replacement and optional observation intent from explicit authored bytes, local date, timestamp, tracking value and day-part settings. It MUST establish a missing completion origin before choosing the observation date, preserve tracked-completion versus skip distinctions, and retain source errors. It MUST NOT read a clock, resolve a provider, write files, publish projections or start a scheduler. |
-| LN-TASK-093 | Native lifecycle acceptance MUST compare complete planner outputs and source errors against frozen captures from the unchanged Task and occurrence repositories. Captures MUST retain full attempted and persisted Markdown, source observations, errors, write order and partial-failure retries. Existing qualified fixture bytes MUST remain unchanged. Source qualification MUST NOT imply native provider, persistence, recovery or host acceptance. |
+| LN-TASK-093 | Native lifecycle acceptance MUST compare complete planner outputs and source errors against frozen captures from the unchanged Task and occurrence repositories. Captures MUST retain full attempted and persisted Markdown, source observations, errors, write order and partial-failure retries. Existing qualified fixture bytes MUST remain unchanged. Source qualification MUST NOT imply native provider, persistence, recovery or host acceptance.                                                     |
 
 ## Retained lifecycle authority
 
@@ -41,3 +41,13 @@ native provider, validate both physical paths and revisions, process daily bytes
 before advancing the Task, retain partial-write outcomes, and recover without
 replaying an uncertain write. Tracked-today scheduling belongs to the existing
 admitted native application owner; this crate adds no timer or writer.
+
+## Valid duration source acceptance
+
+A separate retained corpus MUST cover authored duration tracking through the
+source-owned `target` string, including complete/skip, recurrence anchors,
+ordinary and unavailable occurrences, and missing/invalid completion values.
+The prior `targetMinutes` traces MUST remain byte-preserved as normalization
+observations; their no-tracking result MUST NOT qualify valid duration capture.
+Capture MUST retain complete repository attempts and planner results before
+native application intake; it grants no new writer or scheduler authority.
