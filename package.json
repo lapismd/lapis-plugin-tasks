@@ -45,7 +45,9 @@
     "validation": "node scripts/validation.mjs",
     "validation:doctor": "node scripts/validation.mjs doctor",
     "validation:images": "node scripts/validation.mjs images",
-    "validation:clean": "node scripts/validation.mjs clean"
+    "validation:clean": "node scripts/validation.mjs clean",
+    "capture:native-lifecycle-reference": "node scripts/validation.mjs run capture:native-lifecycle-reference",
+    "test:native-lifecycle-reference": "node scripts/validation.mjs run test:native-lifecycle-reference"
   },
   "files": [
     "dist",

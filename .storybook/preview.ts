@@ -66,7 +66,7 @@ const preview: Preview = {
                 "Documents",
                 ["Recurrence"],
                 "Runtime",
-                ["Native transformations"],
+                ["Native transformations", "Native coordination"],
                 "Lists",
                 "Planner",
                 [

@@ -132,3 +132,11 @@ It forwards console warnings/errors and fails Svelte runtime diagnostics during
 mount, interaction and teardown. The wrapper records origin stacks without
 throwing through framework cleanup; post-test and post-file assertions make
 every retained diagnostic fatal. No suppression or allowlist is permitted.
+
+## Native lifecycle reference authoring
+
+Run `pnpm capture:native-lifecycle-reference` to collect the unchanged repository
+reference in `test-results/lifecycle.json`. Freeze that complete artifact in the
+private native fixture directory before adding planner implementation. Then run
+`pnpm test:native-lifecycle-reference` and exact native conformance, followed by
+the full source gates. Ordinary tests never regenerate the expected artifact.

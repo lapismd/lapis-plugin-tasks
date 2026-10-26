@@ -112,6 +112,8 @@
 | LN-TASK-089 | Implemented | Frozen corpus: 1,766 native cases and 1,768 retained TypeScript/reference cases. Full owner run 25408aba passes strict/check/build/publint/static/spec, 25 native tests, 2,847 unit cases and 62 cold catalog cases. Protected old source/corpora audit passes; application adoption remains pending. |
 | LN-TASK-090 | Implemented | Native reader source prerequisite: 114 complete retained snapshots (75 original plus 18 Unicode/JSON/YAML and 21 core-scalar cases), 39 retained TypeScript cases, 16 native tests, 1,074 full unit cases and 62 cold catalog cases. Full check/build/publint/static/spec gates pass. Original seven-case and discarded-candidate two-case failures remain recorded. Consumer adoption remains separate. |
 | LN-TASK-091 | Implemented | Five complete frozen priority-presence snapshots pass (three original failures repaired; absent/null controls unchanged), together with all 114 inherited document snapshots, 17 native tests, 1,079 unit cases and 62 cold catalog cases. Strict checks, build/publint/static Storybook pass; final canonical gate follows the recorded two-chapter mapping repair. Host adoption remains separate. |
+| LN-TASK-092 | Implemented | Pure lifecycle plans match 95 retained repository scenarios / 98 complete outputs; 26 native tests, strict checks, 2,848 unit cases and 62 cold catalog cases pass. Notes providers, checked writes, recovery and scheduling remain separate. |
+| LN-TASK-093 | Implemented | The unchanged retained repositories supply the frozen full traces, source errors and partial-write retries. Capture, frozen replay and exact native parity pass; evidence is in [the lifecycle record](../records/2026-10-26-task-lifecycle-planning.md). |
 
 ## Local dependency and Storybook evidence
 

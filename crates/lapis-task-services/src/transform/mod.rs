@@ -4,6 +4,7 @@ mod completion;
 mod completion_conformance;
 #[cfg(test)]
 mod conformance;
+mod coordination;
 mod daily;
 mod error;
 mod lifecycle;
@@ -13,6 +14,9 @@ mod serializer;
 mod yaml;
 
 pub use completion::{complete_task_occurrence, tracking_completion};
+pub use coordination::{
+    TaskLifecycleAction, TaskLifecycleObservation, TaskLifecyclePlan, plan_task_lifecycle,
+};
 pub use daily::{materialize_task_occurrence, task_occurrence_day_part};
 pub use error::TaskTransformError;
 pub use observations::scan_task_occurrence_observations;

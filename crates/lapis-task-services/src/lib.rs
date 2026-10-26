@@ -14,10 +14,11 @@ mod structure;
 mod transform;
 
 pub use transform::{
-    TaskDayPartSettings, TaskMutation, TaskOccurrenceCompletion, TaskOccurrenceDayPart,
-    TaskOccurrenceMaterialization, TaskOccurrenceObservation, TaskPauseRange, TaskPlan, TaskPlanAt,
-    TaskRepeat, TaskRepeatAnchor, TaskRepeatMissed, TaskStart, TaskTracking, TaskTransformError,
-    apply_task_mutation, complete_task_occurrence, materialize_task_occurrence,
+    TaskDayPartSettings, TaskLifecycleAction, TaskLifecycleObservation, TaskLifecyclePlan,
+    TaskMutation, TaskOccurrenceCompletion, TaskOccurrenceDayPart, TaskOccurrenceMaterialization,
+    TaskOccurrenceObservation, TaskPauseRange, TaskPlan, TaskPlanAt, TaskRepeat, TaskRepeatAnchor,
+    TaskRepeatMissed, TaskStart, TaskTracking, TaskTransformError, apply_task_mutation,
+    complete_task_occurrence, materialize_task_occurrence, plan_task_lifecycle,
     scan_task_occurrence_observations, task_occurrence_day_part, tracking_completion,
 };
 

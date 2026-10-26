@@ -209,3 +209,10 @@ The planned [native transformation source](./runtime/native-transformations.md)
 defines LN-TASK-086–089 separately from qualified read-only indexing. It retains
 the existing mutation/materialization behavior and requires explicit export
 approval before exposing the proposed pure Rust value API.
+
+## Native lifecycle planning source
+
+The [private coordination contract](./runtime/native-coordination.md) defines
+LN-TASK-092–093. It freezes retained complete/skip observation selection and
+partial-write retry behavior before the native pure planner and Notes provider/
+persistence intake. It does not select a host or add a scheduler.

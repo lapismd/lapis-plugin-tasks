@@ -361,3 +361,10 @@ The existing unparsed-priority snapshot keeps its retained null representation;
 absent and explicit-null priority remain absent. The source-only repair adds no
 write authority or host selection. See
 [the priority presence record](../../../records/2026-10-25-task-priority-presence.md).
+
+## Native lifecycle planning source
+
+The [private coordination contract](./runtime/native-coordination.md) defines
+LN-TASK-092–093. It freezes retained complete/skip observation selection and
+partial-write retry behavior before the native pure planner and Notes provider/
+persistence intake. It does not select a host or add a scheduler.

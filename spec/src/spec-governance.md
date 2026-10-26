@@ -172,3 +172,9 @@ It distinguishes the real Tasks Shell from focused AppShell and Column Canvas
 examples. The fixture helper isolates synthetic setup controls; it is not
 production application UI. Source, interaction, accessibility and visual gates
 remain distinct. No visual baseline is approved by this tooling.
+
+Native lifecycle reference capture uses the explicit Docker-routed
+`capture:native-lifecycle-reference` authoring command. It exports complete
+retained repository results into collected `test-results/lifecycle.json`; the
+ordinary `test:native-lifecycle-reference` lane compares frozen expected bytes
+and never updates them. Capture alone does not qualify a native implementation.
