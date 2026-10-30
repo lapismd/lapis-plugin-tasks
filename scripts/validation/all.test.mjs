@@ -18,6 +18,7 @@ describe("aggregate Docker validation", () => {
       "build-storybook",
       "test:storybook",
       "spec:check",
+      "release:prepare",
     ];
     expect(aggregateLanes).toEqual(gates);
     expect(events).toEqual(
@@ -46,7 +47,9 @@ describe("aggregate Docker validation", () => {
     const execute = vi.fn();
     const native = vi.fn();
     const nestedDocker = vi.fn();
-    const lanes = Object.fromEntries(aggregateLanes.map((lane) => [lane, lane]));
+    const lanes = Object.fromEntries(
+      aggregateLanes.map((lane) => [lane, lane]),
+    );
     const docker = vi.fn(async () => {
       await runAll(async (lane) => {
         const invocation = nativeInvocation(lanes, lane, [], "/worker", {});

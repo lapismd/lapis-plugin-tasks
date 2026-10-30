@@ -70,6 +70,7 @@ try {
   process.env.LAPIS_TASKS_VALIDATION_WORKER = "1";
   process.env.CI = "true";
   const archives = validateArchives(source.archives);
+  process.env.LAPIS_TASKS_VALIDATION_ARCHIVE_COUNT = String(archives.length);
   const packagePath = join(root, "package.json"),
     lockPath = join(root, "pnpm-lock.yaml");
   const originalPackage = await readFile(packagePath),
@@ -155,6 +156,7 @@ try {
     "spec/book",
     "storybook-static",
     "dist",
+    ".release",
     "test-results",
     "playwright-report",
   ]) {

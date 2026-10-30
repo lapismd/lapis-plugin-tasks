@@ -10,6 +10,7 @@ export const aggregateLanes = Object.freeze([
   "build-storybook",
   "test:storybook",
   "spec:check",
+  "release:prepare",
 ]);
 
 /** The outer Docker runner owns the one snapshot, lease and installation. */
@@ -25,7 +26,9 @@ if (
 ) {
   try {
     if (process.env.LAPIS_TASKS_VALIDATION_RUNTIME !== "native")
-      throw Error("Use pnpm validation:all; direct native execution is explicit");
+      throw Error(
+        "Use pnpm validation:all; direct native execution is explicit",
+      );
     await runAll(runNative, process.argv.slice(2));
   } catch (error) {
     console.error(error);

@@ -1495,11 +1495,43 @@
       )!;
     }
 
-    async function expectListSource(expected = originalListSource) {
+    async function expectListSource(
+      expected = originalListSource,
+      reviewTitle = "Review interview notes",
+    ) {
       await waitFor(async () => {
         expect(await app.vault.cachedRead(listFile)).toBe(expected);
         expect(surface).toHaveAttribute("data-editing", "true");
-        expect(liveBlock()).toBeVisible();
+        const block = liveBlock();
+        expect(block).toBeVisible();
+        const review = within(block).getByRole("button", {
+          name: reviewTitle,
+          exact: true,
+        });
+        const send = within(block).getByRole("button", {
+          name: "Send follow-up email",
+          exact: true,
+        });
+        expect(review).toBeVisible();
+        expect(send).toBeVisible();
+        expect(
+          Boolean(
+            review.compareDocumentPosition(send) & Node.DOCUMENT_POSITION_FOLLOWING,
+          ),
+        ).toBe(
+          expected.indexOf("../inbox/today-2.md") <
+            expected.indexOf("../inbox/evening.md"),
+        );
+      });
+    }
+
+    async function taskRow(title: string) {
+      return waitFor(() => {
+        const row = within(liveBlock())
+          .getByRole("button", { name: title, exact: true })
+          .closest<HTMLElement>(".application-planner-task-row")!;
+        expect(row).toBeVisible();
+        return row;
       });
     }
 
@@ -1528,7 +1560,7 @@
         "# Review interview notes updated",
       );
     });
-    await expectListSource();
+    await expectListSource(originalListSource, "Review interview notes updated");
 
     await editTitle("Review interview notes updated", "Review interview notes");
     await waitFor(async () => {
@@ -1586,12 +1618,8 @@
     });
     await expectListSource();
 
-    const reviewRow = within(liveBlock())
-      .getByRole("button", { name: "Review interview notes", exact: true })
-      .closest<HTMLElement>(".application-planner-task-row")!;
-    const sendRow = within(liveBlock())
-      .getByRole("button", { name: "Send follow-up email", exact: true })
-      .closest<HTMLElement>(".application-planner-task-row")!;
+    const reviewRow = await taskRow("Review interview notes");
+    const sendRow = await taskRow("Send follow-up email");
     await fireEvent.dragStart(
       reviewRow.closest<HTMLElement>(".task-list-items-block__task")!,
     );
@@ -1607,12 +1635,8 @@
     );
     await expectListSource(reorderedListSource);
 
-    const movedReviewRow = within(liveBlock())
-      .getByRole("button", { name: "Review interview notes", exact: true })
-      .closest<HTMLElement>(".application-planner-task-row")!;
-    const movedSendRow = within(liveBlock())
-      .getByRole("button", { name: "Send follow-up email", exact: true })
-      .closest<HTMLElement>(".application-planner-task-row")!;
+    const movedReviewRow = await taskRow("Review interview notes");
+    const movedSendRow = await taskRow("Send follow-up email");
     await fireEvent.dragStart(
       movedReviewRow.closest<HTMLElement>(".task-list-items-block__task")!,
     );
@@ -1624,9 +1648,7 @@
     );
     await expectListSource();
 
-    const keyboardReviewRow = within(liveBlock())
-      .getByRole("button", { name: "Review interview notes", exact: true })
-      .closest<HTMLElement>(".application-planner-task-row")!;
+    const keyboardReviewRow = await taskRow("Review interview notes");
     await fireEvent.click(
       within(keyboardReviewRow).getByRole("button", {
         name: "Move task down",
@@ -1634,9 +1656,7 @@
       }),
     );
     await expectListSource(reorderedListSource);
-    const keyboardMovedReviewRow = within(liveBlock())
-      .getByRole("button", { name: "Review interview notes", exact: true })
-      .closest<HTMLElement>(".application-planner-task-row")!;
+    const keyboardMovedReviewRow = await taskRow("Review interview notes");
     await fireEvent.click(
       within(keyboardMovedReviewRow).getByRole("button", {
         name: "Move task up",
@@ -1671,9 +1691,7 @@
       expect(surface).toHaveAttribute("data-editing", "true");
     });
 
-    const createdRow = within(liveBlock())
-      .getByRole("button", { name: "Live mutation task", exact: true })
-      .closest<HTMLElement>(".application-planner-task-row")!;
+    const createdRow = await taskRow("Live mutation task");
     await fireEvent.click(
       within(createdRow).getByRole("button", {
         name: "Show delete action for Live mutation task",

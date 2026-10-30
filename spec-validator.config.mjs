@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import {
   defineConfig,
   singleIdVerification,
@@ -17,6 +18,7 @@ export default defineConfig(tableRequirements(), {
     storybookMirrors: "LPT-SPEC-009",
     specFirst: "LPT-SPEC-002",
     internal: "LPT-SPEC-003",
+    qmd: "LPT-SPEC-020",
   },
   diagnostics: {
     "SPEC-PKG-PORTABLE": "LPT-SPEC-004",
@@ -40,9 +42,10 @@ export default defineConfig(tableRequirements(), {
         evidence: ["Evidence"],
         required: [],
       },
-      statuses: ["Implemented", "Planned", "Visual pending"],
+      statuses: ["Implemented", "In progress", "Planned", "Visual pending"],
     }),
     book: true,
+    qmd: { collection: "lapis-tasks-spec", configPath: ".qmd/index.yml" },
     storybookMirrors: {
       style: "src-spec-mdx",
       directory: "stories/spec",
@@ -55,7 +58,9 @@ export default defineConfig(tableRequirements(), {
     },
     packageManifest: {
       name: "@lapis-notes/lapis-plugin-tasks",
-      version: "0.1.0",
+      version: JSON.parse(
+        readFileSync(new URL("./package.json", import.meta.url), "utf8"),
+      ).version,
       privateAllowed: false,
       portableDependencies: true,
       manifestPath: "manifest.json",

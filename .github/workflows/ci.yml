@@ -1,35 +1,127 @@
-name: CI
+name: CI and npm release
 
 on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tasks-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   validate:
+    name: Docker source, native and browser acceptance
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
         with:
-          version: 10.32.1
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
       - run: node scripts/validation/install-tools.mjs --ci
       - name: Select the exact CI source revision
         run: |
           jj git init --colocate .
           jj --ignore-immutable edit "$GITHUB_SHA"
-      - run: pnpm validation:check
-      - run: pnpm validation:smoke
-      - run: pnpm spec:check
-      - run: pnpm check
-      - run: pnpm test
-      - run: pnpm build
-      - run: pnpm publint
-      - run: pnpm test:storybook
-      - run: pnpm build-storybook
+      - run: pnpm validation:all
+      - name: Collect the qualified immutable npm artifact
+        run: |
+          mkdir .release
+          cp .local/validation/runs/*/.release/* .release/
+      - uses: actions/upload-artifact@v7
+        with:
+          name: tasks-npm-${{ github.sha }}
+          path: .release/
+          include-hidden-files: true
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: tasks-validation-${{ github.sha }}
+          path: .local/validation/runs/
+          include-hidden-files: true
+          if-no-files-found: warn
+
+  changesets:
+    name: Version packages
+    needs: validate
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      hasChangesets: ${{ steps.changesets.outputs.hasChangesets }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-pnpmfile
+      - id: changesets
+        uses: changesets/action@v1.8.0
+        with:
+          version: pnpm release:version
+          commitMode: github-api
+          title: "chore: version Tasks package"
+          commit: "chore: version Tasks package"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    name: Publish and verify npm release
+    needs: [validate, changesets]
+    if: github.ref == 'refs/heads/main' && needs.changesets.outputs.hasChangesets != 'true'
+    runs-on: ubuntu-latest
+    environment: npm-production
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - run: pnpm install --frozen-lockfile --ignore-pnpmfile
+      - uses: actions/download-artifact@v8
+        with:
+          name: tasks-npm-${{ github.sha }}
+          path: .release
+      - name: Sign and verify npm-compatible provenance for the qualified artifact
+        run: pnpm release:attest
+      - name: Check inherited release credentials without exposing them
+        run: |
+          if [ -n "$NODE_AUTH_TOKEN" ]; then
+            npm whoami --registry=https://registry.npmjs.org
+          else
+            echo "No inherited token; npm will use the configured trusted publisher."
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: pnpm release:publish
+        env:
+          LAPIS_TASKS_RELEASE_APPROVED: "1"
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: tasks-registry-receipt-${{ github.sha }}
+          path: .release/
+          include-hidden-files: true
+          if-no-files-found: error

@@ -27,7 +27,8 @@ use one build job; browser tests use one worker and three fresh sequential
 shards by default. Explicit file, test-name and shard arguments stay literal.
 
 `validation:all` runs existing check, test, build, publint, static Storybook,
-complete catalog and specification lanes sequentially in one worker, snapshot
+complete catalog and specification lanes, then immutable npm artifact preparation,
+sequentially in one worker, snapshot
 and installation. It stops at the original first failure; individual commands
 and exact selectors remain available. It accepts no selectors of its own.
 

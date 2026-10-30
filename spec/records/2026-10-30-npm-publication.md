@@ -1,0 +1,75 @@
+# Tasks npm publication qualification
+
+This record supports LPT-SPEC-020 and LPT-SPEC-021. Canonical release behavior
+and status remain in `spec/src/spec-governance.md` and `spec/src/verification.md`.
+
+## Reproduced boundaries
+
+- The registry-only `pnpm check:svelte` baseline failed with 16 errors, zero
+  warnings and seven affected files. Existing CI run
+  [41097632606](https://github.com/lapismd/lapis-plugin-tasks/actions/runs/41097632606)
+  shows the same missing native Tasks API and duplicated API identity failures.
+  Released API 0.2.0 and the matching host cohort reduce this exact check to
+  zero errors and zero warnings.
+- Updated Storybook initially failed one static build because docgen received
+  uncompiled Svelte. Ordering the package compiler before framework docgen
+  restores the cold static build.
+- Vite 7.3.7 with the Svelte Vite 6.2.4 compiler produced seven import-failing
+  suites in browser shard 1, with virtual CSS falling through to raw Svelte.
+  The compatible Vite 6.4.5 / Svelte Vite 5.1.1 cohort passes that exact shard:
+  13 tests, zero failures. No diagnostics were suppressed.
+- The complete registry run passed 27 native tests, 2,886 unit tests, strict
+  checks, package build/publint and static Storybook. Its catalog result was
+  62 passed / one failed across 63 tests. The failure was `LiveEditMutations`;
+  the exact focused command reproduced it before edits.
+- Live mutation acceptance now preserves every source/edit/reorder assertion
+  while waiting for the saved order and reacquiring visible rows before the
+  next interaction. This reaches deletion and exposes the separate published
+  Design Core 0.7.1 `derived_inert` defect in Swipe Item action teardown.
+  That owning-package repair is included in the pending Design Core 0.7.2
+  release. Tasks neither suppresses the diagnostic nor changes the component.
+
+## Independent tooling evidence
+
+Docker `pnpm spec:check` passes 118 requirements, spec-first, mdBook and App
+ownership checks. The six release guard tests and all 27 native tests pass.
+The added guard proves temporary archive installations are rejected before
+release preparation. Actionlint and the routing audit pass. Doctor verifies the Node-only validator
+and QMD collection; its alias warning reflects the required Docker routes.
+`pnpm spec:search --semantic` returns canonical release requirements.
+
+The standalone Docker `release:prepare` lane builds and lints its input before
+packing. Its internal 0.1.0 artifact has 290 entries, includes the runtime
+manifest and AGPL license, excludes source tests/stories, and matches package
+identity and SHA512. This validates preparation; it is not public publication.
+
+## Temporary source acceptance
+
+The Design Core release candidate is a source-validation artifact, distinct
+from the published npm 0.7.1 implementation. Its source is
+`7f5801601ea744e5232e4683c51bba48fbe03ae6`; its SHA256 is
+`79ff0e66af1cf424405d5d33af843e27c5ab65fd3af569ae103901ec7a06a17f`.
+Isolated archive intake verifies that identity and checksum and restores tracked
+registry manifests/lockfiles before checks. The exact `LiveEditMutations` target passes against that verified archive with
+the fatal diagnostic guard enabled (one passed, zero failures). The complete
+consumer catalog also passes all 63 interaction/accessibility cases across
+three cold shards (13 + 9 + 41), with zero fatal Svelte diagnostics. Actual Tasks
+publication still requires final qualification against downloadable Design Core
+0.7.2.
+
+The real `pnpm release:version` command was also exercised reversibly. It
+advanced package and runtime manifest to 0.1.1, consumed the patch changeset,
+created the changelog and synchronized the canonical declaration. Docker
+`pnpm spec:check` passes on that generated version shape. The exact original
+Jujutsu source tree was then restored so the bot retains ownership of the actual
+Version Packages PR.
+
+## Publication boundary
+
+The normal patch changeset advances the existing unpublished 0.1.0 source to
+the first public 0.1.1 package. The Version Packages PR must pass and merge;
+its exact main source must then pass every Docker gate and produce the immutable
+artifact plus verified npm-compatible Sigstore provenance. Publication remains
+incomplete until npm downloads/signatures, strict-peer clean consumer checks and
+the package-scoped GitHub release succeed. Signed registry onboarding, visual
+approval and application adoption remain separate. No visual baselines changed.

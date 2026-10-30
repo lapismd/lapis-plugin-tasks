@@ -23,5 +23,6 @@
   "validation:check": "vitest run --project unit scripts/validation.test.mjs scripts/spec-validation/storybook-parity.test.mjs --maxWorkers=1 --no-file-parallelism",
   "validation:smoke": "node scripts/validation/smoke.mjs",
   "capture:native-lifecycle-reference": "LAPIS_TASKS_CAPTURE_LIFECYCLE=1 vitest run --project unit src/lib/model/native-lifecycle-reference.test.ts --maxWorkers=1 --no-file-parallelism",
-  "test:native-lifecycle-reference": "vitest run --project unit src/lib/model/native-lifecycle-reference.test.ts --maxWorkers=1 --no-file-parallelism"
+  "test:native-lifecycle-reference": "vitest run --project unit src/lib/model/native-lifecycle-reference.test.ts --maxWorkers=1 --no-file-parallelism",
+  "release:prepare": "pnpm run prepack && node scripts/release.mjs prepare"
 }

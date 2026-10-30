@@ -1,10 +1,13 @@
 # Tasks plugin
 
-Tracked dependencies use registry Design Core `0.6.0` and Mira `0.1.1` through
-portable npm ranges. Current source qualification uses explicitly verified
-temporary archives in an isolated worker installation, as governed by
-LPT-SPEC-014; publication and consumer adoption remain separate. Source
-ownership and public contracts remain unchanged.
+Tracked dependencies use registry API `0.2.0`, Design Core `0.7.1` and Mira
+`0.1.2` through portable npm ranges. Clean registry-only Docker qualification
+remains distinct from temporary archive acceptance governed by LPT-SPEC-014,
+publication and consumer adoption. Source ownership and public contracts remain
+unchanged.
+Release package and runtime manifest version: `0.1.0`. The public npm artifact
+includes runtime metadata and the existing AGPL-3.0-or-later license. Changesets
+keeps these versions synchronized under LPT-SPEC-021.
 
 `@lapis-notes/lapis-plugin-tasks` owns the first-party external Tasks catalog
 and plugin runtime. A task is a Markdown file with YAML front
@@ -240,3 +243,8 @@ Native interrupted-request references use the existing public App database
 metadata transaction facility, independently of cached plugin settings. See
 [native coordination](runtime/native-coordination.md#ln-task-096) for atomic
 capacity, per-request cleanup and retained reload-inspection requirements.
+
+Live-edit mutation acceptance for LN-TASK-036 retains exact persisted-source
+assertions and waits for both expected task rows in the saved structural order
+before chaining another interaction. Projection completion requires those
+visible task controls in addition to the mounted editor and TaskRun boundary.

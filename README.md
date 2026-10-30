@@ -59,3 +59,9 @@ tokens (16px, regular weight) rather than a demo-specific override.
 
 The [10 October review record](spec/records/2026-10-10-review.md) lists the
 repaired failures, acceptance counts, and deferred runner issue.
+
+## npm releases
+
+The [canonical release operations](spec/src/spec-governance.md#npm-release-operations)
+define the Changesets PR, qualification, publication and registry verification
+sequence. The specification remains authoritative for release status and gates.
