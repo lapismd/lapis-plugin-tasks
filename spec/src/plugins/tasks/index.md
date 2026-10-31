@@ -1,6 +1,6 @@
 # Tasks plugin
 
-Tracked dependencies use registry API `^0.2.2`, Design Core `^0.7.2`, UI
+Tracked dependencies use registry API `^0.2.3`, Design Core `^0.7.2`, UI
 `^0.1.5` and Mira `~0.1.3` through portable npm ranges. Clean registry-only Docker qualification
 remains distinct from temporary archive acceptance governed by LPT-SPEC-014,
 publication and consumer adoption. Source ownership and public contracts remain

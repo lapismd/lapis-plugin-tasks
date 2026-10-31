@@ -329,3 +329,44 @@ the extracted patch hashes byte-for-byte identically to Tasks' tracked payload.
 This is preliminary asset-layout inspection, not registry qualification. Final
 Tasks intake must repeat the checks on actual published Core 0.7.3 and qualify
 the installed patched graph with published API 0.2.3 before release.
+
+### Actual API 0.2.3 registry intake
+
+Tasks independently downloaded API 0.2.3 from npm and verified its identity,
+743,727-byte size, SHA256
+`00f234336b3dd33cbcd0814ae45e819dc82484497caa051cdac9571d17f43700`
+and registry SHA512 integrity
+`sha512-CGQQzAq/2aH3SDznhVIv/1oCictAxvXfLUiqQ4aYfmR0hN2YL/jTomH9sJn+gVSnSoeP4qyXXTMmRNrZfABM0Q==`.
+The owner independently cryptographically verified the exact GitHub
+`release.yml` signer and matching SLSA subject/source
+`0d9d4d9253579541b1e796d7f2c68ef3b19a8df6`, run
+[41190163735](https://github.com/lapismd/lapis-notes/actions/runs/41190163735).
+Its fresh published-consumer gate and GitHub asset completion were still
+pending at this intake checkpoint; artifact availability is not a completed
+publisher release receipt.
+
+The Tasks API peer/development minimum is now explicitly `^0.2.3` and the
+registry lock resolves API 0.2.3. Its published UI/Mira peer contracts remain
+compatible with UI 0.1.5 and Mira 0.1.3. The development Workspace host advances
+from 0.3.0 to the owner's already published 0.3.1; no unpublished dependency
+is introduced. Core remains at 0.7.2, so the required fixed Core release and
+final original/full Tasks qualification remain outstanding.
+
+The API publisher subsequently completed all 14 jobs in the same run, including
+real publication, fresh published-consumer verification and GitHub release
+[`api@0.2.3`](https://github.com/lapismd/lapis-notes/releases/tag/api%400.2.3).
+The release tag/source is `0d9d4d9253579541b1e796d7f2c68ef3b19a8df6`.
+Root independently downloaded the same bytes/hash. API publication acceptance
+is complete; the remaining dependency gate for final Tasks acceptance is the
+actual repaired Core 0.7.3 release.
+
+The actual API 0.2.3/Workspace 0.3.1 intake passes Docker strict checks with
+zero Svelte errors or warnings (`lapis-tasks-run-5d6b02fd-52ba-4445-85b7-49036295f979`)
+and canonical spec-first/mdBook/App ownership
+(`lapis-tasks-run-bf882a54-d051-44f2-8282-77acc6f68c92`). The installed lock
+confirms the explicit API 0.2.3 and Workspace 0.3.1 entries, one patched Bits
+instance across all four API/UI/Core/Mira edges, no unpatched instance, and the
+same 547-package runtime/peer closure with no unresolved edges. Both minimatch
+parents remain patched at 11.0.3. These are preliminary intake checks; the
+original cold case and complete Tasks acceptance remain held for actual Core
+0.7.3, rather than borrowing the older API 0.2.2 catalog result.
