@@ -29,6 +29,7 @@ Shared specification tooling resolves the Deno-free `@lapismd/spec-validator@0.2
 | LPT-SPEC-019 | The classified validation:all command MUST execute the existing check, unit/native test, build, publint, static Storybook, complete catalog and specification lanes, then immutable release preparation, sequentially within one Docker snapshot and dependency installation. It MUST preserve first-failure propagation, refuse aggregate selectors and retain every individual command and exact target.                                                                                                                                                                                                                                                                        |
 | LPT-SPEC-020 | Specification discovery MUST expose native `spec:search` and `spec:index` developer commands backed by the repository QMD collection. Conceptual discovery MUST use semantic search; search and index MUST stay outside CI and validation. Doctor MUST verify this wiring.                                                                                                                                                                                                                                                                                                                                                                                                        |
 | LPT-SPEC-021 | Public npm releases MUST use Changesets version PRs and synchronize package/runtime-manifest versions. Main-source publication MUST consume the exact checksummed tarball produced after every Docker source, native and browser gate, with provenance. The workflow MUST verify the downloadable registry artifact, signatures and a clean registry consumer before creating the package-scoped GitHub release. Existing versions MUST be immutable; retries MUST compare bytes. Changeset/version/attest/publish/verify commands are reviewed native release bootstrap exceptions and MUST NOT bypass Docker qualification. Signed plugin-registry onboarding remains separate. |
+| LPT-SPEC-022 | The explicitly approved temporary `bits-ui@2.20.2` combined LinkPreview, Slider and FocusScope repair MUST remain a tracked pnpm patch with registry semver dependencies, lockfile patch integrity and provenance for each repair, including FocusScope upstream PR #2264. Each consuming application or package root MUST install and qualify the patch itself because package-manager patch metadata does not propagate through published dependencies. The patch MUST be removed after a released upstream replacement contains all recorded repairs and passes their original regressions and complete affected acceptance lanes.                                             |
 
 Aggregate validation shares the outer worker's single lease, exact snapshot and
 installation. Inner gates use the native execution port inside that worker;
@@ -226,3 +227,41 @@ workflow provenance and a tampered payload before any bundle is retained.
 The npm provenance predicate MUST include `internalParameters.github` with
 the admitted event and exact numeric repository and owner ID strings. Signing
 MUST reject foreign IDs and events outside main push or manual dispatch.
+
+## Temporary Bits UI patch
+
+The user explicitly approved a limited package-manager patch for the released
+`bits-ui@2.20.2` dependency while upstream PR
+[#2264](https://github.com/huntabyte/bits-ui/pull/2264) awaits a maintainer release.
+The shared patch retains the previously approved LinkPreview deferred-selection timer
+cleanup and six Slider destroyed-state guards, and adds owner repair `692fbdf5`
+for stale same-container FocusScope cleanup. This scoped exception does not
+authorize unrelated package patches, a fork publication, diagnostic suppression
+or changes to existing assertions.
+
+| Repair                                       | Provenance                                                                                                                                                                                                                                      |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| LinkPreview deferred-selection timer cleanup | Notes source `bf492db552702fd310dcc6439152d42d472de068`, carried by its existing `bits-ui@2.20.2` patch, SHA256 `d9b49a52c343dfbd392e235b5d748e5922f3e16e727cf92064437a95c90530f9`. Registry 2.20.2 already includes the listener-safe cleanup. |
+| Slider destroyed-state guards                | Plugins source `201b1feb60fe97ee383ea30b061e453e1ad5e853`, its `bits-ui@2.19.5` patch SHA256 `4fbe511eb1c148b33aa474fa3bd7efd13d8401111b37dbbb7f9bd64c951ec894`. The six guards are retained against the matching 2.20.2 implementation.        |
+| FocusScope same-container cleanup            | Owner source `692fbdf5` and upstream PR [#2264](https://github.com/huntabyte/bits-ui/pull/2264).                                                                                                                                                |
+
+Tasks must apply the tracked patch through its own `patchedDependencies`
+configuration and frozen lockfile, keeping all package dependencies on normal
+registry versions. The isolated Docker installer consumes that exact root
+configuration; Core's own patch metadata is insufficient for Tasks acceptance.
+The final registry-only full Tasks validation must use the repaired published
+Core package and the explicit root Bits patch together.
+
+The shared payload is `patches/bits-ui@2.20.2.patch`, SHA256
+`debd3bc7d43917f0967f0cc1e212fc5c7721c751d3b92bf8f31030d1c96289ad`.
+The exact root override admits only `bits-ui@2.20.2`, and the frozen lock records
+that payload hash for every peer-specialized instance.
+
+The root patch configuration is not inherited by npm consumers of Tasks.
+Every consuming host must apply the same version-qualified patch in its own
+package-manager root, regenerate its lock, and qualify all affected functional,
+interaction and accessibility surfaces. A clean npm metadata/integrity receipt
+alone does not qualify an unpatched UI host. Keep the patch until an upstream
+release contains every recorded repair and passes each original reproduction
+plus the complete affected lanes, then remove the root patch declaration/file and
+refresh every affected consumer lock together.

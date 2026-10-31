@@ -65,3 +65,20 @@ repaired failures, acceptance counts, and deferred runner issue.
 The [canonical release operations](spec/src/spec-governance.md#npm-release-operations)
 define the Changesets PR, qualification, publication and registry verification
 sequence. The specification remains authoritative for release status and gates.
+
+### Temporary Bits UI patch for consumers
+
+Until the upstream fixes are released, this checkout applies the approved
+`bits-ui@2.20.2` patch through its pnpm root configuration and frozen lockfile.
+It retains the approved LinkPreview cleanup and Slider lifetime guards, and
+adds the FocusScope same-container cleanup repair from
+[upstream PR #2264](https://github.com/huntabyte/bits-ui/pull/2264).
+
+Published dependency packages do not propagate pnpm patches to applications.
+Each consuming root must copy this repository's version-qualified patch,
+configure its own `patchedDependencies` and exact Bits override, regenerate its
+lock, and run affected functional, interaction and accessibility acceptance.
+A successful package installation alone does not qualify an unpatched host.
+The [canonical patch requirements](https://github.com/lapismd/lapis-plugin-tasks/blob/main/spec/src/spec-governance.md#temporary-bits-ui-patch)
+record provenance and removal conditions. Remove the patch after the repaired
+upstream release passes the original regressions and all affected acceptance.

@@ -231,3 +231,70 @@ approvals, completed publication workflows, and verification of the exact npm
 version/artifact, provenance and package-scoped GitHub release. Opening or
 merging a PR and dispatching a workflow are intermediate states. Required clean
 consumer acceptance and immutable-version checks remain blocking.
+
+## Authorized shared Bits UI root patch (2026-10-31)
+
+The user explicitly authorized a package-manager patch exception for the existing
+Bits issues. Tasks now tracks the exact shared three-file
+`patches/bits-ui@2.20.2.patch` with SHA256
+`debd3bc7d43917f0967f0cc1e212fc5c7721c751d3b92bf8f31030d1c96289ad`,
+matching Core and Notes. The exact root override and `patchedDependencies`
+selector target registry Bits 2.20.2; the frozen lock records that same patch
+hash for every peer-specialized instance. No package fork, source dependency
+substitution or ad hoc node_modules edit is involved.
+
+The package comes from npm's `bits-ui-2.20.2.tgz`, integrity
+`sha512-cb1eQD1wZEhJWb1dTLiAdYWqeUI5v7f+7EAHmetxBuELI9lo4cpAIfGEjald/PR4wTR80Fu5DFH+IaY1OKn+tg==`.
+A fresh `pnpm patch bits-ui@2.20.2` extraction independently matches all three
+shared preimages, and the complete payload passes `patch --dry-run -p1`.
+
+| Registry file                                           | Before SHA256                                                      | Expected patched SHA256                                            |
+| ------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| `dist/bits/link-preview/link-preview.svelte.js`         | `d1003472761d056c70c5dc06651473bdbcbfad4f53fea224021da65747135cc3` | `84ceb64f136ffd57c08973ffa70cdcbe8875000d10262244f2fc5dd36b626d14` |
+| `dist/bits/slider/slider.svelte.js`                     | `8f78d5045adaf4cde3e8c051c50b5e50ce3715bcc2ffab2c3f529211f57c7515` | `99da433f4cc360138c73c4ba5d2a11083c4dc95720a09bbc8b7ec61e78d2f201` |
+| `dist/bits/utilities/focus-scope/focus-scope.svelte.js` | `1ce5e39a89c8359778712f996193c65375287a0eceb9fde45186c7988c83dd1f` | `62c6ee5f7352531f61e465b38ae901bb9b3c2d1c3fb3d5bd7dc445e491a1e0f1` |
+
+The LinkPreview deferred-selection timer repair originates in Notes source
+`bf492db552702fd310dcc6439152d42d472de068` (the existing 2.20.2 patch has SHA256
+`d9b49a52c343dfbd392e235b5d748e5922f3e16e727cf92064437a95c90530f9`).
+The Slider destroyed-state/six event guards originate in Plugins source
+`201b1feb60fe97ee383ea30b061e453e1ad5e853`; the prior 2.19.5 patch has SHA256
+`4fbe511eb1c148b33aa474fa3bd7efd13d8401111b37dbbb7f9bd64c951ec894`.
+The two-line FocusScope same-container admission guard matches owner `692fbdf5`
+and [upstream PR #2264](https://github.com/huntabyte/bits-ui/pull/2264).
+Registry 2.20.2 already contains listener-safe LinkPreview cleanup, so the shared
+payload does not duplicate that upstream implementation.
+
+LPT-SPEC-022 governs this limited exception, per-root consumer propagation,
+full graph qualification and removal after a qualified upstream replacement.
+Patch files are protected by the spec-first governance mapping. The existing
+Core 0.7.2 Swipe failure is a separate release gate; this Bits repair cannot
+substitute for the required published Core Swipe/JSON fix.
+
+### Tasks-root patched consumer qualification
+
+The frozen registry installation has exactly one Bits peer-specialized instance.
+Every transitive API, UI, Core and Mira dependency edge records the shared
+`debd3bc7...` patch hash; there are zero unpatched Bits instances. The complete
+runtime/peer closure remains 547 packages with no unresolved edges and patched
+minimatch 11.0.3 on both API/Core paths.
+
+| Docker command         | Result                                                          | Retained report                                        |
+| ---------------------- | --------------------------------------------------------------- | ------------------------------------------------------ |
+| `pnpm check`           | All strict lanes; Svelte zero errors/warnings; 119 requirements | `lapis-tasks-run-5e8b594c-fe51-4f25-a481-044183fde820` |
+| `pnpm test`            | 2,889 unit and 27 native tests pass                             | `lapis-tasks-run-72823980-17d6-43d4-a76c-53018f047e3f` |
+| `pnpm build`           | Native/public package and bundled publint pass                  | `lapis-tasks-run-b84ec80e-3b1f-4d53-862d-db97801c0e03` |
+| `pnpm publint`         | Fresh public build and package lint pass                        | `lapis-tasks-run-993b1509-bac1-40e1-a7e1-00ed14e5482d` |
+| `pnpm build-storybook` | Cold static catalog passes                                      | `lapis-tasks-run-f34c286c-f427-473b-9839-696f2cdbd91b` |
+| `pnpm spec:check`      | Canonical validation, spec-first, mdBook and App ownership pass | `lapis-tasks-run-0c17ce63-9171-459d-8749-5196fd2ced14` |
+| `pnpm test:storybook`  | 62 pass / one existing Core Swipe teardown failure              | `lapis-tasks-run-d01b325a-d1ed-4f75-aa51-43e237352376` |
+
+The three complete cold interaction/accessibility shards report 13 passed,
+9 passed and 40 passed / one failed. The sole failure remains
+`LiveEditMutations` in published Core 0.7.2 `SwipeItemState.close`, identical to
+the preceding registry-only reproduction. The explicit Bits patch adds no
+new functional, interaction or accessibility failure and does not suppress the
+existing fatal diagnostic. This is patch preparation, not a passing release.
+Final acceptance still requires the fixed Core registry version and a fully
+passing `pnpm validation:all` on that resulting graph before source/version PR
+merges, actual npm publication and verified GitHub receipts.
