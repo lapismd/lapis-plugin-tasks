@@ -5,7 +5,7 @@ Tracked dependencies use registry API `^0.2.3`, Design Core `^0.7.4`, UI
 remains distinct from temporary archive acceptance governed by LPT-SPEC-014,
 publication and consumer adoption. Source ownership and public contracts remain
 unchanged.
-Release package and runtime manifest version: `0.1.0`. The public npm artifact
+Release package and runtime manifest version: `0.1.1`. The public npm artifact
 includes runtime metadata and the existing AGPL-3.0-or-later license. Changesets
 keeps these versions synchronized under LPT-SPEC-021. Peer and development floors require published Design Core ^0.7.4 and development Mira ~0.1.4. Prior Core 0.7.3 and API 0.2.3 qualification remains intermediate evidence. Final
 Tasks acceptance uses this frozen registry graph with the explicit root Bits
