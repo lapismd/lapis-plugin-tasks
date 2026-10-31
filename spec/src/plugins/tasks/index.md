@@ -1,10 +1,19 @@
 # Tasks plugin
 
-Tracked dependencies use registry Design Core `0.6.0` and Mira `0.1.1` through
-portable npm ranges. Current source qualification uses explicitly verified
-temporary archives in an isolated worker installation, as governed by
-LPT-SPEC-014; publication and consumer adoption remain separate. Source
-ownership and public contracts remain unchanged.
+Tracked dependencies use registry API `^0.2.3`, Design Core `^0.7.4`, UI
+`^0.1.5` and Mira `~0.1.4` through portable npm ranges. Clean registry-only Docker qualification
+remains distinct from temporary archive acceptance governed by LPT-SPEC-014,
+publication and consumer adoption. Source ownership and public contracts remain
+unchanged.
+Release package and runtime manifest version: `0.1.0`. The public npm artifact
+includes runtime metadata and the existing AGPL-3.0-or-later license. Changesets
+keeps these versions synchronized under LPT-SPEC-021. Peer and development floors require published Design Core ^0.7.4 and development Mira ~0.1.4. Prior Core 0.7.3 and API 0.2.3 qualification remains intermediate evidence. Final
+Tasks acceptance uses this frozen registry graph with the explicit root Bits
+patch. GitHub CI fans Governance, Quality, Unit tests, Native, Static Storybook,
+and three Storybook interaction shards through Docker, then Dependency audits.
+Validate is the gate before source and version merges and publication. Dependency
+audits must pass on the patched transitive floors, ignoring only unfixed
+deepmerge GHSA-gcqx-w48m-w2h4.
 
 `@lapis-notes/lapis-plugin-tasks` owns the first-party external Tasks catalog
 and plugin runtime. A task is a Markdown file with YAML front
@@ -240,3 +249,8 @@ Native interrupted-request references use the existing public App database
 metadata transaction facility, independently of cached plugin settings. See
 [native coordination](runtime/native-coordination.md#ln-task-096) for atomic
 capacity, per-request cleanup and retained reload-inspection requirements.
+
+Live-edit mutation acceptance for LN-TASK-036 retains exact persisted-source
+assertions and waits for both expected task rows in the saved structural order
+before chaining another interaction. Projection completion requires those
+visible task controls in addition to the mounted editor and TaskRun boundary.

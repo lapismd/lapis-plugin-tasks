@@ -112,6 +112,13 @@ export function browserInvocations(args) {
 export function auditRouting(scripts, lanes) {
   const findings = [];
   const native = {
+    changeset: "changeset",
+    "release:version": "node scripts/release.mjs version",
+    "release:publish": "node scripts/release.mjs publish",
+    "release:verify": "node scripts/release.mjs verify",
+    "release:attest": "node scripts/release.mjs attest",
+    "spec:search": "spec-validator search",
+    "spec:index": "spec-validator index",
     storybook:
       "WATCHPACK_POLLING=250 node scripts/storybook-run.mjs --no-open --config-dir .storybook",
     "storybook:stop": "bash scripts/storybook-stop.sh",

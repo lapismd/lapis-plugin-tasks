@@ -1,35 +1,440 @@
-name: CI
+name: CI and npm release
 
 on:
   pull_request:
   push:
-    branches: [main]
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: tasks-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  TURBO_API: ${{ vars.TURBO_API }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_REMOTE_CACHE_SIGNATURE_KEY: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
 
 jobs:
-  validate:
+  governance:
+    name: Governance
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v5
+      - name: Check out the repository
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
-      - uses: pnpm/action-setup@v4
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
         with:
-          version: 10.32.1
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
-      - run: node scripts/validation/install-tools.mjs --ci
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-pnpmfile --prefer-offline
+      - name: Install the pinned Jujutsu tool
+        run: node scripts/validation/install-tools.mjs --ci
       - name: Select the exact CI source revision
         run: |
           jj git init --colocate .
           jj --ignore-immutable edit "$GITHUB_SHA"
-      - run: pnpm validation:check
-      - run: pnpm validation:smoke
-      - run: pnpm spec:check
-      - run: pnpm check
-      - run: pnpm test
-      - run: pnpm build
-      - run: pnpm publint
-      - run: pnpm test:storybook
-      - run: pnpm build-storybook
+      - name: Run governance checks
+        run: node scripts/run-turbo.mjs ci:governance --summarize
+      - name: Report Turbo cache
+        run: node scripts/report-turbo-cache.mjs --github-summary
+      - name: Upload validation reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: tasks-validation-governance-${{ github.sha }}
+          path: .local/validation/runs/
+          include-hidden-files: true
+          if-no-files-found: warn
+
+  quality:
+    name: Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-pnpmfile --prefer-offline
+      - name: Install the pinned Jujutsu tool
+        run: node scripts/validation/install-tools.mjs --ci
+      - name: Select the exact CI source revision
+        run: |
+          jj git init --colocate .
+          jj --ignore-immutable edit "$GITHUB_SHA"
+      - name: Run type and source-style checks
+        run: node scripts/run-turbo.mjs ci:quality --summarize
+      - name: Report Turbo cache
+        run: node scripts/report-turbo-cache.mjs --github-summary
+      - name: Upload validation reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: tasks-validation-quality-${{ github.sha }}
+          path: .local/validation/runs/
+          include-hidden-files: true
+          if-no-files-found: warn
+
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-pnpmfile --prefer-offline
+      - name: Install the pinned Jujutsu tool
+        run: node scripts/validation/install-tools.mjs --ci
+      - name: Select the exact CI source revision
+        run: |
+          jj git init --colocate .
+          jj --ignore-immutable edit "$GITHUB_SHA"
+      - name: Run unit tests
+        run: node scripts/run-turbo.mjs ci:unit --summarize
+      - name: Report Turbo cache
+        run: node scripts/report-turbo-cache.mjs --github-summary
+      - name: Upload validation reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: tasks-validation-unit-${{ github.sha }}
+          path: .local/validation/runs/
+          include-hidden-files: true
+          if-no-files-found: warn
+
+  native:
+    name: Native
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-pnpmfile --prefer-offline
+      - name: Install the pinned Jujutsu tool
+        run: node scripts/validation/install-tools.mjs --ci
+      - name: Select the exact CI source revision
+        run: |
+          jj git init --colocate .
+          jj --ignore-immutable edit "$GITHUB_SHA"
+      - name: Run native checks, tests, and build
+        run: node scripts/run-turbo.mjs ci:native --summarize
+      - name: Report Turbo cache
+        run: node scripts/report-turbo-cache.mjs --github-summary
+      - name: Upload validation reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: tasks-validation-native-${{ github.sha }}
+          path: .local/validation/runs/
+          include-hidden-files: true
+          if-no-files-found: warn
+
+  storybook-static:
+    name: Static Storybook
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-pnpmfile --prefer-offline
+      - name: Install the pinned Jujutsu tool
+        run: node scripts/validation/install-tools.mjs --ci
+      - name: Select the exact CI source revision
+        run: |
+          jj git init --colocate .
+          jj --ignore-immutable edit "$GITHUB_SHA"
+      - name: Build static Storybook
+        run: node scripts/run-turbo.mjs ci:storybook-static --summarize
+      - name: Report Turbo cache
+        run: node scripts/report-turbo-cache.mjs --github-summary
+      - name: Upload validation reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: tasks-validation-storybook-static-${{ github.sha }}
+          path: .local/validation/runs/
+          include-hidden-files: true
+          if-no-files-found: warn
+
+  storybook-interaction:
+    name: Storybook interactions (${{ matrix.shard }}/3)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-pnpmfile --prefer-offline
+      - name: Install the pinned Jujutsu tool
+        run: node scripts/validation/install-tools.mjs --ci
+      - name: Select the exact CI source revision
+        run: |
+          jj git init --colocate .
+          jj --ignore-immutable edit "$GITHUB_SHA"
+      - name: Run one Storybook interaction shard
+        run: node scripts/run-turbo.mjs ci:storybook-interaction-${{ matrix.shard }} --summarize
+      - name: Report Turbo cache
+        run: node scripts/report-turbo-cache.mjs --github-summary
+      - name: Upload validation reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: tasks-validation-storybook-interaction-${{ matrix.shard }}-${{ github.sha }}
+          path: .local/validation/runs/
+          include-hidden-files: true
+          if-no-files-found: warn
+
+  audit:
+    name: Dependency audits
+    needs:
+      - governance
+      - quality
+      - unit
+      - native
+      - storybook-static
+      - storybook-interaction
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-pnpmfile --prefer-offline
+      - name: Audit all dependencies
+        run: pnpm audit
+      - name: Audit production dependencies
+        run: pnpm audit --prod
+
+  validate:
+    name: Validate
+    if: always()
+    needs:
+      - governance
+      - quality
+      - unit
+      - native
+      - storybook-static
+      - storybook-interaction
+      - audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Aggregate blocking validation lanes
+        env:
+          GOVERNANCE: ${{ needs.governance.result }}
+          QUALITY: ${{ needs.quality.result }}
+          UNIT: ${{ needs.unit.result }}
+          NATIVE: ${{ needs.native.result }}
+          STORYBOOK_STATIC: ${{ needs.storybook-static.result }}
+          STORYBOOK_INTERACTION: ${{ needs.storybook-interaction.result }}
+          AUDIT: ${{ needs.audit.result }}
+        run: |
+          set -euo pipefail
+          results=(
+            "$GOVERNANCE"
+            "$QUALITY"
+            "$UNIT"
+            "$NATIVE"
+            "$STORYBOOK_STATIC"
+            "$STORYBOOK_INTERACTION"
+            "$AUDIT"
+          )
+          for result in "${results[@]}"; do
+            if [ "$result" != "success" ]; then
+              echo "A required Tasks validation lane finished with: $result" >&2
+              exit 1
+            fi
+          done
+          echo "All blocking Tasks validation lanes passed."
+      - name: Check out the repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-pnpmfile --prefer-offline
+      - name: Install the pinned Jujutsu tool
+        run: node scripts/validation/install-tools.mjs --ci
+      - name: Select the exact CI source revision
+        run: |
+          jj git init --colocate .
+          jj --ignore-immutable edit "$GITHUB_SHA"
+      - name: Prepare the immutable npm artifact
+        run: node scripts/run-turbo.mjs ci:release-prepare --summarize
+      - name: Report Turbo cache
+        run: node scripts/report-turbo-cache.mjs --github-summary
+      - name: Collect the qualified immutable npm artifact
+        run: |
+          mkdir .release
+          cp .local/validation/runs/*/.release/* .release/
+      - name: Upload the qualified npm artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: tasks-npm-${{ github.sha }}
+          path: .release/
+          include-hidden-files: true
+          if-no-files-found: error
+      - name: Upload validation reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: tasks-validation-validate-${{ github.sha }}
+          path: .local/validation/runs/
+          include-hidden-files: true
+          if-no-files-found: warn
+
+  changesets:
+    name: Version packages
+    needs: validate
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      hasChangesets: ${{ steps.changesets.outputs.hasChangesets }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-pnpmfile
+      - id: changesets
+        uses: changesets/action@v1.8.0
+        with:
+          version: pnpm release:version
+          commitMode: github-api
+          title: "chore: version Tasks package"
+          commit: "chore: version Tasks package"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    name: Publish and verify npm release
+    needs: [validate, changesets]
+    if: github.ref == 'refs/heads/main' && needs.changesets.outputs.hasChangesets != 'true'
+    runs-on: ubuntu-latest
+    environment: npm-production
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - run: pnpm install --frozen-lockfile --ignore-pnpmfile
+      - uses: actions/download-artifact@v8
+        with:
+          name: tasks-npm-${{ github.sha }}
+          path: .release
+      - name: Sign and verify npm-compatible provenance for the qualified artifact
+        run: pnpm release:attest
+      - name: Check inherited release credentials without exposing them
+        run: |
+          if [ -n "$NODE_AUTH_TOKEN" ]; then
+            npm whoami --registry=https://registry.npmjs.org
+          else
+            echo "No inherited token; npm will use the configured trusted publisher."
+          fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: pnpm release:publish
+        env:
+          LAPIS_TASKS_RELEASE_APPROVED: "1"
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: tasks-registry-receipt-${{ github.sha }}
+          path: .release/
+          include-hidden-files: true
+          if-no-files-found: error

@@ -1,32 +1,35 @@
 # Specification Governance
 
-Tracked dependencies use registry Design Core `0.6.0` and Mira `0.1.1`.
+Tracked dependencies use registry API `^0.2.3`, Design Core `^0.7.4`, UI `^0.1.5` and Mira `~0.1.4`.
 Explicit temporary source acceptance follows LPT-SPEC-014 with verified archives
 in isolated installations. Source ownership and public contracts remain unchanged.
-Shared specification tooling resolves `@lapismd/spec-validator@0.1.4` from npm.
+Shared specification tooling resolves the Deno-free `@lapismd/spec-validator@0.2.0` from npm.
 
 ## Requirements
 
-| ID           | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| LPT-SPEC-001 | `spec/src` MUST remain the canonical standalone specification and MUST build with mdBook.                                                                                                                                                                                                                                                                                                                                                                                                     |
-| LPT-SPEC-002 | Protected package, manifest, source, Storybook, validation, and CI changes MUST update an owning canonical chapter in the same Jujutsu change. Host plugin-class registration is specified in LN-TASK-007 and does not move governance ownership.                                                                                                                                                                                                                                             |
-| LPT-SPEC-003 | Every normative requirement ID MUST be unique and MUST have exactly one verification row with concrete evidence.                                                                                                                                                                                                                                                                                                                                                                              |
-| LPT-SPEC-004 | Published package manifests MUST use portable semver ranges and MUST NOT contain `workspace:`, `link:`, `file:`, or machine-specific dependency paths. Registry packages such as `yaml` MAY be added when the Markdown-first task model needs them. Recurrence execution MUST pin `rrule` exactly at `2.8.1` so library behavior cannot drift independently from its RFC compatibility tests.                                                                                                 |
-| LPT-SPEC-005 | Published LapisMD dependencies MUST resolve through npm semver ranges. Local package source or artifacts MAY replace matching install dependencies through `.pnpmfile.cjs` only when those paths exist; absent local paths and CI MUST retain registry resolution. External repositories MUST NOT become workspace members or mutate dependency `node_modules`. Workspace overrides MUST pin the CodeMirror and Lezer packages used by Storybook shell hosts.                                 |
-| LPT-SPEC-006 | Package Storybook MUST expose checkout-owned `storybook`, `storybook:stop`, and `storybook:restart` commands. They MUST default to port 7030, honour `.env.storybook.local`, reuse one supervisor per checkout, refuse to replace a listener owned by another checkout, apply exactly one Svelte transform pipeline to package and linked-source modules in both the dev server and browser-test project, and synchronously apply the selected preview theme before story play functions run. |
-| LPT-SPEC-007 | Tracked agent guidance MUST require explicit or context-owned App access, restrict `globalThis.app`, and require the package ownership audit for App-related changes.                                                                                                                                                                                                                                                                                                                         |
-| LPT-SPEC-008 | Repository validation MUST reject story titles outside the `Plugins/Tasks/*` taxonomy.                                                                                                                                                                                                                                                                                                                                                                                                        |
-| LPT-SPEC-009 | Repository validation MUST compare every SUMMARY chapter with an exact metadata-only Storybook mirror and MUST keep those mirrors as Storybook's first section in SUMMARY order.                                                                                                                                                                                                                                                                                                              |
-| LPT-SPEC-011 | Tracked agent guidance MUST require preserving unrelated work, committing every independently verified change with Jujutsu without waiting for another request, and using a PR-quality message that explains what changed, why it changed, and which validation passed.                                                                                                                                                                                                                       |
-| LPT-SPEC-012 | Every executable Storybook family MUST declare application, component, integration or prototype coverage. The guard MUST follow its selected CSF-Svelte render path through actual imports. Application coverage MUST reach exactly one public WorkspaceShell; focused component coverage MUST identify the real rendered subject. Missing or stale declarations, unused imports, replacement roots and private production presentation overrides MUST fail checks.                           |
-| LPT-SPEC-013 | Portable root validation commands MUST default to the fail-closed Docker runner and be registered in the lane inventory. Every other root script MUST match an explicitly reviewed native development or bootstrap exception. Docker errors MUST NOT trigger a host fallback. Intentional native diagnosis MUST require an explicit runtime override.                                                                                                                                         |
-| LPT-SPEC-014 | Docker validation MUST transfer the exact tracked Jujutsu revision and ancestry without ignored local state, host dependency/source mounts or a Docker socket. Registry installs MUST be frozen. Explicit temporary archive acceptance MUST verify package identity and checksum, restore tracked manifests and lockfiles before checks, and record archive provenance.                                                                                                                       |
-| LPT-SPEC-015 | The Docker image MUST pin base and toolchain identities and install Chromium matching the locked Playwright version. Default browser acceptance MUST use sequential bounded shards and one worker. Explicit file, test-name and shard arguments MUST remain literal and MUST NOT be silently expanded into unrelated cases.                                                                                                                                                                   |
-| LPT-SPEC-016 | Synthetic story controls MUST use the visible padded dotted FixtureControls boundary. Application fixtures MUST use overlay placement outside production geometry; focused component stories MAY use inline placement. The boundary MUST NOT conceal production roots or dynamic component replacement. Functional acceptance MUST verify the visible boundary in an affected story.                                                                                                          |
-| LPT-SPEC-017 | Every Docker worker MUST have finite CPU, memory and shared-memory limits and a per-checkout lease. Reports MUST retain source, image, tool, argument and outcome identities with available outputs and combined logs. Cleanup MUST collect reports before deleting stopped owned runs and MUST NOT prune global data or delete another checkout's containers.                                                                                                                                |
-| LPT-SPEC-018 | Browser acceptance MUST fail on Svelte runtime diagnostics from console warnings or errors, including mount, interaction and teardown. The guard MUST install before story hooks, retain original diagnostic stacks until post-test and post-file assertions without interrupting framework cleanup, and preserve console output without suppression or allowlisting.                                                                                                                         |
-| LPT-SPEC-019 | The classified validation:all command MUST execute the existing check, unit/native test, build, publint, static Storybook, complete catalog and specification lanes sequentially within one Docker snapshot and dependency installation. It MUST preserve first-failure propagation, refuse aggregate selectors and retain every individual command and exact target.                                                                                                                         |
+| ID           | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| LPT-SPEC-001 | `spec/src` MUST remain the canonical standalone specification and MUST build with mdBook.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| LPT-SPEC-002 | Protected package, manifest, source, Storybook, validation, and CI changes MUST update an owning canonical chapter in the same Jujutsu change. Host plugin-class registration is specified in LN-TASK-007 and does not move governance ownership.                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| LPT-SPEC-003 | Every normative requirement ID MUST be unique and MUST have exactly one verification row with concrete evidence.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| LPT-SPEC-004 | Published package manifests MUST use portable semver ranges and MUST NOT contain `workspace:`, `link:`, `file:`, or machine-specific dependency paths. Registry packages such as `yaml` MAY be added when the Markdown-first task model needs them. Recurrence execution MUST pin `rrule` exactly at `2.8.1` so library behavior cannot drift independently from its RFC compatibility tests.                                                                                                                                                                                                                                                                                     |
+| LPT-SPEC-005 | Published LapisMD dependencies MUST resolve through npm semver ranges. Local package source or artifacts MAY replace matching install dependencies through `.pnpmfile.cjs` only when those paths exist; absent local paths and CI MUST retain registry resolution. External repositories MUST NOT become workspace members or mutate dependency `node_modules`. Workspace overrides MUST pin the CodeMirror and Lezer packages used by Storybook shell hosts.                                                                                                                                                                                                                     |
+| LPT-SPEC-006 | Package Storybook MUST expose checkout-owned `storybook`, `storybook:stop`, and `storybook:restart` commands. They MUST default to port 7030, honour `.env.storybook.local`, reuse one supervisor per checkout, refuse to replace a listener owned by another checkout, apply exactly one Svelte transform pipeline to package and linked-source modules before Storybook docgen in the dev server and static build and within the browser-test project, and synchronously apply the selected preview theme before story play functions run.                                                                                                                                      |
+| LPT-SPEC-007 | Tracked agent guidance MUST require explicit or context-owned App access, restrict `globalThis.app`, and require the package ownership audit for App-related changes.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| LPT-SPEC-008 | Repository validation MUST reject story titles outside the `Plugins/Tasks/*` taxonomy.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| LPT-SPEC-009 | Repository validation MUST compare every SUMMARY chapter with an exact metadata-only Storybook mirror and MUST keep those mirrors as Storybook's first section in SUMMARY order.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| LPT-SPEC-011 | Tracked agent guidance MUST require preserving unrelated work, committing every independently verified change with Jujutsu without waiting for another request, and using a PR-quality message that explains what changed, why it changed, and which validation passed.                                                                                                                                                                                                                                                                                                                                                                                                           |
+| LPT-SPEC-012 | Every executable Storybook family MUST declare application, component, integration or prototype coverage. The guard MUST follow its selected CSF-Svelte render path through actual imports. Application coverage MUST reach exactly one public WorkspaceShell; focused component coverage MUST identify the real rendered subject. Missing or stale declarations, unused imports, replacement roots and private production presentation overrides MUST fail checks.                                                                                                                                                                                                               |
+| LPT-SPEC-013 | Portable root validation commands MUST default to the fail-closed Docker runner and be registered in the lane inventory. Every other root script MUST match an explicitly reviewed native development or bootstrap exception. Docker errors MUST NOT trigger a host fallback. Intentional native diagnosis MUST require an explicit runtime override.                                                                                                                                                                                                                                                                                                                             |
+| LPT-SPEC-014 | Docker validation MUST transfer the exact tracked Jujutsu revision and ancestry without ignored local state, host dependency/source mounts or a Docker socket. Registry installs MUST be frozen. Explicit temporary archive acceptance MUST verify package identity and checksum, restore tracked manifests and lockfiles before checks, and record archive provenance.                                                                                                                                                                                                                                                                                                           |
+| LPT-SPEC-015 | The Docker image MUST pin base and toolchain identities and install Chromium matching the locked Playwright version. Default browser acceptance MUST use sequential bounded shards and one worker. Explicit file, test-name and shard arguments MUST remain literal and MUST NOT be silently expanded into unrelated cases.                                                                                                                                                                                                                                                                                                                                                       |
+| LPT-SPEC-016 | Synthetic story controls MUST use the visible padded dotted FixtureControls boundary. Application fixtures MUST use overlay placement outside production geometry; focused component stories MAY use inline placement. The boundary MUST NOT conceal production roots or dynamic component replacement. Functional acceptance MUST verify the visible boundary in an affected story.                                                                                                                                                                                                                                                                                              |
+| LPT-SPEC-017 | Every Docker worker MUST have finite CPU, memory and shared-memory limits and a per-checkout lease. Reports MUST retain source, image, tool, argument and outcome identities with available outputs and combined logs. Cleanup MUST collect reports before deleting stopped owned runs and MUST NOT prune global data or delete another checkout's containers.                                                                                                                                                                                                                                                                                                                    |
+| LPT-SPEC-018 | Browser acceptance MUST fail on Svelte runtime diagnostics from console warnings or errors, including mount, interaction and teardown. The guard MUST install before story hooks, retain original diagnostic stacks until post-test and post-file assertions without interrupting framework cleanup, and preserve console output without suppression or allowlisting.                                                                                                                                                                                                                                                                                                             |
+| LPT-SPEC-019 | The classified validation:all command MUST execute the existing check, unit/native test, build, publint, static Storybook, complete catalog and specification lanes, then immutable release preparation, sequentially within one Docker snapshot and dependency installation. It MUST preserve first-failure propagation, refuse aggregate selectors and retain every individual command and exact target.                                                                                                                                                                                                                                                                        |
+| LPT-SPEC-020 | Specification discovery MUST expose native `spec:search` and `spec:index` developer commands backed by the repository QMD collection. Conceptual discovery MUST use semantic search; search and index MUST stay outside CI and validation. Doctor MUST verify this wiring.                                                                                                                                                                                                                                                                                                                                                                                                        |
+| LPT-SPEC-021 | Public npm releases MUST use Changesets version PRs and synchronize package/runtime-manifest versions. Pull requests and main pushes MUST fan Docker governance, quality, unit, native, static Storybook, and three explicit Storybook interaction shards out in parallel, then run full and production dependency audits, and MUST report one stable Validate result that fails unless every required lane succeeds. Main-source publication MUST consume the exact checksummed tarball produced after that aggregate, with provenance. The workflow MUST verify the downloadable registry artifact, signatures and a clean registry consumer before creating the package-scoped GitHub release. Existing versions MUST be immutable; retries MUST compare bytes. Changeset/version/attest/publish/verify commands are reviewed native release bootstrap exceptions and MUST NOT bypass Docker qualification. Signed plugin-registry onboarding remains separate. |
+| LPT-SPEC-022 | The explicitly approved temporary `bits-ui@2.20.2` combined LinkPreview, Slider and FocusScope repair MUST remain a tracked pnpm patch with registry semver dependencies, lockfile patch integrity and provenance for each repair, including FocusScope upstream PR #2264. Each consuming application or package root MUST install and qualify the patch itself because package-manager patch metadata does not propagate through published dependencies. The patch MUST be removed after a released upstream replacement contains all recorded repairs and passes their original regressions and complete affected acceptance lanes.                                             |
 
 Aggregate validation shares the outer worker's single lease, exact snapshot and
 installation. Inner gates use the native execution port inside that worker;
@@ -184,3 +187,141 @@ Native lifecycle reference capture uses the explicit Docker-routed
 retained repository results into collected `test-results/lifecycle.json`; the
 ordinary `test:native-lifecycle-reference` lane compares frozen expected bytes
 and never updates them. Capture alone does not qualify a native implementation.
+
+## npm release operations
+
+A source PR includes a public-package changeset. Hosted CI checks out the exact
+revision, installs pnpm and Node 24, and runs each portable lane through the
+fail-closed Docker runner. Turbo supplies the signed organization cache and
+fails open to normal execution when that cache is unavailable. Governance and
+release preparation stay uncached. The required checks are Governance, Quality,
+Unit tests, Native, Static Storybook, Storybook interactions (1/3), Storybook
+interactions (2/3), Storybook interactions (3/3), Dependency audits, and
+Validate. `main` is not branch-protected, so Validate is the release gate:
+Changesets and npm publication run only after it succeeds. Local
+`pnpm validation:all` remains the sequential one-worker aggregate. The
+main-source workflow runs these Docker gates before opening the Changesets
+Version Packages PR. The version
+command synchronizes `package.json`, `manifest.json`, the lockfile and the
+canonical release-version declaration; it does not publish. After that PR passes
+CI and merges, the workflow qualifies its exact source again, publishes the
+checksummed tarball with provenance, downloads that same npm version and proves
+strict-peer clean installation, frozen reinstall, signature verification and
+publint before creating the package-scoped GitHub release. A green version PR
+alone is not completed publication.
+
+`changeset`, `release:version`, `release:attest`, `release:publish` and `release:verify` are reviewed
+native release bootstrap commands. The publisher requires the approved main
+workflow and exact candidate/source agreement. Preparation MUST reject temporary
+archive installations; publishable candidates MUST record frozen registry-only
+dependencies. `release:prepare` remains a
+Docker lane and is the final step of `validation:all`. CI runs that same
+preparation in Validate only after the parallel lanes and dependency audits
+succeed, then uploads the checksummed tarball for publication. A failed publish or
+registry check leaves the release incomplete and must be followed through;
+retrying may reuse only an existing version with identical artifact integrity.
+The protected main job MUST also retain an npm-compatible Sigstore provenance
+bundle whose sole subject is the qualified tarball PURL and SHA512 digest, with
+the exact workflow and source revision. Initial npm bootstrap MAY stage that
+identical CI artifact with its verified provenance file; it MUST NOT repack or
+resign another candidate. The npm credential belongs to the protected `npm-production` environment or the
+configured trusted publisher. Signed plugin-registry onboarding and platform
+application adoption remain separate acceptance work.
+
+The `npm-production` environment is configured for the `main` branch only,
+required reviewer `stevejuma` (GitHub user 46745434), self-review permitted and
+no wait timer. Root owns approval of the exact qualified candidate and any npm
+bootstrap/authentication. The authenticated account was confirmed as `stevejuma`;
+no repository-secret value is recorded or assumed, and inherited organization
+credentials must be assessed independently. For an unpublished package, bootstrap
+MUST reuse the qualified tarball and its already verified CI provenance bundle.
+Trusted-publisher configuration names `lapismd/lapis-plugin-tasks`, workflow
+filename `ci.yml`, environment `npm-production` and direct publish permission.
+An identical-version skip verifies existing bytes but does not prove an OIDC
+publish or validate a newly configured trusted publisher.
+
+The Tasks runtime and required-peer closure is audited independently of package
+signatures and source-owner approvals. Published Design Core ^0.7.4 and Mira
+~0.1.4 are the required floors. A duplicate consumer dependency must not
+substitute for that source-owned release boundary. An exception recorded by
+another package does not transfer to Tasks.
+
+The first split dependency audit failed while fixable advisories were still
+installed. Workspace override floors now require `dompurify >=3.4.17`,
+`source-map-js >=1.2.2`, `brace-expansion >=5.0.12`, `minimatch >=11.0.1`,
+`glob >=14.0.2`, and `katex >=0.18.2`. Those floors clear the DOMPurify,
+source-map-js, brace-expansion, minimatch GHSA-g3hv-75wg-m249, glob
+GHSA-3g3m-2fjr-6pw4, and residual KaTeX GHSA-238p-pmpm-9mq7 findings. Mermaid
+still declares `katex ^0.16.47` and cacache still declares `glob ^13`; the
+floors are the Tasks remediation of those transitive ranges and do not replace
+the adopted Mira 0.1.4 release. The Bits UI patch hash stays
+`debd3bc7d43917f0967f0cc1e212fc5c7721c751d3b92bf8f31030d1c96289ad`.
+
+`deepmerge@4.3.1` has no patched release for GHSA-gcqx-w48m-w2h4. pnpm
+`auditConfig.ignoreGhsas` admits only that advisory, which enters through
+`@sveltejs/vite-plugin-svelte`. Remove the ignore when a patched deepmerge
+version exists. Full and production dependency audits must otherwise exit zero.
+
+Registry browser qualification retains Vite `6.4.5` with the Svelte `5.1.1` Vite
+plugin. The compiler MUST retain ownership of generated virtual CSS during
+Storybook development, static builds and Vitest browser execution.
+
+Detached provenance verification MUST pass the issuer and anchored workflow
+identity through Sigstore 4.1.1's two-argument options overload and check the
+returned signer identity. A real verifier regression MUST reject valid foreign
+workflow provenance and a tampered payload before any bundle is retained.
+The npm provenance predicate MUST include `internalParameters.github` with
+the admitted event and exact numeric repository and owner ID strings. Signing
+MUST reject foreign IDs and events outside main push or manual dispatch.
+
+## Temporary Bits UI patch
+
+The user explicitly approved a limited package-manager patch for the released
+`bits-ui@2.20.2` dependency while upstream PR
+[#2264](https://github.com/huntabyte/bits-ui/pull/2264) awaits a maintainer release.
+The shared patch retains the previously approved LinkPreview deferred-selection timer
+cleanup and six Slider destroyed-state guards, and adds owner repair `692fbdf5`
+for stale same-container FocusScope cleanup. This scoped exception does not
+authorize unrelated package patches, a fork publication, diagnostic suppression
+or changes to existing assertions.
+
+| Repair                                       | Provenance                                                                                                                                                                                                                                              |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| LinkPreview deferred-selection timer cleanup | Plugins source `bf492db552702fd310dcc6439152d42d472de068`, carried by the existing Notes `bits-ui@2.20.2` patch, SHA256 `d9b49a52c343dfbd392e235b5d748e5922f3e16e727cf92064437a95c90530f9`. Registry 2.20.2 already includes the listener-safe cleanup. |
+| Slider destroyed-state guards                | Plugins source `201b1feb60fe97ee383ea30b061e453e1ad5e853`, its `bits-ui@2.19.5` patch SHA256 `4fbe511eb1c148b33aa474fa3bd7efd13d8401111b37dbbb7f9bd64c951ec894`. The six guards are retained against the matching 2.20.2 implementation.                |
+| FocusScope same-container cleanup            | Owner source `692fbdf5` and upstream PR [#2264](https://github.com/huntabyte/bits-ui/pull/2264).                                                                                                                                                        |
+
+Tasks must apply the tracked patch through its own `patchedDependencies`
+configuration and frozen lockfile, keeping all package dependencies on normal
+registry versions. The isolated Docker installer consumes that exact root
+configuration; Core's own patch metadata is insufficient for Tasks acceptance.
+The final registry-only full Tasks validation must use actual released API
+0.2.3, Core 0.7.4 and development Mira ~0.1.4 with the explicit root Bits patch. API 0.2.3 carries the
+Notes lifecycle repair. Tasks must raise both API peer/development minimums to
+`^0.2.3` and explicitly resolve the published lock entry, even when the owner
+publishes that release under its `next` tag; an existing `^0.2.2` lock is not
+proof that the lifecycle fix is installed. The Core peer and development
+minimum must admit published Design Core `^0.7.4` or newer, and the development
+Mira range must admit published `~0.1.4`.
+
+The shared payload is `patches/bits-ui@2.20.2.patch`, SHA256
+`debd3bc7d43917f0967f0cc1e212fc5c7721c751d3b92bf8f31030d1c96289ad`.
+The exact root override admits only `bits-ui@2.20.2`, and the frozen lock records
+that payload hash for every peer-specialized instance.
+
+Tasks consumers obtain the authoritative patch assets from the qualified
+published Design Core package: `patches/manifest.json`,
+`patches/bits-ui@2.20.2.patch` and `patches/README.md`. Final Core intake MUST
+verify those actual registry assets against the Tasks root payload and use the
+manifest's three installed postimage hashes for consumer graph qualification.
+The prepared Core source archive proves the asset layout only; it is not
+published-registry acceptance.
+
+The root patch configuration is not inherited by npm consumers of Tasks.
+Every consuming host must apply the same version-qualified patch in its own
+package-manager root, regenerate its lock, and qualify all affected functional,
+interaction and accessibility surfaces. A clean npm metadata/integrity receipt
+alone does not qualify an unpatched UI host. Keep the patch until an upstream
+release contains every recorded repair and passes each original reproduction
+plus the complete affected lanes, then remove the root patch declaration/file and
+refresh every affected consumer lock together.
