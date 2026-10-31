@@ -73,8 +73,12 @@ LAPIS_TASKS_VALIDATION_RUNTIME=native pnpm validation:check
 
 Interactive `pnpm storybook`, stop/restart and validation bootstrap commands
 remain native. Native execution is never a Docker error-recovery mechanism.
-Hosted CI also uses Docker; its only host bootstrap installs the pinned Jujutsu
-tool and selects the exact CI commit.
+Hosted CI also uses Docker. Each lane's host bootstrap installs the pinned
+Jujutsu tool and selects the exact CI commit, then Turbo runs that lane.
+Governance, Quality, Unit tests, Native, Static Storybook, and the three
+Storybook interaction shards run in parallel. Dependency audits follow them.
+Validate fails unless every required lane succeeds, then prepares the npm
+artifact. The local `validation:all` command remains sequential in one worker.
 
 ## Outputs, archives and cleanup
 

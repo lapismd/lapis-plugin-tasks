@@ -11,5 +11,7 @@ AGENTS.override.md
 *.tsbuildinfo
 crates/lapis-task-services/target/
 .local/
+.turbo/
+.env
 .qmd/index.sqlite*
 .release/

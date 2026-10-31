@@ -1,5 +1,10 @@
 # Tasks for Lapis
 
+[![CI and npm release](https://github.com/lapismd/lapis-plugin-tasks/actions/workflows/ci.yml/badge.svg)](https://github.com/lapismd/lapis-plugin-tasks/actions/workflows/ci.yml)
+[![Storybook Pages](https://github.com/lapismd/lapis-plugin-tasks/actions/workflows/publish-storybook-pages.yml/badge.svg)](https://github.com/lapismd/lapis-plugin-tasks/actions/workflows/publish-storybook-pages.yml)
+[![npm version](https://img.shields.io/npm/v/@lapis-notes/lapis-plugin-tasks.svg)](https://www.npmjs.com/package/@lapis-notes/lapis-plugin-tasks)
+[![Storybook](https://img.shields.io/badge/storybook-live-ff4785?logo=storybook&logoColor=white)](https://lapismd.github.io/lapis-plugin-tasks/)
+
 `@lapis-notes/lapis-plugin-tasks` is the first-party external Tasks plugin for
 Lapis. It ships a vault-backed planner runtime and a Design Core-backed catalog.
 The package Storybook includes a real Lapis workspace that loads the plugin.
@@ -59,6 +64,28 @@ tokens (16px, regular weight) rather than a demo-specific override.
 
 The [10 October review record](spec/records/2026-10-10-review.md) lists the
 repaired failures, acceptance counts, and deferred runner issue.
+
+## CI and local parity
+
+`pnpm validation:all` runs the complete Docker aggregate in one worker:
+governance and source checks, unit and native tests, package build, publint,
+static Storybook, the three Storybook interaction shards, specification, and
+immutable release preparation. It stops at the first failure.
+
+Local task output can be cached under `.turbo/`. The same tasks use the signed
+organization cache in CI and fail open to normal execution when it is
+unavailable. To use the remote cache locally, copy `.env.example` to the ignored
+root `.env` and provide `TURBO_TOKEN` and
+`TURBO_REMOTE_CACHE_SIGNATURE_KEY`. Never commit those credentials.
+
+CI fans the Docker lanes out in parallel: Governance, Quality, Unit tests,
+Native, Static Storybook, and Storybook interactions (1/3), (2/3), and (3/3).
+Each lane sets up pnpm, Node 24, and the pinned Jujutsu tool, then selects the
+exact source revision. Dependency audits run after those lanes. Validate fails
+unless every required lane succeeds, then prepares the npm artifact. `main` is
+not branch-protected; Validate is the gate for version and publish jobs.
+`Publish Storybook to GitHub Pages` builds with `pnpm build-storybook` and
+deploys `https://lapismd.github.io/lapis-plugin-tasks/`.
 
 ## npm releases
 

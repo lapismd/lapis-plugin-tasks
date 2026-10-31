@@ -1,0 +1,43 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "remoteCache": {
+    "signature": true,
+    "timeout": 10,
+    "uploadTimeout": 30
+  },
+  "futureFlags": {
+    "longerSignatureKey": true
+  },
+  "globalEnv": ["CI", "LAPIS_TASKS_VALIDATION_RUNTIME"],
+  "tasks": {
+    "ci:governance": {
+      "cache": false,
+      "outputs": []
+    },
+    "ci:quality": {
+      "outputs": []
+    },
+    "ci:unit": {
+      "outputs": []
+    },
+    "ci:native": {
+      "outputs": []
+    },
+    "ci:storybook-static": {
+      "outputs": []
+    },
+    "ci:storybook-interaction-1": {
+      "outputs": []
+    },
+    "ci:storybook-interaction-2": {
+      "outputs": []
+    },
+    "ci:storybook-interaction-3": {
+      "outputs": []
+    },
+    "ci:release-prepare": {
+      "cache": false,
+      "outputs": []
+    }
+  }
+}

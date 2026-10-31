@@ -28,7 +28,7 @@ Shared specification tooling resolves the Deno-free `@lapismd/spec-validator@0.2
 | LPT-SPEC-018 | Browser acceptance MUST fail on Svelte runtime diagnostics from console warnings or errors, including mount, interaction and teardown. The guard MUST install before story hooks, retain original diagnostic stacks until post-test and post-file assertions without interrupting framework cleanup, and preserve console output without suppression or allowlisting.                                                                                                                                                                                                                                                                                                             |
 | LPT-SPEC-019 | The classified validation:all command MUST execute the existing check, unit/native test, build, publint, static Storybook, complete catalog and specification lanes, then immutable release preparation, sequentially within one Docker snapshot and dependency installation. It MUST preserve first-failure propagation, refuse aggregate selectors and retain every individual command and exact target.                                                                                                                                                                                                                                                                        |
 | LPT-SPEC-020 | Specification discovery MUST expose native `spec:search` and `spec:index` developer commands backed by the repository QMD collection. Conceptual discovery MUST use semantic search; search and index MUST stay outside CI and validation. Doctor MUST verify this wiring.                                                                                                                                                                                                                                                                                                                                                                                                        |
-| LPT-SPEC-021 | Public npm releases MUST use Changesets version PRs and synchronize package/runtime-manifest versions. Main-source publication MUST consume the exact checksummed tarball produced after every Docker source, native and browser gate, with provenance. The workflow MUST verify the downloadable registry artifact, signatures and a clean registry consumer before creating the package-scoped GitHub release. Existing versions MUST be immutable; retries MUST compare bytes. Changeset/version/attest/publish/verify commands are reviewed native release bootstrap exceptions and MUST NOT bypass Docker qualification. Signed plugin-registry onboarding remains separate. |
+| LPT-SPEC-021 | Public npm releases MUST use Changesets version PRs and synchronize package/runtime-manifest versions. Pull requests and main pushes MUST fan Docker governance, quality, unit, native, static Storybook, and three explicit Storybook interaction shards out in parallel, then run full and production dependency audits, and MUST report one stable Validate result that fails unless every required lane succeeds. Main-source publication MUST consume the exact checksummed tarball produced after that aggregate, with provenance. The workflow MUST verify the downloadable registry artifact, signatures and a clean registry consumer before creating the package-scoped GitHub release. Existing versions MUST be immutable; retries MUST compare bytes. Changeset/version/attest/publish/verify commands are reviewed native release bootstrap exceptions and MUST NOT bypass Docker qualification. Signed plugin-registry onboarding remains separate. |
 | LPT-SPEC-022 | The explicitly approved temporary `bits-ui@2.20.2` combined LinkPreview, Slider and FocusScope repair MUST remain a tracked pnpm patch with registry semver dependencies, lockfile patch integrity and provenance for each repair, including FocusScope upstream PR #2264. Each consuming application or package root MUST install and qualify the patch itself because package-manager patch metadata does not propagate through published dependencies. The patch MUST be removed after a released upstream replacement contains all recorded repairs and passes their original regressions and complete affected acceptance lanes.                                             |
 
 Aggregate validation shares the outer worker's single lease, exact snapshot and
@@ -190,8 +190,18 @@ and never updates them. Capture alone does not qualify a native implementation.
 
 ## npm release operations
 
-A source PR includes a public-package changeset. The main-source workflow runs
-all Docker gates before opening the Changesets Version Packages PR. The version
+A source PR includes a public-package changeset. Hosted CI checks out the exact
+revision, installs pnpm and Node 24, and runs each portable lane through the
+fail-closed Docker runner. Turbo supplies the signed organization cache and
+fails open to normal execution when that cache is unavailable. Governance and
+release preparation stay uncached. The required checks are Governance, Quality,
+Unit tests, Native, Static Storybook, Storybook interactions (1/3), Storybook
+interactions (2/3), Storybook interactions (3/3), Dependency audits, and
+Validate. `main` is not branch-protected, so Validate is the release gate:
+Changesets and npm publication run only after it succeeds. Local
+`pnpm validation:all` remains the sequential one-worker aggregate. The
+main-source workflow runs these Docker gates before opening the Changesets
+Version Packages PR. The version
 command synchronizes `package.json`, `manifest.json`, the lockfile and the
 canonical release-version declaration; it does not publish. After that PR passes
 CI and merges, the workflow qualifies its exact source again, publishes the
@@ -205,7 +215,9 @@ native release bootstrap commands. The publisher requires the approved main
 workflow and exact candidate/source agreement. Preparation MUST reject temporary
 archive installations; publishable candidates MUST record frozen registry-only
 dependencies. `release:prepare` remains a
-Docker lane and is the final step of `validation:all`. A failed publish or
+Docker lane and is the final step of `validation:all`. CI runs that same
+preparation in Validate only after the parallel lanes and dependency audits
+succeed, then uploads the checksummed tarball for publication. A failed publish or
 registry check leaves the release incomplete and must be followed through;
 retrying may reuse only an existing version with identical artifact integrity.
 The protected main job MUST also retain an npm-compatible Sigstore provenance
