@@ -137,3 +137,40 @@ floors of `^0.2.2` and `^0.7.2`, a refreshed registry lock and a repeated runtim
 closure check. No override or new audit exception is accepted. The final
 registry-only `pnpm validation:all`, protected source/version PR merges,
 immutable artifact, actual npm verification and GitHub release remain pending.
+
+## Combined fixed API and Core source acceptance (2026-10-31)
+
+The source-qualified cohort also includes API source
+`5a24816e7e5770dacbff69604cdff589f480cd38`, packed through its normal public
+prepack, publint and package-type checks. Its pre-version package identity is
+`@lapis-notes/api@0.2.1` and archive SHA256 is
+`b350f0f8b509c443350982840de8806884a15ff20afe2ec970236e52e69af9c4`.
+Every archive member matches the API owner's fully qualified public pack.
+The combined descriptor retains Core `fd1748be` and its checksum above.
+Both archives are verified only inside the isolated installation projection.
+
+With `LAPIS_TASKS_VALIDATION_ARCHIVES` selecting that combined descriptor,
+the exact cold `LiveEditMutations` target passes one case with zero failures
+(23 deliberately filtered), followed by every affected consumer lane:
+
+| Command                | Result                                         | Retained Docker report                                 |
+| ---------------------- | ---------------------------------------------- | ------------------------------------------------------ |
+| `pnpm check`           | All strict checks; Svelte zero errors/warnings | `lapis-tasks-run-d974e1ab-89e4-45fe-8bf4-e1d46bf25fae` |
+| `pnpm test`            | 2,889 unit and 27 native cases passed          | `lapis-tasks-run-01a12095-36d6-4903-9e1d-ebe358c5b2a6` |
+| `pnpm build`           | Native and public package builds passed        | `lapis-tasks-run-c60e24ca-8a8b-4da9-8560-b649680b9a78` |
+| `pnpm publint`         | Fresh public package build and lint passed     | `lapis-tasks-run-12349165-d11f-42eb-bbc5-c1cef03e4d50` |
+| `pnpm build-storybook` | Cold static catalog passed                     | `lapis-tasks-run-457360f7-5d07-40bd-bbaa-d26bd6554f4d` |
+| `pnpm test:storybook`  | All 63 interaction/axe cases passed            | `lapis-tasks-run-2769ee64-71d1-4142-8b59-c832d43aa49c` |
+| `pnpm spec:check`      | Spec-first, mdBook and ownership passed        | `lapis-tasks-run-94939119-2e42-4da6-a560-847d601096df` |
+
+The exact target report is
+`lapis-tasks-run-09cc7429-1444-4996-a45a-91d3bd91fd15`. The fatal diagnostic
+guard remains enabled throughout the cold catalog. There are zero functional,
+interaction or accessibility failures in this source-qualified cohort.
+
+Its actual installed runtime/peer closure has 547 reachable packages, zero
+unresolved edges, and both API and Core minimatch paths resolve to 11.0.3.
+No vulnerable minimatch parent remains in that graph. These preliminary source
+archives are distinct from actual API 0.2.2 and Core 0.7.2 registry releases.
+Final published floors, registry-only qualification, protected source/version
+PR merges, immutable publication and verified release receipts remain required.
