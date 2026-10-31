@@ -249,8 +249,13 @@ Tasks must apply the tracked patch through its own `patchedDependencies`
 configuration and frozen lockfile, keeping all package dependencies on normal
 registry versions. The isolated Docker installer consumes that exact root
 configuration; Core's own patch metadata is insufficient for Tasks acceptance.
-The final registry-only full Tasks validation must use the repaired published
-Core package and the explicit root Bits patch together.
+The final registry-only full Tasks validation must use actual released API
+0.2.3 and Core 0.7.3 with the explicit root Bits patch. API 0.2.3 carries the
+Notes lifecycle repair. Tasks must raise both API peer/development minimums to
+`^0.2.3` and explicitly resolve the published lock entry, even when the owner
+publishes that release under its `next` tag; an existing `^0.2.2` lock is not
+proof that the lifecycle fix is installed. The Core peer/development minimum
+must likewise admit only the released Swipe/JSON repair or newer.
 
 The shared payload is `patches/bits-ui@2.20.2.patch`, SHA256
 `debd3bc7d43917f0967f0cc1e212fc5c7721c751d3b92bf8f31030d1c96289ad`.

@@ -298,3 +298,18 @@ existing fatal diagnostic. This is patch preparation, not a passing release.
 Final acceptance still requires the fixed Core registry version and a fully
 passing `pnpm validation:all` on that resulting graph before source/version PR
 merges, actual npm publication and verified GitHub receipts.
+
+### Final API lifecycle intake gate
+
+The Notes owner has completed source qualification and pushed PR #51, with
+hosted interaction/web gates and API 0.2.3 publication still pending. That
+release carries the lifecycle repair required for the final host cohort.
+Tasks must explicitly raise its API peer and development minimums to `^0.2.3`
+and resolve the actual 0.2.3 registry lock entry after publication, even under
+the owner's normal `next` tag. Keeping the earlier `^0.2.2` lock or obtaining
+only a source-qualified archive does not admit that repaired release.
+
+The final Tasks gate therefore combines actual API 0.2.3 and Core 0.7.3 with
+the shared Bits root patch, followed by the original cold regression and
+complete frozen-registry acceptance. The recorded API 0.2.2/Core 0.7.2 results
+remain preliminary evidence, with the assigned Core Swipe failure unchanged.
