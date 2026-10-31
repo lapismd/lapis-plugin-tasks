@@ -216,6 +216,18 @@ resign another candidate. The npm credential belongs to the protected `npm-produ
 configured trusted publisher. Signed plugin-registry onboarding and platform
 application adoption remain separate acceptance work.
 
+The `npm-production` environment is configured for the `main` branch only,
+required reviewer `stevejuma` (GitHub user 46745434), self-review permitted and
+no wait timer. Root owns approval of the exact qualified candidate and any npm
+bootstrap/authentication. The authenticated account was confirmed as `stevejuma`;
+no repository-secret value is recorded or assumed, and inherited organization
+credentials must be assessed independently. For an unpublished package, bootstrap
+MUST reuse the qualified tarball and its already verified CI provenance bundle.
+Trusted-publisher configuration names `lapismd/lapis-plugin-tasks`, workflow
+filename `ci.yml`, environment `npm-production` and direct publish permission.
+An identical-version skip verifies existing bytes but does not prove an OIDC
+publish or validate a newly configured trusted publisher.
+
 Registry browser qualification retains Vite `6.4.5` with the Svelte `5.1.1` Vite
 plugin. The compiler MUST retain ownership of generated virtual CSS during
 Storybook development, static builds and Vitest browser execution.

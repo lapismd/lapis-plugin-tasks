@@ -370,3 +370,44 @@ same 547-package runtime/peer closure with no unresolved edges. Both minimatch
 parents remain patched at 11.0.3. These are preliminary intake checks; the
 original cold case and complete Tasks acceptance remain held for actual Core
 0.7.3, rather than borrowing the older API 0.2.2 catalog result.
+
+### Protected release environment and first-publication readiness
+
+Root created `npm-production` using the existing sibling release policy.
+Independent API readback confirms custom deployment branch `main`, required
+reviewer `stevejuma` (46745434), `prevent_self_review=false`, and no wait timer.
+The repository is public; its active workflow ID is 402046918 at
+`.github/workflows/ci.yml`, and the Actions bot PR permission is enabled.
+The publish job already has GitHub-hosted `ubuntu-latest`, Node 24,
+`id-token: write` and `contents: write` and uses that environment.
+
+The public Tasks npm metadata returned 404 at this checkpoint. Repository-level
+secret names were empty during read-only inspection; no conclusion was drawn
+about inherited organization credentials or private npm account state. Root
+confirmed `npm whoami` succeeds as `stevejuma` under Node 24; this agent started
+no login, read no secret values and changed no credential or global configuration.
+Local npm 11.19.1 supports stage/trust tooling; project validation uses Node 24.
+
+After source and Changesets PR qualification, Root approves the exact protected
+main candidate. If inherited credentials can publish, the existing workflow
+uses them. Otherwise the allowed bootstrap reuses the exact CI tarball,
+`candidate.json`, verified `provenance.sigstore.json` and statement. It never
+repacks or resigns another candidate. The candidate source/run/hash and bundle
+must be handed to Root before authentication or bootstrap is required. An
+initial successful npm upload remains incomplete until the fresh consumer,
+signature/integrity and scoped GitHub release checks pass.
+
+The official [npm trust prerequisites](https://docs.npmjs.com/cli/v11/commands/npm-trust/)
+require an existing package, package write access and account 2FA. The trusted
+publisher identity is GitHub `lapismd/lapis-plugin-tasks`, workflow filename
+`ci.yml`, environment `npm-production`, with direct publish allowed. Root owns
+any trust setup. [Trusted publisher configuration](https://docs.npmjs.com/trusted-publishers/)
+needs its first successful trusted publish within two days. The existing script
+skips `npm publish` when registry bytes already match, so that idempotent path
+cannot establish OIDC activation or validate a new trust configuration.
+
+If Root chooses the official [staged bootstrap](https://docs.npmjs.com/staged-publishing/),
+it uses the same qualified tarball and provenance bundle. Staging a new package
+creates a public `0.0.0-stage` placeholder; the actual package version becomes
+published only after the 2FA approval. A placeholder, created trust relationship
+or same-byte retry is not a completed release receipt.
