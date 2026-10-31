@@ -241,18 +241,26 @@ An identical-version skip verifies existing bytes but does not prove an OIDC
 publish or validate a newly configured trusted publisher.
 
 The Tasks runtime and required-peer closure is audited independently of package
-signatures and source-owner approvals. The current compatible lock refresh
-removes the 30 critical/high/moderate and additional low advisory/version pairs
-from the prior 31-pair baseline without changing package manifests or adding
-dependency overrides. Its residual low KaTeX 0.16.47 advisory
-GHSA-238p-pmpm-9mq7 remains a release hold pending remediation in the owning
-math-adapter chain or explicit Tasks-specific acceptance. An exception recorded
-by another package does not transfer to Tasks. The refreshed graph passes renewed cold regression and complete Docker
-qualification, but remains intermediate acceptance. Final release must consume
-the actual published Mira repair through a newly qualified Core release whose
-declared Mira minimum requires that repair, with the corresponding Tasks Core
-peer/development floors and frozen graph. A duplicate consumer dependency or
-override must not substitute for the source-owned release boundary.
+signatures and source-owner approvals. Published Design Core ^0.7.4 and Mira
+~0.1.4 are the required floors. A duplicate consumer dependency must not
+substitute for that source-owned release boundary. An exception recorded by
+another package does not transfer to Tasks.
+
+The first split dependency audit failed while fixable advisories were still
+installed. Workspace override floors now require `dompurify >=3.4.17`,
+`source-map-js >=1.2.2`, `brace-expansion >=5.0.12`, `minimatch >=11.0.1`,
+`glob >=14.0.2`, and `katex >=0.18.2`. Those floors clear the DOMPurify,
+source-map-js, brace-expansion, minimatch GHSA-g3hv-75wg-m249, glob
+GHSA-3g3m-2fjr-6pw4, and residual KaTeX GHSA-238p-pmpm-9mq7 findings. Mermaid
+still declares `katex ^0.16.47` and cacache still declares `glob ^13`; the
+floors are the Tasks remediation of those transitive ranges and do not replace
+the adopted Mira 0.1.4 release. The Bits UI patch hash stays
+`debd3bc7d43917f0967f0cc1e212fc5c7721c751d3b92bf8f31030d1c96289ad`.
+
+`deepmerge@4.3.1` has no patched release for GHSA-gcqx-w48m-w2h4. pnpm
+`auditConfig.ignoreGhsas` admits only that advisory, which enters through
+`@sveltejs/vite-plugin-svelte`. Remove the ignore when a patched deepmerge
+version exists. Full and production dependency audits must otherwise exit zero.
 
 Registry browser qualification retains Vite `6.4.5` with the Svelte `5.1.1` Vite
 plugin. The compiler MUST retain ownership of generated virtual CSS during

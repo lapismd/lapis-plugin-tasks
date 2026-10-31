@@ -20,6 +20,16 @@ overrides:
   "@lezer/markdown": "1.8.1"
   "@lezer/lr": "1.4.12"
   svelte: "5.56.10"
+  brace-expansion: ">=5.0.12"
+  dompurify: ">=3.4.17"
+  glob: ">=14.0.2"
+  katex: ">=0.18.2"
+  minimatch: ">=11.0.1"
+  source-map-js: ">=1.2.2"
+
+auditConfig:
+  ignoreGhsas:
+    - GHSA-gcqx-w48m-w2h4
 
 patchedDependencies:
   bits-ui@2.20.2: patches/bits-ui@2.20.2.patch

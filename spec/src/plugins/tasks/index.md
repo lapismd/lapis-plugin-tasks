@@ -11,8 +11,9 @@ keeps these versions synchronized under LPT-SPEC-021. Peer and development floor
 Tasks acceptance uses this frozen registry graph with the explicit root Bits
 patch. GitHub CI fans Governance, Quality, Unit tests, Native, Static Storybook,
 and three Storybook interaction shards through Docker, then Dependency audits.
-Validate is the gate before source and version merges and publication. The inherited dependency audit findings
-remain a separate release hold described in the canonical verification row.
+Validate is the gate before source and version merges and publication. Dependency
+audits must pass on the patched transitive floors, ignoring only unfixed
+deepmerge GHSA-gcqx-w48m-w2h4.
 
 `@lapis-notes/lapis-plugin-tasks` owns the first-party external Tasks catalog
 and plugin runtime. A task is a Markdown file with YAML front
