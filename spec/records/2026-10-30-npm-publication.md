@@ -174,3 +174,21 @@ No vulnerable minimatch parent remains in that graph. These preliminary source
 archives are distinct from actual API 0.2.2 and Core 0.7.2 registry releases.
 Final published floors, registry-only qualification, protected source/version
 PR merges, immutable publication and verified release receipts remain required.
+
+## Current upstream release hold (2026-10-31)
+
+The Core release owner has identified a further upstream Bits UI same-container
+FocusScope remount defect. Its owner candidate `692fbdf5` is newer than the
+`fd1748be` Core archive qualified above. The exact owner regression is repaired,
+but the required complete upstream browser lane remains unqualified and the
+accepted Core/Bits cohort has not been released. Earlier Tasks source receipts
+remain valid only for their recorded trees and do not qualify that later cohort.
+
+Publication stays pending until legitimately released compatible Bits/Core and
+API 0.2.2 packages are downloadable. Adopt the accepted published Bits cohort in
+Tasks as needed, retain the planned API `^0.2.2` and Core `^0.7.2` floors, then
+repeat the exact cold regression, complete runtime/peer closure audit and final
+registry-only `pnpm validation:all`. Source and Changesets PR checks, reviewed
+current-base merges, immutable artifact/provenance production, actual npm
+verification and the scoped GitHub release remain blocking. No source-archive
+substitution, diagnostic exception or visual baseline change qualifies release.
