@@ -247,6 +247,9 @@ cells also use that form surface over grey panels. Date chips share the plan-dat
 natural-language parser and normalize against the injected clock before the
 canonical local dates are persisted. Their suggestion popovers remain inside
 the sheet so accepting a suggestion is not treated as an outside interaction.
+Interaction tests that continue after a date commit address the end-condition
+control by its visible Inline Option Picker trigger label, so a mounted
+suggestion option cannot satisfy that query.
 The custom sheet also accepts
 natural-language recurrence descriptions through rrule.js and presents a
 friendly `toText()` summary instead of exposing the stored property value as

@@ -656,11 +656,13 @@
     await userEvent.type(until, "{Enter}");
     expect(dialog).toBeVisible();
     expect(state().repeat).toMatchObject({ rrule: "FREQ=DAILY;INTERVAL=2" });
-    await userEvent.click(
-      within(customForm).getByRole("button", {
-        name: "Recurrence end condition: On date",
-      }),
+    const endOnDate = customForm.querySelector(
+      'button.cv-form-inline-option-trigger[aria-label="Recurrence end condition: On date"]',
     );
+    if (!(endOnDate instanceof HTMLElement)) {
+      throw new Error("Missing the visible recurrence end-condition trigger");
+    }
+    await userEvent.click(endOnDate);
     await userEvent.click(
       within(
         within(customForm).getByRole("listbox", {
