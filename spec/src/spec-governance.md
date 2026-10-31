@@ -1,6 +1,6 @@
 # Specification Governance
 
-Tracked dependencies use registry API `^0.2.3`, Design Core `^0.7.2`, UI `^0.1.5` and Mira `~0.1.3`.
+Tracked dependencies use registry API `^0.2.3`, Design Core `^0.7.3`, UI `^0.1.5` and Mira `~0.1.3`.
 Explicit temporary source acceptance follows LPT-SPEC-014 with verified archives
 in isolated installations. Source ownership and public contracts remain unchanged.
 Shared specification tooling resolves the Deno-free `@lapismd/spec-validator@0.2.0` from npm.

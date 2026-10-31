@@ -411,3 +411,85 @@ it uses the same qualified tarball and provenance bundle. Staging a new package
 creates a public `0.0.0-stage` placeholder; the actual package version becomes
 published only after the 2FA approval. A placeholder, created trust relationship
 or same-byte retry is not a completed release receipt.
+
+### Actual fixed Core 0.7.3 registry intake
+
+The Core owner completed source/version PR reviews and checked merges, then
+all five release jobs in run
+[41194948225](https://github.com/lapismd/design-core/actions/runs/41194948225).
+Source/tag is `1ff36f37c165a3496be4826be48b048fc812e38e`; the scoped
+[Core 0.7.3 release](https://github.com/lapismd/design-core/releases/tag/design-core%400.7.3)
+and 44 valid npm signatures, SLSA source/workflow/subject binding and actual
+registry bytes are verified by the owner.
+
+Tasks independently downloads the actual 1,903,722-byte npm tarball and matches
+SHA256 `4c07fdaa8fecc6d7f1ede2f03f89b5afb0728dae82b25dc0e55ec6ddda7ab6ca`
+and registry SRI
+`sha512-mXDhs+c6kdMZ8E3krwXTxzVavb/b4UVEVrNDlM3eQ6ILgfeOHeFiXfrP29QKZ2JXAIKwcqDPIS3WNElL94fH3w==`.
+The actual published patch, manifest and README assets are present. The patch
+matches Tasks' tracked bytes exactly at shared SHA256 `debd3bc7...`; the
+manifest identifies Bits 2.20.2 and all three expected postimages.
+
+Tasks now raises both Core peer/development minimums to `^0.7.3` and explicitly
+resolves that actual registry version, retaining actual API `^0.2.3`, Workspace
+`^0.3.1` and the root Bits patch. The original cold regression and complete
+frozen-registry acceptance are now required on this exact graph. No prepared
+archive or inherited source-owner audit exception admits the Tasks release.
+
+### Actual registry regression and dependency audit
+
+The cold original `LiveEditMutations` command now passes on actual API 0.2.3
+and Core 0.7.3: one pass, zero failures and 23 deliberately filtered cases.
+Report `lapis-tasks-run-ca646086-2d49-47bf-983d-18b594f4cfe5` retains its
+installed registry lock. The previous Core 0.7.2 result was one failure in
+`SwipeItemState.close`; the fatal Svelte diagnostic guard and every assertion
+remain enabled.
+
+The full frozen registry run
+`lapis-tasks-run-378a618e-1125-4bc9-9789-bc48143172d6` independently verifies
+the installed Bits files against actual Core 0.7.3's public manifest. All three
+postimage SHA256 values match; exactly one patched installed Bits instance and
+no unpatched instance exist. The actual Core patch bytes match Tasks' root
+patch. Supplemental `installed-bits-postimages.json` and
+`installed-bits-graph.json` are retained with that local run.
+
+The actual runtime dependency closure includes all 15 direct dependency and
+required peer roots, 547 reachable pnpm snapshots and 522 package names, with
+zero unresolved edges. A fresh npm bulk-advisory query, filtered against the
+actual versions using semver, finds 31 advisory/version pairs across 11
+packages: one critical, 13 high, 14 moderate and three low. The same query on
+the previous API 0.2.2/Core 0.7.2 installed lock produces exactly the same
+31 findings, with no additions or removals. These counts represent distinct
+advisory/version pairs, not npm's additional affected-parent counts.
+
+| Inherited path                                                         | Affected installed versions                                                                                                               |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| API → AI Host → MCP SDK and HTTP dependencies                          | MCP SDK 1.30.0; `@hono/node-server` 2.1.1; Hono 4.13.7; fast-uri 3.1.7; body-parser 2.3.0; proxy-addr 2.0.7; qs 6.16.0; ip-address 10.7.0 |
+| API → Transformers and ONNX Runtime                                    | sharp 0.34.5; adm-zip 0.5.18                                                                                                              |
+| API/Core → Mira → rehype-katex or remark-math/micromark-extension-math | KaTeX 0.16.47                                                                                                                             |
+
+The critical finding is proxy-addr
+[GHSA-jqcg-44mw-7w3h](https://github.com/advisories/GHSA-jqcg-44mw-7w3h).
+The low KaTeX finding is
+[GHSA-238p-pmpm-9mq7](https://github.com/advisories/GHSA-238p-pmpm-9mq7).
+Full package/version/range/path receipts are retained locally as
+`.local/release-preflight/api-023-core-073-runtime-advisories.json` and
+`api-022-core-072-runtime-advisories.json`.
+
+No Tasks exception is approved, and a source owner's scoped exception does
+not transfer to this consumer. Root assigned an ordinary compatible transitive
+lock refresh after the complete baseline run, preserving manifests and assertions, plus
+separate assessment in the remaining dependency owners. Source/version merges
+and publication remain blocked until the resulting Tasks graph is re-audited
+and every residual finding is repaired or explicitly accepted for Tasks.
+
+The full registry-only `pnpm validation:all` run above completed successfully:
+2,889 unit cases, 27 native Rust cases, all 63 interaction/axe cases in three
+fresh browser batches, strict checks with zero Svelte errors/warnings,
+native/public build, publint, cold static Storybook, canonical specification,
+mdBook, spec-first, App ownership and immutable artifact preparation. Its source
+snapshot is `2a177e51080e29d5f30e5a3985b3ec480df1bd28`, with no temporary
+archives. The local pre-version 0.1.0 tarball is qualification evidence only;
+bootstrap must use the eventual qualified main 0.1.1 CI artifact after the
+Changesets version PR. Security remediation, hosted checks and actual Tasks
+publication remain incomplete.
