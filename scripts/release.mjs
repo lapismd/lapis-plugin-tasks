@@ -62,8 +62,26 @@ export function verifyRegistryIdentity(candidate, metadata, bytes) {
     integrity(bytes) !== candidate.integrity
   )
     throw Error("Published npm artifact differs from the qualified candidate");
+  verifyPublishedArtifact(metadata, bytes);
+}
+
+export function publicationDecision(existing, candidate) {
+  if (!existing) return "publish";
+  return existing.dist?.integrity === candidate.integrity
+    ? "skip-same"
+    : "skip-different";
+}
+
+export function verifyPublishedArtifact(metadata, bytes) {
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  if (
+    !metadata?.dist?.integrity ||
+    integrity(bytes) !== metadata.dist.integrity
+  )
+    throw Error("Registry tarball does not match its published integrity");
   if (!metadata.dist.attestations?.provenance)
     throw Error("Published npm artifact has no provenance attestation");
+  return { size: bytes.length, sha256, integrity: metadata.dist.integrity };
 }
 
 export function validateExistingRelease(candidate, existing, release) {
@@ -321,7 +339,8 @@ async function registry(candidate) {
   return response.json();
 }
 
-export async function verify(root = process.cwd()) {
+export async function verify(root = process.cwd(), options = {}) {
+  const matchCandidate = options.matchCandidate !== false;
   const { candidate } = await loadCandidate(root);
   let metadata;
   for (let attempt = 0; attempt < 12; attempt++) {
@@ -333,11 +352,13 @@ export async function verify(root = process.cwd()) {
   const response = await fetch(metadata.dist?.tarball);
   if (!response.ok)
     throw Error(`npm archive request failed: ${response.status}`);
-  verifyRegistryIdentity(
-    candidate,
-    metadata,
-    Buffer.from(await response.arrayBuffer()),
+  const publishedBytes = Buffer.from(await response.arrayBuffer());
+  const published = verifyPublishedArtifact(metadata, publishedBytes);
+  console.log(
+    `Registry artifact ${candidate.name}@${candidate.version}: ${published.size} bytes sha256 ${published.sha256}`,
   );
+  if (matchCandidate)
+    verifyRegistryIdentity(candidate, metadata, publishedBytes);
   const consumer = await mkdtemp(join(tmpdir(), "lapis-tasks-npm-consumer-"));
   try {
     await writeFile(
@@ -429,8 +450,9 @@ export async function publish(root = process.cwd()) {
   } catch (error) {
     if (!String(error.stderr ?? "").includes("release not found")) throw error;
   }
-  validateExistingRelease(candidate, existing, release);
-  if (!existing)
+  const decision = publicationDecision(existing, candidate);
+  if (decision === "publish") {
+    validateExistingRelease(candidate, existing, release);
     run(
       "npm",
       [
@@ -444,7 +466,17 @@ export async function publish(root = process.cwd()) {
       ],
       { cwd: root },
     );
-  await verify(root);
+  } else
+    console.log(
+      `Skipping ${tag}; npm already has this version (${decision}).`,
+    );
+  await verify(root, { matchCandidate: decision !== "skip-different" });
+  if (decision === "skip-different") {
+    console.log(
+      `Leaving ${tag} unchanged; local candidate bytes differ from the published tarball.`,
+    );
+    return candidate;
+  }
   if (release)
     console.log(
       `Existing release remains at ${release.targetCommitish}; current qualified artifact has identical npm bytes.`,

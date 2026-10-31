@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
 import {
@@ -8,6 +9,8 @@ import {
   verifyRegistryIdentity,
   provenanceStatement,
   validateExistingRelease,
+  publicationDecision,
+  verifyPublishedArtifact,
   prepare,
   verifyProvenanceSigner,
 } from "./release.mjs";
@@ -113,6 +116,28 @@ describe("Tasks immutable npm release boundary", () => {
     expect(() =>
       verifyRegistryIdentity(
         candidate,
+        { ...metadata, dist: { integrity: candidate.integrity } },
+        bytes,
+      ),
+    ).toThrow("provenance");
+  });
+
+  it("skips an already published version and still checks its bytes and provenance", () => {
+    expect(publicationDecision(null, candidate)).toBe("publish");
+    expect(publicationDecision(metadata, candidate)).toBe("skip-same");
+    expect(
+      publicationDecision(
+        { ...metadata, dist: { integrity: "changed" } },
+        candidate,
+      ),
+    ).toBe("skip-different");
+    expect(verifyPublishedArtifact(metadata, bytes)).toEqual({
+      size: bytes.length,
+      sha256: createHash("sha256").update(bytes).digest("hex"),
+      integrity: candidate.integrity,
+    });
+    expect(() =>
+      verifyPublishedArtifact(
         { ...metadata, dist: { integrity: candidate.integrity } },
         bytes,
       ),

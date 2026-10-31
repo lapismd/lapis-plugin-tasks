@@ -83,9 +83,14 @@ Native, Static Storybook, and Storybook interactions (1/3), (2/3), and (3/3).
 Each lane sets up pnpm, Node 24, and the pinned Jujutsu tool, then selects the
 exact source revision. Dependency audits run after those lanes. Validate fails
 unless every required lane succeeds, then prepares the npm artifact. `main` is
-not branch-protected; Validate is the gate for version and publish jobs.
-`Publish Storybook to GitHub Pages` builds with `pnpm build-storybook` and
-deploys `https://lapismd.github.io/lapis-plugin-tasks/`.
+not branch-protected; Validate is the gate. The same `CI and npm release`
+workflow then runs `Version packages`, which opens the changeset pull request
+and does not publish. `Publish and verify npm release` runs only on `main`
+after that pull request merges and no changesets remain. An npm version that
+already exists is not uploaded again; the job checks the published tarball's
+size, SHA-256, and provenance and succeeds. `Publish Storybook to GitHub Pages`
+builds with `pnpm build-storybook` and deploys
+`https://lapismd.github.io/lapis-plugin-tasks/`.
 
 ## npm releases
 

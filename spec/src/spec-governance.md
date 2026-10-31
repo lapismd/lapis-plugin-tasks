@@ -219,7 +219,14 @@ Docker lane and is the final step of `validation:all`. CI runs that same
 preparation in Validate only after the parallel lanes and dependency audits
 succeed, then uploads the checksummed tarball for publication. A failed publish or
 registry check leaves the release incomplete and must be followed through;
-retrying may reuse only an existing version with identical artifact integrity.
+retrying an already published version must not upload again. The job downloads
+that version, checks its size, SHA-256, integrity and provenance, and succeeds.
+A local candidate with different bytes is left unpublished. An identical
+candidate still runs the clean-consumer verification. `Version packages` and
+`Publish and verify npm release` stay in `.github/workflows/ci.yml`. A main
+push that still has changesets opens the version pull request and does not
+publish. Publishing starts only after that pull request merges and no
+changesets remain. The trusted publisher stays bound to `ci.yml`.
 The protected main job MUST also retain an npm-compatible Sigstore provenance
 bundle whose sole subject is the qualified tarball PURL and SHA512 digest, with
 the exact workflow and source revision. Initial npm bootstrap MAY stage that
