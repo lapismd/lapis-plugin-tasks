@@ -683,8 +683,19 @@
     });
     await userEvent.click(additionalDates);
     await userEvent.type(additionalDates, "tom");
-    const tomorrowOption = within(dialog).getByRole("option", {
-      name: "Tomorrow",
+    const tomorrowOption = await waitFor(() => {
+      const option = [
+        ...dialog.querySelectorAll("button.ui-autocomplete-input__item"),
+      ].find(
+        (item) =>
+          item instanceof HTMLElement &&
+          item.textContent?.trim() === "Tomorrow" &&
+          item.getClientRects().length > 0,
+      );
+      if (!(option instanceof HTMLElement)) {
+        throw new Error("Missing the visible Tomorrow suggestion");
+      }
+      return option;
     });
     expect(tomorrowOption).toBeVisible();
     await userEvent.click(

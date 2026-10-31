@@ -249,7 +249,9 @@ canonical local dates are persisted. Their suggestion popovers remain inside
 the sheet so accepting a suggestion is not treated as an outside interaction.
 Interaction tests that continue after a date commit address the end-condition
 control by its visible Inline Option Picker trigger label, so a mounted
-suggestion option cannot satisfy that query.
+suggestion option cannot satisfy that query. A later suggestion assertion
+waits until that option has layout, so a closed popover's mounted item cannot
+satisfy it.
 The custom sheet also accepts
 natural-language recurrence descriptions through rrule.js and presents a
 friendly `toText()` summary instead of exposing the stored property value as
