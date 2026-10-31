@@ -237,8 +237,12 @@ credentials must be assessed independently. For an unpublished package, bootstra
 MUST reuse the qualified tarball and its already verified CI provenance bundle.
 Trusted-publisher configuration names `lapismd/lapis-plugin-tasks`, workflow
 filename `ci.yml`, environment `npm-production` and direct publish permission.
-An identical-version skip verifies existing bytes but does not prove an OIDC
-publish or validate a newly configured trusted publisher.
+The publish job installs npm 12.0.2 and does not write a registry auth token.
+An empty inherited `NPM_TOKEN` must not land in `.npmrc`, because that blocks
+the trusted-publisher OIDC exchange. The publish at `fdee90f3` failed
+`ENEEDAUTH` after provenance signing for that reason. An identical-version
+skip verifies existing bytes but does not prove an OIDC publish or validate a
+newly configured trusted publisher.
 
 The Tasks runtime and required-peer closure is audited independently of package
 signatures and source-owner approvals. Published Design Core ^0.7.4 and Mira
