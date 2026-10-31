@@ -228,6 +228,20 @@ filename `ci.yml`, environment `npm-production` and direct publish permission.
 An identical-version skip verifies existing bytes but does not prove an OIDC
 publish or validate a newly configured trusted publisher.
 
+The Tasks runtime and required-peer closure is audited independently of package
+signatures and source-owner approvals. The current compatible lock refresh
+removes the 30 critical/high/moderate and additional low advisory/version pairs
+from the prior 31-pair baseline without changing package manifests or adding
+dependency overrides. Its residual low KaTeX 0.16.47 advisory
+GHSA-238p-pmpm-9mq7 remains a release hold pending remediation in the owning
+math-adapter chain or explicit Tasks-specific acceptance. An exception recorded
+by another package does not transfer to Tasks. The refreshed graph passes renewed cold regression and complete Docker
+qualification, but remains intermediate acceptance. Final release must consume
+the actual published Mira repair through a newly qualified Core release whose
+declared Mira minimum requires that repair, with the corresponding Tasks Core
+peer/development floors and frozen graph. A duplicate consumer dependency or
+override must not substitute for the source-owned release boundary.
+
 Registry browser qualification retains Vite `6.4.5` with the Svelte `5.1.1` Vite
 plugin. The compiler MUST retain ownership of generated virtual CSS during
 Storybook development, static builds and Vitest browser execution.

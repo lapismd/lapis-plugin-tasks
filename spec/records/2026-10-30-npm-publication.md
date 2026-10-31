@@ -493,3 +493,64 @@ archives. The local pre-version 0.1.0 tarball is qualification evidence only;
 bootstrap must use the eventual qualified main 0.1.1 CI artifact after the
 Changesets version PR. Security remediation, hosted checks and actual Tasks
 publication remain incomplete.
+
+### Compatible dependency lock refresh
+
+Root assigned a normal transitive lock refresh after the complete green
+baseline. `pnpm update --lockfile-only --ignore-pnpmfile --depth Infinity`
+selects the affected AI/HTTP/image dependency names, without `--latest`.
+`package.json` remains byte-identical; no override, patch, assertion, diagnostic
+or baseline changes. All selected versions satisfy the already published
+dependency ranges.
+
+| Dependency         | Previous version | Refreshed version |
+| ------------------ | ---------------- | ----------------- |
+| Transformers       | 4.2.0            | 4.3.2             |
+| sharp              | 0.34.5           | 0.35.5            |
+| ONNX Runtime Node  | 1.24.3           | 1.30.0            |
+| adm-zip            | 0.5.18           | 0.6.1             |
+| MCP TypeScript SDK | 1.30.0           | 1.32.2            |
+| Express            | 5.2.1            | 5.3.0             |
+| Hono               | 4.13.7           | 4.13.14           |
+| Hono Node server   | 2.1.1            | 2.1.5             |
+| fast-uri           | 3.1.7            | 3.1.9             |
+| proxy-addr         | 2.0.7            | 2.0.8             |
+| body-parser        | 2.3.0            | 2.4.0             |
+| qs                 | 6.16.0           | 6.17.1            |
+| ip-address         | 10.7.0           | 10.7.5            |
+
+The refreshed lock's 544 runtime/required-peer snapshots and 517 package names
+have zero unresolved edges. The same npm bulk/semver audit now reports one
+low advisory/version pair, zero critical, high or moderate. The residual is
+KaTeX 0.16.47, vulnerable range `>=0.11.0 <0.18.2`,
+[GHSA-238p-pmpm-9mq7](https://github.com/advisories/GHSA-238p-pmpm-9mq7).
+Mira 0.1.3 is reachable through both API and Core. Its `rehype-katex@7.0.1`
+and `remark-math@6.0.0` → `micromark-extension-math@3.1.0` paths both require
+KaTeX `^0.16.0`; Mira's own direct KaTeX 0.18.10 is already patched. Receipt:
+`.local/release-preflight/compatible-refresh-runtime-advisories.json`.
+
+The refreshed exact cold `LiveEditMutations` command passes one case, zero
+failures and 23 filtered cases in
+`lapis-tasks-run-b6ff515d-6b5f-472c-be6d-489695e5195b`.
+Full registry-only `pnpm validation:all` then passes again in
+`lapis-tasks-run-aef523dc-ff9e-47cf-825a-738c43e59770`, source snapshot
+`d4414187db5a64ff770f26acbb24cdc20d150c27`: 2,889 unit, 27 native Rust,
+all 63 interaction/axe cases, strict checks with zero Svelte errors/warnings,
+public/native builds, publint, cold static catalog, canonical specification,
+mdBook, spec-first, App ownership and immutable package preparation. No
+assertion, fatal Svelte guard or baseline changed. All three actual installed
+Bits postimages match Core's published manifest; one patched instance, four
+patched host edges and zero unpatched edges are independently recorded in
+`installed-bits-qualified.json` alongside the run. A fresh audit of this full
+run's actual installed lock independently reproduces only the one low finding
+in `.local/release-preflight/compatible-refresh-full-installed-runtime-advisories.json`.
+
+Root authorized a narrow source-owned Mira math-adapter packaging repair,
+followed by its real publication and a Core patch whose declared Mira floor
+requires that repair. Tasks final Core peer/development floors must require
+the actual verified repaired Core publication, then repeat the original cold
+and complete affected acceptance lanes on its registry graph. The current
+Core 0.7.3 cohort remains intermediate evidence. No duplicate consumer Mira
+dependency, waiver or security override is introduced, and no final release
+push, source/version merge or npm publication is justified by this intermediate
+qualification alone.
