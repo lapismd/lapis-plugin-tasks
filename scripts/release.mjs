@@ -83,7 +83,11 @@ export function provenanceStatement(candidate, env = process.env) {
     env.GITHUB_SHA !== candidate.source ||
     env.GITHUB_WORKFLOW_REF !==
       "lapismd/lapis-plugin-tasks/.github/workflows/ci.yml@refs/heads/main" ||
-    !/^\d+$/.test(env.GITHUB_RUN_ID ?? "")
+    !/^\d+$/.test(env.GITHUB_RUN_ID ?? "") ||
+    !/^\d+$/.test(env.GITHUB_RUN_ATTEMPT ?? "") ||
+    env.GITHUB_REPOSITORY_ID !== "1440023837" ||
+    env.GITHUB_REPOSITORY_OWNER_ID !== "311425888" ||
+    !["push", "workflow_dispatch"].includes(env.GITHUB_EVENT_NAME)
   )
     throw Error(
       "Provenance signing requires the exact qualified main workflow",
@@ -113,7 +117,13 @@ export function provenanceStatement(candidate, env = process.env) {
             path: ".github/workflows/ci.yml",
           },
         },
-        internalParameters: {},
+        internalParameters: {
+          github: {
+            event_name: env.GITHUB_EVENT_NAME,
+            repository_id: env.GITHUB_REPOSITORY_ID,
+            repository_owner_id: env.GITHUB_REPOSITORY_OWNER_ID,
+          },
+        },
         resolvedDependencies: [
           {
             uri: `git+${repository}@${env.GITHUB_REF}`,
@@ -124,7 +134,7 @@ export function provenanceStatement(candidate, env = process.env) {
       runDetails: {
         builder: { id: "https://github.com/actions/runner/github-hosted" },
         metadata: {
-          invocationId: `${repository}/actions/runs/${env.GITHUB_RUN_ID}/attempts/${env.GITHUB_RUN_ATTEMPT ?? "1"}`,
+          invocationId: `${repository}/actions/runs/${env.GITHUB_RUN_ID}/attempts/${env.GITHUB_RUN_ATTEMPT}`,
         },
       },
     },

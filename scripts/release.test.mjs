@@ -145,8 +145,18 @@ describe("Tasks immutable npm release boundary", () => {
         "lapismd/lapis-plugin-tasks/.github/workflows/ci.yml@refs/heads/main",
       GITHUB_RUN_ID: "123",
       GITHUB_RUN_ATTEMPT: "2",
+      GITHUB_EVENT_NAME: "push",
+      GITHUB_REPOSITORY_ID: "1440023837",
+      GITHUB_REPOSITORY_OWNER_ID: "311425888",
     };
     const statement = provenanceStatement(candidate, env);
+    expect(statement.predicate.buildDefinition.internalParameters).toEqual({
+      github: {
+        event_name: "push",
+        repository_id: "1440023837",
+        repository_owner_id: "311425888",
+      },
+    });
     expect(statement.subject).toEqual([
       {
         name: "pkg:npm/%40lapis-notes/lapis-plugin-tasks@0.1.1",
@@ -166,6 +176,9 @@ describe("Tasks immutable npm release boundary", () => {
       { GITHUB_SHA: "b".repeat(40) },
       { GITHUB_WORKFLOW_REF: "different" },
       { GITHUB_RUN_ID: "" },
+      { GITHUB_REPOSITORY_ID: "0" },
+      { GITHUB_REPOSITORY_OWNER_ID: "0" },
+      { GITHUB_EVENT_NAME: "pull_request" },
     ])
       expect(() =>
         provenanceStatement(candidate, { ...env, ...patch }),

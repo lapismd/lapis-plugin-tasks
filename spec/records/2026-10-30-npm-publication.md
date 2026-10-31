@@ -92,3 +92,14 @@ ownership checks pass after the correction. Hosted source CI run
 [41147072385](https://github.com/lapismd/lapis-plugin-tasks/actions/runs/41147072385)
 independently reproduces only the assigned Design Core 0.7.1 Swipe Item
 diagnostic; its artifact and publication stages remain blocked.
+
+## npm predicate compatibility (2026-10-31)
+
+The exact npm-PURL regression reproduced one failure because the predicate
+omitted npm's GitHub internal metadata. The generator now includes the admitted
+event and verified numeric repository/owner ID strings, rejects foreign IDs,
+and restricts signing to main push or manual dispatch. The exact Docker target
+changes from one failure to zero; all seven release guards and 27 native tests
+pass afterward. Canonical spec-first/mdBook/App ownership checks pass. Hosted
+run 41149098975 independently retains the same single Design Core 0.7.1
+`LiveEditMutations` diagnostic. No package publication has occurred.
