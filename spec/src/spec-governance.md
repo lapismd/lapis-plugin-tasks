@@ -239,11 +239,11 @@ for stale same-container FocusScope cleanup. This scoped exception does not
 authorize unrelated package patches, a fork publication, diagnostic suppression
 or changes to existing assertions.
 
-| Repair                                       | Provenance                                                                                                                                                                                                                                      |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| LinkPreview deferred-selection timer cleanup | Notes source `bf492db552702fd310dcc6439152d42d472de068`, carried by its existing `bits-ui@2.20.2` patch, SHA256 `d9b49a52c343dfbd392e235b5d748e5922f3e16e727cf92064437a95c90530f9`. Registry 2.20.2 already includes the listener-safe cleanup. |
-| Slider destroyed-state guards                | Plugins source `201b1feb60fe97ee383ea30b061e453e1ad5e853`, its `bits-ui@2.19.5` patch SHA256 `4fbe511eb1c148b33aa474fa3bd7efd13d8401111b37dbbb7f9bd64c951ec894`. The six guards are retained against the matching 2.20.2 implementation.        |
-| FocusScope same-container cleanup            | Owner source `692fbdf5` and upstream PR [#2264](https://github.com/huntabyte/bits-ui/pull/2264).                                                                                                                                                |
+| Repair                                       | Provenance                                                                                                                                                                                                                                              |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| LinkPreview deferred-selection timer cleanup | Plugins source `bf492db552702fd310dcc6439152d42d472de068`, carried by the existing Notes `bits-ui@2.20.2` patch, SHA256 `d9b49a52c343dfbd392e235b5d748e5922f3e16e727cf92064437a95c90530f9`. Registry 2.20.2 already includes the listener-safe cleanup. |
+| Slider destroyed-state guards                | Plugins source `201b1feb60fe97ee383ea30b061e453e1ad5e853`, its `bits-ui@2.19.5` patch SHA256 `4fbe511eb1c148b33aa474fa3bd7efd13d8401111b37dbbb7f9bd64c951ec894`. The six guards are retained against the matching 2.20.2 implementation.                |
+| FocusScope same-container cleanup            | Owner source `692fbdf5` and upstream PR [#2264](https://github.com/huntabyte/bits-ui/pull/2264).                                                                                                                                                        |
 
 Tasks must apply the tracked patch through its own `patchedDependencies`
 configuration and frozen lockfile, keeping all package dependencies on normal
@@ -261,6 +261,14 @@ The shared payload is `patches/bits-ui@2.20.2.patch`, SHA256
 `debd3bc7d43917f0967f0cc1e212fc5c7721c751d3b92bf8f31030d1c96289ad`.
 The exact root override admits only `bits-ui@2.20.2`, and the frozen lock records
 that payload hash for every peer-specialized instance.
+
+Tasks consumers obtain the authoritative patch assets from the qualified
+published Design Core package: `patches/manifest.json`,
+`patches/bits-ui@2.20.2.patch` and `patches/README.md`. Final Core intake MUST
+verify those actual registry assets against the Tasks root payload and use the
+manifest's three installed postimage hashes for consumer graph qualification.
+The prepared Core source archive proves the asset layout only; it is not
+published-registry acceptance.
 
 The root patch configuration is not inherited by npm consumers of Tasks.
 Every consuming host must apply the same version-qualified patch in its own

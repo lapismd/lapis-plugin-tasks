@@ -75,9 +75,13 @@ adds the FocusScope same-container cleanup repair from
 [upstream PR #2264](https://github.com/huntabyte/bits-ui/pull/2264).
 
 Published dependency packages do not propagate pnpm patches to applications.
-Each consuming root must copy this repository's version-qualified patch,
-configure its own `patchedDependencies` and exact Bits override, regenerate its
-lock, and run affected functional, interaction and accessibility acceptance.
+Install the qualified Design Core release as a direct host dependency. Its
+`patches/manifest.json`, `patches/bits-ui@2.20.2.patch` and `patches/README.md`
+provide the authoritative registry-delivered patch assets. Copy the patch into
+the consumer root, verify its SHA256 against that manifest, configure the
+root's own `patchedDependencies` and exact Bits override, and regenerate its
+lock. Verify the three installed postimage hashes and run affected functional,
+interaction and accessibility acceptance.
 A successful package installation alone does not qualify an unpatched host.
 The [canonical patch requirements](https://github.com/lapismd/lapis-plugin-tasks/blob/main/spec/src/spec-governance.md#temporary-bits-ui-patch)
 record provenance and removal conditions. Remove the patch after the repaired

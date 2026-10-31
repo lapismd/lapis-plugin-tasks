@@ -254,7 +254,7 @@ shared preimages, and the complete payload passes `patch --dry-run -p1`.
 | `dist/bits/slider/slider.svelte.js`                     | `8f78d5045adaf4cde3e8c051c50b5e50ce3715bcc2ffab2c3f529211f57c7515` | `99da433f4cc360138c73c4ba5d2a11083c4dc95720a09bbc8b7ec61e78d2f201` |
 | `dist/bits/utilities/focus-scope/focus-scope.svelte.js` | `1ce5e39a89c8359778712f996193c65375287a0eceb9fde45186c7988c83dd1f` | `62c6ee5f7352531f61e465b38ae901bb9b3c2d1c3fb3d5bd7dc445e491a1e0f1` |
 
-The LinkPreview deferred-selection timer repair originates in Notes source
+The LinkPreview deferred-selection timer repair originates in Plugins source
 `bf492db552702fd310dcc6439152d42d472de068` (the existing 2.20.2 patch has SHA256
 `d9b49a52c343dfbd392e235b5d748e5922f3e16e727cf92064437a95c90530f9`).
 The Slider destroyed-state/six event guards originate in Plugins source
@@ -313,3 +313,19 @@ The final Tasks gate therefore combines actual API 0.2.3 and Core 0.7.3 with
 the shared Bits root patch, followed by the original cold regression and
 complete frozen-registry acceptance. The recorded API 0.2.2/Core 0.7.2 results
 remain preliminary evidence, with the assigned Core Swipe failure unchanged.
+
+### Registry-delivered patch assets for downstream roots
+
+Core's public package supplies the authoritative `patches/manifest.json`,
+`patches/bits-ui@2.20.2.patch` and `patches/README.md`. Tasks consumer guidance
+uses those assets, verifies the shared payload hash, and requires all three
+installed postimages from the manifest at the consuming root.
+
+Read-only inspection of the owner-qualified prepared Core archive (package
+source 95b70dd4, pre-version identity 0.7.2, archive SHA256
+`b80ad762df4f4bd33f65e6cb895ac2827f9f28f21dbe202c9c11dc9c00592856`)
+confirms that its manifest identifies Bits 2.20.2 and the exact shared patch;
+the extracted patch hashes byte-for-byte identically to Tasks' tracked payload.
+This is preliminary asset-layout inspection, not registry qualification. Final
+Tasks intake must repeat the checks on actual published Core 0.7.3 and qualify
+the installed patched graph with published API 0.2.3 before release.
