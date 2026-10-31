@@ -1,16 +1,15 @@
 # Tasks plugin
 
-Tracked dependencies use registry API `^0.2.3`, Design Core `^0.7.3`, UI
-`^0.1.5` and Mira `~0.1.3` through portable npm ranges. Clean registry-only Docker qualification
+Tracked dependencies use registry API `^0.2.3`, Design Core `^0.7.4`, UI
+`^0.1.5` and Mira `~0.1.4` through portable npm ranges. Clean registry-only Docker qualification
 remains distinct from temporary archive acceptance governed by LPT-SPEC-014,
 publication and consumer adoption. Source ownership and public contracts remain
 unchanged.
 Release package and runtime manifest version: `0.1.0`. The public npm artifact
 includes runtime metadata and the existing AGPL-3.0-or-later license. Changesets
-keeps these versions synchronized under LPT-SPEC-021. Actual Core 0.7.3 and API 0.2.3 are downloaded and checksum-verified; final
-Tasks acceptance uses their frozen registry graph with the explicit root Bits
-patch before source/version merges and publication. Full frozen registry qualification
-passes all source/native/browser gates. The inherited dependency audit findings
+keeps these versions synchronized under LPT-SPEC-021. Peer and development floors require published Design Core ^0.7.4 and development Mira ~0.1.4. Prior Core 0.7.3 and API 0.2.3 qualification remains intermediate evidence. Final
+Tasks acceptance uses this frozen registry graph with the explicit root Bits
+patch; GitHub CI on the adopting revision is the gate before source and version merges and publication. The inherited dependency audit findings
 remain a separate release hold described in the canonical verification row.
 
 `@lapis-notes/lapis-plugin-tasks` owns the first-party external Tasks catalog

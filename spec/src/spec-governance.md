@@ -1,6 +1,6 @@
 # Specification Governance
 
-Tracked dependencies use registry API `^0.2.3`, Design Core `^0.7.3`, UI `^0.1.5` and Mira `~0.1.3`.
+Tracked dependencies use registry API `^0.2.3`, Design Core `^0.7.4`, UI `^0.1.5` and Mira `~0.1.4`.
 Explicit temporary source acceptance follows LPT-SPEC-014 with verified archives
 in isolated installations. Source ownership and public contracts remain unchanged.
 Shared specification tooling resolves the Deno-free `@lapismd/spec-validator@0.2.0` from npm.
@@ -276,12 +276,13 @@ configuration and frozen lockfile, keeping all package dependencies on normal
 registry versions. The isolated Docker installer consumes that exact root
 configuration; Core's own patch metadata is insufficient for Tasks acceptance.
 The final registry-only full Tasks validation must use actual released API
-0.2.3 and Core 0.7.3 with the explicit root Bits patch. API 0.2.3 carries the
+0.2.3, Core 0.7.4 and development Mira ~0.1.4 with the explicit root Bits patch. API 0.2.3 carries the
 Notes lifecycle repair. Tasks must raise both API peer/development minimums to
 `^0.2.3` and explicitly resolve the published lock entry, even when the owner
 publishes that release under its `next` tag; an existing `^0.2.2` lock is not
-proof that the lifecycle fix is installed. The Core peer/development minimum
-must likewise admit only the released Swipe/JSON repair or newer.
+proof that the lifecycle fix is installed. The Core peer and development
+minimum must admit published Design Core `^0.7.4` or newer, and the development
+Mira range must admit published `~0.1.4`.
 
 The shared payload is `patches/bits-ui@2.20.2.patch`, SHA256
 `debd3bc7d43917f0967f0cc1e212fc5c7721c751d3b92bf8f31030d1c96289ad`.
