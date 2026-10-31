@@ -192,3 +192,42 @@ registry-only `pnpm validation:all`. Source and Changesets PR checks, reviewed
 current-base merges, immutable artifact/provenance production, actual npm
 verification and the scoped GitHub release remain blocking. No source-archive
 substitution, diagnostic exception or visual baseline change qualifies release.
+
+## Registry cohort refresh and complete release ownership (2026-10-31)
+
+Registry metadata now supplies API 0.2.2, Design Core 0.7.2, UI 0.1.5 and
+Mira 0.1.3. Tasks adopts API `^0.2.2`, Core `^0.7.2`, UI `^0.1.5` and
+Mira `~0.1.3` in the tracked manifest and frozen registry lock. The latter two
+satisfy API 0.2.2's current peer contracts. No archive or package override is
+involved. The Deno-free spec validator remains the current npm 0.2.0 release;
+doctor and semantic QMD discovery pass with the installed Node 24 runtime.
+
+The exact cold registry-only command
+`pnpm test:storybook -- src/stories/PluginWorkspace.stories.svelte -t LiveEditMutations`
+still fails one case, with 23 deliberately filtered cases. Its retained Docker
+report is `lapis-tasks-run-8902a8ec-97d3-4338-b742-250078a9a3a6`. The fatal
+`derived_inert` diagnostic originates in published Core 0.7.2
+`SwipeItemState.close` after the Swipe Item action destroys its owner. Thus this
+new registry version does not contain the already prepared owning fix in
+[Design Core PR #42](https://github.com/lapismd/design-core/pull/42). That fix now
+requires the next Core patch release; the earlier record's expected 0.7.2 fix
+number was superseded by a separate successful release. No assertion or
+runtime-diagnostic guard was weakened, and Tasks remains unqualified for merge
+or publication until the repaired registry cohort passes.
+
+The registry-only strict check passes (zero Svelte errors and warnings), all
+2,889 unit and 27 native tests pass, and the native/public builds plus publint
+pass. Their Docker receipts are respectively
+`lapis-tasks-run-afbcc092-877c-4251-99d8-5193f1a31e78`,
+`lapis-tasks-run-c7a20b99-265c-4ba5-bca5-a00547fcdaa0` and
+`lapis-tasks-run-2989cc73-ee86-4876-85b9-cb1a3da14e1b`. The actual frozen
+installed runtime/peer closure has 547 reachable packages, zero unresolved
+edges, and API/Core minimatch paths both resolve to 11.0.3. This removes the
+recorded runtime security gate while retaining the assigned browser failure.
+
+The release owner must continue through review and approval of each ready
+Changesets/version PR, a merge after required checks pass, protected release
+approvals, completed publication workflows, and verification of the exact npm
+version/artifact, provenance and package-scoped GitHub release. Opening or
+merging a PR and dispatching a workflow are intermediate states. Required clean
+consumer acceptance and immutable-version checks remain blocking.

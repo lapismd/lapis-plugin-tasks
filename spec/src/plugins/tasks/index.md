@@ -1,13 +1,15 @@
 # Tasks plugin
 
-Tracked dependencies use registry API `0.2.0`, Design Core `0.7.1` and Mira
-`0.1.2` through portable npm ranges. Clean registry-only Docker qualification
+Tracked dependencies use registry API `^0.2.2`, Design Core `^0.7.2`, UI
+`^0.1.5` and Mira `~0.1.3` through portable npm ranges. Clean registry-only Docker qualification
 remains distinct from temporary archive acceptance governed by LPT-SPEC-014,
 publication and consumer adoption. Source ownership and public contracts remain
 unchanged.
 Release package and runtime manifest version: `0.1.0`. The public npm artifact
 includes runtime metadata and the existing AGPL-3.0-or-later license. Changesets
-keeps these versions synchronized under LPT-SPEC-021.
+keeps these versions synchronized under LPT-SPEC-021. The published Core 0.7.2
+cohort still fails the exact Swipe Item teardown case; final release qualification
+requires the repaired registry cohort documented in the verification record.
 
 `@lapis-notes/lapis-plugin-tasks` owns the first-party external Tasks catalog
 and plugin runtime. A task is a Markdown file with YAML front
