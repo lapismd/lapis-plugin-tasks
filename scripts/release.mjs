@@ -131,19 +131,34 @@ export function provenanceStatement(candidate, env = process.env) {
   };
 }
 
-export async function attest(root = process.cwd()) {
-  const { candidate } = await loadCandidate(root);
-  const statement = provenanceStatement(candidate);
-  const { attest: sign, verify: verifyBundle } = await import("sigstore");
-  const bundle = await sign(
-    Buffer.from(JSON.stringify(statement)),
-    "application/vnd.in-toto+json",
-  );
-  await verifyBundle(bundle, undefined, {
+export async function verifyProvenanceSigner(bundle) {
+  const { verify } = await import("sigstore");
+  const signer = await verify(bundle, {
     certificateIssuer: "https://token.actions.githubusercontent.com",
     certificateIdentityURI:
       "^https://github\\.com/lapismd/lapis-plugin-tasks/\\.github/workflows/ci\\.yml@refs/heads/main$",
   });
+  if (
+    signer?.identity?.extensions?.issuer !==
+      "https://token.actions.githubusercontent.com" ||
+    signer.identity.subjectAlternativeName !==
+      "https://github.com/lapismd/lapis-plugin-tasks/.github/workflows/ci.yml@refs/heads/main"
+  )
+    throw Error(
+      "Provenance signer does not match the qualified Tasks workflow",
+    );
+  return signer;
+}
+
+export async function attest(root = process.cwd()) {
+  const { candidate } = await loadCandidate(root);
+  const statement = provenanceStatement(candidate);
+  const { attest: sign } = await import("sigstore");
+  const bundle = await sign(
+    Buffer.from(JSON.stringify(statement)),
+    "application/vnd.in-toto+json",
+  );
+  await verifyProvenanceSigner(bundle);
   await writeFile(
     join(root, ".release/provenance.sigstore.json"),
     JSON.stringify(bundle, null, 2) + "\n",

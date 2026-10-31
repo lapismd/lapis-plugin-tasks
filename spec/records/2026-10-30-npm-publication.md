@@ -73,3 +73,22 @@ artifact plus verified npm-compatible Sigstore provenance. Publication remains
 incomplete until npm downloads/signatures, strict-peer clean consumer checks and
 the package-scoped GitHub release succeed. Signed registry onboarding, visual
 approval and application adoption remain separate. No visual baselines changed.
+
+## Sigstore identity correction (2026-10-31)
+
+The real public-library regression reproduced one failure: Sigstore 4.1.1
+accepted a valid Design Core bundle when the old three-argument call silently
+discarded the issuer/workflow policy. The corrected two-argument call and exact
+returned signer checks retain cryptographic verification and reject foreign
+workflow identity and payload tampering. The public fixture comes from npm
+provenance for `@lapismd/design-core@0.7.1`, has 12,005 bytes and SHA256
+`e68da538522ac91ccf86a1ca0472c71f3895e79a1adf997e27155911c07d7c60`. It
+contains public certificate/signature material and no signing or npm credential.
+No Tasks bundle or package was published before this correction.
+
+The exact Docker verifier regression changed from one failure to zero, and all
+seven release guards plus 27 native tests pass. Canonical spec-first/mdBook/App
+ownership checks pass after the correction. Hosted source CI run
+[41147072385](https://github.com/lapismd/lapis-plugin-tasks/actions/runs/41147072385)
+independently reproduces only the assigned Design Core 0.7.1 Swipe Item
+diagnostic; its artifact and publication stages remain blocked.

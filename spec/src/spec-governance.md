@@ -218,3 +218,8 @@ application adoption remain separate acceptance work.
 Registry browser qualification retains Vite `6.4.5` with the Svelte `5.1.1` Vite
 plugin. The compiler MUST retain ownership of generated virtual CSS during
 Storybook development, static builds and Vitest browser execution.
+
+Detached provenance verification MUST pass the issuer and anchored workflow
+identity through Sigstore 4.1.1's two-argument options overload and check the
+returned signer identity. A real verifier regression MUST reject valid foreign
+workflow provenance and a tampered payload before any bundle is retained.

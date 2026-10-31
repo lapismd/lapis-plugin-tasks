@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
 import {
   integrity,
@@ -8,6 +9,7 @@ import {
   provenanceStatement,
   validateExistingRelease,
   prepare,
+  verifyProvenanceSigner,
 } from "./release.mjs";
 
 describe("Tasks immutable npm release boundary", () => {
@@ -169,4 +171,26 @@ describe("Tasks immutable npm release boundary", () => {
         provenanceStatement(candidate, { ...env, ...patch }),
       ).toThrow();
   });
+  it("rejects a cryptographically valid foreign workflow provenance", async () => {
+    const { verify } = await import("sigstore");
+    const bundle = JSON.parse(
+      readFileSync(
+        new URL(
+          "./fixtures/design-core-0.7.1-provenance.json",
+          import.meta.url,
+        ),
+        "utf8",
+      ),
+    );
+    const signer = await verify(bundle);
+    expect(signer.identity.subjectAlternativeName).toBe(
+      "https://github.com/lapismd/design-core/.github/workflows/release.yml@refs/heads/main",
+    );
+    await expect(verifyProvenanceSigner(bundle)).rejects.toThrow(
+      /certificate identity|signer does not match/,
+    );
+    const tampered = structuredClone(bundle);
+    tampered.dsseEnvelope.payload = Buffer.from("{}").toString("base64");
+    await expect(verifyProvenanceSigner(tampered)).rejects.toThrow();
+  }, 30_000);
 });
