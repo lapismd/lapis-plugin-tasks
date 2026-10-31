@@ -103,3 +103,37 @@ changes from one failure to zero; all seven release guards and 27 native tests
 pass afterward. Canonical spec-first/mdBook/App ownership checks pass. Hosted
 run 41149098975 independently retains the same single Design Core 0.7.1
 `LiveEditMutations` diagnostic. No package publication has occurred.
+
+## Refreshed Core acceptance and runtime security gate (2026-10-31)
+
+The later Core source archive includes the Bits UI 2.20.2 and patched minimatch
+cohort. Its source is `fd1748bed97b32cb2d956e74b4f338b42f86fa80` and SHA256 is
+`0af4b94fcfb40a56037ea057c47352eca023d69408dd2559e0ab4010d5ccb74d`. The archive
+still identifies itself as pre-version Core 0.7.1; it is source acceptance,
+not an npm 0.7.2 publication receipt. The isolated installation verifies the
+archive and restores the tracked registry manifests and lockfile before checks.
+
+With `LAPIS_TASKS_VALIDATION_ARCHIVES` selecting that verified descriptor:
+
+- `pnpm test:storybook -- src/stories/PluginWorkspace.stories.svelte -t LiveEditMutations`
+  passes one exact cold case, with zero failures and 23 intentionally filtered
+  cases; the registry Core 0.7.1 baseline has one failure.
+- `pnpm test:storybook` passes all 63 interaction/accessibility cases in three
+  fresh-process shards (13 + 9 + 41), retaining the fatal diagnostic guard.
+- `pnpm check` passes routing, 24 composition families, 118 requirements,
+  App ownership, no-Tailwind, Svelte (zero errors and warnings), TypeScript,
+  native Clippy and Rust formatting.
+
+The retained Docker reports are
+`lapis-tasks-run-35f49bd9-afb5-429c-97cf-71e0f8f71a74` (exact),
+`lapis-tasks-run-cc729ffa-3f3b-40f1-9b5f-1e1c6bf9e22a` (complete catalog), and
+`lapis-tasks-run-c35ecc53-3d2b-478c-96ee-400c6a98686c` (strict checks).
+
+The current public runtime/peer closure contains 546 reachable packages and no
+unresolved edges. API 0.2.0 and Core 0.7.1 each introduce minimatch 10.2.6,
+affected by GHSA-g3hv-75wg-m249 (versions below 11.0.1). Publication therefore
+also requires the owning API 0.2.2 and Core 0.7.2 releases, peer/development
+floors of `^0.2.2` and `^0.7.2`, a refreshed registry lock and a repeated runtime
+closure check. No override or new audit exception is accepted. The final
+registry-only `pnpm validation:all`, protected source/version PR merges,
+immutable artifact, actual npm verification and GitHub release remain pending.
