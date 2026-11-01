@@ -4,6 +4,7 @@
     type WorkspaceShellProps,
   } from "@lapis-notes/workspace";
   import { onMount } from "svelte";
+  import type { TasksPlugin } from "../lib";
   import type { App } from "@lapis-notes/api";
 
   import { bootPluginWorkspaceDemo } from "./create-plugin-workspace-demo";
@@ -11,9 +12,11 @@
   let {
     displayMode = "desktop",
     navigationPath = "lists.md",
+    pluginClass,
   }: {
     displayMode?: WorkspaceShellProps["displayMode"];
     navigationPath?: string | null;
+    pluginClass?: typeof TasksPlugin;
   } = $props();
 
   let app = $state<App | null>(null);
@@ -32,7 +35,7 @@
 
   onMount(() => {
     let cancelled = false;
-    const runtimePromise = bootPluginWorkspaceDemo(navigationPath);
+    const runtimePromise = bootPluginWorkspaceDemo(navigationPath, pluginClass);
     void runtimePromise
       .then((runtime) => {
         if (cancelled) return;

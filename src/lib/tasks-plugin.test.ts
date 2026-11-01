@@ -65,7 +65,12 @@ describe("TasksPlugin", () => {
       "@lapis-notes/markdown",
     );
     expect(pkg).not.toMatch(/"(?:workspace|link|file):/u);
-    expect(workspaceHost).toContain("plugin: TasksPlugin");
+    // The ordinary workspace keeps its TasksPlugin default; archive acceptance
+    // can pass the verified compiled constructor through the same owned host.
+    expect(workspaceHost).toContain(
+      "pluginClass: typeof TasksPlugin = TasksPlugin",
+    );
+    expect(workspaceHost).toContain("plugin: pluginClass");
     expect(workspaceHost).toContain("await app.plugins.loadPlugins(");
     expect(workspaceHost).toContain("await app.workspace.loadLayout()");
     expect(workspaceHost).not.toContain("registerView");

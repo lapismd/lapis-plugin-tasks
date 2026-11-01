@@ -11,6 +11,19 @@ The package Storybook includes a real Lapis workspace that loads the plugin.
 
 The runtime plugin ID is `tasks`.
 
+[![Plugin workspace](registry-assets/banner.preview.webp)](registry-assets/banner.full.webp)
+
+<details>
+<summary>Plugin screenshots</summary>
+
+[![Daily planner](registry-assets/gallery/planner.preview.webp)](registry-assets/gallery/planner.full.webp)
+
+[![Task details](registry-assets/gallery/details.preview.webp)](registry-assets/gallery/details.full.webp)
+
+</details>
+
+Registry publication and manual verification: [publishing guide](docs/registry-publishing.md).
+
 ## Development
 
 Published LapisMD dependencies resolve through npm semver ranges. Package

@@ -118,6 +118,7 @@ export function createPluginWorkspaceSeed(
 
 export async function bootPluginWorkspaceDemo(
   navigationPath: string | null = "lists.md",
+  pluginClass: typeof TasksPlugin = TasksPlugin,
 ): Promise<{
   app: App;
   dispose: () => Promise<void>;
@@ -150,7 +151,7 @@ export async function bootPluginWorkspaceDemo(
     },
     { plugin: SearchPlugin, required: false, enabledByDefault: true },
     {
-      plugin: TasksPlugin,
+      plugin: pluginClass,
       required: false,
       enabledByDefault: true,
       distribution: "first-party-external",
@@ -164,7 +165,7 @@ export async function bootPluginWorkspaceDemo(
     optionalCorePlugins: "configured",
   });
   const tasksPlugin = app.plugins.plugins.get("tasks");
-  if (!(tasksPlugin instanceof TasksPlugin)) {
+  if (!(tasksPlugin instanceof pluginClass)) {
     throw new Error(
       "The Tasks workspace fixture could not resolve TasksPlugin.",
     );

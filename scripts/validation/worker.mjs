@@ -156,6 +156,7 @@ try {
     "spec/book",
     "storybook-static",
     "dist",
+    "registry-assets",
     ".release",
     "test-results",
     "playwright-report",

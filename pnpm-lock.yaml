@@ -104,6 +104,9 @@ importers:
       '@fontsource-variable/dm-sans':
         specifier: ^5.2.8
         version: 5.3.0
+      '@fontsource-variable/inter':
+        specifier: 5.3.0
+        version: 5.3.0
       '@fontsource-variable/source-code-pro':
         specifier: 5.2.7
         version: 5.2.7
@@ -134,6 +137,9 @@ importers:
       '@lapismd/spec-validator':
         specifier: ^0.2.0
         version: 0.2.0
+      '@lapismd/storybook-addon-visual-delta':
+        specifier: 0.0.7
+        version: 0.0.7(playwright@1.62.1)(react@19.2.8)(storybook@10.6.5(@types/react@19.2.18)(react@19.2.8))(svelte@5.56.10)(vite@6.4.5(@types/node@24.19.2)(jiti@2.7.0)(lightningcss@1.30.1)(tsx@4.23.13)(yaml@2.9.0))
       '@lezer/highlight':
         specifier: 1.2.5
         version: 1.2.5
@@ -182,6 +188,15 @@ importers:
       aria-query:
         specifier: 5.3.2
         version: 5.3.2
+      es-module-lexer:
+        specifier: ^1.7.0
+        version: 1.7.0
+      fflate:
+        specifier: ^0.8.3
+        version: 0.8.3
+      playwright:
+        specifier: 1.62.1
+        version: 1.62.1
       publint:
         specifier: 0.3.12
         version: 0.3.12
@@ -191,6 +206,9 @@ importers:
       react-dom:
         specifier: 19.2.8
         version: 19.2.8(react@19.2.8)
+      sharp:
+        specifier: 0.35.5
+        version: 0.35.5(@types/node@24.19.2)
       sigstore:
         specifier: 4.1.1
         version: 4.1.1
@@ -817,6 +835,9 @@ packages:
   '@fontsource-variable/dm-sans@5.3.0':
     resolution: {integrity: sha512-BpUG5bqePiDFMBM4ZtLSlPdAIOM990uB1dlXzIf4aw21yQR7BmykedLXXXMqGWsR18aMLOsbWccwJNh3ztTQaA==}
 
+  '@fontsource-variable/inter@5.3.0':
+    resolution: {integrity: sha512-OupL48va4JNofb97w6NYeF9S7W/kHNKM0Er8Dem5nqi4jeOLrVJDoE8tZEpnMJmtkvNbB1EIPPwHcdkF6b1oUA==}
+
   '@fontsource-variable/source-code-pro@5.2.7':
     resolution: {integrity: sha512-kZ0VNwnhvSA7vu5MaiO52eicQ4zC+k+8HBLZb+1js0MK/RngLy25NEUFB1y/AKd0ZMwru88T433QBcFf9m/huw==}
 
@@ -1177,6 +1198,23 @@ packages:
     resolution: {integrity: sha512-fUMh7fpoZXuMRAc5Jdo+Y2sUhAPeO5o5R5AIdwKEs/xNLS2W3mSSHimscxI58JuUEFPPk/SI+jE0Vcvv7gXdlw==}
     engines: {node: '>=22'}
     hasBin: true
+
+  '@lapismd/storybook-addon-visual-delta@0.0.7':
+    resolution: {integrity: sha512-Ll0AAqye2kr7FhGKAlrm3l2/HkCTLqR3DbHQQvNQy262kbs0j7MvFXlewsWb1T0v5Tq1zOs3S0gWFdhtrYfcdQ==}
+    hasBin: true
+    peerDependencies:
+      playwright: '*'
+      react: '*'
+      storybook: '*'
+      svelte: 5.56.10
+      vite: '*'
+    peerDependenciesMeta:
+      playwright:
+        optional: true
+      svelte:
+        optional: true
+      vite:
+        optional: true
 
   '@lezer/common@1.5.5':
     resolution: {integrity: sha512-Pw7PVCndruF1pb3ebCxpSVpkMHSDjwRCLcTRw+RizUKco5QbWylwq2g4lnG/RYN7yTTQDXE9F77MwtkAyphrjg==}
@@ -2842,6 +2880,9 @@ packages:
     resolution: {integrity: sha512-Zf5H2Kxt2xjTvbJvP2ZWLEICxA6j+hAmMzIlypy4xcBg1vKVnx89Wy0GbS+kf5cwCVFFzdCFh2XSCFNULS6csw==}
     engines: {node: '>= 0.4'}
 
+  es-module-lexer@1.7.0:
+    resolution: {integrity: sha512-jEQoCwk8hyb2AZziIOLhDqpm5+2ww5uIE6lkO/6jcOCusfk6LhMHpXXfBLXTZ7Ydyt0j4VoUQv6uGNYbdW+kBA==}
+
   es-module-lexer@2.3.2:
     resolution: {integrity: sha512-poHGpORABojJJucnV9KbOavETW8lBVnphkW77ER5/BQ5Fz7oXSoCNek7IH3vR5nRjdsEz926ibFYX8KtLQmdyw==}
 
@@ -3124,6 +3165,9 @@ packages:
   hono@4.13.14:
     resolution: {integrity: sha512-yhRLQ21U6qa9Hsu2N7Qcbh8tE+WKEcoErjIo56LeSGiGXGp9sA7UpE86Ui9uexb61KakiGwuHMn2QdV7w6i6kQ==}
     engines: {node: '>=16.9.0'}
+
+  html-to-image@1.11.13:
+    resolution: {integrity: sha512-cuOPoI7WApyhBElTTb9oqsawRvZ0rHhaHwghRLlTuffoD1B2aDemlCruLeZrUIIdvG7gs9xeELEPm6PhuASqrg==}
 
   html-void-elements@3.0.0:
     resolution: {integrity: sha512-bEqo66MRXsUGxWHV5IP0PUiAWwoEjba4VCzg0LjFJBpchPaTfyfCKTG6bc5F8ucKec3q5y6qOdGyYTSBEvhCrg==}
@@ -3737,6 +3781,10 @@ packages:
   picomatch@4.0.7:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
+
+  pixelmatch@7.2.0:
+    resolution: {integrity: sha512-xhcb4yHu9sM/G7foGzoLtXYcC0zHEaOXXjRKhGup0fw78Nf2Tkiapv4EQyMzrbcmQPsllAI7DbFY2UT7PlI9Pg==}
+    hasBin: true
 
   pkce-challenge@5.0.1:
     resolution: {integrity: sha512-wQ0b/W4Fr01qtpHlqSqspcj3EhBvimsdh0KlHhH8HRZnMsEa0ea2fTULOXOS9ccQr3om+GcGRk4e+isrZWV8qQ==}
@@ -4966,13 +5014,13 @@ snapshots:
     dependencies:
       '@dnd-kit/geometry': 0.4.0
       '@dnd-kit/state': 0.4.0
-      tslib: 2.8.1
+      tslib: 2.9.1
 
   '@dnd-kit/collision@0.4.0':
     dependencies:
       '@dnd-kit/abstract': 0.4.0
       '@dnd-kit/geometry': 0.4.0
-      tslib: 2.8.1
+      tslib: 2.9.1
 
   '@dnd-kit/dom@0.4.0':
     dependencies:
@@ -4985,7 +5033,7 @@ snapshots:
   '@dnd-kit/geometry@0.4.0':
     dependencies:
       '@dnd-kit/state': 0.4.0
-      tslib: 2.8.1
+      tslib: 2.9.1
 
   '@dnd-kit/helpers@0.4.0':
     dependencies:
@@ -4995,7 +5043,7 @@ snapshots:
   '@dnd-kit/state@0.4.0':
     dependencies:
       '@preact/signals-core': 1.14.4
-      tslib: 2.8.1
+      tslib: 2.9.1
 
   '@dnd-kit/svelte@0.4.0(svelte@5.56.10)':
     dependencies:
@@ -5008,7 +5056,7 @@ snapshots:
   '@emnapi/core@1.11.0':
     dependencies:
       '@emnapi/wasi-threads': 1.2.2
-      tslib: 2.8.1
+      tslib: 2.9.1
     optional: true
 
   '@emnapi/core@1.11.2':
@@ -5024,12 +5072,12 @@ snapshots:
   '@emnapi/core@1.9.2':
     dependencies:
       '@emnapi/wasi-threads': 1.2.1
-      tslib: 2.8.1
+      tslib: 2.9.1
     optional: true
 
   '@emnapi/runtime@1.11.0':
     dependencies:
-      tslib: 2.8.1
+      tslib: 2.9.1
     optional: true
 
   '@emnapi/runtime@1.11.3':
@@ -5042,7 +5090,7 @@ snapshots:
 
   '@emnapi/runtime@1.9.2':
     dependencies:
-      tslib: 2.8.1
+      tslib: 2.9.1
     optional: true
 
   '@emnapi/wasi-threads@1.1.0':
@@ -5051,12 +5099,12 @@ snapshots:
 
   '@emnapi/wasi-threads@1.2.1':
     dependencies:
-      tslib: 2.8.1
+      tslib: 2.9.1
     optional: true
 
   '@emnapi/wasi-threads@1.2.2':
     dependencies:
-      tslib: 2.8.1
+      tslib: 2.9.1
 
   '@emoji-mart/data@1.2.1': {}
 
@@ -5228,6 +5276,8 @@ snapshots:
   '@floating-ui/utils@0.2.12': {}
 
   '@fontsource-variable/dm-sans@5.3.0': {}
+
+  '@fontsource-variable/inter@5.3.0': {}
 
   '@fontsource-variable/source-code-pro@5.2.7': {}
 
@@ -5892,6 +5942,19 @@ snapshots:
       jiti: 2.7.0
       typescript: 5.9.3
 
+  '@lapismd/storybook-addon-visual-delta@0.0.7(playwright@1.62.1)(react@19.2.8)(storybook@10.6.5(@types/react@19.2.18)(react@19.2.8))(svelte@5.56.10)(vite@6.4.5(@types/node@24.19.2)(jiti@2.7.0)(lightningcss@1.30.1)(tsx@4.23.13)(yaml@2.9.0))':
+    dependencies:
+      '@storybook/icons': 2.1.0(react@19.2.8)
+      html-to-image: 1.11.13
+      pixelmatch: 7.2.0
+      pngjs: 7.0.0
+      react: 19.2.8
+      storybook: 10.6.5(@types/react@19.2.18)(react@19.2.8)
+    optionalDependencies:
+      playwright: 1.62.1
+      svelte: 5.56.10
+      vite: 6.4.5(@types/node@24.19.2)(jiti@2.7.0)(lightningcss@1.30.1)(tsx@4.23.13)(yaml@2.9.0)
+
   '@lezer/common@1.5.5': {}
 
   '@lezer/cpp@1.1.6':
@@ -6531,7 +6594,7 @@ snapshots:
 
   '@swc/helpers@0.5.23':
     dependencies:
-      tslib: 2.8.1
+      tslib: 2.9.1
 
   '@tailwindcss/node@4.1.12':
     dependencies:
@@ -6677,7 +6740,7 @@ snapshots:
 
   '@tybys/wasm-util@0.10.3':
     dependencies:
-      tslib: 2.8.1
+      tslib: 2.9.1
 
   '@types/aria-query@5.0.4': {}
 
@@ -6999,7 +7062,7 @@ snapshots:
 
   ast-types@0.16.1:
     dependencies:
-      tslib: 2.8.1
+      tslib: 2.9.1
 
   axe-core@4.13.0: {}
 
@@ -7465,6 +7528,8 @@ snapshots:
 
   es-errors@1.3.0: {}
 
+  es-module-lexer@1.7.0: {}
+
   es-module-lexer@2.3.2: {}
 
   es-object-atoms@1.1.2:
@@ -7895,6 +7960,8 @@ snapshots:
   highlight.js@11.11.2: {}
 
   hono@4.13.14: {}
+
+  html-to-image@1.11.13: {}
 
   html-void-elements@3.0.0: {}
 
@@ -8729,6 +8796,10 @@ snapshots:
 
   picomatch@4.0.7: {}
 
+  pixelmatch@7.2.0:
+    dependencies:
+      pngjs: 7.0.0
+
   pkce-challenge@5.0.1: {}
 
   pkg-types@1.3.1:
@@ -8837,7 +8908,7 @@ snapshots:
       esprima: 4.0.1
       source-map: 0.6.1
       tiny-invariant: 1.3.3
-      tslib: 2.8.1
+      tslib: 2.9.1
 
   redent@3.0.0:
     dependencies:
