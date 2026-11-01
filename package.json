@@ -106,8 +106,8 @@
   "peerDependencies": {
     "@codemirror/state": "^6.7.6",
     "@codemirror/view": "^6.43.15",
-    "@lapis-notes/api": "^0.2.3",
-    "@lapismd/design-core": "^0.7.4",
+    "@lapis-notes/api": "^0.2.4",
+    "@lapismd/design-core": "^0.7.4 || ^0.8.0 || ^0.9.0",
     "svelte": "^5.0.0"
   },
   "devDependencies": {
@@ -122,13 +122,13 @@
     "@codemirror/view": "6.43.15",
     "@fontsource-variable/dm-sans": "^5.2.8",
     "@fontsource-variable/source-code-pro": "5.2.7",
-    "@lapis-notes/api": "^0.2.3",
+    "@lapis-notes/api": "^0.2.4",
     "@lapis-notes/file-explorer": "^0.2.0",
     "@lapis-notes/markdown": "^0.2.0",
     "@lapis-notes/search": "^0.1.4",
     "@lapis-notes/ui": "^0.1.5",
     "@lapis-notes/workspace": "^0.3.1",
-    "@lapismd/design-core": "^0.7.4",
+    "@lapismd/design-core": "^0.9.0",
     "@lapismd/mira": "~0.1.4",
     "@lapismd/spec-validator": "^0.2.0",
     "@lezer/highlight": "1.2.5",
