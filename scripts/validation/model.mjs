@@ -112,6 +112,8 @@ export function browserInvocations(args) {
 export function auditRouting(scripts, lanes) {
   const findings = [];
   const native = {
+    "registry:publish": "node scripts/registry-release.mjs publish",
+    "registry:sign": "node scripts/registry-release.mjs sign",
     changeset: "changeset",
     "release:version": "node scripts/release.mjs version",
     "release:publish": "node scripts/release.mjs publish",

@@ -20,17 +20,7 @@
     customPropertyContrastRatio,
   } from "./contrast";
 
-  const workspaceA11y = {
-    test: "error",
-    config: {
-      rules: [
-        // Full-shell rows intentionally compose nested task controls.
-        { id: "nested-interactive", enabled: false },
-        // CodeMirror owns its aria-hidden gutter focus behavior upstream.
-        { id: "aria-hidden-focus", enabled: false },
-      ],
-    },
-  } as const;
+  import { workspaceA11y } from "./workspace-a11y";
 
   const { Story } = defineMeta({
     title: "Plugins/Tasks/Shell",

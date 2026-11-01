@@ -33,5 +33,11 @@
   "ci:storybook-interaction-1": "node scripts/test-storybook-batches.mjs -- --shard=1/3",
   "ci:storybook-interaction-2": "node scripts/test-storybook-batches.mjs -- --shard=2/3",
   "ci:storybook-interaction-3": "node scripts/test-storybook-batches.mjs -- --shard=3/3",
-  "ci:release-prepare": "pnpm run prepack && node scripts/release.mjs prepare"
+  "ci:release-prepare": "pnpm run prepack && node scripts/release.mjs prepare",
+  "registry:prepare": "pnpm build:bundle && node scripts/registry-release.mjs prepare .release/runtime",
+  "registry:media:capture": "node scripts/registry-media.mjs",
+  "registry:media:check": "node scripts/registry-media.mjs --check",
+  "registry:check": "vitest run --project unit scripts/registry-*.test.mjs --maxWorkers=1 --no-file-parallelism",
+  "build:bundle": "node scripts/build-plugin-bundle.mjs",
+  "registry:runtime:check": "pnpm registry:prepare && node scripts/registry-runtime-smoke.mjs"
 }

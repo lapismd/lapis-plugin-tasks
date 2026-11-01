@@ -64,7 +64,15 @@
     "release:prepare": "node scripts/validation.mjs run release:prepare",
     "release:publish": "node scripts/release.mjs publish",
     "release:verify": "node scripts/release.mjs verify",
-    "release:attest": "node scripts/release.mjs attest"
+    "release:attest": "node scripts/release.mjs attest",
+    "registry:prepare": "node scripts/validation.mjs run registry:prepare",
+    "registry:media:capture": "node scripts/validation.mjs run registry:media:capture",
+    "registry:media:check": "node scripts/validation.mjs run registry:media:check",
+    "registry:check": "node scripts/validation.mjs run registry:check",
+    "registry:sign": "node scripts/registry-release.mjs sign",
+    "registry:publish": "node scripts/registry-release.mjs publish",
+    "build:bundle": "node scripts/validation.mjs run build:bundle",
+    "registry:runtime:check": "node scripts/validation.mjs run registry:runtime:check"
   },
   "files": [
     "dist",
@@ -160,6 +168,12 @@
     "vitest": "4.1.12",
     "@changesets/cli": "^3.0.3",
     "@dnd-kit/dom": "0.4.0",
-    "sigstore": "4.1.1"
+    "sigstore": "4.1.1",
+    "fflate": "^0.8.3",
+    "es-module-lexer": "^1.7.0",
+    "sharp": "0.35.5",
+    "@fontsource-variable/inter": "5.3.0",
+    "@lapismd/storybook-addon-visual-delta": "0.0.7",
+    "playwright": "1.62.1"
   }
 }

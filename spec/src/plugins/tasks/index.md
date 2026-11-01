@@ -254,3 +254,11 @@ Live-edit mutation acceptance for LN-TASK-036 retains exact persisted-source
 assertions and waits for both expected task rows in the saved structural order
 before chaining another interaction. Projection completion requires those
 visible task controls in addition to the mounted editor and TaskRun boundary.
+
+Registry distribution is governed by LPT-SPEC-023. Root `registry.json` owns immutable source media references. The registry receiver opens a one-file submission PR; maintainers merge it into the queue and review the combined publication PR. Installable archives externalize only declared public host modules and bundle other dependencies. Existing npm releases without source metadata are not retrofitted; the next patch release onboards this plugin.
+
+Registry archives MUST externalize only public web modules admitted by the
+published API host import map. Public components absent from that map MUST be
+bundled, rather than relying on a host to resolve their package names. The
+archive acceptance lane MUST boot the actual compiled plugin class in a fresh
+Lapis WorkspaceShell, open task details, and dispose it without runtime errors.

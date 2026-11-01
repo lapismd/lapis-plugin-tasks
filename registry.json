@@ -1,0 +1,141 @@
+{
+  "$schema": "https://registry.lapis.md/schemas/plugin-source.schema.json",
+  "schemaVersion": 2,
+  "categories": ["productivity"],
+  "highlights": [
+    "Plan daily work and project lists from vault-native Markdown tasks.",
+    "Track recurrence, due dates, checklists and task metadata.",
+    "Query and index tasks across the vault."
+  ],
+  "documentationUrl": "https://github.com/lapismd/lapis-plugin-tasks#readme",
+  "appearance": {
+    "icon": "list-checks",
+    "accent": "#8B5CF6"
+  },
+  "media": {
+    "banner": {
+      "alt": "Tasks daily planner in the real Lapis workspace with Explorer, project lists, a calendar and populated task rows.",
+      "images": {
+        "preview": {
+          "path": "registry-assets/banner.preview.webp"
+        },
+        "full": {
+          "path": "registry-assets/banner.full.webp"
+        },
+        "light": {
+          "path": "registry-assets/banner.light.webp"
+        },
+        "dark": {
+          "path": "registry-assets/banner.dark.webp"
+        }
+      },
+      "capture": {
+        "storyId": "plugins-tasks-registry-screenshots--daily-planner",
+        "focus": "full-shell"
+      }
+    },
+    "overview": {
+      "alt": "Task detail view in the Lapis workspace, showing scheduling metadata, a checklist and comments.",
+      "images": {
+        "preview": {
+          "path": "registry-assets/overview.preview.webp"
+        },
+        "full": {
+          "path": "registry-assets/overview.full.webp"
+        },
+        "light": {
+          "path": "registry-assets/overview.light.webp"
+        },
+        "dark": {
+          "path": "registry-assets/overview.dark.webp"
+        }
+      },
+      "capture": {
+        "storyId": "plugins-tasks-registry-screenshots--task-details",
+        "focus": "full-shell"
+      }
+    }
+  },
+  "gallery": [
+    {
+      "alt": "Tasks daily planner in the real Lapis workspace with Explorer, project lists, a calendar and populated task rows.",
+      "images": {
+        "preview": {
+          "path": "registry-assets/gallery/planner.preview.webp"
+        },
+        "full": {
+          "path": "registry-assets/gallery/planner.full.webp"
+        },
+        "light": {
+          "path": "registry-assets/gallery/planner.light.webp"
+        },
+        "dark": {
+          "path": "registry-assets/gallery/planner.dark.webp"
+        }
+      },
+      "capture": {
+        "storyId": "plugins-tasks-registry-screenshots--daily-planner",
+        "focus": "full-shell"
+      },
+      "id": "planner",
+      "card": {
+        "headline": [
+          {
+            "text": "Make room",
+            "tone": "neutral"
+          },
+          {
+            "text": "for focused work",
+            "tone": "violet"
+          }
+        ],
+        "description": [
+          {
+            "text": "Your next step, in view.",
+            "tone": "neutral"
+          }
+        ]
+      }
+    },
+    {
+      "alt": "Task detail view in the Lapis workspace, showing scheduling metadata, a checklist and comments.",
+      "images": {
+        "preview": {
+          "path": "registry-assets/gallery/details.preview.webp"
+        },
+        "full": {
+          "path": "registry-assets/gallery/details.full.webp"
+        },
+        "light": {
+          "path": "registry-assets/gallery/details.light.webp"
+        },
+        "dark": {
+          "path": "registry-assets/gallery/details.dark.webp"
+        }
+      },
+      "capture": {
+        "storyId": "plugins-tasks-registry-screenshots--task-details",
+        "focus": "full-shell"
+      },
+      "id": "details",
+      "card": {
+        "headline": [
+          {
+            "text": "Turn the details",
+            "tone": "neutral"
+          },
+          {
+            "text": "into the next action",
+            "tone": "violet"
+          }
+        ],
+        "description": [
+          {
+            "text": "Notes and checklists.",
+            "tone": "neutral"
+          }
+        ]
+      }
+    }
+  ]
+}
