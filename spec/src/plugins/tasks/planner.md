@@ -375,3 +375,7 @@ Navigation acceptance scopes the collapsed Today count to its visible tooltip.
 The same number may remain in the open planner, so the story MUST verify the
 label and count inside the visible public tooltip content rather than use a document-wide
 number query.
+
+Custom recurrence catalog acceptance waits for the reopened end-condition menu
+option to become visible before selecting After count, then verifies the saved
+recurrence. Merely finding the option in the DOM does not establish readiness.
