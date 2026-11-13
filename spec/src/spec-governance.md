@@ -4,7 +4,7 @@
 
 Dependency update PRs from the trusted LapisMD App, Dependabot or Renovate MAY skip specification checks using the PR author rather than the rerun actor. Functional checks remain required. The shared `lapismd/dependency-automation` coordinator proposes published first-party npm updates with Changeset release intent where required; it does not merge, publish, sign or deploy. This CI policy changes no runtime or public contract in this chapter.
 
-Tracked dependencies use registry API `^0.2.3`, Design Core `^0.9.0`, UI `^0.1.5` and Mira `~0.1.4`.
+Tracked dependencies use registry API `^0.2.3`, Design Core `^0.9.0`, UI `^0.1.5` and Mira `~0.1.5`.
 Explicit temporary source acceptance follows LPT-SPEC-014 with verified archives
 in isolated installations. Source ownership and public contracts remain unchanged.
 Shared specification tooling resolves the Deno-free `@lapismd/spec-validator@0.2.0` from npm.
@@ -267,19 +267,22 @@ newly configured trusted publisher.
 
 The Tasks runtime and required-peer closure is audited independently of package
 signatures and source-owner approvals. Published Design Core ^0.7.4 and Mira
-~0.1.4 are the required floors. A duplicate consumer dependency must not
+~0.1.5 are the required floors. A duplicate consumer dependency must not
 substitute for that source-owned release boundary. An exception recorded by
 another package does not transfer to Tasks.
 
 The first split dependency audit failed while fixable advisories were still
 installed. Workspace override floors now require `dompurify >=3.4.17`,
 `source-map-js >=1.2.2`, `brace-expansion >=5.0.12`, `minimatch >=11.0.1`,
-`glob >=14.0.2`, and `katex >=0.18.2`. Those floors clear the DOMPurify,
+`glob >=14.0.2`, `katex >=0.18.2`, Hono `4.13.16`, and `@hono/node-server`
+`2.1.6`. Those floors clear the DOMPurify,
 source-map-js, brace-expansion, minimatch GHSA-g3hv-75wg-m249, glob
-GHSA-3g3m-2fjr-6pw4, and residual KaTeX GHSA-238p-pmpm-9mq7 findings. Mermaid
+GHSA-3g3m-2fjr-6pw4, residual KaTeX GHSA-238p-pmpm-9mq7, Hono
+`GHSA-4m76-xfj5-7975`/`GHSA-h7mg-cq63-vhpq`/`GHSA-46wx-v44x-9hh2`/`GHSA-4h7h-rv7c-7m2v`/`GHSA-3gg2-335m-rxc6`,
+and `@hono/node-server` `GHSA-qv5m-9pm6-hqp3`/`GHSA-jpvv-r467-5p4w` findings. Mermaid
 still declares `katex ^0.16.47` and cacache still declares `glob ^13`; the
 floors are the Tasks remediation of those transitive ranges and do not replace
-the adopted Mira 0.1.4 release. The Bits UI patch hash stays
+the adopted Mira 0.1.5 release. The Bits UI patch hash stays
 `debd3bc7d43917f0967f0cc1e212fc5c7721c751d3b92bf8f31030d1c96289ad`.
 
 `deepmerge@4.3.1` has no patched release for GHSA-gcqx-w48m-w2h4. pnpm
@@ -321,13 +324,13 @@ configuration and frozen lockfile, keeping all package dependencies on normal
 registry versions. The isolated Docker installer consumes that exact root
 configuration; Core's own patch metadata is insufficient for Tasks acceptance.
 The final registry-only full Tasks validation must use actual released API
-0.2.3, Core 0.7.4 and development Mira ~0.1.4 with the explicit root Bits patch. API 0.2.3 carries the
+0.2.3, Core 0.7.4 and development Mira ~0.1.5 with the explicit root Bits patch. API 0.2.3 carries the
 Notes lifecycle repair. Tasks must raise both API peer/development minimums to
 `^0.2.3` and explicitly resolve the published lock entry, even when the owner
 publishes that release under its `next` tag; an existing `^0.2.2` lock is not
 proof that the lifecycle fix is installed. The Core peer and development
 minimum must admit published Design Core `^0.9.0` or newer, and the development
-Mira range must admit published `~0.1.4`.
+Mira range must admit published `~0.1.5`.
 
 The shared payload is `patches/bits-ui@2.20.2.patch`, SHA256
 `debd3bc7d43917f0967f0cc1e212fc5c7721c751d3b92bf8f31030d1c96289ad`.
