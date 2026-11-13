@@ -12,8 +12,8 @@ Tasks acceptance uses this frozen registry graph with the explicit root Bits
 patch. GitHub CI fans Governance, Quality, Unit tests, Native, Static Storybook,
 and three Storybook interaction shards through Docker, then Dependency audits.
 Validate is the gate before source and version merges and publication. Dependency
-audits must pass on the patched transitive floors, ignoring only unfixed
-deepmerge GHSA-gcqx-w48m-w2h4.
+audits must pass on the patched transitive floors, including Hono `4.13.16` and
+`@hono/node-server` `2.1.6`, ignoring only unfixed deepmerge GHSA-gcqx-w48m-w2h4.
 
 `@lapis-notes/lapis-plugin-tasks` owns the first-party external Tasks catalog
 and plugin runtime. A task is a Markdown file with YAML front

@@ -274,9 +274,12 @@ another package does not transfer to Tasks.
 The first split dependency audit failed while fixable advisories were still
 installed. Workspace override floors now require `dompurify >=3.4.17`,
 `source-map-js >=1.2.2`, `brace-expansion >=5.0.12`, `minimatch >=11.0.1`,
-`glob >=14.0.2`, and `katex >=0.18.2`. Those floors clear the DOMPurify,
+`glob >=14.0.2`, `katex >=0.18.2`, Hono `4.13.16`, and `@hono/node-server`
+`2.1.6`. Those floors clear the DOMPurify,
 source-map-js, brace-expansion, minimatch GHSA-g3hv-75wg-m249, glob
-GHSA-3g3m-2fjr-6pw4, and residual KaTeX GHSA-238p-pmpm-9mq7 findings. Mermaid
+GHSA-3g3m-2fjr-6pw4, residual KaTeX GHSA-238p-pmpm-9mq7, Hono
+`GHSA-4m76-xfj5-7975`/`GHSA-h7mg-cq63-vhpq`/`GHSA-46wx-v44x-9hh2`/`GHSA-4h7h-rv7c-7m2v`/`GHSA-3gg2-335m-rxc6`,
+and `@hono/node-server` `GHSA-qv5m-9pm6-hqp3`/`GHSA-jpvv-r467-5p4w` findings. Mermaid
 still declares `katex ^0.16.47` and cacache still declares `glob ^13`; the
 floors are the Tasks remediation of those transitive ranges and do not replace
 the adopted Mira 0.1.5 release. The Bits UI patch hash stays
