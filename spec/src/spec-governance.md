@@ -353,3 +353,7 @@ alone does not qualify an unpatched UI host. Keep the patch until an upstream
 release contains every recorded repair and passes each original reproduction
 plus the complete affected lanes, then remove the root patch declaration/file and
 refresh every affected consumer lock together.
+
+The Visual Delta development dependency intake resolves registry version
+`0.1.0` in the frozen lockfile. Existing comparison-only visual review and
+explicit baseline approval rules remain in force for the Tasks catalog.

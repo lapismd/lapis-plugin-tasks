@@ -1,5 +1,8 @@
 # Tasks plugin
 
+Catalog development uses registry Visual Delta `0.1.0`; the addon stays outside
+the published plugin runtime and does not alter Tasks host contracts.
+
 Tracked dependencies use registry API `^0.2.3`, Design Core `^0.7.4 || ^0.8.0 || ^0.9.0`, UI
 `^0.1.5` and Mira `~0.1.5` through portable npm ranges. Clean registry-only Docker qualification
 remains distinct from temporary archive acceptance governed by LPT-SPEC-014,
