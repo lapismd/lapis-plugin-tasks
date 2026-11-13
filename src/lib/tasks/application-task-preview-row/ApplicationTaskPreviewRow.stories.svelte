@@ -663,13 +663,16 @@
       throw new Error("Missing the visible recurrence end-condition trigger");
     }
     await userEvent.click(endOnDate);
-    await userEvent.click(
-      within(
+    const afterCount = await waitFor(() => {
+      const option = within(
         within(customForm).getByRole("listbox", {
           name: "Recurrence end condition",
         }),
-      ).getByRole("option", { name: "After count" }),
-    );
+      ).getByRole("option", { name: "After count" });
+      expect(option).toBeVisible();
+      return option;
+    });
+    await userEvent.click(afterCount);
     const count = within(customForm).getByRole("spinbutton", {
       name: "Recurrence count",
     });
