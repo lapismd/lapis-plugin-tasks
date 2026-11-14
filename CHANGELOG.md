@@ -1,5 +1,11 @@
 # @lapis-notes/lapis-plugin-tasks
 
+## 0.2.0
+
+### Minor Changes
+
+- f4900bf: Contribute native Tasks operation definitions and shared CLI help for scoped HTTP, MCP and CLI access.
+
 ## 0.1.5
 
 ### Patch Changes
