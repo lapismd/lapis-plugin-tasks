@@ -374,3 +374,13 @@ Registry product imagery for the task-details overview and gallery card MUST
 reproduce the current governed capture. A product-media refresh updates only
 declared WebP outputs and retains the fixed stories, light/dark variants and
 separate Visual Delta baseline-approval boundary.
+
+The Core 0.13 / Mira 0.2 catalog intake uses the published API 0.4.0 and
+Workspace 0.4.1 cohort, superseding the historical catalog floors above while
+preserving the old API peer line. Workspace 0.3 excludes Core 0.13 and MUST NOT
+be coerced with an override or a consumer type cast. Source qualification MAY
+use checksum-verified Markdown and Search candidate archives from their owning
+Plugins repository in the isolated worker only. That provisional evidence MUST
+remain separate from final registry-only acceptance after those independently
+versioned packages are published. Manifests, tracked lockfiles, host ownership,
+patch provenance and all normal gates remain governed by their existing rules.
