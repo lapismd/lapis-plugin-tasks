@@ -265,11 +265,13 @@ visible task controls in addition to the mounted editor and TaskRun boundary.
 
 Registry distribution is governed by LPT-SPEC-023. Root `registry.json` owns immutable source media references. The registry receiver opens a one-file submission PR; maintainers merge it into the queue and review the combined publication PR. Installable archives externalize only declared public host modules and bundle other dependencies. Existing npm releases without source metadata are not retrofitted; the next patch release onboards this plugin.
 
-Registry archives MUST externalize only public web modules admitted by the
-published API host import map. Public components absent from that map MUST be
-bundled, rather than relying on a host to resolve their package names. The
-archive acceptance lane MUST boot the actual compiled plugin class in a fresh
-Lapis WorkspaceShell, open task details, and dispose it without runtime errors.
+Registry archives MUST externalize only modules declared in the Tasks runtime
+manifest and admitted as public web modules by the published API host import
+map. Public components absent from either set MUST be bundled, rather than
+relying on a host to resolve their package names. The archive acceptance lane
+MUST boot the actual compiled plugin class in a fresh Lapis WorkspaceShell, open
+task details and the Markdown comment composer, and dispose it without runtime
+errors.
 
 The tracked custom-recurrence row scenario MUST await the reopened end-condition
 option becoming visible before choosing After count, and MUST retain its

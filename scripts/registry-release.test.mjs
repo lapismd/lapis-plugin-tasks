@@ -287,3 +287,18 @@ test("every external runtime module is in the published web host import map", as
     );
   expect(missing).toEqual([]);
 });
+
+test("runtime bundle shares only the modules declared by Tasks", async () => {
+  const { default: config } = await import("../vite.bundle.config.ts");
+  const external = config.build.rollupOptions.external;
+  const manifest = await json("manifest.json");
+  const shared = manifest.lapis.runtime.entries.workspace.sharedDependencies;
+  expect(shared).toContain("@lapismd/design-core/shadcn/button");
+  expect(external("@lapismd/design-core/shadcn/button")).toBe(true);
+  // Public host availability alone must not create an undeclared archive import.
+  expect(shared).toContain("@lapismd/design-core/chat");
+  expect(external("@lapismd/design-core/chat")).toBe(true);
+  expect(shared).not.toContain("@lapismd/design-core/shadcn/card");
+  expect(external("@lapismd/design-core/shadcn/card")).toBe(false);
+  expect(external("@lapismd/design-core/unavailable")).toBe(false);
+});
