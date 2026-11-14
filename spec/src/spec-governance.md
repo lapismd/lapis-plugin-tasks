@@ -369,3 +369,8 @@ The Mira 0.2 maintenance intake changes only the development catalog graph.
 Tasks runtime dependencies and every governance, quality, interaction and
 accessibility gate remain required. The merged existing-version attestation
 recovery remains unchanged and retains exact registry artifact verification.
+
+Registry product imagery for the task-details overview and gallery card MUST
+reproduce the current governed capture. A product-media refresh updates only
+declared WebP outputs and retains the fixed stories, light/dark variants and
+separate Visual Delta baseline-approval boundary.

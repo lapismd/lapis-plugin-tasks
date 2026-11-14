@@ -146,5 +146,12 @@ pass 2,924 units, the native lanes, all 65 catalog interaction/accessibility
 cases, builds, package lint and specification checks in Docker. The aggregate
 then finds stale `registry-assets/overview.preview.webp`; the exact
 `registry:media:check` also fails at that file on unchanged main `ec9a3ed4`.
-This pre-existing visual comparison remains pending separate review; no
-committed registry image or visual baseline changes accompany this intake.
+The separate product-media refresh updates only the declared overview and
+details WebP outputs. Exact recapture must reproduce them before publication;
+visual test baselines remain unchanged.
+
+Fresh `registry:media:check` verifies all 16 declared WebP outputs after the
+eight task-details outputs are refreshed. `registry:prepare` and the cold
+production archive host pass with the actual Tasks plugin, planner, details
+and teardown. The new patch Changeset binds the product-media refresh to a
+new release rather than replacing an existing immutable published artifact.
