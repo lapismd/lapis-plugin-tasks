@@ -2,9 +2,11 @@
   import { Button } from "@lapismd/design-core/shadcn/button";
   import { Textarea } from "@lapismd/design-core/shadcn/textarea";
   import * as Chat from "@lapismd/design-core/ai/chat";
+  import { MarkdownComposer } from "@lapismd/design-core/chat";
   import * as Accordion from "@lapismd/design-core/shadcn/accordion";
   import * as Empty from "@lapismd/design-core/shadcn/empty";
   import CheckIcon from "@lucide/svelte/icons/check";
+  import MessageSquareIcon from "@lucide/svelte/icons/message-square";
   import PencilIcon from "@lucide/svelte/icons/pencil";
   import RotateCcwIcon from "@lucide/svelte/icons/rotate-ccw";
   import Trash2Icon from "@lucide/svelte/icons/trash-2";
@@ -34,7 +36,7 @@
     onRefresh: () => void | Promise<void>;
   } = $props();
   let comments = $state<TaskComment[]>([]);
-  let openSections = $state<string[]>(["comments"]);
+  let openSections = $state<string[]>([]);
   let rows = $state<TaskOccurrenceHistoryRow[]>([]);
   let draft = $state("");
   let editId = $state<string | null>(null);
@@ -44,6 +46,7 @@
   let error = $state<string | null>(null);
   let busy = $state(false);
   let generation = 0;
+  let disclosurePath: string | null = null;
   const today = $derived(todayDateOnly(repository.now()));
   const filteredRows = $derived(filterTaskOccurrenceHistory(rows, filter));
   const statistics = $derived(
@@ -69,6 +72,10 @@
           : [];
       if (current !== generation) return;
       comments = document.task.comments;
+      if (disclosurePath !== path) {
+        openSections = comments.length ? ["comments"] : [];
+        disclosurePath = path;
+      }
       rows = history.filter((row) => row.taskId === task.id);
     } catch (cause) {
       if (current === generation)
@@ -98,14 +105,11 @@
   }
   async function post(value: string) {
     if (busy || !value.trim()) return;
-    // The shared composer clears after submit; restore only an unpersisted draft.
-    const submittedDraft = draft;
-    let saved = false;
     await mutate(async () => {
       await repository.addComment(task.sourcePath!, value);
-      saved = true;
+      // Acknowledge only this successfully persisted snapshot.
+      if (draft === value) draft = "";
     });
-    if (!saved) draft = submittedDraft;
   }
 </script>
 
@@ -118,11 +122,12 @@
     {#if task.tracking && task.repeat}
       <Accordion.Item value="history">
         <Accordion.Trigger
+          class="task-detail-extras__heading"
           level={2}
           indicatorPosition="start"
           indicatorVariant="disclosure">History</Accordion.Trigger
         >
-        <Accordion.Content>
+        <Accordion.Content class="task-detail-extras__content">
           <ToggleGroup.Root
             type="single"
             value={days}
@@ -202,6 +207,7 @@
     {/if}
     <Accordion.Item value="comments">
       <Accordion.Trigger
+        class="task-detail-extras__heading"
         level={2}
         indicatorPosition="start"
         indicatorVariant="disclosure"
@@ -209,7 +215,7 @@
           ? `(${comments.length})`
           : ""}</Accordion.Trigger
       >
-      <Accordion.Content>
+      <Accordion.Content class="task-detail-extras__content">
         <Chat.MessageList
           density="compact"
           aria-label={`${task.title} comments`}
@@ -218,6 +224,9 @@
           {#snippet emptyState()}
             <Empty.Root>
               <Empty.Header>
+                <Empty.Media variant="icon"
+                  ><MessageSquareIcon aria-hidden="true" /></Empty.Media
+                >
                 <Empty.Title>No comments yet</Empty.Title>
                 <Empty.Description
                   >Leave a local comment below.</Empty.Description
@@ -333,24 +342,14 @@
             </Chat.Message>
           {/each}
         </Chat.MessageList>
-        <Chat.Composer
+        <MarkdownComposer
           bind:value={draft}
-          density="compact"
+          label="Task comment composer"
+          inputLabel="Local comment"
           placeholder="Leave a comment…"
           disabled={busy}
           onSubmit={(value) => void post(value)}
-        >
-          {#snippet input()}
-            <Chat.ComposerInput
-              bind:value={draft}
-              label="Local comment"
-              placeholder="Leave a comment…"
-              disabled={busy}
-              hasHistory={false}
-              pasteAsToken={false}
-            />
-          {/snippet}
-        </Chat.Composer>
+        />
       </Accordion.Content>
     </Accordion.Item>
   </Accordion.Root>
@@ -358,8 +357,31 @@
 
 <style>
   .task-detail-extras {
-    padding: 0.75rem 1rem;
+    padding: 0;
     font: inherit;
+  }
+  .task-detail-extras :global(.task-detail-extras__heading) {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    min-height: 2.5rem;
+    border: 0;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+    padding: 0.5rem 1rem;
+    text-align: start;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .task-detail-extras :global(.task-detail-extras__heading:hover),
+  .task-detail-extras :global(.task-detail-extras__heading:focus-visible) {
+    background: var(--muted);
+    text-decoration: none;
+  }
+  .task-detail-extras :global(.task-detail-extras__content) {
+    padding: 0.75rem 1rem;
   }
   .task-detail-extras__muted {
     color: var(--muted-foreground);

@@ -18,9 +18,22 @@
 }
 
 .task-list-markdown-surface__content {
+  box-sizing: border-box;
   min-height: 100%;
-  padding: 1rem 1.25rem 2rem;
+  padding: 0.75rem 1rem;
   background: var(--task-list-document-background);
+}
+
+/* Full-file layout must leave compact inline Task editors on their own tokens. */
+.task-list-markdown-surface
+  .markdown-preview-surface:not([data-task-inline-notes] *),
+.task-list-markdown-surface
+  .markdown-editor-surface:not([data-task-inline-notes] *) {
+  --file-line-width: 100%;
+  --file-margins-x: 1rem;
+  --file-margins-y: 0.75rem;
+  --mira-preview-padding: 0;
+  --mira-preview-bottom-padding: 0;
 }
 
 .task-list-markdown-surface .lapis-markdown-file-surface,
