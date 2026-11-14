@@ -52,6 +52,78 @@
           "requiresReloadOnUpdate": false
         }
       }
+    },
+    "contributes": {
+      "operations": [
+        {
+          "id": "list",
+          "version": 1
+        },
+        {
+          "id": "get",
+          "version": 1
+        },
+        {
+          "id": "checklist",
+          "version": 1
+        },
+        {
+          "id": "plan",
+          "version": 1
+        },
+        {
+          "id": "start",
+          "version": 1
+        },
+        {
+          "id": "deadline",
+          "version": 1
+        },
+        {
+          "id": "inbox",
+          "version": 1
+        },
+        {
+          "id": "repeat",
+          "version": 1
+        },
+        {
+          "id": "tracking",
+          "version": 1
+        },
+        {
+          "id": "pause",
+          "version": 1
+        },
+        {
+          "id": "resume",
+          "version": 1
+        },
+        {
+          "id": "cancel",
+          "version": 1
+        },
+        {
+          "id": "reopen",
+          "version": 1
+        },
+        {
+          "id": "complete",
+          "version": 1
+        },
+        {
+          "id": "skip",
+          "version": 1
+        },
+        {
+          "id": "inspect",
+          "version": 1
+        },
+        {
+          "id": "retry",
+          "version": 1
+        }
+      ]
     }
   }
 }

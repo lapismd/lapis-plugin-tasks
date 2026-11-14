@@ -1,5 +1,10 @@
 # Tasks plugin
 
+The optional native operation declarations follow
+[LN-TASK-106](runtime/native-transformations.md). `operations.json` is generated
+from the compiled provider and shipped as package metadata; the existing Tasks
+workspace UI remains an observer of native services when selected.
+
 Catalog development uses registry Visual Delta `0.1.5`; the addon stays outside
 the published plugin runtime and does not alter Tasks host contracts.
 

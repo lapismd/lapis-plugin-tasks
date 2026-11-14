@@ -84,6 +84,10 @@ export default defineConfig(tableRequirements(), {
       ],
       rules: [
         {
+          pattern: "^(?:crates/lapis-task-operations/|operations\\.json$|scripts/operations\\.mjs$)",
+          chapters: ["spec/src/plugins/tasks/runtime.md"],
+        },
+        {
           pattern: "^stories/catalog/",
           chapters: ["spec/src/spec-governance.md"],
         },

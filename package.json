@@ -16,6 +16,9 @@
   },
   "type": "module",
   "scripts": {
+    "generate:operations": "node scripts/validation.mjs run generate:operations",
+    "check:operations": "node scripts/validation.mjs run check:operations",
+    "test:operations": "node scripts/validation.mjs run test:operations",
     "build": "node scripts/validation.mjs run build",
     "check": "node scripts/validation.mjs run check",
     "check:app-ownership": "node scripts/validation.mjs run check:app-ownership",
@@ -75,6 +78,7 @@
     "registry:runtime:check": "node scripts/validation.mjs run registry:runtime:check"
   },
   "files": [
+    "operations.json",
     "dist",
     "!dist/**/*.test.*",
     "!dist/**/*.spec.*",
@@ -91,6 +95,7 @@
   "svelte": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
+    "./operations.json": "./operations.json",
     ".": {
       "types": "./dist/index.d.ts",
       "svelte": "./dist/index.js",

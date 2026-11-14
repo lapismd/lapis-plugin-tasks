@@ -1,5 +1,10 @@
 # Runtime
 
+[LN-TASK-106](runtime/native-transformations.md) adds a compiled operation
+adapter over the existing admitted Core service. Its generated descriptors and
+authored help support HTTP, MCP and CLI without running renderer callbacks.
+`check:operations` and `test:operations` validate the rebased Core/Protocol pin.
+
 Vault Markdown is the source of truth. AppDatabase holds a disposable public
 `tasks/task` projection so the planner can query summaries without parsing
 every file on each paint. UI must not treat the database as authoritative.
