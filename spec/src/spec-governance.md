@@ -355,7 +355,7 @@ plus the complete affected lanes, then remove the root patch declaration/file an
 refresh every affected consumer lock together.
 
 The Visual Delta development dependency intake resolves registry version
-`0.1.0` in the frozen lockfile. Existing comparison-only visual review and
+`0.1.5` in the frozen lockfile. Existing comparison-only visual review and
 explicit baseline approval rules remain in force for the Tasks catalog.
 
 Before requesting fresh npm provenance, release attestation MUST look up the

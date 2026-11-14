@@ -1,6 +1,6 @@
 # Tasks plugin
 
-Catalog development uses registry Visual Delta `0.1.0`; the addon stays outside
+Catalog development uses registry Visual Delta `0.1.5`; the addon stays outside
 the published plugin runtime and does not alter Tasks host contracts.
 
 The public API peer range retains `^0.2.4` and admits `^0.4.0`. Catalog
