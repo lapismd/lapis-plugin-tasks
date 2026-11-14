@@ -11,6 +11,7 @@ import {
   validateExistingRelease,
   publicationDecision,
   verifyPublishedArtifact,
+  waitForRegistry,
   prepare,
   verifyProvenanceSigner,
 } from "./release.mjs";
@@ -120,6 +121,35 @@ describe("Tasks immutable npm release boundary", () => {
         bytes,
       ),
     ).toThrow("provenance");
+  });
+
+  it("waits through bounded npm propagation before verifying a release", async () => {
+    const lookup = vi
+      .fn()
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null)
+      .mockResolvedValue(metadata);
+    const sleep = vi.fn().mockResolvedValue();
+
+    await expect(
+      waitForRegistry(candidate, {
+        attempts: 3,
+        intervalMs: 5_000,
+        lookup,
+        sleep,
+      }),
+    ).resolves.toBe(metadata);
+    expect(lookup).toHaveBeenCalledTimes(3);
+    expect(sleep).toHaveBeenCalledTimes(2);
+
+    await expect(
+      waitForRegistry(candidate, {
+        attempts: 2,
+        intervalMs: 5_000,
+        lookup: vi.fn().mockResolvedValue(null),
+        sleep,
+      }),
+    ).rejects.toThrow("not downloadable");
   });
 
   it("skips an already published version and still checks its bytes and provenance", () => {

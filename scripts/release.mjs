@@ -349,16 +349,30 @@ async function registry(candidate) {
   return metadata;
 }
 
+export async function waitForRegistry(candidate, options = {}) {
+  const attempts = options.attempts ?? 60;
+  const intervalMs = options.intervalMs ?? 5_000;
+  const lookup = options.lookup ?? registry;
+  const sleep =
+    options.sleep ??
+    ((milliseconds) =>
+      new Promise((resolve) => setTimeout(resolve, milliseconds)));
+  if (!Number.isInteger(attempts) || attempts < 1)
+    throw Error("Registry verification attempts must be a positive integer");
+  if (!Number.isFinite(intervalMs) || intervalMs < 0)
+    throw Error("Registry verification interval must be non-negative");
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    const metadata = await lookup(candidate);
+    if (metadata) return metadata;
+    if (attempt + 1 < attempts) await sleep(intervalMs);
+  }
+  throw Error("Published npm version is not downloadable");
+}
+
 export async function verify(root = process.cwd(), options = {}) {
   const matchCandidate = options.matchCandidate !== false;
   const { candidate } = await loadCandidate(root);
-  let metadata;
-  for (let attempt = 0; attempt < 12; attempt++) {
-    metadata = await registry(candidate);
-    if (metadata) break;
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-  }
-  if (!metadata) throw Error("Published npm version is not downloadable");
+  const metadata = await waitForRegistry(candidate, options.registryWait);
   const response = await fetch(metadata.dist?.tarball);
   if (!response.ok)
     throw Error(`npm archive request failed: ${response.status}`);
