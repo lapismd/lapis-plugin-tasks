@@ -270,3 +270,8 @@ The tracked custom-recurrence row scenario MUST await the reopened end-condition
 option becoming visible before choosing After count, and MUST retain its
 persisted recurrence assertions. DOM insertion alone does not establish that
 the menu has completed its interaction-ready transition.
+
+Storybook development consumes released Mira `~0.2.0` through the registry
+lockfile. The published Tasks runtime still uses public API and Design Core
+contracts and does not add a Mira runtime dependency. The existing custom
+recurrence story retains its visibility and selection assertions.

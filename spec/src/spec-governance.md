@@ -4,7 +4,7 @@
 
 Dependency update PRs from the trusted LapisMD App, Dependabot or Renovate MAY skip specification checks using the PR author rather than the rerun actor. Functional checks remain required. The shared `lapismd/dependency-automation` coordinator proposes published first-party npm updates with Changeset release intent where required; it does not merge, publish, sign or deploy. This CI policy changes no runtime or public contract in this chapter.
 
-Tracked dependencies use registry API `^0.2.3`, Design Core `^0.9.0`, UI `^0.1.5` and Mira `~0.1.5`.
+Tracked dependencies use registry API `^0.2.3`, Design Core `^0.9.0`, UI `^0.1.5` and Mira `~0.2.0`.
 Explicit temporary source acceptance follows LPT-SPEC-014 with verified archives
 in isolated installations. Source ownership and public contracts remain unchanged.
 Shared specification tooling resolves the Deno-free `@lapismd/spec-validator@0.2.0` from npm.
@@ -15,8 +15,8 @@ archives under LPT-SPEC-014; registry-only and archive evidence stay distinct.
 The local Docker VM lacked build memory, so final portable checks use the
 documented bounded remote Docker context, without a native fallback.
 
-| ID | Requirement |
-| --- | --- |
+| ID           | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | LPT-SPEC-023 | registry distribution MUST prepare deterministic ESM installable archives from the exact admitted stable release commit, retain the source runtime ID, and sign only inside the protected `registry-production` environment with the app's pinned Ed25519 release key. It MUST verify the actual published archive, checksum, coordinates and resolved tag before dispatching `plugin_release`; retained assets MUST supply their original signed source commit. Publishing MUST preserve immutable versions and every existing npm approval/provenance gate. A manual dry run MUST prepare and verify without signing, upload or dispatch. Workflow code MUST come from current main, and tagged source MUST be merged into main with successful aggregate CI. registry source metadata MUST live at the repository root and declare fixed real WorkspaceShell stories under `Plugins/Tasks/Registry Screenshots`. Captures MUST preserve declared order, alt text and public App ownership, use 1200x800 at 2x in light/dark, and generate preview/full/light/dark cards using the pinned shared compositor and bundled Inter. Capture MUST NOT create or approve Visual Delta baselines. Vendored distribution modules MUST remain byte-identical to their recorded upstream commit and SHA-256; generic fixes belong upstream first. Signing/publication are reviewed native CI exceptions so private keys never enter Docker or source builds. |
 
 ## Requirements
@@ -330,7 +330,7 @@ Notes lifecycle repair. Tasks must raise both API peer/development minimums to
 publishes that release under its `next` tag; an existing `^0.2.2` lock is not
 proof that the lifecycle fix is installed. The Core peer and development
 minimum must admit published Design Core `^0.9.0` or newer, and the development
-Mira range must admit published `~0.1.5`.
+Mira range must admit published `~0.2.0`.
 
 The shared payload is `patches/bits-ui@2.20.2.patch`, SHA256
 `debd3bc7d43917f0967f0cc1e212fc5c7721c751d3b92bf8f31030d1c96289ad`.
@@ -364,3 +364,13 @@ Existing matching package coordinates MUST skip signing for either identical or
 different immutable bytes; the publication step MUST still verify the existing
 registry artifact, provenance and signatures. Registry errors or malformed
 identity metadata MUST fail closed before signing.
+
+The Mira 0.2 maintenance intake changes only the development catalog graph.
+Tasks runtime dependencies and every governance, quality, interaction and
+accessibility gate remain required. The merged existing-version attestation
+recovery remains unchanged and retains exact registry artifact verification.
+
+Registry product imagery for the task-details overview and gallery card MUST
+reproduce the current governed capture. A product-media refresh updates only
+declared WebP outputs and retains the fixed stories, light/dark variants and
+separate Visual Delta baseline-approval boundary.
