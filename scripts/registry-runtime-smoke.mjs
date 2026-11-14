@@ -229,6 +229,12 @@ void startArchive().catch(error => { queueMicrotask(() => { throw error; }); });
         })
         .click();
       await page.waitForSelector("[data-task-sidebar-detail]");
+      const detail = page.locator("[data-task-sidebar-detail]");
+      await detail.getByRole("button", { name: "Comments", exact: true }).click();
+      await detail.getByRole("textbox", { name: "Local comment", exact: true })
+        .waitFor({ state: "visible" });
+      await detail.getByRole("button", { name: "Formatting options", exact: true })
+        .waitFor({ state: "visible" });
       await page.evaluate(() =>
         document.getElementById("storybook-root").__disposeArchive(),
       );
@@ -246,7 +252,7 @@ void startArchive().catch(error => { queueMicrotask(() => { throw error; }); });
     }
     if (errors.length) throw Error(errors.join("\n"));
     console.log(
-      `Cold ${mode} archive host: actual TasksPlugin, planner, details and teardown passed.`,
+      `Cold ${mode} archive host: actual TasksPlugin, planner, details, Markdown composer and teardown passed.`,
     );
   }
 } finally {

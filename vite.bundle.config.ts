@@ -4,14 +4,18 @@ import { pluginHostModuleRegistry } from "@lapis-notes/api/plugin-host-modules";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { defineConfig } from "vite";
 
+const require = createRequire(import.meta.url);
+const sharedDependencies = new Set<string>(
+  require("./manifest.json").lapis.runtime.entries.workspace.sharedDependencies,
+);
+
 export default defineConfig({
   base: "./",
   define: { "process.env.NODE_ENV": JSON.stringify("production") },
   plugins: [
     rendererHostModulePlugin({
       mode: "plugin",
-      svelteVersion: createRequire(import.meta.url)("svelte/package.json")
-        .version,
+      svelteVersion: require("svelte/package.json").version,
     }),
     svelte(),
   ],
@@ -33,6 +37,7 @@ export default defineConfig({
         > = pluginHostModuleRegistry;
         const host = hosts[specifier];
         return (
+          sharedDependencies.has(specifier) &&
           /^(?:@lapis-notes\/api(?:$|\/)|@lapismd\/design-core(?:$|\/)|@codemirror\/(?:state|view)$)/.test(
             specifier,
           ) && Boolean(host?.public && host.platforms.includes("web"))

@@ -22,6 +22,7 @@
             "@lapis-notes/api/app-database",
             "@lapis-notes/api/native-tasks",
             "@lapis-notes/api/workspace-host",
+            "@lapismd/design-core/chat",
             "@lapismd/design-core/shadcn/alert",
             "@lapismd/design-core/shadcn/badge",
             "@lapismd/design-core/shadcn/button",
