@@ -399,3 +399,9 @@ Tracked dependency manifests and the lockfile retain registry semver ranges.
 Live List mutation acceptance waits for both source persistence and matching
 rendered Task order before the next action. Full-file layout tokens exclude
 compact inline Task notes and preserve their existing folding rail and margins.
+
+Registry bundle externalization MUST intersect the Tasks manifest's declared
+shared modules with the published API's public web host map. The Markdown
+composer host module MUST be declared explicitly. Archive acceptance MUST open
+Comments and render its composer and formatting controls in both cold development
+and production hosts before teardown. The generated-import audit remains strict.
