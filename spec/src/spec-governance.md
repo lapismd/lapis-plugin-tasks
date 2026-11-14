@@ -4,7 +4,7 @@
 
 Dependency update PRs from the trusted LapisMD App, Dependabot or Renovate MAY skip specification checks using the PR author rather than the rerun actor. Functional checks remain required. The shared `lapismd/dependency-automation` coordinator proposes published first-party npm updates with Changeset release intent where required; it does not merge, publish, sign or deploy. This CI policy changes no runtime or public contract in this chapter.
 
-Tracked dependencies use registry API `^0.2.3`, Design Core `^0.9.0`, UI `^0.1.5` and Mira `~0.1.5`.
+Tracked dependencies use registry API `^0.2.3`, Design Core `^0.9.0`, UI `^0.1.5` and Mira `~0.2.0`.
 Explicit temporary source acceptance follows LPT-SPEC-014 with verified archives
 in isolated installations. Source ownership and public contracts remain unchanged.
 Shared specification tooling resolves the Deno-free `@lapismd/spec-validator@0.2.0` from npm.
@@ -357,3 +357,7 @@ refresh every affected consumer lock together.
 The Visual Delta development dependency intake resolves registry version
 `0.1.0` in the frozen lockfile. Existing comparison-only visual review and
 explicit baseline approval rules remain in force for the Tasks catalog.
+
+The Mira 0.2 maintenance intake changes only the development catalog graph.
+Tasks runtime dependencies and every governance, quality, interaction and
+accessibility gate remain required.
