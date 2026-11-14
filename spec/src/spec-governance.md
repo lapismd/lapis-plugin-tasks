@@ -357,3 +357,10 @@ refresh every affected consumer lock together.
 The Visual Delta development dependency intake resolves registry version
 `0.1.0` in the frozen lockfile. Existing comparison-only visual review and
 explicit baseline approval rules remain in force for the Tasks catalog.
+
+Before requesting fresh npm provenance, release attestation MUST look up the
+exact candidate name and version. Only registry HTTP 404 permits signing.
+Existing matching package coordinates MUST skip signing for either identical or
+different immutable bytes; the publication step MUST still verify the existing
+registry artifact, provenance and signatures. Registry errors or malformed
+identity metadata MUST fail closed before signing.

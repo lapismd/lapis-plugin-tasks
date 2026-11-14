@@ -180,6 +180,13 @@ export async function verifyProvenanceSigner(bundle) {
 
 export async function attest(root = process.cwd()) {
   const { candidate } = await loadCandidate(root);
+  const existing = await registry(candidate);
+  if (existing) {
+    console.log(
+      `Skipping fresh provenance for published ${candidate.name}@${candidate.version}; publication still verifies the registry artifact.`,
+    );
+    return;
+  }
   const statement = provenanceStatement(candidate);
   const { attest: sign } = await import("sigstore");
   const bundle = await sign(
@@ -336,7 +343,10 @@ async function registry(candidate) {
   if (response.status === 404) return null;
   if (!response.ok)
     throw Error(`npm metadata request failed: ${response.status}`);
-  return response.json();
+  const metadata = await response.json();
+  if (metadata?.name !== candidate.name || metadata?.version !== candidate.version)
+    throw Error("npm metadata identity mismatch");
+  return metadata;
 }
 
 export async function verify(root = process.cwd(), options = {}) {
