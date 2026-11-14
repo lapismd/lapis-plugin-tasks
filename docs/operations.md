@@ -19,8 +19,12 @@ register, and renderer-free get/cancel preserves stale-version rejection.
 Strict Clippy and generated-catalog drift checks pass. Docker package check and
 test pass, including 2,924 TypeScript cases and the retained native conformance
 corpora. Package build/publint and host delivery are recorded separately.
-Hosted listener, credentials, consent, cold restart and public package intake
-are qualified in Server. Desktop intake remains separate.
+Server source acceptance passes actual HTTP/MCP/CLI completion and duplicate
+receipt handling, browser permission selection, cold declaration/journal recovery
+and old-token refusal. Its full hosted suite passes 39 cases with five existing
+opt-in skips, including all 15 Tasks cases. Server retains that evidence in
+`spec/records/2026-11-14-native-plugin-operations.md`. Public package intake and
+Desktop integration remain separate.
 
 Final source validation on 2026-11-14 retained Docker reports under
 `.local/validation/runs/`: operation check `83b41ffa-9775-4a3b-9008-401d475ffee6`,
