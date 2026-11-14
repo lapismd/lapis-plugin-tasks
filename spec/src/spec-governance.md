@@ -384,3 +384,8 @@ Plugins repository in the isolated worker only. That provisional evidence MUST
 remain separate from final registry-only acceptance after those independently
 versioned packages are published. Manifests, tracked lockfiles, host ownership,
 patch provenance and all normal gates remain governed by their existing rules.
+
+The released Markdown 0.2.6 and Search 0.1.10 replace provisional owner archives
+for this catalog cohort. Final consumer and release acceptance MUST use the
+frozen registry-only graph with no temporary archive projection. Historical
+candidate evidence does not authorize publication or replacement of old versions.
