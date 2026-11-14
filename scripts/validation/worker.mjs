@@ -153,6 +153,8 @@ try {
     JSON.stringify(result, null, 2),
   );
   for (const path of [
+    "operations.json",
+    "manifest.json",
     "spec/book",
     "storybook-static",
     "dist",

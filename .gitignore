@@ -10,6 +10,7 @@ AGENTS.override.md
 *.tgz
 *.tsbuildinfo
 crates/lapis-task-services/target/
+crates/lapis-task-operations/target/
 .local/
 .turbo/
 .env

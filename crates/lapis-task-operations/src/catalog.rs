@@ -10,6 +10,24 @@ fn schema<T: JsonSchema>() -> Value {
         .to_value()
 }
 
+fn output(id: &str) -> Value {
+    let snapshot = schema::<lapis_app_protocol::TextSnapshot>();
+    match id {
+        "get" => {
+            json!({"type":"object","properties":{"snapshot":snapshot,"task":{"type":"object"}},"required":["snapshot","task"],"additionalProperties":false})
+        }
+        "list" => {
+            json!({"type":"object","properties":{"items":{"type":"array","maxItems":100,"items":{"type":"object"}},"truncated":{"type":"boolean"},"freshness":{"type":"object","properties":{"source":{"const":"projection"},"authoritative":{"const":false}},"required":["source","authoritative"],"additionalProperties":false}},"required":["items","truncated","freshness"],"additionalProperties":false})
+        }
+        "complete" | "skip" | "inspect" | "retry" => {
+            json!({"type":"object","properties":{"operation":{"anyOf":[{"type":"null"},{"type":"object","properties":{"request_id":{"type":"string","format":"uuid"},"path":{"type":"string"},"disposition":schema::<NativeTaskDisposition>(),"last_failure":schema::<Option<NativeTaskKnownFailure>>()},"required":["request_id","path","disposition","last_failure"],"additionalProperties":false}]}},"required":["operation"],"additionalProperties":false})
+        }
+        _ => {
+            json!({"type":"object","properties":{"kind":{"const":"snapshot"},"snapshot":snapshot},"required":["kind","snapshot"],"additionalProperties":false})
+        }
+    }
+}
+
 fn descriptor(id: &str, mut input: Value, read: bool) -> OperationDescriptor {
     let properties = input["properties"].as_object_mut().unwrap();
     properties.remove("type");
@@ -59,7 +77,7 @@ fn descriptor(id: &str, mut input: Value, read: bool) -> OperationDescriptor {
             ContentEffect::Write
         },
         input_schema: input,
-        output_schema: json!({"type":"object"}),
+        output_schema: output(id),
         help: OperationHelp {
             command: vec!["tasks".into(), id.into()],
             summary: format!("Tasks {id}"),
