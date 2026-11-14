@@ -3,20 +3,25 @@
 Catalog development uses registry Visual Delta `0.1.0`; the addon stays outside
 the published plugin runtime and does not alter Tasks host contracts.
 
-Tracked dependencies use registry API `^0.2.3`, Design Core `^0.7.4 || ^0.8.0 || ^0.9.0`, UI
-`^0.1.5` and Mira `~0.1.5` through portable npm ranges. Clean registry-only Docker qualification
-remains distinct from temporary archive acceptance governed by LPT-SPEC-014,
-publication and consumer adoption. Source ownership and public contracts remain
-unchanged.
-Release package and runtime manifest version: `0.1.3`. The public npm artifact
-includes runtime metadata and the existing AGPL-3.0-or-later license. Changesets
-keeps these versions synchronized under LPT-SPEC-021. The peer range admits published Design Core ^0.7.4 and ^0.8.0; development acceptance uses Core ^0.9.0 and Mira ~0.1.5. Prior Core 0.7.3 and API 0.2.3 qualification remains intermediate evidence. Final
-Tasks acceptance uses this frozen registry graph with the explicit root Bits
-patch. GitHub CI fans Governance, Quality, Unit tests, Native, Static Storybook,
-and three Storybook interaction shards through Docker, then Dependency audits.
-Validate is the gate before source and version merges and publication. Dependency
-audits must pass on the patched transitive floors, including Hono `4.13.16` and
-`@hono/node-server` `2.1.6`, ignoring only unfixed deepmerge GHSA-gcqx-w48m-w2h4.
+The public API peer range retains `^0.2.4` and admits `^0.4.0`. Catalog
+development uses the published API `^0.4.0`, Workspace `^0.4.1`, UI `^0.1.10`,
+File Explorer `^0.2.6`, Design Core `^0.13.2` and Mira `~0.2.0` cohort.
+The Shell development host MUST consume published Markdown `^0.2.6` and
+Search `^0.1.10`, whose API peer contracts admit API 0.4.
+The Core peer range preserves the existing 0.7.4, 0.8 and 0.9 lines and admits
+`^0.13.0`. Workspace 0.3 cannot qualify this catalog because its Core range
+excludes 0.13 and creates incompatible API host identities.
+Tracked manifests and the lockfile retain registry semver coordinates. Temporary
+owner archive acceptance under LPT-SPEC-014 proves source compatibility only;
+final consumer acceptance requires the released Plugins cohort with no archive
+projection. Runtime API adoption adds no ambient App state or consumer casts.
+
+Release package and runtime manifest version: `0.1.3`. Changesets synchronizes
+those versions under LPT-SPEC-021. GitHub CI fans Governance, Quality, Unit tests,
+Native, Static Storybook and three interaction shards through Docker, followed
+by Dependency audits. Validate remains required before source/version merges and
+publication. The existing root Bits patch and transitive security floors remain
+required; the existing exact development-only deepmerge exception is unchanged.
 
 `@lapis-notes/lapis-plugin-tasks` owns the first-party external Tasks catalog
 and plugin runtime. A task is a Markdown file with YAML front
