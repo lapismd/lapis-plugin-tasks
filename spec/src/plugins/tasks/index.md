@@ -16,7 +16,7 @@ owner archive acceptance under LPT-SPEC-014 proves source compatibility only;
 final consumer acceptance requires the released Plugins cohort with no archive
 projection. Runtime API adoption adds no ambient App state or consumer casts.
 
-Release package and runtime manifest version: `0.1.3`. Changesets synchronizes
+Release package and runtime manifest version: `0.1.4`. Changesets synchronizes
 those versions under LPT-SPEC-021. GitHub CI fans Governance, Quality, Unit tests,
 Native, Static Storybook and three interaction shards through Docker, followed
 by Dependency audits. Validate remains required before source/version merges and

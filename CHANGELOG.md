@@ -1,5 +1,11 @@
 # @lapis-notes/lapis-plugin-tasks
 
+## 0.1.4
+
+### Patch Changes
+
+- 3b26466: Refresh first-party Lapis dependencies to the published versions recorded in this pull request.
+
 ## 0.1.3
 
 ### Patch Changes
