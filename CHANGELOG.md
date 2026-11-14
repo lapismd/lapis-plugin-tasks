@@ -1,5 +1,11 @@
 # @lapis-notes/lapis-plugin-tasks
 
+## 0.1.3
+
+### Patch Changes
+
+- 2a9e762: Refresh the task-details registry product imagery to match the governed current catalog capture.
+
 ## 0.1.2
 
 ### Patch Changes
