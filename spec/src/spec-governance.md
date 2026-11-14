@@ -119,8 +119,9 @@ the documented fresh-process batches. Temporary local package snapshots retain
 registry ranges in publishable manifests; visual review remains pending.
 
 Shell comment acceptance MUST verify the public Design Core chat transcript and
-composer composition, stored timestamps, accessible comment actions, keyboard
-posting, failed-post draft restoration, and Accordion disclosure/icon state
+Markdown composer composition and formatting, stored timestamps, accessible
+comment actions, keyboard posting, failed-post draft restoration, empty-section default collapse, full-width
+heading button extents, activation and borders, and Accordion disclosure/icon state
 with draft retention through collapse. It MUST continue to exercise the
 existing edit-failure retry, resolution, reopen, and deletion boundaries.
 
@@ -389,3 +390,12 @@ The released Markdown 0.2.6 and Search 0.1.10 replace provisional owner archives
 for this catalog cohort. Final consumer and release acceptance MUST use the
 frozen registry-only graph with no temporary archive projection. Historical
 candidate evidence does not authorize publication or replacement of old versions.
+
+Task detail review uses the released Design Core 0.13.2 public Markdown composer.
+The specification lanes use the Deno-free spec-validator 0.2.0 release.
+Final acceptance uses the frozen registry-only dependency graph.
+Tracked dependency manifests and the lockfile retain registry semver ranges.
+
+Live List mutation acceptance waits for both source persistence and matching
+rendered Task order before the next action. Full-file layout tokens exclude
+compact inline Task notes and preserve their existing folding rail and margins.

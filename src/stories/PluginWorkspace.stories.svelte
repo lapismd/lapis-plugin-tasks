@@ -62,7 +62,10 @@
     lineHeight: string;
   };
 
-  function inlineOptionTrigger(canvas: ReturnType<typeof within>, label: string) {
+  function inlineOptionTrigger(
+    canvas: ReturnType<typeof within>,
+    label: string,
+  ) {
     const trigger = canvas.getByRole("button", {
       name: (name) => name.startsWith(`${label}: `),
     });
@@ -1748,8 +1751,9 @@
       });
     }
 
-    const writingRow = (await docsButton("Writing"))
-      .closest<HTMLElement>("[data-task-list-row]")!;
+    const writingRow = (await docsButton("Writing")).closest<HTMLElement>(
+      "[data-task-list-row]",
+    )!;
     expect(writingRow.querySelector("[data-task-list-row-icon]")).toBeVisible();
     expect(
       writingRow.querySelector("[data-task-checkbox]"),
@@ -1789,8 +1793,9 @@
       Number.parseFloat(linkedListColumnStyle.borderTopLeftRadius),
     ).toBeGreaterThan(0);
 
-    const draftRow = (await docsButton("Draft design critique"))
-      .closest<HTMLElement>(".task-list-items-block__task")!;
+    const draftRow = (
+      await docsButton("Draft design critique")
+    ).closest<HTMLElement>(".task-list-items-block__task")!;
     const writingDragRow = writingRow.closest<HTMLElement>(
       ".task-list-items-block__list",
     )!;
@@ -1806,10 +1811,12 @@
       expect(docsSurface).toHaveAttribute("data-editing", "true");
     });
 
-    const movedWritingRow = (await docsButton("Writing"))
-      .closest<HTMLElement>(".task-list-items-block__list")!;
-    const movedDraftRow = (await docsButton("Draft design critique"))
-      .closest<HTMLElement>(".task-list-items-block__task")!;
+    const movedWritingRow = (await docsButton("Writing")).closest<HTMLElement>(
+      ".task-list-items-block__list",
+    )!;
+    const movedDraftRow = (
+      await docsButton("Draft design critique")
+    ).closest<HTMLElement>(".task-list-items-block__task")!;
     await fireEvent.dragStart(movedWritingRow);
     await fireEvent.dragOver(movedDraftRow);
     await fireEvent.drop(movedDraftRow);
@@ -1817,8 +1824,9 @@
       expect(await app.vault.cachedRead(docsFile)).toBe(originalDocsSource);
     });
 
-    const restoredWritingRow = (await docsButton("Writing"))
-      .closest<HTMLElement>("[data-task-list-row]")!;
+    const restoredWritingRow = (
+      await docsButton("Writing")
+    ).closest<HTMLElement>("[data-task-list-row]")!;
     await userEvent.click(
       within(restoredWritingRow).getByRole("button", {
         name: "Delete list Writing",
@@ -2909,6 +2917,138 @@
 />
 
 <Story
+  name="Detail layout"
+  args={{ displayMode: "desktop" }}
+  parameters={{
+    docs: {
+      description: {
+        story:
+          "Task detail keeps the checkbox aligned with the first title line and uses the full document width with a small inset in preview and live editing, leaving room for editor gutters.",
+      },
+    },
+  }}
+  play={async ({ canvasElement }) => {
+    const canvas = await waitForReady(canvasElement);
+    await userEvent.click(
+      await canvas.findByRole("button", {
+        name: "Open task details for Tailor platform CV variant",
+        exact: true,
+      }),
+    );
+    const title = await canvas.findByRole("textbox", { name: "Task title" });
+    const detail = title.closest<HTMLElement>("[data-task-sidebar-detail]")!;
+    const checkbox = within(detail).getByRole("checkbox", {
+      name: "Mark task done",
+    });
+    const titleBox = title.getBoundingClientRect();
+    const checkboxBox = checkbox.getBoundingClientRect();
+    const firstLineHeight = Number.parseFloat(
+      getComputedStyle(title).lineHeight,
+    );
+    expect(
+      Math.abs(
+        checkboxBox.top +
+          checkboxBox.height / 2 -
+          titleBox.top -
+          firstLineHeight / 2,
+      ),
+    ).toBeLessThan(1);
+
+    const surface = detail.querySelector<HTMLElement>(
+      "[data-task-markdown-surface]",
+    )!;
+    await waitFor(() =>
+      expect(surface.querySelector(".markdown-preview-surface")).toBeVisible(),
+    );
+    const content = surface.querySelector<HTMLElement>(
+      ".task-list-markdown-surface__content",
+    )!;
+    const preview = surface.querySelector<HTMLElement>(
+      ".markdown-preview-surface",
+    )!;
+    const paddingSides = [
+      "paddingTop",
+      "paddingRight",
+      "paddingBottom",
+      "paddingLeft",
+    ] as const;
+    for (const [node, expected] of [
+      [content, [12, 16, 12, 16]],
+      [preview, [0, 0, 0, 0]],
+    ] as const) {
+      const style = getComputedStyle(node);
+      for (const [index, side] of paddingSides.entries()) {
+        expect(Number.parseFloat(style[side])).toBe(expected[index]);
+      }
+    }
+    const sizer = preview.querySelector<HTMLElement>(".cm-sizer")!;
+    expect(
+      Math.abs(
+        sizer.getBoundingClientRect().width -
+          preview.getBoundingClientRect().width,
+      ),
+    ).toBeLessThan(1);
+    await userEvent.click(
+      within(detail).getByRole("button", {
+        name: "Edit Tailor platform CV variant",
+        exact: true,
+      }),
+    );
+    await waitFor(() =>
+      expect(surface).toHaveAttribute("data-editing", "true"),
+    );
+    await waitFor(() => {
+      const scroller = surface.querySelector<HTMLElement>(
+        ".cm-editor > .cm-scroller",
+      )!;
+      expect(scroller).toBeVisible();
+      const style = getComputedStyle(scroller);
+      for (const [index, side] of paddingSides.entries()) {
+        expect(Number.parseFloat(style[side])).toBe([12, 16, 12, 16][index]);
+      }
+      const gutters = surface.querySelector<HTMLElement>(".cm-gutters")!;
+      expect(gutters).toBeVisible();
+      const gutterBox = gutters.getBoundingClientRect();
+      const scrollerBox = scroller.getBoundingClientRect();
+      expect(gutterBox.left - scrollerBox.left).toBeGreaterThanOrEqual(16);
+      expect(gutterBox.right).toBeLessThan(scrollerBox.right - 16);
+    });
+    await userEvent.click(
+      within(detail).getByRole("button", {
+        name: "Read Tailor platform CV variant",
+        exact: true,
+      }),
+    );
+    await waitFor(() =>
+      expect(surface).toHaveAttribute("data-editing", "false"),
+    );
+    const plugin = storyApp(canvasElement).plugins.plugins.get(
+      "tasks",
+    ) as TasksPlugin;
+    await plugin.repository.setTitle(
+      "inbox/today-1.md",
+      "Review the complete platform handoff and its open follow-up actions before sharing the next detailed update with the entire delivery team. ".repeat(
+        3,
+      ),
+      plugin.repository.now().toISOString(),
+    );
+    await waitFor(() => {
+      const wrappedTitle = title.getBoundingClientRect();
+      const checkboxBox = checkbox.getBoundingClientRect();
+      expect(wrappedTitle.height).toBeGreaterThan(firstLineHeight);
+      expect(
+        Math.abs(
+          checkboxBox.top +
+            checkboxBox.height / 2 -
+            wrappedTitle.top -
+            firstLineHeight / 2,
+        ),
+      ).toBeLessThan(1);
+    });
+  }}
+/>
+
+<Story
   name="Runtime detail actions"
   args={{ displayMode: "desktop" }}
   parameters={{
@@ -2953,12 +3093,41 @@
     });
     expect(commentsToggle).toHaveAttribute("data-ui-part", "accordion-trigger");
     expect(commentsToggle.parentElement).toHaveAttribute("aria-level", "2");
+    expect(commentsToggle).toHaveAttribute("aria-expanded", "false");
+    expect(
+      detail.queryByRole("textbox", { name: "Local comment" }),
+    ).not.toBeInTheDocument();
+    const headingBox = commentsToggle.getBoundingClientRect();
+    const section = commentsToggle.closest<HTMLElement>(".task-detail-extras")!;
+    const sectionBox = section.getBoundingClientRect();
+    expect(
+      Math.abs(
+        headingBox.top -
+          sectionBox.top -
+          Number.parseFloat(getComputedStyle(section).borderTopWidth),
+      ),
+    ).toBeLessThan(1);
+    expect(Math.abs(headingBox.width - sectionBox.width)).toBeLessThan(1);
+    expect(getComputedStyle(commentsToggle).borderBottomWidth).toBe("1px");
+    expect(getComputedStyle(commentsToggle).textDecorationLine).toBe("none");
+    expect(getComputedStyle(commentsToggle).pointerEvents).not.toBe("none");
+    await userEvent.click(commentsToggle);
     expect(commentsToggle).toHaveAttribute("aria-expanded", "true");
+    expect(
+      detail
+        .getByText("No comments yet")
+        .closest('[data-ui-component="empty"]'),
+    ).not.toBeNull();
+    expect(
+      canvasElement.querySelector(
+        '[data-task-sidebar-detail] [data-ui-part="empty-media"][data-variant="icon"] svg',
+      ),
+    ).toBeVisible();
     expect(
       commentsToggle.querySelector('[data-ui-part="accordion-expanded-icon"]'),
     ).toBeVisible();
     await userEvent.type(
-      detail.getByRole("combobox", { name: "Local comment" }),
+      detail.getByRole("textbox", { name: "Local comment" }),
       "Draft retained through collapse.",
     );
     await userEvent.click(commentsToggle);
@@ -2969,15 +3138,13 @@
     await userEvent.keyboard("{Enter}");
     await waitFor(() =>
       expect(
-        detail.getByRole("combobox", { name: "Local comment" }),
+        detail.getByRole("textbox", { name: "Local comment" }),
       ).toHaveTextContent("Draft retained through collapse."),
     );
     await userEvent.clear(
-      detail.getByRole("combobox", { name: "Local comment" }),
+      detail.getByRole("textbox", { name: "Local comment" }),
     );
-    await userEvent.click(
-      inlineOptionTrigger(detail, "Task priority"),
-    );
+    await userEvent.click(inlineOptionTrigger(detail, "Task priority"));
     await userEvent.click(
       page.getByRole("option", { name: "High", exact: true }),
     );
@@ -2987,13 +3154,26 @@
       ).toBe("high"),
     );
     const commentComposer = canvasElement.querySelector(
-      '[data-task-sidebar-detail] [data-ui-component="ai-chat-composer"]',
+      '[data-task-sidebar-detail] [data-ui-component="markdown-composer"]',
     );
     expect(commentComposer).toBeVisible();
     expect(detail.getByRole("button", { name: "Send message" })).toBeDisabled();
     await userEvent.type(
-      detail.getByRole("combobox", { name: "Local comment" }),
+      detail.getByRole("textbox", { name: "Local comment" }),
       "Keep the interview examples concise.",
+    );
+    const commentEditor = EditorView.findFromDOM(
+      detail.getByRole("textbox", { name: "Local comment" }),
+    )!;
+    commentEditor.dispatch({ selection: { anchor: 0, head: 4 } });
+    await userEvent.click(
+      detail.getByRole("button", { name: "Formatting options", exact: true }),
+    );
+    await userEvent.click(
+      detail.getByRole("button", { name: "Bold", exact: true }),
+    );
+    expect(commentEditor.state.doc.toString()).toBe(
+      "**Keep** the interview examples concise.",
     );
     const failedPost = spyOn(app.vault, "process").mockRejectedValueOnce(
       new Error("Comment post unavailable"),
@@ -3008,8 +3188,8 @@
         ),
       );
       expect(
-        detail.getByRole("combobox", { name: "Local comment" }),
-      ).toHaveTextContent("Keep the interview examples concise.");
+        detail.getByRole("textbox", { name: "Local comment" }),
+      ).toHaveTextContent("**Keep** the interview examples concise.");
       expect(
         (await plugin.repository.getTaskDocument(path)).task.comments,
       ).toEqual([]);
@@ -3017,13 +3197,13 @@
       failedPost.mockRestore();
     }
     await userEvent.click(
-      detail.getByRole("combobox", { name: "Local comment" }),
+      detail.getByRole("textbox", { name: "Local comment" }),
     );
     await userEvent.keyboard("{Enter}");
     await waitFor(async () =>
       expect(
         (await plugin.repository.getTaskDocument(path)).task.comments[0]?.text,
-      ).toBe("Keep the interview examples concise."),
+      ).toBe("**Keep** the interview examples concise."),
     );
     const comment = await detail.findByRole("article", {
       name: "Local comment",
@@ -3036,7 +3216,7 @@
       comment.querySelector(
         '[data-ui-component="ai-chat-message-bubble"][data-sender="user"]',
       ),
-    ).toHaveTextContent("Keep the interview examples concise.");
+    ).toHaveTextContent("**Keep** the interview examples concise.");
     expect(
       comment.querySelector(
         '[data-ui-component="ai-chat-message-metadata"] time',
@@ -3045,9 +3225,13 @@
       "datetime",
       (await plugin.repository.getTaskDocument(path)).task.comments[0].at,
     );
-    expect(
-      detail.getByRole("combobox", { name: "Local comment" }),
-    ).toBeEmptyDOMElement();
+    await waitFor(() =>
+      expect(
+        EditorView.findFromDOM(
+          detail.getByRole("textbox", { name: "Local comment" }),
+        )?.state.doc.toString(),
+      ).toBe(""),
+    );
     await userEvent.click(
       detail.getByRole("button", { name: "Resolve comment" }),
     );
@@ -3062,7 +3246,7 @@
     );
     detail = await open();
     expect(
-      detail.getByText("Keep the interview examples concise."),
+      detail.getByText("**Keep** the interview examples concise."),
     ).toBeVisible();
     expect(detail.getByText("Resolved", { exact: true })).toBeVisible();
     expect(
@@ -3833,16 +4017,12 @@
     ).not.toBeNull();
     const apply = async (action: string, title: string, heading?: string) => {
       await userEvent.click(headerAction());
-      await userEvent.click(
-        inlineOptionTrigger(page, "Document action"),
-      );
+      await userEvent.click(inlineOptionTrigger(page, "Document action"));
       await userEvent.click(
         page.getByRole("option", { name: action, exact: true }),
       );
       if (heading) {
-        await userEvent.click(
-          inlineOptionTrigger(page, "Choose heading"),
-        );
+        await userEvent.click(inlineOptionTrigger(page, "Choose heading"));
         await userEvent.click(
           await page.findByRole("option", { name: heading, exact: true }),
         );
