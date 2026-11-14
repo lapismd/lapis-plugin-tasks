@@ -8,7 +8,6 @@
   import FolderKanbanIcon from "@lucide/svelte/icons/folder-kanban";
   import InboxIcon from "@lucide/svelte/icons/inbox";
   import ListTodoIcon from "@lucide/svelte/icons/list-todo";
-  import PanelLeftIcon from "@lucide/svelte/icons/panel-left";
   import PanelLeftOpenIcon from "@lucide/svelte/icons/panel-left-open";
   import PencilIcon from "@lucide/svelte/icons/pencil";
   import * as ColumnCanvas from "@lapismd/design-core/shadcn/column-canvas";
@@ -1176,11 +1175,7 @@
             columnTitle="Tasks"
             previewOnHover
             aria-label="Toggle Tasks navigation"
-          >
-            {#snippet icon(_state)}
-              <PanelLeftIcon aria-hidden="true" />
-            {/snippet}
-          </ColumnCanvas.Toggle>
+          />
           <div
             data-ui-component="column-canvas"
             data-ui-part="column-header-main"

@@ -37,6 +37,11 @@ The planner has four responsibilities:
 4. Preserve the richer Markdown presentation when a Task or List document is
    opened inside the workspace.
 
+The Tasks navigation action uses the public Design Core Column Canvas Toggle
+and its shared PanelToggle presentation and state indicator, without a custom
+Lucide icon. Click toggling, persisted navigation state, and hover previews
+remain owned by Column Canvas. See LN-TASK-099.
+
 Host movable panels remain unspecified. The package registers one `tasks`
 main-area view; Storybook catalog compositions exercise the same public
 controllers and components without defining another runtime.
@@ -326,7 +331,12 @@ and a 1px transparent border without extra surrounding padding. The expanded
 row, its backing surface, and resting checklist footer use the editor's theme
 background as one uniform surface. Checklist labels remain beside their checkboxes when
 the editor is nested inside a rendered Markdown List.
-Full-document Markdown surfaces retain their normal layout.
+Task detail and List document surfaces fill their owning column. Tasks configures
+the public Mira file-width, file-margin, and preview-padding tokens on their
+Markdown surfaces, excluding compact inline Task notes. Reading and live
+editing retain a 0.75rem block and 1rem inline inset; the live editor also
+preserves its gutter controls. The detail checkbox aligns with the first title
+line, including when the title wraps. See LN-TASK-098.
 
 The shared `inbox/today-1.md` demo Task contains authored paragraphs, headings,
 bold text, and a list. `InlineEditorAlignment` opens it in Today and Applications,
@@ -354,19 +364,26 @@ callbacks. It omits those actions and verifies selection, popover navigation,
 and task editing. Vault-backed List actions are exercised in the real App shell.
 
 Task comments use Design Core `MessageList`, `Message`, `MessageBubble`,
-`MessageMetadata`, `TokenizedText`, and `Composer` from the public
-`@lapismd/design-core/ai/chat` entry point, matching Lapis AI's transcript
-composition. Local comments use user-message alignment and shared bubble and
-composer tokens. Timestamps retain their authored `datetime`; edited/resolved
+`MessageMetadata`, and `TokenizedText` from the public
+`@lapismd/design-core/ai/chat` entry point, plus `MarkdownComposer` from
+`@lapismd/design-core/chat`. The shared Markdown composer owns formatting and
+keyboard input; Tasks owns submission and acknowledgement. Local comments use
+user-message alignment and shared bubble and composer tokens. Timestamps retain their authored `datetime`; edited/resolved
 state and compact accessible action controls appear in the message metadata.
 Posting by the Send control or Enter persists through the existing guarded
-repository lifecycle. A failed post restores the draft for retry; editing,
+repository lifecycle. Only successful persistence clears an unchanged submitted
+draft. A failed post retains the exact Markdown draft for retry; editing,
 resolution, reopening, and deletion keep their existing semantics. See
 LN-TASK-061.
 
 Comments and History use the public Design Core shadcn Accordion family with
-its leading right/down disclosure chevrons. Comments start open and History
-starts closed; both sections can be open independently. The shared trigger owns
+its leading right/down disclosure chevrons. Comments start open when comments
+exist and collapsed when empty. History starts closed; both sections can be open independently. Each heading spans its
+section with compact padding and a bottom border, and the entire heading toggles
+the disclosure. The whole heading has a hover/focus background without an
+underlined label. Expanded empty comments use the public shadcn Empty icon,
+heading, and description composition. Refreshes retain the user's disclosure
+choice for the same Task. The shared trigger owns
 keyboard handling, `aria-expanded`, focus treatment, and icon state. Collapsing
 and reopening Comments retains an unsent draft. These section headings use
 level two beneath the Task title.

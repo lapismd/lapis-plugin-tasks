@@ -995,6 +995,12 @@
     const navigationToggle = canvas.getByRole("button", {
       name: "Toggle Tasks navigation",
     });
+    expect(navigationToggle).toHaveAttribute("data-panel-toggle");
+    expect(
+      navigationToggle.querySelector(
+        '[data-ui-component="panel-toggle"][data-ui-part="icon"]',
+      ),
+    ).toBeVisible();
     await waitFor(() =>
       expect(navigationToggle).toHaveAttribute("data-state", "collapsed"),
     );
