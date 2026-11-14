@@ -1,5 +1,6 @@
 # Native transformations
 
+
 Status: implemented pure native value contract; source parity is qualified.
 The user approved these pure exports and DTOs before implementation. Neither
 application selects these transformations. Existing read-only exports and frozen
@@ -11,6 +12,7 @@ Priority presence is qualified separately in `2cfcdc59` (LN-TASK-091).
 
 | ID | Requirement |
 | --- | --- |
+| LN-TASK-106 | The private automation adapter MUST own Tasks operation schemas and CLI/help metadata. It MUST delegate reads and guarded actions to the admitted Core service. Creation and text editing remain future work; no renderer callback or filesystem root grants native authority. |
 | LN-TASK-086 | Native Task mutations MUST receive complete authored Markdown, its vault-relative path and explicit action values. They MUST return replacement Markdown or the retained error without filesystem, database, wall-clock, App or host access. They MUST NOT acquire write authority or select a host provider. |
 | LN-TASK-087 | Native Task mutation results MUST retain the existing TypeScript action, recurrence, lifecycle, checklist and serialization behavior, including optional-field absence, opaque metadata, exact UTF-16 preconditions and error identity. Returned replacement Markdown MUST match the complete retained output; a normalized parse alone MUST NOT qualify serialization parity. |
 | LN-TASK-088 | Native daily-observation transformations MUST retain canonical-date checks, section placement, escaped labels and hrefs, identity idempotence, duplicate rejection, completion validation, contextual Markdown and stale UTF-16 range checks. They MUST return replacement text without creating daily files or scheduling materialization. |
