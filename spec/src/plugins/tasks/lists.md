@@ -84,8 +84,12 @@ inert Edit action; New list remains available.
 
 ## Markdown-native List page
 
-Selecting a List mounts its real `TFile`. All authored headings and rich
-content retain their source order. Every resolved contiguous TaskRun is replaced
+Selecting a List mounts its real `TFile`. The Tasks-owned Markdown surface
+establishes the Mira `obsidian` palette before mounting the public file
+provider, which inherits its owning surface's theme. Tasks does not override
+the provider's CSS or reset themes inside nested rendered content.
+
+All authored headings and rich content retain their source order. Every resolved contiguous TaskRun is replaced
 in place with the shared rich block; unsupported or unresolved candidates stay
 ordinary Markdown.
 

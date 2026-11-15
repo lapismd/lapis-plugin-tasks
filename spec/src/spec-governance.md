@@ -416,3 +416,8 @@ shared modules with the published API's public web host map. The Markdown
 composer host module MUST be declared explicitly. Archive acceptance MUST open
 Comments and render its composer and formatting controls in both cold development
 and production hosts before teardown. The generated-import audit remains strict.
+
+API0.6 host compatibility under LN-TASK-001 retains portable public ranges and
+qualifies the real published API0.6 development cohort. Source peer admission,
+package artifacts, downstream archive intake and final publication remain
+separate evidence; this change authorizes no package publication.
