@@ -12,6 +12,11 @@ helper and Design Core plus Notes UI/API on one Bits UI 2.20.2 runtime. Earlier
 Runtime diagnostics remain fatal under LPT-SPEC-018; dependency refresh does
 not authorize weaker interactions or a duplicate Bits context graph.
 
+The custom recurrence catalog play MUST wait for the actual Tomorrow suggestion
+to satisfy its visibility assertion before clicking it. Layout rectangles alone
+do not establish visibility through a containing popover. This readiness check
+retains the existing deadline and the subsequent recurrence persistence checks.
+
 The planner is a main-area Tasks view over the Markdown document model. It
 derives navigation, date buckets, daily sections, and summary rows without
 turning those views into stored task state. The selected Task or List remains a
