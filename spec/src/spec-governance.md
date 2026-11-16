@@ -52,7 +52,14 @@ documented bounded remote Docker context, without a native fallback.
 LPT-SPEC-021 version PRs MUST use the existing dependency App only on canonical
 main, scoped to this repository with contents and pull-request write permissions.
 Missing credentials MUST fail closed and checkout MUST NOT persist credentials.
-The version job's workflow token remains read-only. Changesets MUST NOT create
+The version job's workflow token remains read-only. Before App minting,
+LPT-SPEC-021 requires the reviewed pinned shared Node24 guard to validate
+source-owned CLI3, pnpm, Changesets config, release-helper and workspace-policy
+bindings. Adoption requires actual whole-recipe qualification, including the
+runtime manifest and canonical version outputs. The existing validation
+aggregate, non-PR main gate, frozen registry install, exact custom command,
+no-op output and publication authority MUST remain unchanged.
+Changesets MUST NOT create
 GitHub releases directly; the separate existing qualified publisher retains its
 OIDC, signatures, provenance, registry verification and workflow credentials.
 
