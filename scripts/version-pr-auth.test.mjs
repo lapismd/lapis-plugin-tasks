@@ -91,6 +91,7 @@ test("qualified runtime guard validates source inputs before writer App minting"
       "pnpm-workspace.yaml",
       "scripts/release-sigstore.mjs",
       "scripts/release.mjs",
+      "scripts/release-install-readiness.mjs",
     ].sort(),
     "every source-owned helper in the admitted release recipe is bound",
   );

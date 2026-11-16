@@ -11,7 +11,7 @@ Dependency update PRs from the trusted LapisMD App, Dependabot or Renovate MAY s
 Tracked dependencies use registry API `^0.2.3`, Design Core `^0.9.0`, UI `^0.1.5` and Mira `~0.2.0`.
 Explicit temporary source acceptance follows LPT-SPEC-014 with verified archives
 in isolated installations. Source ownership and public contracts remain unchanged.
-Shared specification tooling resolves the Deno-free `@lapismd/spec-validator@0.2.0` from npm.
+Shared specification tooling resolves the Deno-free `@lapismd/spec-validator@0.2.1` from npm.
 
 The public Core peer admits `^0.7.4 || ^0.8.0 || ^0.9.0` while this qualification
 uses the current 0.9 renderer. API prerequisites remain checksum-verified local
@@ -228,6 +228,21 @@ ordinary `test:native-lifecycle-reference` lane compares frozen expected bytes
 and never updates them. Capture alone does not qualify a native implementation.
 
 ## npm release operations
+
+The LPT-SPEC-021 readiness integration uses one five-minute monotonic budget
+from registry metadata observation through the initial clean installation.
+Bounded full-metadata lookup and install-v1 readiness share that budget; no
+second propagation window is added. The shared Lapis CI helper receives the
+independently verified published name/version/SHA512 identity, including an
+existing different-byte publication. It retains npm12.0.2, ignore-scripts and
+strict peers. Frozen npm ci, signature verification and publint remain separate
+mandatory acceptance gates. Missing shared setup, tool drift, wrong identity,
+integrity or unrelated install failures stop verification without republishing.
+The release receipt records the published integrity actually verified.
+
+The changed release-helper closure requires a fresh whole-version-recipe proof
+before this source can land. Local binding metadata is a preparation proposal,
+not evidence of hosted recipe qualification or publication completion.
 
 A source PR includes a public-package changeset. Hosted CI checks out the exact
 revision, installs pnpm and Node 24, and runs each portable lane through the

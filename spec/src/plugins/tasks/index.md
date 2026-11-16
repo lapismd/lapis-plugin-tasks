@@ -1,10 +1,17 @@
 # Tasks plugin
 
 Publication-only Sigstore integration uses the already-locked public signing
-and bundle SDKs. The unpublished 0.2.1 runtime and manifest identity remain the
-release target. Imported signing-helper bytes join the source-owned version
+and bundle SDKs. The published 0.2.1 runtime and manifest identity remain
+unchanged by private publication-readiness work. Imported signing-helper bytes join the source-owned version
 recipe bindings after actual Node 24 whole-recipe qualification; this does not
 alter Tasks host facilities or product behavior.
+
+The private readiness integration preserves LPT-SPEC-021: source-pinned shared
+metadata/install handling uses the independently verified published identity,
+one five-minute budget and existing npm12 strict-peer/ignore-scripts policy.
+Frozen reinstall, signatures and publint remain mandatory. The released
+Node-only validator0.2.1 changes development tooling only. The new version-helper
+closure still requires fresh actual recipe qualification before source landing.
 
 The optional native operation declarations follow
 [LN-TASK-106](runtime/native-transformations.md). `operations.json` is generated
