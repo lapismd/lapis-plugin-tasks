@@ -60,6 +60,11 @@ bindings. Adoption requires actual whole-recipe qualification, including the
 runtime manifest and canonical version outputs. The existing validation
 aggregate, non-PR main gate, frozen registry install, exact custom command,
 no-op output and publication authority MUST remain unchanged.
+After that guard, the installed CLI's status release plan MUST determine genuine
+version intent before App minting. Only a version-changing release for the
+expected Tasks package MAY acquire the writer or run Changesets. Empty notes
+MUST remain retained without blocking an otherwise qualified unpublished
+version. Invalid CLI evidence or unknown targets MUST fail closed.
 Changesets MUST NOT create
 GitHub releases directly; the separate existing qualified publisher retains its
 OIDC, signatures, provenance, registry verification and workflow credentials.
@@ -258,9 +263,10 @@ that version, checks its size, SHA-256, integrity and provenance, and succeeds.
 A local candidate with different bytes is left unpublished. An identical
 candidate still runs the clean-consumer verification. `Version packages` and
 `Publish and verify npm release` stay in `.github/workflows/ci.yml`. A main
-push that still has changesets opens the version pull request and does not
+push with genuine package version intent opens the version pull request and does not
 publish. Publishing starts only after that pull request merges and no
-changesets remain. The trusted publisher stays bound to `ci.yml`.
+version-changing releases remain; empty maintenance notes do not count. The
+trusted publisher stays bound to `ci.yml`.
 The protected main job MUST also retain an npm-compatible Sigstore provenance
 bundle whose sole subject is the qualified tarball PURL and SHA512 digest, with
 the exact workflow and source revision. Initial npm bootstrap MAY stage that

@@ -12,6 +12,23 @@ const writer = version.steps.find((step) =>
   step.uses?.startsWith("changesets/action@"),
 );
 
+test("empty Changesets do not mint a writer or block the qualified publisher", () => {
+  const intent = version.steps.find((step) => step.id === "intent");
+  const app = version.steps.find((step) => step.id === "app");
+  assert.ok(
+    intent,
+    "version intent must be determined before acquiring authority",
+  );
+  assert.equal(intent.run, "node scripts/version-intent.mjs");
+  assert(version.steps.indexOf(intent) < version.steps.indexOf(app));
+  assert.equal(app.if, "steps.intent.outputs.hasChangesets == 'true'");
+  assert.equal(writer.if, app.if);
+  assert.equal(
+    version.outputs.hasChangesets,
+    "${{ steps.intent.outputs.hasChangesets }}",
+  );
+});
+
 test("qualified runtime guard validates source inputs before writer App minting", () => {
   const guard = version.steps.find((step) =>
     step.uses?.startsWith("lapismd/lapis-ci/actions/guard-version-runtime@"),
@@ -33,8 +50,12 @@ test("qualified runtime guard validates source inputs before writer App minting"
   );
   assert(version.steps.indexOf(install) < version.steps.indexOf(guard));
   assert(version.steps.indexOf(guard) < version.steps.indexOf(app));
+  assert(
+    version.steps.indexOf(guard) <
+      version.steps.findIndex((step) => step.id === "intent"),
+  );
   assert.deepEqual(version.outputs, {
-    hasChangesets: "${{ steps.changesets.outputs.hasChangesets }}",
+    hasChangesets: "${{ steps.intent.outputs.hasChangesets }}",
   });
   assert.equal(version.needs, "validate");
   assert.equal(
@@ -89,7 +110,7 @@ test("version PRs require canonical main and a repository-scoped App without fal
   );
   assert.ok(app, "version PR writes require an App token");
   assert.equal(app.id, "app");
-  assert.equal(app.if, undefined);
+  assert.equal(app.if, "steps.intent.outputs.hasChangesets == 'true'");
   assert.equal(app["continue-on-error"], undefined);
   assert.deepEqual(app.with, {
     "client-id": "${{ vars.LAPIS_DEPENDENCY_APP_CLIENT_ID }}",
