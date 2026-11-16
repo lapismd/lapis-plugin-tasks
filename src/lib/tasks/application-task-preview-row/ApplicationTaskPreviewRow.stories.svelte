@@ -698,9 +698,9 @@
       if (!(option instanceof HTMLElement)) {
         throw new Error("Missing the visible Tomorrow suggestion");
       }
+      expect(option).toBeVisible();
       return option;
     });
-    expect(tomorrowOption).toBeVisible();
     await userEvent.click(
       tomorrowOption,
     );
