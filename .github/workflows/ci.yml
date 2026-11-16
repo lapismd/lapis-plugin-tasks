@@ -438,6 +438,8 @@ jobs:
         run: |
           pnpm install --frozen-lockfile --ignore-pnpmfile
           npm install --global npm@12.0.2
+      - name: Prepare source-pinned registry installation readiness
+        uses: lapismd/lapis-ci/actions/setup-registry-readiness@c9fed365342109997587bd9a5a3b63066e8373aa
       - uses: actions/download-artifact@v8
         with:
           name: tasks-npm-${{ github.sha }}

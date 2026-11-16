@@ -143,7 +143,7 @@
     "@lapis-notes/workspace": "^0.4.6",
     "@lapismd/design-core": "^0.13.4",
     "@lapismd/mira": "~0.2.0",
-    "@lapismd/spec-validator": "^0.2.0",
+    "@lapismd/spec-validator": "^0.2.1",
     "@lezer/highlight": "1.2.5",
     "@lezer/lr": "1.4.12",
     "@storybook/addon-a11y": "10.6.5",
