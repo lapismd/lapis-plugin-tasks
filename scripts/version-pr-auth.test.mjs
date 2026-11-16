@@ -1,5 +1,6 @@
 import { test } from "vitest";
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import YAML from "yaml";
 
@@ -10,6 +11,62 @@ const version = workflow.jobs.changesets;
 const writer = version.steps.find((step) =>
   step.uses?.startsWith("changesets/action@"),
 );
+
+test("qualified runtime guard validates source inputs before writer App minting", () => {
+  const guard = version.steps.find((step) =>
+    step.uses?.startsWith("lapismd/lapis-ci/actions/guard-version-runtime@"),
+  );
+  assert.ok(guard, "source-owned shared runtime guard exists");
+  assert.equal(
+    guard.uses,
+    "lapismd/lapis-ci/actions/guard-version-runtime@bfa9743d8b403681ef7fb81ae3c5e53a99e3de55",
+  );
+  assert.deepEqual(Object.keys(guard).sort(), ["name", "uses", "with"]);
+  assert.deepEqual(guard.with, {
+    "qualification-file": ".github/versioning-runtime.json",
+  });
+  const install = version.steps.find(
+    (step) => step.run === "pnpm install --frozen-lockfile --ignore-pnpmfile",
+  );
+  const app = version.steps.find((step) =>
+    step.uses?.startsWith("actions/create-github-app-token@"),
+  );
+  assert(version.steps.indexOf(install) < version.steps.indexOf(guard));
+  assert(version.steps.indexOf(guard) < version.steps.indexOf(app));
+  assert.deepEqual(version.outputs, {
+    hasChangesets: "${{ steps.changesets.outputs.hasChangesets }}",
+  });
+  assert.equal(version.needs, "validate");
+  assert.equal(
+    version.if,
+    "github.repository == 'lapismd/lapis-plugin-tasks' && needs.validate.result == 'success' && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'",
+  );
+  const qualification = JSON.parse(
+    readFileSync(
+      new URL("../.github/versioning-runtime.json", import.meta.url),
+    ),
+  );
+  const manifest = JSON.parse(
+    readFileSync(new URL("../package.json", import.meta.url)),
+  );
+  assert.equal(qualification.cliVersion, "3.0.3");
+  assert.equal(qualification.packageManager, manifest.packageManager);
+  assert.equal(
+    qualification.scripts["release:version"],
+    manifest.scripts["release:version"],
+  );
+  assert.equal(
+    manifest.scripts["release:version"],
+    "node scripts/release.mjs version",
+  );
+  const hash = (file) =>
+    createHash("sha256")
+      .update(readFileSync(new URL("../" + file, import.meta.url)))
+      .digest("hex");
+  assert.equal(qualification.configSha256, hash(".changeset/config.json"));
+  for (const [file, digest] of Object.entries(qualification.files))
+    assert.equal(digest, hash(file), file);
+});
 
 test("version PRs require canonical main and a repository-scoped App without fallback", () => {
   assert.equal(
