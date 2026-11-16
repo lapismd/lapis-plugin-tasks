@@ -1,5 +1,11 @@
 # Tasks plugin
 
+Publication-only Sigstore integration uses the already-locked public signing
+and bundle SDKs. The unpublished 0.2.1 runtime and manifest identity remain the
+release target. Imported signing-helper bytes join the source-owned version
+recipe bindings after actual Node 24 whole-recipe qualification; this does not
+alter Tasks host facilities or product behavior.
+
 The optional native operation declarations follow
 [LN-TASK-106](runtime/native-transformations.md). `operations.json` is generated
 from the compiled provider and shipped as package metadata; the existing Tasks

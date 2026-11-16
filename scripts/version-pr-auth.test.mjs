@@ -64,6 +64,15 @@ test("qualified runtime guard validates source inputs before writer App minting"
       .update(readFileSync(new URL("../" + file, import.meta.url)))
       .digest("hex");
   assert.equal(qualification.configSha256, hash(".changeset/config.json"));
+  assert.deepEqual(
+    Object.keys(qualification.files).sort(),
+    [
+      "pnpm-workspace.yaml",
+      "scripts/release-sigstore.mjs",
+      "scripts/release.mjs",
+    ].sort(),
+    "every source-owned helper in the admitted release recipe is bound",
+  );
   for (const [file, digest] of Object.entries(qualification.files))
     assert.equal(digest, hash(file), file);
 });

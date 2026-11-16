@@ -434,3 +434,7 @@ LPT-SPEC-024 uses the public SDK recovery option for equivalent Rekor entries.
 The existing registry preflight, complete cryptographic verification, exact
 subject/workflow identity and protected publication gates remain mandatory.
 No provenance output may be saved after recovery or verification failure.
+
+The qualified version-runtime closure MUST bind the Tasks signing helper along
+with the release entrypoint. Adoption follows actual whole-recipe evidence;
+current-source hosted qualification remains required before merge.
