@@ -188,7 +188,7 @@ export async function attest(root = process.cwd()) {
     return;
   }
   const statement = provenanceStatement(candidate);
-  const { attest: sign } = await import("sigstore");
+  const { attestWithRecovery: sign } = await import("./release-sigstore.mjs");
   const bundle = await sign(
     Buffer.from(JSON.stringify(statement)),
     "application/vnd.in-toto+json",
@@ -344,7 +344,10 @@ async function registry(candidate) {
   if (!response.ok)
     throw Error(`npm metadata request failed: ${response.status}`);
   const metadata = await response.json();
-  if (metadata?.name !== candidate.name || metadata?.version !== candidate.version)
+  if (
+    metadata?.name !== candidate.name ||
+    metadata?.version !== candidate.version
+  )
     throw Error("npm metadata identity mismatch");
   return metadata;
 }
@@ -491,9 +494,7 @@ export async function publish(root = process.cwd()) {
       { cwd: root },
     );
   } else
-    console.log(
-      `Skipping ${tag}; npm already has this version (${decision}).`,
-    );
+    console.log(`Skipping ${tag}; npm already has this version (${decision}).`);
   await verify(root, { matchCandidate: decision !== "skip-different" });
   if (decision === "skip-different") {
     console.log(

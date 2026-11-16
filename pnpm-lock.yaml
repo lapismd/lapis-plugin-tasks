@@ -148,6 +148,12 @@ importers:
       '@lezer/lr':
         specifier: 1.4.12
         version: 1.4.12
+      '@sigstore/bundle':
+        specifier: 4.0.0
+        version: 4.0.0
+      '@sigstore/sign':
+        specifier: 4.1.1
+        version: 4.1.1
       '@storybook/addon-a11y':
         specifier: 10.6.5
         version: 10.6.5(storybook@10.6.5(@types/react@19.2.18)(react@19.2.8))
