@@ -8,11 +8,12 @@ workspace UI remains an observer of native services when selected.
 Catalog development uses registry Visual Delta `0.1.5`; the addon stays outside
 the published plugin runtime and does not alter Tasks host contracts.
 
-The public API peer range retains `^0.2.4` and admits `^0.4.0`. Catalog
-development uses the published API `^0.4.0`, Workspace `^0.4.1`, UI `^0.1.10`,
-File Explorer `^0.2.6`, Design Core `^0.13.2` and Mira `~0.2.0` cohort.
-The Shell development host MUST consume published Markdown `^0.2.6` and
-Search `^0.1.10`, whose API peer contracts admit API 0.4.
+The public API peer range MUST retain `^0.2.4` and `^0.4.0` and admit
+`^0.6.0`. Catalog development uses published API `^0.6.5`, Workspace `^0.4.6`,
+UI `^0.2.1`, File Explorer `^0.2.8`, Core `^0.13.4` and Mira `~0.2.0`.
+The Shell host uses published Markdown `^0.3.2` and Search `^0.1.12`, whose
+peer contracts admit API0.6. Current-host qualification MUST retain the same
+owned App and native Tasks capability without a peer waiver or runtime adapter.
 The Core peer range preserves the existing 0.7.4, 0.8 and 0.9 lines and admits
 `^0.13.0`. Workspace 0.3 cannot qualify this catalog because its Core range
 excludes 0.13 and creates incompatible API host identities.

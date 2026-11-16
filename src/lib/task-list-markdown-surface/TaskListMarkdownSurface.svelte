@@ -147,6 +147,7 @@
   class="task-list-markdown-surface"
   class:task-list-markdown-surface--editing={editing}
   data-task-markdown-surface
+  data-mira-theme="obsidian"
   data-hide-completed={(controller.hideCompleted && !editing) || undefined}
   data-editing={editing}
 >
