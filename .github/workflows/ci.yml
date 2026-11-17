@@ -48,6 +48,10 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-pnpmfile --prefer-offline
+      - name: Guard reviewed version inputs before merge
+        uses: lapismd/lapis-ci/actions/guard-version-runtime@dd71275c5b2618afceae0b97ee0a071649781971
+        with:
+          qualification-file: .github/versioning-runtime.json
       - name: Install the pinned Jujutsu tool
         run: node scripts/validation/install-tools.mjs --ci
       - name: Select the exact CI source revision
@@ -389,7 +393,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile --ignore-pnpmfile
       - name: Guard qualified version runtime
-        uses: lapismd/lapis-ci/actions/guard-version-runtime@bfa9743d8b403681ef7fb81ae3c5e53a99e3de55 # reviewed whole-recipe proof
+        uses: lapismd/lapis-ci/actions/guard-version-runtime@dd71275c5b2618afceae0b97ee0a071649781971 # reviewed whole-recipe proof
         with:
           qualification-file: .github/versioning-runtime.json
       - name: Determine genuine package version intent

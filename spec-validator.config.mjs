@@ -74,7 +74,7 @@ export default defineConfig(tableRequirements(), {
     specFirst: {
       mode: "mapped",
       canonicalPattern:
-        "^spec/src/(?:plugins/(?:index|tasks/(?:index|documents|runtime|lists|planner))|spec-governance)\\.md$",
+        "^spec/src/(?:plugins/(?:index|tasks/(?:index|documents|runtime|lists|planner|dependency-automation))|spec-governance)\\.md$",
       ignore: [
         "(^|/)node_modules/",
         "(^|/)(?:dist|build|storybook-static)/",
@@ -84,7 +84,8 @@ export default defineConfig(tableRequirements(), {
       ],
       rules: [
         {
-          pattern: "^(?:crates/lapis-task-operations/|operations\\.json$|scripts/operations\\.mjs$)",
+          pattern:
+            "^(?:crates/lapis-task-operations/|operations\\.json$|scripts/operations\\.mjs$)",
           chapters: ["spec/src/plugins/tasks/runtime.md"],
         },
         {

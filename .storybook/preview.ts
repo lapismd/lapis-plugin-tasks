@@ -63,6 +63,7 @@ const preview: Preview = {
             [
               "Tasks",
               [
+                "Dependency automation",
                 "Documents",
                 ["Recurrence"],
                 "Runtime",

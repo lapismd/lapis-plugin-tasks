@@ -1,0 +1,19 @@
+name: Notify dependency completion
+on:
+  workflow_run:
+    workflows:
+      - CI and npm release
+      - Publish Storybook to GitHub Pages
+    types: [completed]
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+jobs:
+  notify:
+    if: github.event.workflow_run.conclusion == 'success'
+    uses: lapismd/dependency-automation/.github/workflows/completion.yml@2cef3b7fdf5e68012c3fa58b017822ea8b218230
+    with:
+      automation-ref: 2cef3b7fdf5e68012c3fa58b017822ea8b218230
+    secrets:
+      app-private-key: ${{ secrets.LAPIS_DEPENDENCY_APP_PRIVATE_KEY }}

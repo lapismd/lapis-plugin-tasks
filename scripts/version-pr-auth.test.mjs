@@ -36,7 +36,7 @@ test("qualified runtime guard validates source inputs before writer App minting"
   assert.ok(guard, "source-owned shared runtime guard exists");
   assert.equal(
     guard.uses,
-    "lapismd/lapis-ci/actions/guard-version-runtime@bfa9743d8b403681ef7fb81ae3c5e53a99e3de55",
+    "lapismd/lapis-ci/actions/guard-version-runtime@dd71275c5b2618afceae0b97ee0a071649781971",
   );
   assert.deepEqual(Object.keys(guard).sort(), ["name", "uses", "with"]);
   assert.deepEqual(guard.with, {
@@ -88,7 +88,6 @@ test("qualified runtime guard validates source inputs before writer App minting"
   assert.deepEqual(
     Object.keys(qualification.files).sort(),
     [
-      "pnpm-workspace.yaml",
       "scripts/release-sigstore.mjs",
       "scripts/release.mjs",
       "scripts/release-install-readiness.mjs",
@@ -152,4 +151,42 @@ test("publisher and dispatch authority remain separate from the PR App", () => {
   );
   assert.equal(command.env.GH_TOKEN, "${{ secrets.GITHUB_TOKEN }}");
   assert.ok(!JSON.stringify(publish).includes("steps.app.outputs.token"));
+});
+
+test("the workspace binding admits only the reviewed Core development coordinate", () => {
+  const read = (file) => readFileSync(new URL("../" + file, import.meta.url));
+  const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
+  const q = JSON.parse(read(".github/versioning-runtime.json"));
+  assert.equal(q.nodeMajor, 24);
+  assert.equal(q.formatterPolicy, "unconfigured");
+  assert.deepEqual(q.workspacePolicy.developmentOverride, {
+    dependency: "@lapismd/design-core",
+    series: "0.13",
+    minimumPatch: 4,
+  });
+  const source = read("pnpm-workspace.yaml").toString();
+  const selected = JSON.parse(read("package.json")).devDependencies[
+    "@lapismd/design-core"
+  ];
+  const needle = '  "@lapismd/design-core": "' + selected + '"';
+  assert.equal(source.split(needle).length, 2);
+  assert.equal(
+    q.workspacePolicy.sha256,
+    hash(
+      source.replace(
+        needle,
+        '  "@lapismd/design-core": "<development-override>"',
+      ),
+    ),
+  );
+  const workflow = YAML.parse(read(".github/workflows/ci.yml").toString());
+  const guard = workflow.jobs.governance.steps.find((s) =>
+    s.uses?.startsWith("lapismd/lapis-ci/actions/guard-version-runtime@"),
+  );
+  assert.equal(
+    guard.uses,
+    "lapismd/lapis-ci/actions/guard-version-runtime@dd71275c5b2618afceae0b97ee0a071649781971",
+  );
+  assert.equal(guard.if, undefined);
+  assert.equal(guard["continue-on-error"], undefined);
 });

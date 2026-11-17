@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "kind": "single-development-dependency",
+  "repository": "lapismd/lapis-plugin-tasks",
+  "dependency": "@lapismd/design-core",
+  "slot": "core-development",
+  "chapters": [
+    "spec/src/plugins/tasks/dependency-automation.md",
+    "spec/src/plugins/index.md"
+  ]
+}

@@ -308,3 +308,7 @@ recurrence story retains its visibility and selection assertions.
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | LN-TASK-098 | Task detail checkboxes MUST align with the first title line. Task detail and List documents MUST fill the available width with a small inset in reading and live-edit modes and room for editor gutter controls, without centered readable-column spacing. Consumers MUST configure these surfaces through public Mira layout tokens. |
 | LN-TASK-099 | Tasks navigation MUST use the public Design Core Column Canvas Toggle and its shared PanelToggle icon. Tasks MUST NOT replace that stateful sidebar indicator with a consumer-drawn or third-party glyph.                                                                                                                             |
+
+The source-owned [dependency automation](dependency-automation.md) chapter binds
+only the Core development catalog under LPT-SPEC-025. Its public runtime peers
+remain unchanged, and the required full audit blocks unapproved findings.
