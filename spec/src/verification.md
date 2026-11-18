@@ -1,5 +1,7 @@
 # Verification
 
+LPT-SPEC-021 retains the [disabled exact HIGH proposal](../records/2026-11-18-development-high-proposal.md); no HIGH approval is active and required audits remain blocking.
+
 LPT-SPEC-021 additionally retains the [qualified runtime proof and admission
 record](../records/2026-11-16-qualified-version-runtime.md), including actual
 whole-recipe execution, exact source/lock/receipt bindings and the failing-before,

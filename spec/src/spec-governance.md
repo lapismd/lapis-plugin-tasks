@@ -467,8 +467,8 @@ current-source hosted qualification remains required before merge.
 | LPT-SPEC-025 | Compatible Core development intake MUST retain public peer contracts and registry coordinates, verify source-owned policy and exact current catalog facts in two managed chapters, and run the independent offline guard in ordinary quality/check lanes outside specification exemptions. Only a forward0.13 patch may change the development pin, matching override and mechanical lock closure; unrelated source/catalog changes MUST fail. |
 | LPT-SPEC-026 | Successful existing CI/npm and Pages workflows MAY send a completion hint only through the reviewed immutable coordinator implementation and its matching source policy. Verification MUST precede App minting and final dispatch; candidate code/artifacts/caches, callback self-triggers and inherited secrets MUST remain excluded. Source activation and every audit, functional, publication and ownership gate remain separate. |
 
-The catalog pin remains Core0.13.4 during setup. Version guarding uses the
-reviewed development-coordinate workspace digest, preserving all other source
-bytes. The root Tasks package/runtime version and public peers are unchanged.
-The required full audit currently reports an unapproved HIGH Changesets finding;
-this source preparation cannot bypass it or inherit the coordinator exception.
+Core0.13.4, runtime versions and public peers remain unchanged; version guarding
+retains the reviewed development-coordinate workspace digest.
+HIGH admission MUST remain disabled until exact user approval; it ends
+November19 at00:00UTC or a fix, whichever comes first.
+Existing LOW acceptance and every other gate remain; no approval transfers.

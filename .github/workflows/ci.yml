@@ -274,6 +274,8 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - name: Set up pnpm
         uses: pnpm/action-setup@v6
       - name: Set up Node.js
@@ -283,10 +285,22 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-pnpmfile --prefer-offline
-      - name: Audit all dependencies
-        run: pnpm audit
+      - name: Audit complete raw graphs under exact source-owned policy
+        uses: lapismd/lapis-ci/actions/check-development-audit@63e64958e9b271d36feba06a162ee02b079a3206
+        with:
+          policy-file: .github/development-audit.json
       - name: Audit production dependencies
         run: pnpm audit --prod
+
+      - name: Retain complete raw dependency audit evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: tasks-dependency-audit-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .local/dependency-audit/
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 14
 
   validate:
     name: Validate

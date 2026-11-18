@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "repository": "lapismd/lapis-plugin-tasks",
+  "status": "disabled",
+  "approvedAt": null,
+  "authority": null,
+  "expiresAt": "2026-11-19T00:00:00.000Z",
+  "collector": {
+    "repository": "lapismd/lapis-ci",
+    "revision": "63e64958e9b271d36feba06a162ee02b079a3206",
+    "entrypoint": "actions/check-development-audit"
+  },
+  "finding": {
+    "advisory": "GHSA-fc5q-39xc-vjpf",
+    "package": "picomatch",
+    "version": "4.0.7",
+    "severity": "high",
+    "path": ".>@changesets/cli>@changesets/config>picomatch",
+    "scope": "development-only",
+    "vulnerableRange": "<=4.0.7",
+    "patchedRange": "<0.0.0"
+  },
+  "bindings": {
+    "sourceSha": "a86b18bde00a8cb744518ad65d46d4fa87da8ecb",
+    "manifestSha256": "15f8078f76a4cf9d68a6107a48be2b98ad4b367878c223d6c6a5c026ebaad545",
+    "lockSha256": "4bd16d53d38d480f18f0e1670805d6c26a124baa1aade93ff17a24be82b38849",
+    "workspaceSha256": "21bba751578612b319523e1f906dcb3705b4836a6a265ca25101b0cebfde12d0"
+  },
+  "rawFullCounts": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 1,
+    "critical": 0
+  },
+  "rawProductionCounts": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0
+  },
+  "endsSooner": "Any patched range or stable official successor above4.0.7 blocks immediately.",
+  "decisionRecord": "spec/records/2026-11-18-development-high-decision.md"
+}
