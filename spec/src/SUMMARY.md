@@ -3,6 +3,7 @@
 - [Specification governance](spec-governance.md)
 - [Plugins](plugins/index.md)
   - [Plugins / Tasks](plugins/tasks/index.md)
+    - [Plugins / Tasks / Dependency automation](plugins/tasks/dependency-automation.md)
     - [Plugins / Tasks / Documents](plugins/tasks/documents.md)
       - [Plugins / Tasks / Documents / Recurrence](plugins/tasks/documents/recurrence.md)
     - [Plugins / Tasks / Runtime](plugins/tasks/runtime.md)

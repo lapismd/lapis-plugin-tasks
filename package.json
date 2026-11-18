@@ -75,7 +75,8 @@
     "registry:sign": "node scripts/registry-release.mjs sign",
     "registry:publish": "node scripts/registry-release.mjs publish",
     "build:bundle": "node scripts/validation.mjs run build:bundle",
-    "registry:runtime:check": "node scripts/validation.mjs run registry:runtime:check"
+    "registry:runtime:check": "node scripts/validation.mjs run registry:runtime:check",
+    "check:dependency-intake": "node scripts/validation.mjs run check:dependency-intake"
   },
   "files": [
     "operations.json",
@@ -141,7 +142,7 @@
     "@lapis-notes/search": "^0.1.12",
     "@lapis-notes/ui": "^0.2.1",
     "@lapis-notes/workspace": "^0.4.6",
-    "@lapismd/design-core": "^0.13.4",
+    "@lapismd/design-core": "0.13.4",
     "@lapismd/mira": "~0.2.0",
     "@lapismd/spec-validator": "^0.2.1",
     "@lezer/highlight": "1.2.5",

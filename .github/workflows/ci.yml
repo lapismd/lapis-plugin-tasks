@@ -48,6 +48,10 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-pnpmfile --prefer-offline
+      - name: Guard reviewed version inputs before merge
+        uses: lapismd/lapis-ci/actions/guard-version-runtime@dd71275c5b2618afceae0b97ee0a071649781971
+        with:
+          qualification-file: .github/versioning-runtime.json
       - name: Install the pinned Jujutsu tool
         run: node scripts/validation/install-tools.mjs --ci
       - name: Select the exact CI source revision
@@ -270,6 +274,8 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - name: Set up pnpm
         uses: pnpm/action-setup@v6
       - name: Set up Node.js
@@ -279,10 +285,22 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --ignore-pnpmfile --prefer-offline
-      - name: Audit all dependencies
-        run: pnpm audit
+      - name: Audit complete raw graphs under exact source-owned policy
+        uses: lapismd/lapis-ci/actions/check-development-audit@63e64958e9b271d36feba06a162ee02b079a3206
+        with:
+          policy-file: .github/development-audit.json
       - name: Audit production dependencies
         run: pnpm audit --prod
+
+      - name: Retain complete raw dependency audit evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: tasks-dependency-audit-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .local/dependency-audit/
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 14
 
   validate:
     name: Validate
@@ -389,7 +407,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile --ignore-pnpmfile
       - name: Guard qualified version runtime
-        uses: lapismd/lapis-ci/actions/guard-version-runtime@bfa9743d8b403681ef7fb81ae3c5e53a99e3de55 # reviewed whole-recipe proof
+        uses: lapismd/lapis-ci/actions/guard-version-runtime@dd71275c5b2618afceae0b97ee0a071649781971 # reviewed whole-recipe proof
         with:
           qualification-file: .github/versioning-runtime.json
       - name: Determine genuine package version intent

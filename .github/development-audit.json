@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 2,
+  "repository": "lapismd/lapis-plugin-tasks",
+  "approvals": [
+    {
+      "advisory": "GHSA-fc5q-39xc-vjpf",
+      "package": "picomatch",
+      "version": "4.0.7",
+      "severity": "high",
+      "path": ".>@changesets/cli>@changesets/config>picomatch",
+      "scope": "development-only",
+      "vulnerableRange": "<=4.0.7",
+      "patchedRange": "<0.0.0",
+      "sourceSha": "a86b18bde00a8cb744518ad65d46d4fa87da8ecb",
+      "manifestSha256": "15f8078f76a4cf9d68a6107a48be2b98ad4b367878c223d6c6a5c026ebaad545",
+      "lockSha256": "4bd16d53d38d480f18f0e1670805d6c26a124baa1aade93ff17a24be82b38849",
+      "approvedAt": "2026-11-18T13:30:52.633Z",
+      "expiresAt": "2026-11-19T00:00:00.000Z",
+      "authority": "explicit-user",
+      "record": "spec/records/2026-11-18-development-high-decision.md"
+    }
+  ]
+}
