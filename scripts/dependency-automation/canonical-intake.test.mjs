@@ -4,6 +4,7 @@ import { describe, it, expect } from "vitest";
 import { parse, stringify } from "yaml";
 import {
   tasksCoreFacts,
+  tasksGraphBindings,
   verifyTasksCanonicalIntake,
 } from "./check-canonical-intake.mjs";
 const fixture = JSON.parse(
@@ -23,21 +24,75 @@ const document = (facts) =>
   "# Tasks source contract\n\n<!-- dependency-intake:core-development:start -->\n\n```json\n" +
   JSON.stringify(facts, null, 2) +
   "\n```\n\n<!-- dependency-intake:core-development:end -->\n\nAuthored text.\n";
+function supplementary(files) {
+  const bindings = tasksGraphBindings(files),
+    stable = {
+      sourceSha: "a86b18bde00a8cb744518ad65d46d4fa87da8ecb",
+      authority: "explicit-user",
+      expiresAt: "2026-11-19T00:00:00.000Z",
+    },
+    audit =
+      JSON.stringify(
+        {
+          ...stable,
+          manifestSha256: bindings.manifestSha256,
+          lockSha256: bindings.lockSha256,
+          workspaceSha256: bindings.workspaceSha256,
+        },
+        null,
+        2,
+      ) + "\n";
+  return {
+    ".github/development-audit-high-proposal.json": audit,
+    ".github/development-audit.json":
+      JSON.stringify(
+        {
+          ...stable,
+          manifestSha256: bindings.manifestSha256,
+          lockSha256: bindings.lockSha256,
+        },
+        null,
+        2,
+      ) + "\n",
+    "scripts/fixtures/development-high-blocked-decision.json":
+      JSON.stringify(
+        {
+          sourceSha: stable.sourceSha,
+          manifestSha256: bindings.manifestSha256,
+          lockSha256: bindings.lockSha256,
+        },
+        null,
+        2,
+      ) + "\n",
+    "spec/records/2026-11-18-development-high-proposal.md":
+      `Source ${stable.sourceSha}\nManifest ${bindings.manifestSha256}\nLock ${bindings.lockSha256}\nWorkspace ${bindings.workspaceSha256}\n`,
+    "spec/src/plugins/tasks/index.md": `Core ${bindings.version}\n`,
+    "spec/src/spec-governance.md": `Core${bindings.version}\n`,
+  };
+}
 function input() {
   const before = structuredClone(fixture.before),
-    files = structuredClone(fixture.after);
+    files = structuredClone(fixture.after),
+    baseSupplementaryDocuments = supplementary(before),
+    supplementaryDocuments = supplementary(files);
   return {
     before,
     files,
     policyBytes,
     basePolicyBytes: policyBytes,
-    changedFiles: [...Object.keys(files), ...chapters],
+    changedFiles: [
+      ...Object.keys(files),
+      ...chapters,
+      ...Object.keys(supplementaryDocuments),
+    ],
     baseDocuments: Object.fromEntries(
       chapters.map((p) => [p, document(tasksCoreFacts(before, policyBytes))]),
     ),
     documents: Object.fromEntries(
       chapters.map((p) => [p, document(tasksCoreFacts(files, policyBytes))]),
     ),
+    baseSupplementaryDocuments,
+    supplementaryDocuments,
   };
 }
 describe("source-owned Core intake verification", () => {
@@ -76,6 +131,49 @@ describe("source-owned Core intake verification", () => {
   it("verifies the actual pnpm Core0.13.4 to0.13.5 candidate independently of shared rendering", () => {
     expect(verifyTasksCanonicalIntake(input()).version).toBe("0.13.5");
   });
+  for (const [name, mutate] of [
+    [
+      "audit authority",
+      (d) =>
+        (d.supplementaryDocuments[
+          ".github/development-audit-high-proposal.json"
+        ] = d.supplementaryDocuments[
+          ".github/development-audit-high-proposal.json"
+        ].replace("explicit-user", "dependency-bot")),
+    ],
+    [
+      "audit source identity",
+      (d) =>
+        (d.supplementaryDocuments[".github/development-audit.json"] =
+          d.supplementaryDocuments[".github/development-audit.json"].replace(
+            "a86b18bde00a8cb744518ad65d46d4fa87da8ecb",
+            "b".repeat(40),
+          )),
+    ],
+    [
+      "audit expiry",
+      (d) =>
+        (d.supplementaryDocuments[
+          ".github/development-audit-high-proposal.json"
+        ] = d.supplementaryDocuments[
+          ".github/development-audit-high-proposal.json"
+        ].replace("2026-11-19", "2026-11-20")),
+    ],
+    [
+      "proposal prose",
+      (d) =>
+        (d.supplementaryDocuments[
+          "spec/records/2026-11-18-development-high-proposal.md"
+        ] += "Renewed.\n"),
+    ],
+  ])
+    it(`rejects a supplementary ${name} change`, () => {
+      const d = input();
+      mutate(d);
+      expect(() => verifyTasksCanonicalIntake(d)).toThrow(
+        /supplementary evidence is not an exact graph rebinding/,
+      );
+    });
   for (const [name, mutate] of [
     [
       "stale facts",
