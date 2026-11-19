@@ -142,7 +142,7 @@
     "@lapis-notes/search": "^0.1.12",
     "@lapis-notes/ui": "^0.2.1",
     "@lapis-notes/workspace": "^0.4.6",
-    "@lapismd/design-core": "0.13.4",
+    "@lapismd/design-core": "0.13.6",
     "@lapismd/mira": "~0.2.0",
     "@lapismd/spec-validator": "^0.2.1",
     "@lezer/highlight": "1.2.5",
