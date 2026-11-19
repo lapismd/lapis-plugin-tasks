@@ -66,6 +66,9 @@ a mandatory shared check if any future explicit approval is activated.
 Both targeted proposal and CI/audit-control tests pass. Actionlint is unavailable
 on the host; that failed command preflight is retained and workflows parse cleanly
 inside the existing immutable tool image with read-only source files, no network
-and no credentials. Required full audit remains intentionally failing, not waived. Source manifests,
-locks, workspace policies and every version-recipe binding remain unchanged.
-Final focused qualification passes 7 tests and default-Docker specification validation (10 validators, 15 chapters, 126 requirements) and spec-first (7 protected files). The unchanged source input hashes and active-policy boundary are rechecked by the proposal suite. Hosted qualification remains required before merge.
+and no credentials. Required full audit remains intentionally failing, not waived.
+The proposal remains bound to the exact source graph above. A later guarded Core
+development-only intake may rebind only its manifest, lock and workspace hashes
+to that mechanically verified graph; source identity, authority, approval and
+expiry remain byte-identical, and no decision is renewed or transferred.
+Final focused qualification passes 7 tests and default-Docker specification validation (10 validators, 15 chapters, 126 requirements) and spec-first (7 protected files). The exact source input hashes and active-policy boundary are rechecked by the proposal suite. Hosted qualification remains required before merge.

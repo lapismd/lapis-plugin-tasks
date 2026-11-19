@@ -13,6 +13,26 @@ const chapters = [
   "spec/src/plugins/tasks/dependency-automation.md",
   "spec/src/plugins/index.md",
 ];
+const graphInputs = ["package.json", "pnpm-workspace.yaml", "pnpm-lock.yaml"];
+const supplementaryTransforms = {
+  ".github/development-audit-high-proposal.json": [
+    "manifestSha256",
+    "lockSha256",
+    "workspaceSha256",
+  ],
+  ".github/development-audit.json": ["manifestSha256", "lockSha256"],
+  "scripts/fixtures/development-high-blocked-decision.json": [
+    "manifestSha256",
+    "lockSha256",
+  ],
+  "spec/records/2026-11-18-development-high-proposal.md": [
+    "manifestSha256",
+    "lockSha256",
+    "workspaceSha256",
+  ],
+  "spec/src/plugins/tasks/index.md": ["catalogDevelopmentVersion"],
+  "spec/src/spec-governance.md": ["governanceDevelopmentVersion"],
+};
 const expectedPolicy = {
   schemaVersion: 1,
   kind: "single-development-dependency",
@@ -25,6 +45,51 @@ const fail = (reason) => {
   throw Error(`Tasks canonical intake: ${reason}`);
 };
 const hash = (bytes) => createHash("sha256").update(bytes).digest("hex");
+export function tasksGraphBindings(files) {
+  return {
+    manifestSha256: hash(files["package.json"]),
+    lockSha256: hash(files["pnpm-lock.yaml"]),
+    workspaceSha256: hash(files["pnpm-workspace.yaml"]),
+    version: JSON.parse(files["package.json"]).devDependencies?.[core],
+  };
+}
+function verifySupplementaryTransforms({
+  before,
+  files,
+  baseSupplementaryDocuments,
+  supplementaryDocuments,
+}) {
+  const previous = tasksGraphBindings(before),
+    candidate = tasksGraphBindings(files);
+  for (const [path, fields] of Object.entries(supplementaryTransforms)) {
+    let expected = baseSupplementaryDocuments?.[path];
+    if (typeof expected !== "string")
+      fail(`missing supplementary baseline: ${path}`);
+    for (const field of fields) {
+      const [from, to] =
+        field === "catalogDevelopmentVersion"
+          ? [
+              `Core \`^${previous.version}\``,
+              `Core \`${candidate.version}\``,
+            ]
+          : field === "governanceDevelopmentVersion"
+            ? [
+                `Core${previous.version}, runtime versions`,
+                `Core${candidate.version}, runtime versions`,
+              ]
+            : [previous[field], candidate[field]];
+      if (
+        typeof from !== "string" ||
+        typeof to !== "string" ||
+        !expected.includes(from)
+      )
+        fail(`stale supplementary baseline: ${path}`);
+      expected = expected.replaceAll(from, to);
+    }
+    if (supplementaryDocuments?.[path] !== expected)
+      fail(`supplementary evidence is not an exact graph rebinding: ${path}`);
+  }
+}
 export function tasksCoreFacts(files, policyBytes) {
   if (!equal(JSON.parse(policyBytes), expectedPolicy))
     fail("source policy changed or unsupported");
@@ -176,6 +241,8 @@ export function verifyTasksCanonicalIntake({
   before,
   basePolicyBytes,
   baseDocuments,
+  baseSupplementaryDocuments,
+  supplementaryDocuments,
   changedFiles = [],
 }) {
   const facts = tasksCoreFacts(files, policyBytes);
@@ -204,10 +271,9 @@ export function verifyTasksCanonicalIntake({
     changedFiles.some(
       (p) =>
         ![
-          "package.json",
-          "pnpm-workspace.yaml",
-          "pnpm-lock.yaml",
+          ...graphInputs,
           ...chapters,
+          ...Object.keys(supplementaryTransforms),
         ].includes(p),
     )
   )
@@ -232,6 +298,12 @@ export function verifyTasksCanonicalIntake({
     )
   )
     fail("unexpected public contract or registry catalog change");
+  verifySupplementaryTransforms({
+    before,
+    files,
+    baseSupplementaryDocuments,
+    supplementaryDocuments,
+  });
   const oldFacts = tasksCoreFacts(before, basePolicyBytes);
   for (const p of chapters) {
     const base = slot(baseDocuments[p]),
@@ -247,9 +319,11 @@ export function checkTasksCanonicalIntake(root = process.cwd()) {
     if (realpathSync(target) !== target) fail("non-regular source path");
     return readFileSync(target, "utf8");
   };
-  const inputs = ["package.json", "pnpm-workspace.yaml", "pnpm-lock.yaml"];
-  const files = Object.fromEntries(inputs.map((p) => [p, read(p)])),
-    documents = Object.fromEntries(chapters.map((p) => [p, read(p)]));
+  const files = Object.fromEntries(graphInputs.map((p) => [p, read(p)])),
+    documents = Object.fromEntries(chapters.map((p) => [p, read(p)])),
+    supplementaryDocuments = Object.fromEntries(
+      Object.keys(supplementaryTransforms).map((p) => [p, read(p)]),
+    );
   const run = (args) =>
     execFileSync("jj", ["--ignore-working-copy", ...args], {
       cwd: root,
@@ -273,7 +347,7 @@ export function checkTasksCanonicalIntake(root = process.cwd()) {
       ["--ignore-working-copy", "file", "show", "-r", parents[0], "--", path],
       { cwd: root, encoding: "utf8", maxBuffer: 3 * 1024 * 1024 },
     );
-  const before = Object.fromEntries(inputs.map((p) => [p, base(p)]));
+  const before = Object.fromEntries(graphInputs.map((p) => [p, base(p)]));
   // Initial source adoption pins the existing resolved catalog without a version change.
   // Later candidates must compare against the installed immutable source policy.
   if (
@@ -289,13 +363,16 @@ export function checkTasksCanonicalIntake(root = process.cwd()) {
       policyBytes: read(policyPath),
       documents,
     });
-  let basePolicyBytes, baseDocuments;
+  let basePolicyBytes, baseDocuments, baseSupplementaryDocuments;
   if (
     JSON.parse(before["package.json"]).devDependencies?.[core] !==
     JSON.parse(files["package.json"]).devDependencies?.[core]
   ) {
     basePolicyBytes = base(policyPath);
     baseDocuments = Object.fromEntries(chapters.map((p) => [p, base(p)]));
+    baseSupplementaryDocuments = Object.fromEntries(
+      Object.keys(supplementaryTransforms).map((p) => [p, base(p)]),
+    );
   }
   return verifyTasksCanonicalIntake({
     files,
@@ -304,6 +381,8 @@ export function checkTasksCanonicalIntake(root = process.cwd()) {
     before,
     basePolicyBytes,
     baseDocuments,
+    baseSupplementaryDocuments,
+    supplementaryDocuments,
     changedFiles: changesFromVcs({}, root).map((c) => c.path),
   });
 }
