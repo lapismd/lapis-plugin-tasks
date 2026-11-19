@@ -24,7 +24,7 @@ const document = (facts) =>
   "# Tasks source contract\n\n<!-- dependency-intake:core-development:start -->\n\n```json\n" +
   JSON.stringify(facts, null, 2) +
   "\n```\n\n<!-- dependency-intake:core-development:end -->\n\nAuthored text.\n";
-function supplementary(files) {
+function supplementary(files, baseline = false) {
   const bindings = tasksGraphBindings(files),
     stable = {
       sourceSha: "a86b18bde00a8cb744518ad65d46d4fa87da8ecb",
@@ -66,14 +66,16 @@ function supplementary(files) {
       ) + "\n",
     "spec/records/2026-11-18-development-high-proposal.md":
       `Source ${stable.sourceSha}\nManifest ${bindings.manifestSha256}\nLock ${bindings.lockSha256}\nWorkspace ${bindings.workspaceSha256}\n`,
-    "spec/src/plugins/tasks/index.md": `Core ${bindings.version}\n`,
-    "spec/src/spec-governance.md": `Core${bindings.version}\n`,
+    "spec/src/plugins/tasks/index.md":
+      `Public Core ^0.13.2 remains supported. Catalog development uses Core \`${baseline ? "^" : ""}${bindings.version}\`.\n`,
+    "spec/src/spec-governance.md":
+      `Core${bindings.version}, runtime versions remain unchanged.\n`,
   };
 }
 function input() {
   const before = structuredClone(fixture.before),
     files = structuredClone(fixture.after),
-    baseSupplementaryDocuments = supplementary(before),
+    baseSupplementaryDocuments = supplementary(before, true),
     supplementaryDocuments = supplementary(files);
   return {
     before,
@@ -129,7 +131,11 @@ describe("source-owned Core intake verification", () => {
     );
   });
   it("verifies the actual pnpm Core0.13.4 to0.13.5 candidate independently of shared rendering", () => {
-    expect(verifyTasksCanonicalIntake(input()).version).toBe("0.13.5");
+    const data = input();
+    expect(verifyTasksCanonicalIntake(data).version).toBe("0.13.5");
+    expect(
+      data.supplementaryDocuments["spec/src/plugins/tasks/index.md"],
+    ).toContain("Public Core ^0.13.2 remains supported.");
   });
   for (const [name, mutate] of [
     [

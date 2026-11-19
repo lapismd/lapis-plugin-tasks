@@ -30,8 +30,8 @@ const supplementaryTransforms = {
     "lockSha256",
     "workspaceSha256",
   ],
-  "spec/src/plugins/tasks/index.md": ["version"],
-  "spec/src/spec-governance.md": ["version"],
+  "spec/src/plugins/tasks/index.md": ["catalogDevelopmentVersion"],
+  "spec/src/spec-governance.md": ["governanceDevelopmentVersion"],
 };
 const expectedPolicy = {
   schemaVersion: 1,
@@ -66,13 +66,25 @@ function verifySupplementaryTransforms({
     if (typeof expected !== "string")
       fail(`missing supplementary baseline: ${path}`);
     for (const field of fields) {
+      const [from, to] =
+        field === "catalogDevelopmentVersion"
+          ? [
+              `Core \`^${previous.version}\``,
+              `Core \`${candidate.version}\``,
+            ]
+          : field === "governanceDevelopmentVersion"
+            ? [
+                `Core${previous.version}, runtime versions`,
+                `Core${candidate.version}, runtime versions`,
+              ]
+            : [previous[field], candidate[field]];
       if (
-        typeof previous[field] !== "string" ||
-        typeof candidate[field] !== "string" ||
-        !expected.includes(previous[field])
+        typeof from !== "string" ||
+        typeof to !== "string" ||
+        !expected.includes(from)
       )
         fail(`stale supplementary baseline: ${path}`);
-      expected = expected.replaceAll(previous[field], candidate[field]);
+      expected = expected.replaceAll(from, to);
     }
     if (supplementaryDocuments?.[path] !== expected)
       fail(`supplementary evidence is not an exact graph rebinding: ${path}`);
