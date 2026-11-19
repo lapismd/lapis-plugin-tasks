@@ -4,7 +4,7 @@ packages:
 linkWorkspacePackages: true
 
 overrides:
-  "@lapismd/design-core": "0.13.4"
+  "@lapismd/design-core": "0.13.6"
   bits-ui: "2.20.2"
   "@codemirror/autocomplete": "6.20.4"
   "@codemirror/commands": "6.11.1"
