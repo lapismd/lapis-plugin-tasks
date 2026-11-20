@@ -137,6 +137,11 @@ describe("source-owned Core intake verification", () => {
       data.supplementaryDocuments["spec/src/plugins/tasks/index.md"],
     ).toContain("Public Core ^0.13.2 remains supported.");
   });
+  it("verifies a consecutive pinned Core patch intake", () => {
+    const data = input();
+    data.baseSupplementaryDocuments = supplementary(data.before);
+    expect(verifyTasksCanonicalIntake(data).version).toBe("0.13.5");
+  });
   for (const [name, mutate] of [
     [
       "audit authority",

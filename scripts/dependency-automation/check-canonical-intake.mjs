@@ -66,18 +66,20 @@ function verifySupplementaryTransforms({
     if (typeof expected !== "string")
       fail(`missing supplementary baseline: ${path}`);
     for (const field of fields) {
-      const [from, to] =
-        field === "catalogDevelopmentVersion"
-          ? [
-              `Core \`^${previous.version}\``,
-              `Core \`${candidate.version}\``,
-            ]
-          : field === "governanceDevelopmentVersion"
-            ? [
-                `Core${previous.version}, runtime versions`,
-                `Core${candidate.version}, runtime versions`,
-              ]
-            : [previous[field], candidate[field]];
+      let from, to;
+      if (field === "catalogDevelopmentVersion") {
+        const matches = [
+          `Core \`${previous.version}\``,
+          `Core \`^${previous.version}\``,
+        ].filter((coordinate) => expected.includes(coordinate));
+        if (matches.length !== 1)
+          fail(`stale supplementary baseline: ${path}`);
+        [from] = matches;
+        to = `Core \`${candidate.version}\``;
+      } else if (field === "governanceDevelopmentVersion") {
+        from = `Core${previous.version}, runtime versions`;
+        to = `Core${candidate.version}, runtime versions`;
+      } else [from, to] = [previous[field], candidate[field]];
       if (
         typeof from !== "string" ||
         typeof to !== "string" ||
