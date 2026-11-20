@@ -23,7 +23,7 @@ the published plugin runtime and does not alter Tasks host contracts.
 
 The public API peer range MUST retain `^0.2.4` and `^0.4.0` and admit
 `^0.6.0`. Catalog development uses published API `^0.6.5`, Workspace `^0.4.6`,
-UI `^0.2.1`, File Explorer `^0.2.8`, Core `0.13.6` and Mira `~0.2.0`.
+UI `^0.2.1`, File Explorer `^0.2.8`, Core `0.13.7` and Mira `~0.2.0`.
 The Shell host uses published Markdown `^0.3.2` and Search `^0.1.12`, whose
 peer contracts admit API0.6. Current-host qualification MUST retain the same
 owned App and native Tasks capability without a peer waiver or runtime adapter.
