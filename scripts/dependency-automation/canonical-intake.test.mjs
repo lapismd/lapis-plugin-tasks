@@ -24,7 +24,7 @@ const document = (facts) =>
   "# Tasks source contract\n\n<!-- dependency-intake:core-development:start -->\n\n```json\n" +
   JSON.stringify(facts, null, 2) +
   "\n```\n\n<!-- dependency-intake:core-development:end -->\n\nAuthored text.\n";
-function supplementary(files, baseline = false) {
+function supplementary(files) {
   const bindings = tasksGraphBindings(files),
     stable = {
       sourceSha: "a86b18bde00a8cb744518ad65d46d4fa87da8ecb",
@@ -67,7 +67,7 @@ function supplementary(files, baseline = false) {
     "spec/records/2026-11-18-development-high-proposal.md":
       `Source ${stable.sourceSha}\nManifest ${bindings.manifestSha256}\nLock ${bindings.lockSha256}\nWorkspace ${bindings.workspaceSha256}\n`,
     "spec/src/plugins/tasks/index.md":
-      `Public Core ^0.13.2 remains supported. Catalog development uses Core \`${baseline ? "^" : ""}${bindings.version}\`.\n`,
+      `Public Core ^0.13.2 remains supported. Catalog development uses Core \`${bindings.version}\`.\n`,
     "spec/src/spec-governance.md":
       `Core${bindings.version}, runtime versions remain unchanged.\n`,
   };
@@ -75,7 +75,7 @@ function supplementary(files, baseline = false) {
 function input() {
   const before = structuredClone(fixture.before),
     files = structuredClone(fixture.after),
-    baseSupplementaryDocuments = supplementary(before, true),
+    baseSupplementaryDocuments = supplementary(before),
     supplementaryDocuments = supplementary(files);
   return {
     before,

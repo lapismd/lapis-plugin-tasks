@@ -69,7 +69,7 @@ function verifySupplementaryTransforms({
       const [from, to] =
         field === "catalogDevelopmentVersion"
           ? [
-              `Core \`^${previous.version}\``,
+              `Core \`${previous.version}\``,
               `Core \`${candidate.version}\``,
             ]
           : field === "governanceDevelopmentVersion"
