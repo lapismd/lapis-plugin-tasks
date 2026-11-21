@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "sourceSha": "a86b18bde00a8cb744518ad65d46d4fa87da8ecb",
-  "manifestSha256": "fac7d1d5ad60c043f846ad5fa96b966ea341800a66ba4ac14aae41663dfb0a8a",
+  "manifestSha256": "2de3dc5324c55d746ae8ac630e40e71856080aad69f978edae01eab05e876e52",
   "lockSha256": "81ac49f21c62a22ebc825767d57327406a6c5e89b594a013025b7f3e382b4efa",
   "checkedAt": "2026-11-18T00:39:33.979Z",
   "rawVulnerabilities": {

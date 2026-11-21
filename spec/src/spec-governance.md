@@ -73,6 +73,10 @@ version intent before App minting. Only a version-changing release for the
 expected Tasks package MAY acquire the writer or run Changesets. Empty notes
 MUST remain retained without blocking an otherwise qualified unpublished
 version. Invalid CLI evidence or unknown targets MUST fail closed.
+Version PRs that change the package manifest MUST refresh the exact manifest
+hash in the disabled HIGH proposal, audit policy, blocked collector receipt,
+and proposal record in the same change. This binding refresh MUST NOT renew or
+broaden the expired approval.
 Changesets MUST NOT create
 GitHub releases directly; the separate existing qualified publisher retains its
 OIDC, signatures, provenance, registry verification and workflow credentials.
