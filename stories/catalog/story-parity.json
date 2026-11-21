@@ -32,8 +32,7 @@
     "subject": "src/lib/tasks/application-task-line/ApplicationTaskLine.svelte#default"
   },
   "src/lib/tasks/application-task-planner-mode/ApplicationTaskPlannerAppShell.stories.svelte": {
-    "kind": "component",
-    "subject": "@lapismd/design-core/shell#AppShell.Root",
+    "kind": "application",
     "stories": {
       "Planner Shell": {
         "kind": "component",

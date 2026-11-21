@@ -183,16 +183,31 @@
     const resizedTasksWidth = tasksColumn.getBoundingClientRect().width;
     const resizedPlannerWidth = plannerColumn.getBoundingClientRect().width;
     await userEvent.click(
-      canvas.getByRole("button", { name: "Collapse Tasks column" }),
+      canvas.getByRole("button", { name: "Toggle Tasks navigation" }),
     );
     await waitFor(() =>
       expect(plannerColumn.getBoundingClientRect().width).toBeGreaterThan(
         resizedPlannerWidth,
       ),
     );
-    await userEvent.click(
-      canvas.getByRole("button", { name: "Expand Tasks column" }),
+    expect(
+      canvas.queryByRole("button", { name: "Expand Tasks column" }),
+    ).not.toBeInTheDocument();
+    const bodyTasksToggle = canvas.getByRole("button", {
+      name: "Toggle Tasks navigation",
+    });
+    expect(bodyTasksToggle).toHaveAttribute("data-ui-part", "column-toggle");
+    expect(bodyTasksToggle).toHaveAttribute("data-target-column-id", "tasks");
+    expect(bodyTasksToggle.querySelector("svg")).toHaveAttribute(
+      "data-icon-variant",
+      "compact",
     );
+    expect(
+      context.canvasElement.querySelector(
+        ".task-column-canvas-story__collapsed-separator",
+      ),
+    ).not.toBeInTheDocument();
+    await userEvent.click(bodyTasksToggle);
     await waitFor(() => {
       tasksColumn = context.canvasElement.querySelector<HTMLElement>(
         '[data-column-id="tasks"][data-ui-part="column"]',
@@ -1120,9 +1135,19 @@
       canvas.getByRole("button", { name: "Lists — 5 lists" }),
     ).toHaveAttribute("aria-pressed", "true");
 
-    await userEvent.click(
-      canvas.getByRole("button", { name: "Expand Tasks column" }),
+    expect(
+      canvas.queryByRole("button", { name: "Expand Tasks column" }),
+    ).not.toBeInTheDocument();
+    const bodyTasksToggle = canvas.getByRole("button", {
+      name: "Toggle Tasks navigation",
+    });
+    expect(bodyTasksToggle).toHaveAttribute("data-ui-part", "column-toggle");
+    expect(bodyTasksToggle).toHaveAttribute("data-target-column-id", "tasks");
+    expect(bodyTasksToggle.querySelector("svg")).toHaveAttribute(
+      "data-icon-variant",
+      "compact",
     );
+    await userEvent.click(bodyTasksToggle);
     await waitFor(() =>
       expect(navigationToggle).toHaveAttribute("data-state", "expanded"),
     );
@@ -1190,9 +1215,7 @@
     await waitFor(() =>
       expect(navigationToggle).toHaveAttribute("data-state", "expanded"),
     );
-    await userEvent.click(
-      canvas.getByRole("button", { name: "Collapse Tasks column" }),
-    );
+    await userEvent.click(navigationToggle);
     await waitFor(() =>
       expect(navigationToggle).toHaveAttribute("data-state", "collapsed"),
     );

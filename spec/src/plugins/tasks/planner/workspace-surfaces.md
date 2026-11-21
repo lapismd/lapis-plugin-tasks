@@ -20,8 +20,9 @@ LN-TASK-056.
    descendant.
 
 The Tasks column is collapsible and closeable. The first control in the Planner
-header explicitly targets Tasks, while Planner's own controller-owned collapse
-action remains farthest right. A linked List
+header explicitly targets Tasks and is the only Tasks visibility toggle; the
+Tasks column header does not repeat it, while Planner's own controller-owned
+collapse action remains farthest right. A linked List
 or Task opened from any document appends immediately to that document's right
 without replacing its parent. Each entry retains its own selection and editor
 state and uses the same bordered, rounded column treatment as the planner body.
@@ -51,8 +52,10 @@ its complete outer slot remains ahead of the active content pair so the overlay
 does not obstruct the leading column.
 
 Tasks supplies a consumer-owned collapsed rail rather than Column Canvas's
-fallback vertical title. It contains an expand action, the seven existing
-planner glyphs with task-count Tooltips, and a Lists glyph with a List-count
+fallback vertical title. It omits a redundant rail expand action because the
+adjacent Planner header retains the public Design Core `ColumnCanvas.Toggle`
+for Tasks. The rail contains the seven existing planner glyphs with task-count
+Tooltips and a Lists glyph with a List-count
 Tooltip. The Lists glyph composes the shadcn Tooltip and Popover triggers and
 opens the complete editable `TaskListNavTree` in an approximately 20rem,
 collision-aware surface with its own vertical scroll. Disclosure, rename,
@@ -129,17 +132,21 @@ without remounting CodeMirror or abandoning live preview.
 
 ## Storybook shell acceptance
 
-`Plugins/Tasks/Shell` boots a public `App`, loads File Explorer, Search,
-Markdown, and `TasksPlugin`, seeds real planner Markdown, and restores a
-`tasks` leaf. The fixture includes prose before and after arbitrarily named
+`Plugins/Tasks/Shell` and `Plugins/Tasks/App Shell -> Workspace` boot a public
+`App`, load File Explorer, Search, Markdown, and `TasksPlugin`, and render the
+real public Lapis `WorkspaceShell` rather than synthetic shell chrome. They seed
+real planner Markdown and restore a `tasks` leaf. The fixture includes prose
+before and after arbitrarily named
 grouping headings so it exercises source-order authority rather than a
 list-only special case. It also opens `lists.md` as ordinary Markdown to verify
 that navigation pins reuse List-row presentation without gaining structural
 behavior.
 
 Desktop and phone-width stories use the same pinned clock as the repository
-snapshot. Their final state returns to Today and collapses the Lapis left
-sidebar so the current Tasks surface is the visual focus.
+snapshot. The mobile story explicitly selects the shell's mobile display mode
+and proves the public mobile workspace surface is mounted. Their final state
+returns to Today and collapses the Lapis left sidebar so the current Tasks
+surface is the visual focus.
 
 The focused Deep Navigation Flow keeps the full
 List → Task → List → Task → Task descendant chain mounted as five distinct

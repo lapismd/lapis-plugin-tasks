@@ -8,7 +8,6 @@
   import FolderKanbanIcon from "@lucide/svelte/icons/folder-kanban";
   import InboxIcon from "@lucide/svelte/icons/inbox";
   import ListTodoIcon from "@lucide/svelte/icons/list-todo";
-  import PanelLeftOpenIcon from "@lucide/svelte/icons/panel-left-open";
   import PencilIcon from "@lucide/svelte/icons/pencil";
   import * as ColumnCanvas from "@lapismd/design-core/shadcn/column-canvas";
   import { Button } from "@lapismd/design-core/shadcn/button";
@@ -944,7 +943,7 @@
     <ColumnCanvas.Root controller={canvas} aria-label="Task planner">
       <ColumnCanvas.Column
         id="tasks"
-        title="Tasks"
+        columnTitle="Tasks"
         count={tasks.length}
         closeable
         revealOnEdgeHover
@@ -954,40 +953,12 @@
         {#snippet stickyRail()}
           <ListTodoIcon aria-hidden="true" />
         {/snippet}
-        {#snippet collapsedRail({ expand })}
+        {#snippet collapsedRail()}
           <Tooltip.Provider delayDuration={0}>
             <nav
               class="task-column-canvas-story__collapsed-nav"
               aria-label="Collapsed planner menu"
             >
-              <Tooltip.Root>
-                <Tooltip.Trigger>
-                  {#snippet child({ props })}
-                    <Button
-                      {...props}
-                      variant="ghost"
-                      size="icon-sm"
-                      class="task-column-canvas-story__collapsed-button"
-                      aria-label="Expand Tasks column"
-                      onclick={expand}
-                    >
-                      <PanelLeftOpenIcon aria-hidden="true" />
-                    </Button>
-                  {/snippet}
-                </Tooltip.Trigger>
-                <Tooltip.Content
-                  side="right"
-                  class="task-column-canvas-story__collapsed-tooltip"
-                >
-                  Expand Tasks
-                </Tooltip.Content>
-              </Tooltip.Root>
-
-              <span
-                class="task-column-canvas-story__collapsed-separator"
-                aria-hidden="true"
-              ></span>
-
               {#each plannerBuckets as bucket (bucket.id)}
                 {@const count = bucketCount(bucket.id)}
                 <Tooltip.Root>
@@ -1097,6 +1068,16 @@
             </nav>
           </Tooltip.Provider>
         {/snippet}
+        <ColumnCanvas.Header>
+          <div
+            data-ui-component="column-canvas"
+            data-ui-part="column-header-main"
+          >
+            <ColumnCanvas.Title>Tasks</ColumnCanvas.Title>
+            <ColumnCanvas.Count />
+          </div>
+          <ColumnCanvas.Close />
+        </ColumnCanvas.Header>
         <ColumnCanvas.Body>
           <nav
             class="task-column-canvas-story__nav"

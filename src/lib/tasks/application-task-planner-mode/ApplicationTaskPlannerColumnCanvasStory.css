@@ -160,14 +160,6 @@ body.sb-main-fullscreen #storybook-root:has(.task-column-canvas-story) {
   height: 1rem;
 }
 
-.task-column-canvas-story__collapsed-separator {
-  width: 1.25rem;
-  height: 1px;
-  flex: 0 0 auto;
-  margin-block: 0.15rem;
-  background: var(--ui-tasks-border);
-}
-
 .task-column-canvas-story__collapsed-tooltip[data-ui-part="tooltip-content"] {
   font-size: 0.71875rem;
 }
