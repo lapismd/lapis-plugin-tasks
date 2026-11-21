@@ -4,6 +4,14 @@ The native operation adapter is mapped to the owning Tasks runtime chapter.
 Its generated catalog/manifest drift check and provider tests have registered
 Docker validation lanes. Server owns hosted operation acceptance separately.
 
+The installable registry runtime uses a dedicated bundle entry that imports the
+published Tasks stylesheet before re-exporting the package API. Bundle
+preparation rejects an archive whose stylesheet omits the global Tasks role
+tokens, and cold development plus production archive acceptance verifies that
+the computed Tasks accent resolves through the active host theme. The governed
+App Shell and Shell stories both use the real public Lapis `WorkspaceShell`;
+the mobile story explicitly selects and proves its mobile workspace surface.
+
 <!-- dependency-automation-policy -->
 
 Dependency update PRs from the trusted LapisMD App, Dependabot or Renovate MAY skip specification checks using the PR author rather than the rerun actor. Functional checks remain required. The shared `lapismd/dependency-automation` coordinator proposes published first-party npm updates with Changeset release intent where required; it does not merge, publish, sign or deploy. This CI policy changes no runtime or public contract in this chapter.

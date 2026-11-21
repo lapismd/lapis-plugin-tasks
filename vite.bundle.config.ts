@@ -24,7 +24,7 @@ export default defineConfig({
     outDir: ".release/runtime",
     emptyOutDir: true,
     lib: {
-      entry: "src/lib/index.ts",
+      entry: "src/lib/runtime.ts",
       formats: ["es"],
       fileName: () => "main.mjs",
       cssFileName: "styles",

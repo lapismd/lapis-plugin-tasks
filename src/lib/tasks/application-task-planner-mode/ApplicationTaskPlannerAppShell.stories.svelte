@@ -1,7 +1,9 @@
 <script module lang="ts">
   import { defineMeta } from "@storybook/addon-svelte-csf";
-  import { ApplicationTaskPlannerShellExample } from "../../catalog.example-sources";
-  import ApplicationTaskPlannerAppShellStory from "./ApplicationTaskPlannerAppShellStory.svelte";
+  import { expect, waitFor, within } from "storybook/test";
+  import { PluginWorkspaceExample } from "../../../stories/PluginWorkspace.example-sources";
+  import PluginWorkspaceDemo from "../../../stories/PluginWorkspaceDemo.svelte";
+  import { workspaceA11y } from "../../../stories/workspace-a11y";
   import ApplicationTaskPlannerShell from "../application-task-planner-shell/ApplicationTaskPlannerShell.svelte";
   import ApplicationPlannerTaskRow from "../application-planner-task-row/ApplicationPlannerTaskRow.svelte";
   import { buildPlannerApplicationSummaries } from "../../model";
@@ -10,25 +12,28 @@
     sampleApplicationBoard,
     samplePlannerTasks,
   } from "../story-fixture";
-  import { playTitleClickStartsInlineEdit } from "../planner-title-edit-selection.story-play";
 
   const tasks = samplePlannerTasks();
   const summaries = buildPlannerApplicationSummaries(sampleApplicationBoard);
 
   const { Story } = defineMeta({
     title: "Plugins/Tasks/App Shell",
-    component: ApplicationTaskPlannerAppShellStory,
+    component: PluginWorkspaceDemo,
     parameters: {
+      layout: "fullscreen",
+      a11y: workspaceA11y,
       docs: {
+        canvas: { className: "workspace-shell-docs-canvas" },
         source: {
-          code: ApplicationTaskPlannerShellExample,
+          code: PluginWorkspaceExample,
           language: "svelte",
           type: "code",
         },
         description: {
           component:
-            "Tasks compositions mounted in shell chrome: full App Shell workspace and Planner Shell surface.",
+            "Tasks compositions mounted in the real public Lapis workspace shell, plus the focused Planner Shell surface.",
         },
+        story: { height: "700px", inline: false },
       },
     },
   });
@@ -38,20 +43,37 @@
   name="Workspace"
   tags={["visual-pending", "test"]}
   parameters={{
-    a11y: {
-      test: "off",
-    },
     docs: {
       description: {
         story:
-          "Reference planner workspace composed with the shared App Shell (projects rail, planner sidebar, and main Planner Mode).",
+          "Boot the public Lapis App and render Tasks inside its real desktop WorkspaceShell.",
       },
     },
   }}
-  play={playTitleClickStartsInlineEdit}
+  play={async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(
+      () => {
+        expect(canvas.getByTestId("plugin-workspace-status")).toHaveTextContent(
+          "ready",
+        );
+        expect(
+          canvasElement.querySelector(
+            '[data-ui-component="lapis-workspace-shell"]',
+          ),
+        ).toBeVisible();
+        expect(canvas.getByTestId("tasks-planner")).toBeVisible();
+      },
+      { timeout: 10_000 },
+    );
+    expect(canvas.getByTestId("plugin-workspace-demo")).toHaveAttribute(
+      "data-display-mode",
+      "desktop",
+    );
+  }}
 >
   {#snippet template()}
-    <ApplicationTaskPlannerAppShellStory />
+    <PluginWorkspaceDemo displayMode="desktop" />
   {/snippet}
 </Story>
 

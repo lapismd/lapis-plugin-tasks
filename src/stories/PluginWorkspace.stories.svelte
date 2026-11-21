@@ -601,8 +601,17 @@
     });
     await closeSettings(settingsCanvas);
 
+    expect(
+      canvas.queryByRole("button", {
+        name: "Expand Tasks column",
+        exact: true,
+      }),
+    ).not.toBeInTheDocument();
     await userEvent.click(
-      canvas.getByRole("button", { name: "Expand Tasks column", exact: true }),
+      canvas.getByRole("button", {
+        name: "Toggle Tasks navigation",
+        exact: true,
+      }),
     );
     await waitFor(() => {
       expect(
@@ -2090,7 +2099,6 @@
 
 <Story
   name="Mobile Workspace"
-  args={{ displayMode: "mobile" }}
   parameters={{
     docs: {
       description: {
@@ -2104,6 +2112,14 @@
     canvasElement.style.maxHeight = "100%";
     canvasElement.style.overflow = "hidden";
     const canvas = await waitForReady(canvasElement);
+
+    expect(canvas.getByTestId("plugin-workspace-demo")).toHaveAttribute(
+      "data-display-mode",
+      "mobile",
+    );
+    expect(
+      canvasElement.querySelector('[data-ui-component="lapis-workspace-shell"]'),
+    ).toBeVisible();
 
     const app = storyApp(canvasElement);
     expect(app.plugins.isPluginEnabled("lapis-file-explorer")).toBe(true);
@@ -2148,7 +2164,11 @@
     await showDailyAgendaChecklistSummary(canvasElement, canvas);
     await collapseLapisLeftSidebar(canvas);
   }}
-/>
+>
+  {#snippet template()}
+    <PluginWorkspaceDemo displayMode="mobile" />
+  {/snippet}
+</Story>
 
 <Story
   name="Live Edit Mutations"
@@ -3884,7 +3904,7 @@
       expect((await plugin.repository.lists()).length).toBe(listCount + 1),
     );
     await userEvent.click(
-      canvas.getByRole("button", { name: "Collapse Tasks column" }),
+      canvas.getByRole("button", { name: "Toggle Tasks navigation" }),
     );
     await userEvent.click(canvas.getByRole("button", { name: /Lists —/ }));
     const popover = await waitFor(() => {
@@ -3916,8 +3936,17 @@
     await userEvent.click(
       canvas.getByRole("button", { name: "Tasks", exact: true }),
     );
+    expect(
+      canvas.queryByRole("button", {
+        name: "Expand Tasks column",
+        exact: true,
+      }),
+    ).not.toBeInTheDocument();
     await userEvent.click(
-      canvas.getByRole("button", { name: "Expand Tasks column", exact: true }),
+      canvas.getByRole("button", {
+        name: "Toggle Tasks navigation",
+        exact: true,
+      }),
     );
   }}
 />

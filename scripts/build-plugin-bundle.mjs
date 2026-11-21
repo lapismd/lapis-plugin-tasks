@@ -9,6 +9,12 @@ execFileSync(
   { stdio: "inherit" },
 );
 await copyFile("manifest.json", ".release/runtime/manifest.json");
+const runtimeStyles = await readFile(".release/runtime/styles.css", "utf8");
+if (!runtimeStyles.includes("--ui-tasks-accent:")) {
+  throw Error(
+    "Runtime stylesheet is missing the Tasks role tokens from tasks.tokens.css",
+  );
+}
 const manifest = JSON.parse(await readFile("manifest.json", "utf8"));
 const shared = new Set(
   manifest.lapis.runtime.entries.workspace.sharedDependencies,

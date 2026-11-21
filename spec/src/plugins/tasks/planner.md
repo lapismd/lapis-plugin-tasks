@@ -42,10 +42,14 @@ The planner has four responsibilities:
 4. Preserve the richer Markdown presentation when a Task or List document is
    opened inside the workspace.
 
-The Tasks navigation action uses the public Design Core Column Canvas Toggle
-and its shared PanelToggle presentation and state indicator, without a custom
-Lucide icon. Click toggling, persisted navigation state, and hover previews
-remain owned by Column Canvas. See LN-TASK-099.
+The Planner header's Tasks navigation action uses the public Design Core Column
+Canvas Toggle and its shared PanelToggle presentation and state indicator,
+without a custom Lucide icon. That header action remains available when the
+Tasks navigation is collapsed or hidden, so the collapsed rail does not repeat
+an expand control. The Tasks column's own header also omits the
+controller-generated toggle, leaving exactly one Tasks visibility control in
+the Planner header. Click toggling, persisted navigation state, and hover
+previews remain owned by Column Canvas. See LN-TASK-099.
 
 Host movable panels remain unspecified. The package registers one `tasks`
 main-area view; Storybook catalog compositions exercise the same public
@@ -148,13 +152,13 @@ existing content-specific placement.
 
 The leading navigation column has three durable presentation states. Expanded
 shows the complete named-view and List tree. Collapsed retains a narrow rail
-with an explicit expand action, the seven named-view icons, and a Lists action;
-each action exposes the same derived count in a Tooltip, and Lists opens the
-complete editable tree in a collision-aware, internally scrollable Popover.
-Hidden removes the navigation column from inline layout. The first action in
-the Planner header targets this navigation column, so it can restore either a
-collapsed or hidden column while the Planner column's own collapse action stays
-at the far end of the header.
+with the seven named-view icons and a Lists action, but no duplicate expand
+control or separator; each action exposes the same derived count in a Tooltip,
+and Lists opens the complete editable tree in a collision-aware, internally
+scrollable Popover. Hidden removes the navigation column from inline layout.
+The first action in the Planner header targets this navigation column, so it
+can restore either a collapsed or hidden column while the Planner column's own
+collapse action stays at the far end of the header.
 
 On wide and fixed canvases, a collapsed or hidden navigation column can preview
 its complete expanded content as a full-height overlay. The edge trigger opens

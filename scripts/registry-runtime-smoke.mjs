@@ -212,6 +212,17 @@ void startArchive().catch(error => { queueMicrotask(() => { throw error; }); });
       );
       if (
         !(await page.evaluate(() => {
+          const styles = getComputedStyle(document.documentElement);
+          const accent = styles.getPropertyValue("--ui-tasks-accent").trim();
+          const primary = styles.getPropertyValue("--primary").trim();
+          return accent !== "" && accent === primary;
+        }))
+      )
+        throw Error(
+          "Archive stylesheet did not install the Tasks role tokens",
+        );
+      if (
+        !(await page.evaluate(() => {
           const root = document.getElementById("storybook-root");
           return (
             root
