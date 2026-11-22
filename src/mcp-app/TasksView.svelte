@@ -144,6 +144,27 @@
     canvas.clear();
   }
 
+  function dismissInlineDetails(event: Event) {
+    if (!(event.target instanceof Element)) return;
+    if (
+      event.target.closest(
+        '[data-mcp-inline-task], dialog, [role="dialog"], [role="alertdialog"], [popover]',
+      )
+    )
+      return;
+    closeDetails();
+  }
+
+  $effect(() => {
+    if (details !== "inline" || prompt) return;
+    document.addEventListener("pointerdown", dismissInlineDetails, true);
+    document.addEventListener("focusin", dismissInlineDetails, true);
+    return () => {
+      document.removeEventListener("pointerdown", dismissInlineDetails, true);
+      document.removeEventListener("focusin", dismissInlineDetails, true);
+    };
+  });
+
   function requestDetails(path: string, presentation: "inline" | "column") {
     const movingWhileReading = readingTask && selectedPath === path;
     if ((busy && !movingWhileReading) || prompt || uncertain || !canCall)
@@ -412,7 +433,6 @@
     controller={canvas}
     class="tasks-canvas"
     aria-label="Task planner"
-    compactBreakpoint={640}
   >
     <ColumnCanvas.Column id="planner" columnTitle="Lapis Tasks">
       <ColumnCanvas.Header>
@@ -446,6 +466,7 @@
                       ? selected
                       : undefined}
                   <li
+                    data-mcp-inline-task={expanded || undefined}
                     use:checkboxPermissions={row.status === "open" &&
                       !busy &&
                       !prompt &&
@@ -462,9 +483,6 @@
                       {:else if busy}
                         <p role="status">Reading task…</p>
                       {/if}
-                      <Button size="sm" variant="ghost" onclick={closeDetails}
-                        >Close inline details</Button
-                      >
                     {/snippet}
                     <ApplicationPlannerTaskRow
                       task={inlineTask

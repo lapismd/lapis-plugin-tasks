@@ -191,4 +191,7 @@ task sidebar supplies the only border around the details.
 
 Packed consumer acceptance opens the planner's expanded row by double-click,
 reads the saved notes, changes the schedule through its own metadata footer,
-and opens the distinct sidebar with the details button.
+dismisses on a pointer press or focus outside the row, and opens the distinct
+sidebar with the details button. The compact canvas uses the full stage for
+each pane. The sidebar uses the native inset and Mira Properties styles.
+Packed acceptance exercises the permission-scoped Inbox checkbox.

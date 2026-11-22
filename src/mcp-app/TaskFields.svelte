@@ -1,10 +1,8 @@
 <script lang="ts">
-  import { Checkbox } from "@lapismd/design-core/shadcn/checkbox";
-  import * as Collapsible from "@lapismd/design-core/shadcn/collapsible";
-  import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
+  import { FrontmatterEditor } from "@lapismd/mira/preview";
+  import { FrontmatterController } from "@lapismd/mira/preview/frontmatter";
   import * as ScrollArea from "@lapismd/design-core/shadcn/scroll-area";
-  import { Button } from "@lapismd/design-core/shadcn/button";
-  import type { ComponentProps, Snippet } from "svelte";
+  import { untrack, type ComponentProps, type Snippet } from "svelte";
   import ReferenceMarkdownPreview from "../lib/model/ReferenceMarkdownPreview.svelte";
   import TaskDetailExtras from "../lib/tasks/TaskDetailExtras.svelte";
   import { ApplicationTaskSidebarDetail } from "../lib/tasks";
@@ -39,6 +37,57 @@
   } = $props();
 
   const task = $derived(sidebarTask(selected));
+  const inboxEditable = $derived(!disabled && canUse("tasks_inbox"));
+  const properties = new FrontmatterController({
+    async onRecordChange({ record }) {
+      if (
+        inboxEditable &&
+        typeof record.inbox === "boolean" &&
+        record.inbox !== (task.inbox ?? false)
+      ) {
+        await write("tasks_inbox", { inbox: record.inbox });
+      }
+      properties.syncRecord({ inbox: task.inbox ?? false });
+    },
+  });
+
+  $effect(() => {
+    const inbox = task.inbox ?? false;
+    untrack(() => properties.syncRecord({ inbox }));
+  });
+
+  // Mira renders a full property editor. The MCP view exposes only the
+  // Inbox value and has no grant to rename, add, or retype properties.
+  function limitPropertyControls(node: HTMLElement, editable: boolean) {
+    function syncControls() {
+      for (const button of node.querySelectorAll<HTMLButtonElement>(
+        ".metadata-add-property, .metadata-property-type-button",
+      )) {
+        button.disabled = true;
+      }
+      for (const name of node.querySelectorAll<HTMLInputElement>(
+        ".metadata-property-key input",
+      )) {
+        name.readOnly = true;
+        name.tabIndex = -1;
+      }
+      const inbox = node.querySelector<HTMLInputElement>(
+        '[data-property="inbox"] input[type="checkbox"]',
+      );
+      if (inbox) inbox.disabled = !editable;
+    }
+
+    const observer = new MutationObserver(syncControls);
+    observer.observe(node, { childList: true, subtree: true });
+    syncControls();
+    return {
+      update(next: boolean) {
+        editable = next;
+        syncControls();
+      },
+      destroy: () => observer.disconnect(),
+    };
+  }
 </script>
 
 <ApplicationTaskSidebarDetail
@@ -64,34 +113,18 @@
   {/snippet}
   {#snippet documentBody()}
     <ScrollArea.Root aria-label="Task properties and notes">
-      <Collapsible.Root>
-        <Collapsible.Trigger>
-          {#snippet child({ props })}
-            <Button {...props} variant="ghost">
-              <ChevronRightIcon aria-hidden="true" />
-              Properties
-            </Button>
-          {/snippet}
-        </Collapsible.Trigger>
-        <Collapsible.Content>
-          {#if canUse("tasks_inbox")}
-            <label>
-              <Checkbox
-                checked={task.inbox ?? false}
-                {disabled}
-                onCheckedChange={(inbox) =>
-                  void write("tasks_inbox", { inbox })}
-              />
-              In Inbox
-            </label>
-          {:else}
-            <p>{task.inbox ? "In Inbox" : "Outside Inbox"}</p>
-          {/if}
-        </Collapsible.Content>
-      </Collapsible.Root>
-      {#if task.notes.trim()}
-        <ReferenceMarkdownPreview value={task.notes} compact />
-      {/if}
+      <div class="task-sidebar-detail__scroll-content">
+        <div
+          class="mira"
+          data-mira-theme="obsidian"
+          use:limitPropertyControls={inboxEditable}
+        >
+          <FrontmatterEditor controller={properties} open={false} />
+        </div>
+        {#if task.notes.trim()}
+          <ReferenceMarkdownPreview value={task.notes} compact />
+        {/if}
+      </div>
     </ScrollArea.Root>
   {/snippet}
 </ApplicationTaskSidebarDetail>

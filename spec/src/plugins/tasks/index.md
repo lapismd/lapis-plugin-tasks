@@ -320,4 +320,10 @@ saved-version checks and journaled completion. No browser network permission is
 needed to load the inline resource. The embedded planner uses a 32rem canvas
 and insets the task list from the column edges. The native sidebar supplies
 the only frame around the right-column details. Inline details use the planner
-row’s expanded notes and metadata surface.
+row’s expanded notes and metadata surface. A pointer press or focus move
+outside the expanded row dismisses it, while its popovers and dialogs keep it
+open. The right-hand notes use the native sidebar document inset. The
+standalone resource bundles the same Mira Properties component as the host
+Markdown surface. Only the granted Inbox value can be changed. The canvas
+uses the native compact breakpoint and scroll snapping so each pane fills the
+available stage in compact mode.
