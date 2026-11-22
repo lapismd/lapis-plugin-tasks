@@ -409,5 +409,6 @@ recurrence. Merely finding the option in the DOM does not establish readiness.
 The Task sidebar accepts an optional control policy for embedded hosts. It
 keeps its native title, completion and metadata components while disabling
 actions outside the host’s grant. The Tasks MCP App uses the native planner
-row, sidebar detail and Column Canvas. Double-click opens the detail inline.
+row, sidebar detail and Column Canvas. Double-click expands the native preview row
+with saved notes and its permission-scoped metadata footer.
 The details button opens it in the right column.

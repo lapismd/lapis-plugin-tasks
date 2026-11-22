@@ -8,7 +8,11 @@
   import ReferenceMarkdownPreview from "../lib/model/ReferenceMarkdownPreview.svelte";
   import TaskDetailExtras from "../lib/tasks/TaskDetailExtras.svelte";
   import { ApplicationTaskSidebarDetail } from "../lib/tasks";
-  import { sidebarTask, type SavedTask } from "./task-data";
+  import {
+    editableTaskMetadata,
+    sidebarTask,
+    type SavedTask,
+  } from "./task-data";
 
   type DetailPatch = Parameters<
     NonNullable<
@@ -35,14 +39,6 @@
   } = $props();
 
   const task = $derived(sidebarTask(selected));
-  const editableMetadata = $derived(
-    disabled
-      ? []
-      : [
-          ...(canUse("tasks_plan") ? ["when", "at"] : []),
-          ...(canUse("tasks_deadline") ? ["due-at"] : []),
-        ],
-  );
 </script>
 
 <ApplicationTaskSidebarDetail
@@ -54,7 +50,7 @@
     title: false,
     menu: false,
     completion: !disabled && task.status === "open" && canUse("tasks_complete"),
-    editableMetadata,
+    editableMetadata: editableTaskMetadata(canUse, disabled),
   }}
   documentBodyEnabled
   onUpdateTask={(_, patch) => onMetadataChange(patch)}

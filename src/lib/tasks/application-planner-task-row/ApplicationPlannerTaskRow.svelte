@@ -47,6 +47,8 @@
     editable = true,
     deletable = true,
     notesContent,
+    editableMetadata,
+    showFooterActions,
     /**
      * When true, plain clicks on the preview surface/title select the row
      * instead of starting title edit (used while a host detail panel is open).
@@ -83,6 +85,8 @@
     editable?: boolean;
     deletable?: boolean;
     notesContent?: Snippet;
+    editableMetadata?: readonly string[];
+    showFooterActions?: boolean;
     selectOnSurfaceClick?: boolean;
     areaOptions?: TaskListPickerOptionInput[];
     onRequestOpen?: (
@@ -391,6 +395,8 @@
       {reorderable}
       {editable}
       {notesContent}
+      {editableMetadata}
+      {showFooterActions}
       isExpanded={expanded}
       isClosing={closing}
       {areaOptions}

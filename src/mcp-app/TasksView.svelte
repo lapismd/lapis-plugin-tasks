@@ -5,6 +5,8 @@
   } from "../lib/tasks";
   import * as ColumnCanvas from "@lapismd/design-core/shadcn/column-canvas";
   import RefreshCwIcon from "@lucide/svelte/icons/refresh-cw";
+  import { getTaskNotes } from "../lib/model";
+  import ReferenceMarkdownPreview from "../lib/model/ReferenceMarkdownPreview.svelte";
   import { Button } from "@lapismd/design-core/shadcn/button";
   import { onMount, type ComponentProps } from "svelte";
   import { z } from "zod";
@@ -18,6 +20,7 @@
     allowedTools,
     checkboxPermissions,
     completionResult,
+    editableTaskMetadata,
     invocationId,
     listInput,
     listResult,
@@ -386,20 +389,6 @@
   <ColumnCanvas.Close onclick={closeDetails} />
 {/snippet}
 
-{#snippet detailFields(closeAction: import("svelte").Snippet)}
-  {#if selected?.snapshot.path === selectedPath}
-    <TaskFields
-      {selected}
-      disabled={busy || stale || Boolean(uncertain)}
-      {canUse}
-      {write}
-      {complete}
-      {closeAction}
-      onMetadataChange={(patch) => void updateDetail(patch)}
-    />
-  {/if}
-{/snippet}
-
 <main class="tasks-app">
   {#if notice}<p class="message" role="status">{notice}</p>{/if}
   {#if error}<p class="message" role="alert">{error}</p>{/if}
@@ -450,6 +439,12 @@
             {#if rows.length}
               <ul aria-label="Tasks" inert={Boolean(uncertain)}>
                 {#each rows as row (row.documentPath)}
+                  {@const expanded =
+                    details === "inline" && selectedPath === row.documentPath}
+                  {@const inlineTask =
+                    expanded && selected?.snapshot.path === row.documentPath
+                      ? selected
+                      : undefined}
                   <li
                     use:checkboxPermissions={row.status === "open" &&
                       !busy &&
@@ -457,16 +452,24 @@
                       canUse("tasks_complete") &&
                       !(stale && selectedPath === row.documentPath)}
                   >
-                    {#snippet closeInline()}
+                    {#snippet inlineNotes()}
+                      {#if inlineTask}
+                        <ReferenceMarkdownPreview
+                          value={getTaskNotes(inlineTask.task.body)}
+                          empty="Notes"
+                          compact
+                        />
+                      {:else if busy}
+                        <p role="status">Reading task…</p>
+                      {/if}
                       <Button size="sm" variant="ghost" onclick={closeDetails}
                         >Close inline details</Button
                       >
                     {/snippet}
-                    {#snippet inlineDetails()}
-                      {@render detailFields(closeInline)}
-                    {/snippet}
                     <ApplicationPlannerTaskRow
-                      task={plannerTask(row)}
+                      task={inlineTask
+                        ? { ...plannerTask(row), ...sidebarTask(inlineTask) }
+                        : plannerTask(row)}
                       selected={selectedPath === row.documentPath}
                       selectionPosition={selectedPath === row.documentPath
                         ? "single"
@@ -475,8 +478,18 @@
                         Boolean(
                           row.planDate && row.planDate < localDate(new Date()),
                         )}
-                      expanded={details === "inline" &&
-                        selectedPath === row.documentPath}
+                      {expanded}
+                      editableMetadata={expanded
+                        ? editableTaskMetadata(
+                            canUse,
+                            !inlineTask ||
+                              busy ||
+                              stale ||
+                              prompt ||
+                              Boolean(uncertain),
+                          )
+                        : undefined}
+                      showFooterActions={false}
                       reorderable={false}
                       deletable={false}
                       editable={canUse("tasks_plan") &&
@@ -491,10 +504,12 @@
                           row.documentPath,
                           source === "details-button" ? "column" : "inline",
                         )}
-                      notesContent={inlineDetails}
+                      notesContent={inlineNotes}
                       onToggleDone={(_, event) => void toggleTask(row, event)}
                       onUpdateTask={(_, patch) =>
-                        void updateSchedule(row, patch)}
+                        expanded
+                          ? void updateDetail(patch)
+                          : void updateSchedule(row, patch)}
                       onLoadChecklist={() => loadChecklist(row.documentPath)}
                     />
                   </li>
@@ -515,7 +530,17 @@
       columnTitle="Task details"
       class="task-detail-column"
     >
-      {@render detailFields(closeColumn)}
+      {#if selected?.snapshot.path === selectedPath}
+        <TaskFields
+          {selected}
+          disabled={busy || stale || Boolean(uncertain)}
+          {canUse}
+          {write}
+          {complete}
+          closeAction={closeColumn}
+          onMetadataChange={(patch) => void updateDetail(patch)}
+        />
+      {/if}
     </ColumnCanvas.Column>
   </ColumnCanvas.Root>
 

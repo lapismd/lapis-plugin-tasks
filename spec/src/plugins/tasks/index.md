@@ -319,4 +319,5 @@ resource URI and exact tool dependencies. The UI uses AppBridge and preserves
 saved-version checks and journaled completion. No browser network permission is
 needed to load the inline resource. The embedded planner uses a 32rem canvas
 and insets the task list from the column edges. The native sidebar supplies
-the only frame around the details.
+the only frame around the right-column details. Inline details use the planner
+row’s expanded notes and metadata surface.

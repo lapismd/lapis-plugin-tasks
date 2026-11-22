@@ -186,6 +186,18 @@ export function checkboxPermissions(
   };
 }
 
+export function editableTaskMetadata(
+  canUse: (name: string) => boolean,
+  disabled: boolean,
+): string[] {
+  return disabled
+    ? []
+    : [
+        ...(canUse("tasks_plan") ? ["when", "at"] : []),
+        ...(canUse("tasks_deadline") ? ["due-at"] : []),
+      ];
+}
+
 export function sidebarTask(
   saved: SavedTask,
 ): ComponentProps<typeof ApplicationTaskSidebarDetail>["task"] {
