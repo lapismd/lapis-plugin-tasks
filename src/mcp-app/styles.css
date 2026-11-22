@@ -1,0 +1,13 @@
+@import "@lapismd/design-core/styles.css";
+@import "@lapismd/design-core/themes/lapis.css";
+
+html {
+  color-scheme: light dark;
+  --mcp-canvas: light-dark(#fff, var(--ui-tasks-background, Canvas));
+  background: var(--mcp-canvas);
+}
+
+body {
+  margin: 0;
+  background: var(--mcp-canvas);
+}

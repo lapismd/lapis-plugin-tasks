@@ -312,3 +312,9 @@ recurrence story retains its visibility and selection assertions.
 The source-owned [dependency automation](dependency-automation.md) chapter binds
 only the Core development catalog under LPT-SPEC-025. Its public runtime peers
 remain unchanged, and the required full audit blocks unapproved findings.
+
+The package exports `./mcp-apps.json` for hosts that serve MCP Apps. The
+manifest beside the single-file Tasks UI declares its provider, list operation,
+resource URI and exact tool dependencies. The UI uses AppBridge and preserves
+saved-version checks and journaled completion. No browser network permission is
+needed to load the inline resource.

@@ -484,3 +484,7 @@ retains the reviewed development-coordinate workspace digest.
 HIGH admission MUST remain disabled until exact user approval; it ends
 November19 at00:00UTC or a fix, whichever comes first.
 Existing LOW acceptance and every other gate remain; no approval transfers.
+
+Package preparation builds the Tasks MCP application as a standalone HTML
+resource, checks the declared operations against the Tasks catalog, and
+includes the resource and its manifest in the published npm artifact.

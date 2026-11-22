@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "provider": "tasks",
+  "apps": [
+    {
+      "operation": "list",
+      "actions": ["get", "plan", "deadline", "inbox", "complete", "inspect"],
+      "resourceUri": "ui://lapis/tasks/task-list-v1",
+      "title": "Lapis Tasks",
+      "file": "tasks.html"
+    }
+  ]
+}

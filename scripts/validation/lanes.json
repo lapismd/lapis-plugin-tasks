@@ -13,7 +13,7 @@
   "test:storybook": "node scripts/test-storybook-batches.mjs",
   "build-storybook": "NODE_OPTIONS=\"${NODE_OPTIONS:---max-old-space-size=8192}\" storybook build --config-dir .storybook --output-dir storybook-static",
   "publint": "pnpm run prepack",
-  "prepack": "svelte-package --tsconfig ./tsconfig.pack.json && publint",
+  "prepack": "svelte-package --tsconfig ./tsconfig.pack.json && node scripts/build-mcp-app.mjs && publint",
   "spec:build": "node scripts/dependency-automation/spec-policy.mjs build",
   "spec:check": "pnpm check:dependency-intake && pnpm check:validation-routing && pnpm check:storybook-parity && node scripts/dependency-automation/spec-policy.mjs check && pnpm check:app-ownership",
   "spec:first": "node scripts/dependency-automation/spec-policy.mjs first",

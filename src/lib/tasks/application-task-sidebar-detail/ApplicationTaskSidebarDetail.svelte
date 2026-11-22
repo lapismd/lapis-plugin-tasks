@@ -27,6 +27,8 @@
 
   let {
     task,
+    regionLabel,
+    busy = false,
     creatorLabel,
     extras,
     availableMenuActions = [],
@@ -39,6 +41,7 @@
     documentBodyEnabled = false,
     now = undefined,
     messages,
+    controls,
     onToggleDone = () => {},
     onUpdateTitle = () => {},
     onUpdateTask = () => {},
@@ -47,6 +50,8 @@
     onMenuAction,
   }: {
     task: Task;
+    regionLabel?: string;
+    busy?: boolean;
     creatorLabel?: string;
     extras?: Snippet;
     availableMenuActions?: string[];
@@ -60,7 +65,14 @@
     documentBodyEnabled?: boolean;
     now?: Date;
     messages?: Snippet;
-    onToggleDone?: (task: Task) => void;
+    /** Keep native detail chrome while restricting embedded hosts to their own operations. */
+    controls?: {
+      title?: boolean;
+      completion?: boolean;
+      menu?: boolean;
+      editableMetadata?: readonly string[];
+    };
+    onToggleDone?: (task: Task, event: Event) => void;
     onUpdateTitle?: (task: Task, title: string) => void;
     onUpdateTask?: (task: Task, patch: Partial<ApplicationTask>) => void;
     onRemoveTask?: (task: Task) => void;
@@ -138,6 +150,7 @@
   });
 
   function commitTitle() {
+    if (controls?.title === false) return;
     const next = (titleEditor?.textContent ?? "").replace(/\s+/g, " ").trim();
     if (!next || next === task.title) {
       if (titleEditor) titleEditor.textContent = task.title;
@@ -187,6 +200,9 @@
 
 <div
   class="task-sidebar-detail"
+  role={regionLabel ? "region" : undefined}
+  aria-label={regionLabel}
+  aria-busy={busy || undefined}
   data-task-sidebar-detail
   data-task-id={task.id}
   data-task-status={statusTone}
@@ -213,6 +229,7 @@
                   variant="ghost"
                   size="icon"
                   class="task-sidebar-detail__icon-button"
+                  disabled={controls?.menu === false}
                   aria-label="Task actions"
                   title="Task actions"><EllipsisVerticalIcon /></Button
                 >{/snippet}
@@ -272,14 +289,16 @@
         Boolean(task.completedAt)
           ? "Mark task incomplete"
           : "Mark task done"}
-        onchange={() => onToggleDone(task)}
+        disabled={controls?.completion === false}
+        onchange={(event) => onToggleDone(task, event)}
       />
       <div
         bind:this={titleEditor}
         class="task-sidebar-detail__title"
-        contenteditable="plaintext-only"
+        contenteditable={controls?.title === false ? "false" : "plaintext-only"}
+        aria-readonly={controls?.title === false ? "true" : undefined}
         role="textbox"
-        tabindex="0"
+        tabindex={controls?.title === false ? -1 : 0}
         aria-label="Task title"
         aria-multiline="false"
         spellcheck="true"
@@ -293,6 +312,7 @@
         task={metadataTask}
         {areaOptions}
         {now}
+        editableFields={controls?.editableMetadata}
         onChange={updateTaskMetadata}
       />
     </div>

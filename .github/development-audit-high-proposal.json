@@ -22,8 +22,8 @@
   },
   "bindings": {
     "sourceSha": "a86b18bde00a8cb744518ad65d46d4fa87da8ecb",
-    "manifestSha256": "2de3dc5324c55d746ae8ac630e40e71856080aad69f978edae01eab05e876e52",
-    "lockSha256": "81ac49f21c62a22ebc825767d57327406a6c5e89b594a013025b7f3e382b4efa",
+    "manifestSha256": "8079b326d805ba4ad0df1d3e01ed3cc32a0bf5012c63f6066eb5b4c5ccfdbe72",
+    "lockSha256": "39b599c56ba94e9113add529989d42f5423932c320189000388b2ad15f7b9f06",
     "workspaceSha256": "68d7334df07919bb8a556d36063b520005259954c9361b4e07af980d66b731b9"
   },
   "rawFullCounts": {

@@ -178,3 +178,9 @@ new release rather than replacing an existing immutable published artifact.
 Visual Delta development intake `0.1.5` retains the published Tasks `0.1.4`
 runtime contract. [Qualification](../records/2026-11-14-visual-delta-015-intake.md)
 records the original two missing canonical-chapter findings and their repair.
+
+The packed Tasks MCP App reuses the native planner row, sidebar and comments
+components. The Tasks consumer checks native start records, and the Server
+catalog opens the same packed document at narrow and desktop widths. The
+catalog verifies inline expansion, the right-hand detail column, disabled
+vault actions, and tracked completion.

@@ -2,7 +2,7 @@
   import { Button } from "@lapismd/design-core/shadcn/button";
   import { Textarea } from "@lapismd/design-core/shadcn/textarea";
   import * as Chat from "@lapismd/design-core/ai/chat";
-  import { MarkdownComposer } from "@lapismd/design-core/chat";
+  import type { MarkdownComposer } from "@lapismd/design-core/chat";
   import * as Accordion from "@lapismd/design-core/shadcn/accordion";
   import * as Empty from "@lapismd/design-core/shadcn/empty";
   import CheckIcon from "@lucide/svelte/icons/check";
@@ -25,15 +25,19 @@
   let {
     task,
     repository,
+    snapshotComments = [],
+    composer: Composer,
     revision = 0,
     onBeforeMutation,
     onRefresh,
   }: {
     task: Task;
-    repository: TaskRepository;
+    repository?: TaskRepository;
+    snapshotComments?: TaskComment[];
+    composer?: typeof MarkdownComposer;
     revision?: number;
-    onBeforeMutation: () => Promise<void>;
-    onRefresh: () => void | Promise<void>;
+    onBeforeMutation?: () => Promise<void>;
+    onRefresh?: () => void | Promise<void>;
   } = $props();
   let comments = $state<TaskComment[]>([]);
   let openSections = $state<string[]>([]);
@@ -47,7 +51,7 @@
   let busy = $state(false);
   let generation = 0;
   let disclosurePath: string | null = null;
-  const today = $derived(todayDateOnly(repository.now()));
+  const today = $derived(todayDateOnly(repository?.now() ?? new Date()));
   const filteredRows = $derived(filterTaskOccurrenceHistory(rows, filter));
   const statistics = $derived(
     deriveTaskOccurrenceStatistics(
@@ -56,6 +60,7 @@
     ),
   );
   async function load(path: string, period: string) {
+    if (!repository) return;
     const current = ++generation;
     try {
       const document = await repository.getTaskDocument(path);
@@ -86,16 +91,17 @@
     revision;
     const path = task.sourcePath;
     const period = days;
-    if (path) void load(path, period);
+    if (path && repository) void load(path, period);
+    else comments = snapshotComments;
   });
-  async function mutate(action: () => Promise<void>) {
+  async function mutate(action: () => Promise<unknown>) {
     if (busy) return;
     busy = true;
     error = null;
     try {
-      await onBeforeMutation();
+      await onBeforeMutation?.();
       await action();
-      await onRefresh();
+      await onRefresh?.();
       await load(task.sourcePath!, days);
     } catch (cause) {
       error = cause instanceof Error ? cause.message : String(cause);
@@ -106,7 +112,7 @@
   async function post(value: string) {
     if (busy || !value.trim()) return;
     await mutate(async () => {
-      await repository.addComment(task.sourcePath!, value);
+      await repository?.addComment(task.sourcePath!, value);
       // Acknowledge only this successfully persisted snapshot.
       if (draft === value) draft = "";
     });
@@ -228,9 +234,11 @@
                   ><MessageSquareIcon aria-hidden="true" /></Empty.Media
                 >
                 <Empty.Title>No comments yet</Empty.Title>
-                <Empty.Description
-                  >Leave a local comment below.</Empty.Description
-                >
+                {#if repository}
+                  <Empty.Description
+                    >Leave a local comment below.</Empty.Description
+                  >
+                {/if}
               </Empty.Header>
             </Empty.Root>
           {/snippet}
@@ -254,7 +262,7 @@
                       disabled={busy || !editDraft.trim()}
                       onclick={() =>
                         void mutate(async () => {
-                          await repository.updateComment(
+                          await repository?.updateComment(
                             task.sourcePath!,
                             comment.id,
                             { text: editDraft },
@@ -285,7 +293,7 @@
                     <span class="task-detail-extras__actions">
                       {#if comment.editedAt}<span>Edited</span>{/if}
                       {#if comment.resolved}<span>Resolved</span>{/if}
-                      {#if editId !== comment.id}
+                      {#if repository && editId !== comment.id}
                         <Button
                           variant="ghost"
                           size="icon-xs"
@@ -309,7 +317,7 @@
                             : "Resolve comment"}
                           onclick={() =>
                             void mutate(() =>
-                              repository.updateComment(
+                              repository?.updateComment(
                                 task.sourcePath!,
                                 comment.id,
                                 { resolved: !comment.resolved },
@@ -328,7 +336,7 @@
                           title="Delete comment"
                           onclick={() =>
                             void mutate(() =>
-                              repository.removeComment(
+                              repository?.removeComment(
                                 task.sourcePath!,
                                 comment,
                               ),
@@ -342,14 +350,14 @@
             </Chat.Message>
           {/each}
         </Chat.MessageList>
-        <MarkdownComposer
-          bind:value={draft}
-          label="Task comment composer"
-          inputLabel="Local comment"
-          placeholder="Leave a comment…"
-          disabled={busy}
-          onSubmit={(value) => void post(value)}
-        />
+        {#if repository && Composer}<Composer
+            bind:value={draft}
+            label="Task comment composer"
+            inputLabel="Local comment"
+            placeholder="Leave a comment…"
+            disabled={busy}
+            onSubmit={(value) => void post(value)}
+          />{/if}
       </Accordion.Content>
     </Accordion.Item>
   </Accordion.Root>

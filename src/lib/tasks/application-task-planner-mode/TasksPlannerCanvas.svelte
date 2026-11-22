@@ -9,6 +9,7 @@
   import InboxIcon from "@lucide/svelte/icons/inbox";
   import ListTodoIcon from "@lucide/svelte/icons/list-todo";
   import PencilIcon from "@lucide/svelte/icons/pencil";
+  import { MarkdownComposer } from "@lapismd/design-core/chat";
   import * as ColumnCanvas from "@lapismd/design-core/shadcn/column-canvas";
   import { Button } from "@lapismd/design-core/shadcn/button";
   import * as Popover from "@lapismd/design-core/shadcn/popover";
@@ -1415,6 +1416,7 @@
                 {#if app && repository}<TaskDetailExtras
                     task={detailTask}
                     {repository}
+                    composer={MarkdownComposer}
                     revision={checklistRefreshVersion}
                     onBeforeMutation={() =>
                       flushTaskFileSurfaces(app!, detailTask.sourcePath, true)}
