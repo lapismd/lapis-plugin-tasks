@@ -1,5 +1,11 @@
 # @lapis-notes/lapis-plugin-tasks
 
+## 0.3.0
+
+### Minor Changes
+
+- 16c7d03: Ship a Tasks MCP App contribution using the planner and Task detail components. The packaged manifest declares the list resource and its supported operations. The responsive canvas, inline expansion, detail sidebar and Mira Properties use the native components and keep edits within their MCP grants.
+
 ## 0.2.2
 
 ### Patch Changes

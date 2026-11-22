@@ -1,6 +1,6 @@
 {
   "name": "@lapis-notes/lapis-plugin-tasks",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Lapis Notes Tasks planner, indexing, and catalog",
   "license": "AGPL-3.0-or-later",
   "repository": {
