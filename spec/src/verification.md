@@ -184,3 +184,7 @@ components. The Tasks consumer checks native start records, and the Server
 catalog opens the same packed document at narrow and desktop widths. The
 catalog verifies inline expansion, the right-hand detail column, disabled
 vault actions, and tracked completion.
+
+Server's packed MCP App preview checks that the planner has a 512 px default
+height at the standard root font size and a visible list inset. The native
+task sidebar supplies the only border around the details.

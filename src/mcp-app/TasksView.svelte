@@ -510,7 +510,11 @@
         </div>
       </ColumnCanvas.Body>
     </ColumnCanvas.Column>
-    <ColumnCanvas.Column id="detail" columnTitle="Task details">
+    <ColumnCanvas.Column
+      id="detail"
+      columnTitle="Task details"
+      class="task-detail-column"
+    >
       {@render detailFields(closeColumn)}
     </ColumnCanvas.Column>
   </ColumnCanvas.Root>
@@ -533,10 +537,19 @@
   .tasks-app :global(.tasks-canvas) {
     --ui-column-canvas-background: var(--mcp-canvas);
     --ui-column-canvas-column-background: var(--mcp-canvas);
-    block-size: 27rem;
+    block-size: 32rem;
   }
 
-  .task-list,
+  .tasks-app :global(.task-detail-column[data-ui-part="column"]) {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .task-list {
+    padding: 0.5rem 1rem;
+  }
+
   .tasks-app > :global(.message) {
     padding-inline: 0.75rem;
   }
