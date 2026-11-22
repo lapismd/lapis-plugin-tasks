@@ -195,3 +195,8 @@ dismisses on a pointer press or focus outside the row, and opens the distinct
 sidebar with the details button. The compact canvas uses the full stage for
 each pane. The sidebar uses the native inset and Mira Properties styles.
 Packed acceptance exercises the permission-scoped Inbox checkbox.
+
+`NoDeleteKeepsRowContrast` compares otherwise identical rows with and without
+delete permission. It reproduced 0.6 effective opacity with the same
+`#222222` title token. The corrected row preserves color and full opacity for
+the title, deadline and schedule badge.

@@ -136,7 +136,6 @@
   );
   const showRowControls = $derived(!openSurface && !dragPreview);
   const showRowSwipe = $derived(!openSurface && !dragPreview && deletable);
-  const swipeEnabled = $derived(showRowSwipe && !dragging);
   let swipeOpen = $state<SwipeItemOpen>(null);
 
   function shouldIgnoreRowPointer(
@@ -303,36 +302,40 @@
   tabindex={0}
 >
   <div class="application-planner-task-row__columns">
-    {#if showRowControls}
+    {#if showRowSwipe}
       <SwipeItem.Root
         class="application-planner-task-row__swipe application-planner-task-row__primary"
         bind:open={swipeOpen}
-        disabled={!swipeEnabled}
+        disabled={dragging}
       >
-        {#if deletable}
-          <SwipeItem.Actions
-            side="end"
-            aria-label="Task delete actions"
-            onFullSwipe={removeTask}
+        <SwipeItem.Actions
+          side="end"
+          aria-label="Task delete actions"
+          onFullSwipe={removeTask}
+        >
+          <SwipeItem.Action
+            variant="destructive"
+            size="icon"
+            class="application-planner-task-row__swipe-delete"
+            aria-label={`Remove task ${task.title}`}
+            title={`Remove task ${task.title}`}
+            onclick={removeTask}
           >
-            <SwipeItem.Action
-              variant="destructive"
-              size="icon"
-              class="application-planner-task-row__swipe-delete"
-              aria-label={`Remove task ${task.title}`}
-              title={`Remove task ${task.title}`}
-              onclick={removeTask}
-            >
-              <Trash2Icon />
-            </SwipeItem.Action>
-          </SwipeItem.Actions>
-        {/if}
+            <Trash2Icon />
+          </SwipeItem.Action>
+        </SwipeItem.Actions>
 
         <SwipeItem.Content class="application-planner-task-row__swipe-content">
           {@render primaryColumn()}
         </SwipeItem.Content>
       </SwipeItem.Root>
+    {:else}
+      <div class="application-planner-task-row__primary">
+        {@render primaryColumn()}
+      </div>
+    {/if}
 
+    {#if showRowControls}
       <div class="application-planner-task-row__aside">
         {#if overdue && !applicationTask.done}
           <span
@@ -365,10 +368,6 @@
             <ArrowRightIcon />
           </span>
         </button>
-      </div>
-    {:else}
-      <div class="application-planner-task-row__primary">
-        {@render primaryColumn()}
       </div>
     {/if}
   </div>

@@ -362,7 +362,9 @@ Markdown links. Configuration and plugin changes refresh the registered
 extension stack, and teardown destroys the editor and its listeners. If no
 Markdown editor provider is registered, the surface reports its unavailability.
 
-Runtime action capabilities govern all row controls. Local comments,
+Runtime action capabilities govern all row controls. A row without delete
+permission retains the same title, deadline and badge appearance as a writable
+row and does not mount swipe-to-delete actions. Local comments,
 duplication, supported browser printing, copyable Lapis URLs, direct-child bulk
 actions, recurrence skip, and bounded tracked history are owned by Tasks.
 Logbook retains seven navigation destinations and adds All, Completed, and

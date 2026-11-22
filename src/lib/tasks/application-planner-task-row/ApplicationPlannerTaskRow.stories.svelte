@@ -206,6 +206,55 @@
 </Story>
 
 <Story
+  name="No delete keeps row contrast"
+  tags={["test", "visual-pending"]}
+  parameters={{ a11y: { test: "off" } }}
+  play={async ({ canvasElement }) => {
+    const [deletable, protectedRow] = canvasElement.querySelectorAll<HTMLElement>(
+      "[data-planner-task-id]",
+    );
+    function appearance(row: HTMLElement, selector: string) {
+      const element = row.querySelector<HTMLElement>(selector)!;
+      expect(element).toBeVisible();
+      let opacity = 1;
+      for (
+        let node: HTMLElement | null = element;
+        node;
+        node = node.parentElement
+      ) {
+        opacity *= Number(getComputedStyle(node).opacity);
+        if (node === row) break;
+      }
+      return { color: getComputedStyle(element).color, opacity };
+    }
+    for (const selector of [
+      ".task-line__title",
+      ".task-line__due",
+      ".task-when-picker__trigger",
+    ]) {
+      expect(appearance(protectedRow!, selector)).toEqual(
+        appearance(deletable!, selector),
+      );
+    }
+    expect(
+      within(protectedRow!).queryByRole("button", { name: /^Remove task/ }),
+    ).not.toBeInTheDocument();
+  }}
+>
+  {#snippet template()}
+    {@const task = { ...overdueScheduledTask, dueAt: "2026-08-21" }}
+    <div class="task-story-frame task-story-frame--xl">
+      <ApplicationPlannerTaskRow {task} now={rowStoryNow} />
+      <ApplicationPlannerTaskRow
+        task={{ ...task, id: `${task.id}-protected` }}
+        now={rowStoryNow}
+        deletable={false}
+      />
+    </div>
+  {/snippet}
+</Story>
+
+<Story
   name="Consecutive selection with deadlines"
   tags={["visual-pending", "skip-test", "!test"]}
   parameters={{
