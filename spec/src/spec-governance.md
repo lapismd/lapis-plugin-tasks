@@ -488,3 +488,7 @@ Existing LOW acceptance and every other gate remain; no approval transfers.
 Package preparation builds the Tasks MCP application as a standalone HTML
 resource, checks the declared operations against the Tasks catalog, and
 includes the resource and its manifest in the published npm artifact.
+
+The tracked registry lock resolves the Tasks MCP App dependencies with the
+local package hook disabled, matching the isolated validation worker. Lock
+digest references in the expired audit records track the registry lock.

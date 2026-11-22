@@ -21,7 +21,7 @@ operator's decision, and no renewal or broader ignore is introduced.
 
 Dependency source: `a86b18bde00a8cb744518ad65d46d4fa87da8ecb`.
 Manifest SHA256: `8079b326d805ba4ad0df1d3e01ed3cc32a0bf5012c63f6066eb5b4c5ccfdbe72`.
-Lock SHA256: `39b599c56ba94e9113add529989d42f5423932c320189000388b2ad15f7b9f06`.
+Lock SHA256: `d428f5d117ac4fe3a80ac6c6a2cb82f864614b3345a90a3e016f25309dc2df1e`.
 Workspace SHA256: `68d7334df07919bb8a556d36063b520005259954c9361b4e07af980d66b731b9`.
 The shared collector enforces exact dependency-source/manifest/lock bindings and
 rejects any uncommitted graph input; that source identity covers workspace
