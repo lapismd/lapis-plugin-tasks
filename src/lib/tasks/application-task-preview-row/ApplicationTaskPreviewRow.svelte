@@ -39,6 +39,7 @@
     readonly = false,
     editable = true,
     notesContent,
+    editableMetadata,
     embedded = false,
     reorderable = true,
     showFooterActions = true,
@@ -81,6 +82,7 @@
     readonly?: boolean;
     editable?: boolean;
     notesContent?: Snippet;
+    editableMetadata?: readonly string[];
     embedded?: boolean;
     reorderable?: boolean;
     showFooterActions?: boolean;
@@ -602,8 +604,7 @@
               notesDraft = task.notes ?? "";
               notesInput?.blur();
             }
-          }}
-        ></textarea>
+          }}></textarea>
       {:else if task.notes?.trim()}
         <button
           type="button"
@@ -623,13 +624,14 @@
       {/if}
     </div>
 
-    {#if editable}
+    {#if editable || editableMetadata !== undefined}
       <footer class="task-preview-row__footer">
         <div class="task-preview-row__footer-meta">
           <ApplicationTaskMetadataActionBar
             {task}
             {areaOptions}
             {now}
+            editableFields={editableMetadata}
             onChange={updateFooterTask}
           />
           {#if task.done && task.completedAt}

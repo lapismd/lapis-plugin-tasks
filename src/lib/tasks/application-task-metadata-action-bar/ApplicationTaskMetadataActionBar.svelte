@@ -25,12 +25,14 @@
     areaOptions = [],
     now = undefined,
     class: className = "",
+    editableFields,
     onChange = () => {},
   }: {
     task: ApplicationTask;
     areaOptions?: TaskListPickerOptionInput[];
     now?: Date;
     class?: string;
+    editableFields?: readonly string[];
     onChange?: (task: ApplicationTask) => void;
   } = $props();
 
@@ -270,6 +272,40 @@
       ],
     }),
   );
+  // Keep the existing chip renderers for display while scoped views disable their
+  // edit gestures and focus targets.
+  function scopeFields(
+    node: HTMLDivElement,
+    allowed: readonly string[] | undefined,
+  ) {
+    function apply() {
+      const fields = node.querySelectorAll<HTMLElement>(
+        ".cv-form-field-renderer",
+      );
+      fields.forEach((field, index) => {
+        const name = metadataFormConfig.fields[index]?.id.replace(
+          /^task-metadata-/,
+          "",
+        );
+        field.inert =
+          allowed !== undefined &&
+          (fields.length !== metadataFormConfig.fields.length ||
+            !allowed.includes(name ?? ""));
+      });
+    }
+    const observer = new MutationObserver(apply);
+    observer.observe(node, { childList: true, subtree: true });
+    apply();
+    return {
+      update(next: readonly string[] | undefined) {
+        allowed = next;
+        apply();
+      },
+      destroy() {
+        observer.disconnect();
+      },
+    };
+  }
 </script>
 
 <div
@@ -277,6 +313,7 @@
     .filter(Boolean)
     .join(" ")}
   data-task-metadata-action-bar
+  use:scopeFields={editableFields}
 >
   <StructuredForm
     value={task}

@@ -362,7 +362,9 @@ Markdown links. Configuration and plugin changes refresh the registered
 extension stack, and teardown destroys the editor and its listeners. If no
 Markdown editor provider is registered, the surface reports its unavailability.
 
-Runtime action capabilities govern all row controls. Local comments,
+Runtime action capabilities govern all row controls. A row without delete
+permission retains the same title, deadline and badge appearance as a writable
+row and does not mount swipe-to-delete actions. Local comments,
 duplication, supported browser printing, copyable Lapis URLs, direct-child bulk
 actions, recurrence skip, and bounded tracked history are owned by Tasks.
 Logbook retains seven navigation destinations and adds All, Completed, and
@@ -405,3 +407,10 @@ number query.
 Custom recurrence catalog acceptance waits for the reopened end-condition menu
 option to become visible before selecting After count, then verifies the saved
 recurrence. Merely finding the option in the DOM does not establish readiness.
+
+The Task sidebar accepts an optional control policy for embedded hosts. It
+keeps its native title, completion and metadata components while disabling
+actions outside the host’s grant. The Tasks MCP App uses the native planner
+row, sidebar detail and Column Canvas. Double-click expands the native preview row
+with saved notes and its permission-scoped metadata footer.
+The details button opens it in the right column.
