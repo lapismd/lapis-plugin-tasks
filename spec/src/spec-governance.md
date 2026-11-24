@@ -2,7 +2,7 @@
 
 The native operation adapter is mapped to the owning Tasks runtime chapter.
 Its generated catalog/manifest drift check and provider tests have registered
-Docker validation lanes. Server owns hosted operation acceptance separately.
+Docker validation lanes. Server owns hosted operation acceptance separately. LN-TASK-100/101 uses a separate self-contained headless bundle entry; signed release preparation includes it and rejects imports or oversized handler output, while native-engine acceptance remains separate from browser rendering.
 
 The installable registry runtime uses a dedicated bundle entry that imports the
 published Tasks stylesheet before re-exporting the package API. Bundle

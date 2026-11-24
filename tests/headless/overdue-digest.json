@@ -1,0 +1,121 @@
+{
+  "context": {
+    "pluginId": "tasks",
+    "jobId": "overdue-digest",
+    "runId": "qualified-run",
+    "localDate": "2026-11-24",
+    "scheduledAt": 1795510800000,
+    "occurrence": "daily:2026-11-24"
+  },
+  "state": null,
+  "pages": [
+    {
+      "rows": [
+        {
+          "file": {
+            "path": "overdue.md"
+          },
+          "properties": [
+            {
+              "name": "type",
+              "value": "task"
+            },
+            {
+              "name": "id",
+              "value": "overdue.md"
+            },
+            {
+              "name": "task",
+              "value": {
+                "status": "open",
+                "start": "anytime",
+                "plan": {
+                  "date": "2026-11-23",
+                  "at": "anytime"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "nextCursor": "next"
+    },
+    {
+      "rows": [
+        {
+          "file": {
+            "path": "done.md"
+          },
+          "properties": [
+            {
+              "name": "type",
+              "value": "task"
+            },
+            {
+              "name": "id",
+              "value": "done.md"
+            },
+            {
+              "name": "task",
+              "value": {
+                "status": "completed",
+                "plan": {
+                  "date": "2026-11-23",
+                  "at": "anytime"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "file": {
+            "path": "repeat-skip.md"
+          },
+          "properties": [
+            {
+              "name": "type",
+              "value": "task"
+            },
+            {
+              "name": "id",
+              "value": "repeat-skip.md"
+            },
+            {
+              "name": "task",
+              "value": {
+                "status": "open",
+                "plan": {
+                  "date": "2026-11-20",
+                  "at": "anytime"
+                },
+                "repeat": {
+                  "start": "2026-11-20",
+                  "rrule": "FREQ=DAILY;INTERVAL=3",
+                  "anchor": "schedule",
+                  "missed": "skip"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "expected": [
+    {
+      "action": "notifications.notify",
+      "input": {
+        "id": "overdue-2026-11-24",
+        "title": "Tasks to review",
+        "message": "1 overdue task needs your attention. Open Tasks Review to review them."
+      }
+    },
+    {
+      "action": "state.save",
+      "input": {
+        "notifiedOn": "2026-11-24",
+        "count": 1
+      }
+    }
+  ]
+}
