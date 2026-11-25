@@ -1,5 +1,11 @@
 # @lapis-notes/lapis-plugin-tasks
 
+## 0.4.0
+
+### Minor Changes
+
+- f002127: Package an opt-in daily overdue task digest using native background jobs and the existing recurrence-aware Review rules.
+
 ## 0.3.0
 
 ### Minor Changes
