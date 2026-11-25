@@ -145,3 +145,13 @@ that note; changing dates or viewing an agenda never does. Section placement
 remains derived. Hidden ids retain their position, stale ids are ignored, and
 unlisted tasks use the existing deterministic ordering. This does not reorder
 TaskRun membership links or create habit observations.
+
+## Opt-in overdue digest
+
+LN-TASK-100/101 adds a daily Background jobs declaration. Users approve it in
+host settings, choose their time and IANA time zone, and designate one runner.
+The headless handler queries saved task properties, reconstructs the retained
+Task model and applies `matchesTaskView(..., "review", localDate)`, including
+recurrence state. It publishes one persistent count notification per nonempty
+date and checkpoints that date only after notification publication. It does not
+mutate notes or install its own timer.

@@ -8,6 +8,18 @@ execFileSync(
   ["exec", "vite", "build", "--config", "vite.bundle.config.ts"],
   { stdio: "inherit" },
 );
+execFileSync(
+  "pnpm",
+  ["exec", "vite", "build", "--config", "vite.jobs.config.ts"],
+  { stdio: "inherit" },
+);
+const headless = await readFile(
+  ".release/runtime/jobs/overdue-digest.js",
+  "utf8",
+);
+await init;
+if (Buffer.byteLength(headless) > 1024 * 1024 || parse(headless)[0].length)
+  throw Error("Headless job must be self-contained within 1 MiB");
 await copyFile("manifest.json", ".release/runtime/manifest.json");
 const runtimeStyles = await readFile(".release/runtime/styles.css", "utf8");
 if (!runtimeStyles.includes("--ui-tasks-accent:")) {

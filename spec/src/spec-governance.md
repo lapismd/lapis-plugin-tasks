@@ -2,7 +2,7 @@
 
 The native operation adapter is mapped to the owning Tasks runtime chapter.
 Its generated catalog/manifest drift check and provider tests have registered
-Docker validation lanes. Server owns hosted operation acceptance separately.
+Docker validation lanes. Server owns hosted operation acceptance separately. LN-TASK-100/101 uses a separate self-contained headless bundle entry; signed release preparation includes it and rejects imports or oversized handler output, while native-engine acceptance remains separate from browser rendering.
 
 The installable registry runtime uses a dedicated bundle entry that imports the
 published Tasks stylesheet before re-exporting the package API. Bundle
@@ -474,10 +474,10 @@ current-source hosted qualification remains required before merge.
 
 ## Shared dependency workflow
 
-| ID | Requirement |
-| --- | --- |
+| ID           | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | LPT-SPEC-025 | Compatible Core development intake MUST retain public peer contracts and registry coordinates, verify source-owned policy and exact current catalog facts in two managed chapters, and run the independent offline guard in ordinary quality/check lanes outside specification exemptions. Only a forward0.13 patch may change the development pin, matching override and mechanical lock closure. Named audit evidence, the exact prior catalog `Core <old-development-coordinate>` token—whether the existing historical range or pin—to pinned `Core <new>` and the mapped `Core<version>, runtime versions` token MAY receive only guard-derived substitutions; public compatibility evidence, source identity, authority, approval, expiry and all other bytes MUST remain unchanged. Unrelated source/catalog changes MUST fail. |
-| LPT-SPEC-026 | Successful existing CI/npm and Pages workflows MAY send a completion hint only through the reviewed immutable coordinator implementation and its matching source policy. Verification MUST precede App minting and final dispatch; candidate code/artifacts/caches, callback self-triggers and inherited secrets MUST remain excluded. Source activation and every audit, functional, publication and ownership gate remain separate. |
+| LPT-SPEC-026 | Successful existing CI/npm and Pages workflows MAY send a completion hint only through the reviewed immutable coordinator implementation and its matching source policy. Verification MUST precede App minting and final dispatch; candidate code/artifacts/caches, callback self-triggers and inherited secrets MUST remain excluded. Source activation and every audit, functional, publication and ownership gate remain separate.                                                                                                                                                                                                                                                                                                                                                                                                  |
 
 Core0.13.7, runtime versions and public peers remain unchanged; version guarding
 retains the reviewed development-coordinate workspace digest.
@@ -492,3 +492,7 @@ includes the resource and its manifest in the published npm artifact.
 The tracked registry lock resolves the Tasks MCP App dependencies with the
 local package hook disabled, matching the isolated validation worker. Lock
 digest references in the expired audit records track the registry lock.
+
+The background-job development host MUST resolve i18next at or above26.3.4
+through its released API peer range. Raw production and complete development
+audits remain blocking; expired or absent advisories MUST NOT inherit approval.
