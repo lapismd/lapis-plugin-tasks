@@ -22,7 +22,7 @@
   },
   "bindings": {
     "sourceSha": "a86b18bde00a8cb744518ad65d46d4fa87da8ecb",
-    "manifestSha256": "bb3ddde3e6cc8a0ba182dc843a8378aca05878fb5e28acb4a36d3ef4a7d0f415",
+    "manifestSha256": "d1a31170ed358015fc553390e020c68667da037a5ccaed4230353e0de58d6667",
     "lockSha256": "4500e8bc6ea11e04281d29048386ed3862e39984d37fabca7508d5c702740e92",
     "workspaceSha256": "68d7334df07919bb8a556d36063b520005259954c9361b4e07af980d66b731b9"
   },

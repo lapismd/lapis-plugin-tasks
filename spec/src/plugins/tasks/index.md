@@ -35,7 +35,7 @@ owner archive acceptance under LPT-SPEC-014 proves source compatibility only;
 final consumer acceptance requires the released Plugins cohort with no archive
 projection. Runtime API adoption adds no ambient App state or consumer casts.
 
-Release package and runtime manifest version: `0.3.0`. Changesets synchronizes
+Release package and runtime manifest version: `0.4.0`. Changesets synchronizes
 those versions under LPT-SPEC-021. GitHub CI fans Governance, Quality, Unit tests,
 Native, Static Storybook and three interaction shards through Docker, followed
 by Dependency audits. Validate remains required before source/version merges and
@@ -338,3 +338,8 @@ available stage in compact mode.
 The development host MUST use the patched i18next26 peer supported by the
 released API, with raw complete and production audits remaining blocking.
 This dependency intake does not extend expired audit approvals.
+
+Release version changes MUST refresh exact inactive audit graph bindings without
+renewing expired authorization or enabling a disabled proposal. The
+[0.4.0 binding receipt](../../../records/2026-11-25-background-release-bindings.md)
+retains the original failure and exact retry.

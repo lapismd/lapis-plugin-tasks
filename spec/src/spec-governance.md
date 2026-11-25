@@ -496,3 +496,9 @@ digest references in the expired audit records track the registry lock.
 The background-job development host MUST resolve i18next at or above26.3.4
 through its released API peer range. Raw production and complete development
 audits remain blocking; expired or absent advisories MUST NOT inherit approval.
+
+The 0.4.0 version-only manifest change refreshes inactive graph bindings for
+the disabled proposal, expired decision and negative fixture. Original authority,
+approval dates, expiry and source identity remain fixed; no authorization is
+renewed. The [release binding receipt](../records/2026-11-25-background-release-bindings.md)
+retains the original exact failure and retry evidence.
