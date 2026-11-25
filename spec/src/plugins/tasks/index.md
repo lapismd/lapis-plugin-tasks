@@ -338,3 +338,8 @@ available stage in compact mode.
 The development host MUST use the patched i18next26 peer supported by the
 released API, with raw complete and production audits remaining blocking.
 This dependency intake does not extend expired audit approvals.
+
+Release version changes MUST refresh exact inactive audit graph bindings without
+renewing expired authorization or enabling a disabled proposal. The
+[0.4.0 binding receipt](../../../records/2026-11-25-background-release-bindings.md)
+retains the original failure and exact retry.
