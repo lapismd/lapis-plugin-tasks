@@ -334,3 +334,7 @@ available stage in compact mode.
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | LN-TASK-100 | Tasks MUST package an opt-in daily headless overdue digest with metadata-read and notification permissions only. Its bundled ESM handler MUST be self-contained and MUST NOT import host, network or renderer modules.                                                                                                |
 | LN-TASK-101 | The digest MUST use the retained Review matcher and recurrence evaluation with the native schedule's local date. It MUST scan all metadata pages, notify once per nonempty local date, and stay quiet for empty Review results. A failed or cancelled scan MUST NOT publish a partial count or successful checkpoint. |
+
+The development host MUST use the patched i18next26 peer supported by the
+released API, with raw complete and production audits remaining blocking.
+This dependency intake does not extend expired audit approvals.

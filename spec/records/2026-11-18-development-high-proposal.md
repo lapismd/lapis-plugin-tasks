@@ -20,8 +20,8 @@ hours from actual approval. No timestamp or authority is supplied before the
 operator's decision, and no renewal or broader ignore is introduced.
 
 Dependency source: `a86b18bde00a8cb744518ad65d46d4fa87da8ecb`.
-Manifest SHA256: `f5a93b4dee64f6b705d0eb1c4d1996982caf9591ef4b0807b5d6d9317daf3c4c`.
-Lock SHA256: `c16023ef00cd616b0d708a8d6dfdc04e59c76170394e560df983c936330ba314`.
+Manifest SHA256: `bb3ddde3e6cc8a0ba182dc843a8378aca05878fb5e28acb4a36d3ef4a7d0f415`.
+Lock SHA256: `4500e8bc6ea11e04281d29048386ed3862e39984d37fabca7508d5c702740e92`.
 Workspace SHA256: `68d7334df07919bb8a556d36063b520005259954c9361b4e07af980d66b731b9`.
 The shared collector enforces exact dependency-source/manifest/lock bindings and
 rejects any uncommitted graph input; that source identity covers workspace
